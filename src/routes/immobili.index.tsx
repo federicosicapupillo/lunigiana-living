@@ -39,7 +39,7 @@ const CATEGORIES: { id: PropertyCategory | "tutti"; label: string }[] = [
 type SortKey = "featured" | "price-asc" | "price-desc";
 
 function ImmobiliPage() {
-  const { properties: allProperties } = Route.useLoaderData();
+  const { properties: allProperties } = Route.useLoaderData() as { properties: PublicProperty[] };
   const uniqueLocations = useMemo(
     () => Array.from(new Set(allProperties.map((p) => p.location).filter(Boolean))).sort(),
     [allProperties],
@@ -95,7 +95,7 @@ function ImmobiliPage() {
                 className="rounded-sm border border-border bg-card px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary"
               >
                 <option value="tutte">Tutti i comuni</option>
-                {uniqueLocations.map((l) => (
+                {uniqueLocations.map((l: string) => (
                   <option key={l} value={l}>{l}</option>
                 ))}
               </select>
