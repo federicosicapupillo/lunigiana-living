@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TerritoriRouteImport } from './routes/territori'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ServiziRouteImport } from './routes/servizi'
 import { Route as ImmobiliRouteImport } from './routes/immobili'
 import { Route as ContattiRouteImport } from './routes/contatti'
@@ -19,6 +20,11 @@ import { Route as IndexRouteImport } from './routes/index'
 const TerritoriRoute = TerritoriRouteImport.update({
   id: '/territori',
   path: '/territori',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ServiziRoute = ServiziRouteImport.update({
@@ -53,6 +59,7 @@ export interface FileRoutesByFullPath {
   '/contatti': typeof ContattiRoute
   '/immobili': typeof ImmobiliRoute
   '/servizi': typeof ServiziRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/territori': typeof TerritoriRoute
 }
 export interface FileRoutesByTo {
@@ -61,6 +68,7 @@ export interface FileRoutesByTo {
   '/contatti': typeof ContattiRoute
   '/immobili': typeof ImmobiliRoute
   '/servizi': typeof ServiziRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/territori': typeof TerritoriRoute
 }
 export interface FileRoutesById {
@@ -70,6 +78,7 @@ export interface FileRoutesById {
   '/contatti': typeof ContattiRoute
   '/immobili': typeof ImmobiliRoute
   '/servizi': typeof ServiziRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/territori': typeof TerritoriRoute
 }
 export interface FileRouteTypes {
@@ -80,9 +89,17 @@ export interface FileRouteTypes {
     | '/contatti'
     | '/immobili'
     | '/servizi'
+    | '/sitemap.xml'
     | '/territori'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/chi-siamo' | '/contatti' | '/immobili' | '/servizi' | '/territori'
+  to:
+    | '/'
+    | '/chi-siamo'
+    | '/contatti'
+    | '/immobili'
+    | '/servizi'
+    | '/sitemap.xml'
+    | '/territori'
   id:
     | '__root__'
     | '/'
@@ -90,6 +107,7 @@ export interface FileRouteTypes {
     | '/contatti'
     | '/immobili'
     | '/servizi'
+    | '/sitemap.xml'
     | '/territori'
   fileRoutesById: FileRoutesById
 }
@@ -99,6 +117,7 @@ export interface RootRouteChildren {
   ContattiRoute: typeof ContattiRoute
   ImmobiliRoute: typeof ImmobiliRoute
   ServiziRoute: typeof ServiziRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TerritoriRoute: typeof TerritoriRoute
 }
 
@@ -109,6 +128,13 @@ declare module '@tanstack/react-router' {
       path: '/territori'
       fullPath: '/territori'
       preLoaderRoute: typeof TerritoriRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/servizi': {
@@ -155,6 +181,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContattiRoute: ContattiRoute,
   ImmobiliRoute: ImmobiliRoute,
   ServiziRoute: ServiziRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   TerritoriRoute: TerritoriRoute,
 }
 export const routeTree = rootRouteImport
