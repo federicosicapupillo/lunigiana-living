@@ -145,7 +145,6 @@ function ImmobiliPage() {
           <div className="mt-10">
             <PropertySearchBar
               comuni={uniqueLocations}
-              navigateOnSubmit={false}
               initial={{
                 contract: (urlSearch.contract === "vendita" || urlSearch.contract === "affitto") ? urlSearch.contract : "",
                 featured: urlSearch.featured === "1",
@@ -158,21 +157,6 @@ function ImmobiliPage() {
                 features: urlSearch.features ? urlSearch.features.split(",").filter(Boolean) : [],
                 sort: urlSearch.sort || "recent",
               }}
-              onSubmit={(v) => {
-                const search: Record<string, string> = {};
-                if (v.contract) search.contract = v.contract;
-                if (v.featured) search.featured = "1";
-                if (v.type) search.type = v.type;
-                if (v.comune) search.comune = v.comune;
-                if (v.price_min) search.price_min = v.price_min;
-                if (v.price_max) search.price_max = v.price_max;
-                if (v.size) search.size = v.size;
-                if (v.rooms) search.rooms = v.rooms;
-                if (v.features.length) search.features = v.features.join(",");
-                if (v.sort && v.sort !== "recent") search.sort = v.sort;
-                navigateReplace(search);
-              }}
-              onReset={() => navigateReplace({})}
             />
           </div>
         </div>
