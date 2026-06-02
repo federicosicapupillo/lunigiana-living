@@ -42,6 +42,7 @@ type FormState = {
   title: string;
   reference_code: string;
   property_type: string;
+  descrizione_libera: string;
   contract_type: string;
   price: string;
   price_on_request: boolean;
@@ -88,6 +89,7 @@ const empty: FormState = {
   title: "",
   reference_code: "",
   property_type: "",
+  descrizione_libera: "",
   contract_type: "",
   price: "",
   price_on_request: false,
