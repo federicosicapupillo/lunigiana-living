@@ -11,9 +11,9 @@ type Props = ImgHTMLAttributes<HTMLImageElement> & {
 };
 
 const SIZE_CLASSES: Record<Size, string> = {
-  sm: "w-[30%] max-w-[90px] min-w-[48px]",
-  md: "w-[26%] max-w-[160px] min-w-[80px]",
-  lg: "w-[22%] max-w-[240px] min-w-[100px]",
+  sm: "w-[35%] max-w-[80px] min-w-[32px]",
+  md: "w-[28%] max-w-[150px] min-w-[64px]",
+  lg: "w-[24%] max-w-[240px] min-w-[90px]",
 };
 
 /**
@@ -31,7 +31,12 @@ export function WatermarkedImage({
 }: Props) {
   return (
     <div className={cn("relative h-full w-full overflow-hidden", containerClassName)}>
-      <img {...imgProps} alt={alt} className={cn("h-full w-full object-cover", className)} />
+      <img
+        decoding="async"
+        {...imgProps}
+        alt={alt}
+        className={cn("h-full w-full object-cover", className)}
+      />
       {watermark && (
         <img
           src={watermarkAsset.url}
