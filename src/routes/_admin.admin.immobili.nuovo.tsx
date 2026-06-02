@@ -97,10 +97,7 @@ type FormState = {
   short_notes: string;
   long_description: string;
   internal_notes: string;
-  punti_di_forza: string;
-  target_acquirente: string;
-  vista_contesto: string;
-  elementi_storici: string;
+  multi: Record<MultiSelectKey, MultiSelectValue>;
 };
 
 const empty: FormState = {
@@ -138,10 +135,12 @@ const empty: FormState = {
   short_notes: "",
   long_description: "",
   internal_notes: "",
-  punti_di_forza: "",
-  target_acquirente: "",
-  vista_contesto: "",
-  elementi_storici: "",
+  multi: {
+    punti_di_forza: { ...EMPTY_MULTI },
+    target_acquirente: { ...EMPTY_MULTI },
+    vista_contesto: { ...EMPTY_MULTI },
+    elementi_storici: { ...EMPTY_MULTI },
+  },
 };
 
 function slugify(s: string) {
