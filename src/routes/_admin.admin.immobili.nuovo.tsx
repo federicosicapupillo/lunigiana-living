@@ -21,6 +21,20 @@ import {
   HEATING_OPTIONS,
   FLOOR_OPTIONS,
   FLOOR_TO_NUMBER,
+  SIZE_RANGE_OPTIONS,
+  SIZE_CUSTOM,
+  BEDROOMS_OPTIONS,
+  BEDROOMS_CUSTOM,
+  BEDROOMS_TO_NUMBER,
+  BATHROOMS_OPTIONS,
+  BATHROOMS_CUSTOM,
+  BATHROOMS_TO_NUMBER,
+  TOTAL_FLOORS_OPTIONS,
+  TOTAL_FLOORS_CUSTOM,
+  AMENITY_GROUPS,
+  AMENITY_TO_COLUMN,
+  AMENITY_FEATURE_PREFIX,
+  FURNISHED_TO_BOOL,
 } from "@/lib/admin/property-constants";
 import { LocationFields, EMPTY_LOCATION, type LocationValue } from "@/components/admin/location-fields";
 
@@ -55,24 +69,22 @@ type FormState = {
   postal_code: string;
   country: string;
   show_full_address: boolean;
-  // Sezione 3
-  size_sqm: string;
-  bedrooms: string;
-  bathrooms: string;
+  // Sezione 3 — selezioni rapide + valore preciso
+  size_range: string;
+  size_sqm_exact: string;
+  bedrooms_label: string;
+  bedrooms_exact: string;
+  bathrooms_label: string;
+  bathrooms_exact: string;
   floor_label: string;
-  total_floors: string;
+  total_floors_label: string;
+  total_floors_exact: string;
   condition: string;
   energy_class: string;
   heating: string;
-  furnished: string; // "Sì" | "No" | "Parzialmente" | ""
-  garden: boolean;
-  terrace: boolean;
-  balcony: boolean;
-  garage: boolean;
-  cellar: boolean;
-  elevator: boolean;
-  panoramic_view: boolean;
-  historic_property: boolean;
+  furnished: string;
+  amenities: Record<string, boolean>;
+  altre_dotazioni: string;
   // Sezione 4
   short_notes: string;
   long_description: string;
@@ -100,23 +112,21 @@ const empty: FormState = {
   postal_code: "",
   country: "Italia",
   show_full_address: false,
-  size_sqm: "",
-  bedrooms: "",
-  bathrooms: "",
+  size_range: "",
+  size_sqm_exact: "",
+  bedrooms_label: "",
+  bedrooms_exact: "",
+  bathrooms_label: "",
+  bathrooms_exact: "",
   floor_label: "",
-  total_floors: "",
+  total_floors_label: "",
+  total_floors_exact: "",
   condition: "",
   energy_class: "",
   heating: "",
   furnished: "",
-  garden: false,
-  terrace: false,
-  balcony: false,
-  garage: false,
-  cellar: false,
-  elevator: false,
-  panoramic_view: false,
-  historic_property: false,
+  amenities: {},
+  altre_dotazioni: "",
   short_notes: "",
   long_description: "",
   internal_notes: "",
