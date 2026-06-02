@@ -488,10 +488,12 @@ function MainTab({
         <TextInput value={prop.slug} onChange={(v) => update({ slug: v })} placeholder="auto da titolo se vuoto" />
       </Field>
       <Field label="Codice riferimento">
-        <TextInput
-          value={prop.reference_code}
-          onChange={(v) => update({ reference_code: v })}
-          placeholder="Es. RIF-2026-014"
+        <input
+          type="text"
+          value={prop.reference_code ?? ""}
+          readOnly
+          disabled
+          className={`${inputCls} cursor-not-allowed bg-muted/40 text-muted-foreground`}
         />
       </Field>
       <Field label="Tipologia immobile">
