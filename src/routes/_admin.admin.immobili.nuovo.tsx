@@ -380,10 +380,19 @@ function NewPropertyPage() {
             <TextInput value={f.municipality} onChange={(v) => upd("municipality", v)} placeholder="Es. Pietrasanta" />
           </Field>
           <Field label="Provincia">
-            <TextInput value={f.province} onChange={(v) => upd("province", v)} placeholder="Es. Lucca" />
+            <ProvinceCombobox
+              value={f.province}
+              onChange={(v) => upd("province", v)}
+              placeholder="Cerca provincia o sigla (es. MS, Lucca)"
+            />
           </Field>
           <Field label="Regione">
-            <TextInput value={f.region} onChange={(v) => upd("region", v)} />
+            <SelectInput
+              value={f.region}
+              onChange={(v) => upd("region", v)}
+              options={REGIONS.map((o) => ({ value: o, label: o }))}
+              placeholder="Seleziona regione"
+            />
           </Field>
           <Field label="Nazione">
             <TextInput value={f.country} onChange={(v) => upd("country", v)} />
@@ -417,7 +426,12 @@ function NewPropertyPage() {
             <NumberInput value={f.bathrooms} onChange={(v) => upd("bathrooms", v)} />
           </Field>
           <Field label="Piano dell'immobile">
-            <NumberInput value={f.floors} onChange={(v) => upd("floors", v)} />
+            <SelectInput
+              value={f.floor_label}
+              onChange={(v) => upd("floor_label", v)}
+              options={FLOOR_OPTIONS.map((o) => ({ value: o, label: o }))}
+              placeholder="Seleziona piano"
+            />
           </Field>
           <Field label="Totale piani edificio">
             <NumberInput value={f.total_floors} onChange={(v) => upd("total_floors", v)} />
@@ -437,13 +451,25 @@ function NewPropertyPage() {
             />
           </Field>
           <Field label="Riscaldamento">
-            <TextInput value={f.heating} onChange={(v) => upd("heating", v)} placeholder="Es. Autonomo a gas, pellet, pompa di calore" />
+            <SelectInput
+              value={f.heating}
+              onChange={(v) => upd("heating", v)}
+              options={HEATING_OPTIONS.map((o) => ({ value: o, label: o }))}
+              placeholder="Seleziona riscaldamento"
+            />
+          </Field>
+          <Field label="Arredato">
+            <SelectInput
+              value={f.furnished}
+              onChange={(v) => upd("furnished", v)}
+              options={FURNISHED_OPTIONS.map((o) => ({ value: o, label: o }))}
+              placeholder="Seleziona stato arredo"
+            />
           </Field>
 
           <div className="md:col-span-2">
             <span className="block text-xs uppercase tracking-wider text-muted-foreground">Dotazioni</span>
             <div className="mt-2 grid grid-cols-2 gap-2 md:grid-cols-3">
-              <Toggle label="Arredato" value={f.furnished} onChange={(v) => upd("furnished", v)} />
               <Toggle label="Giardino" value={f.garden} onChange={(v) => upd("garden", v)} />
               <Toggle label="Terrazza" value={f.terrace} onChange={(v) => upd("terrace", v)} />
               <Toggle label="Balcone" value={f.balcony} onChange={(v) => upd("balcony", v)} />
