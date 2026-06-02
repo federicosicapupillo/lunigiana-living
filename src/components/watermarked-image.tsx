@@ -40,7 +40,7 @@ export function WatermarkedImage({
           draggable={false}
           loading="lazy"
           className={cn(
-            "pointer-events-none absolute bottom-2 right-2 select-none object-contain opacity-25 mix-blend-multiply drop-shadow-[0_1px_2px_rgba(255,255,255,0.4)] md:bottom-3 md:right-3",
+            "pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 select-none object-contain opacity-20 mix-blend-multiply drop-shadow-[0_1px_2px_rgba(255,255,255,0.4)]",
             SIZE_CLASSES[watermarkSize],
           )}
         />
