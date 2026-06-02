@@ -1,9 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
 import heroTramontoVignetiAsset from "@/assets/real/hero-tramonto-vigneti.png.asset.json";
-import territoryPontremoli from "@/assets/real/pontremoli-scorcio.jpg";
-import territoryBagnone from "@/assets/real/bagnone-castello.jpg";
-import territoryZeri from "@/assets/real/zeri-monte.jpg";
+import territoryPontremoli from "@/assets/real/pontremoli-lunigiana-v2.png.asset.json";
+import territoryBagnone from "@/assets/real/bagnone-lunigiana.png.asset.json";
+import territoryZeri from "@/assets/real/zeri-lunigiana.png.asset.json";
 import { PropertyCard } from "@/components/property-card";
 import { PropertySearchBar } from "@/components/property-search-bar";
 import { listPublishedProperties, type PublicProperty } from "@/lib/public-properties.functions";
@@ -205,9 +205,9 @@ function Index() {
 
           <div className="mt-14 grid gap-px overflow-hidden rounded-sm bg-cream/10 md:grid-cols-3">
             {[
-              { name: "Pontremoli", img: territoryPontremoli, body: "Borgo capoluogo, vita culturale, vie acciottolate." },
-              { name: "Bagnone", img: territoryBagnone, body: "Castello, mercato, sapori antichi." },
-              { name: "Zeri", img: territoryZeri, body: "Boschi profondi, allevamenti, lentezza." },
+                { name: "Pontremoli", img: territoryPontremoli.url, body: "Borgo capoluogo, vita culturale, vie acciottolate." },
+                { name: "Bagnone", img: territoryBagnone.url, body: "Castello, mercato, sapori antichi." },
+                { name: "Zeri", img: territoryZeri.url, body: "Boschi profondi, allevamenti, lentezza." },
             ].map((t) => (
               <Link
                 key={t.name}
