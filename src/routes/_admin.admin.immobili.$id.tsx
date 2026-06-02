@@ -419,14 +419,16 @@ function SelectInput({
   value,
   onChange,
   options,
+  placeholder,
 }: {
   value: string | null | undefined;
   onChange: (v: string) => void;
   options: readonly string[];
+  placeholder?: string;
 }) {
   return (
     <select value={value ?? ""} onChange={(e) => onChange(e.target.value)} className={inputCls}>
-      <option value="">—</option>
+      <option value="">{placeholder ?? "—"}</option>
       {options.map((o) => (
         <option key={o} value={o}>
           {o}
