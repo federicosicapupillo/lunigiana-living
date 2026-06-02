@@ -22,6 +22,7 @@ import { Route as ImmobiliIdRouteImport } from './routes/immobili.$id'
 import { Route as ApiVirtualStagingRouteImport } from './routes/api/virtual-staging'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
 import { Route as AdminAdminRouteImport } from './routes/_admin.admin'
+import { Route as AdminAdminImmobiliIndexRouteImport } from './routes/_admin.admin.immobili.index'
 import { Route as AdminAdminImmobiliNuovoRouteImport } from './routes/_admin.admin.immobili.nuovo'
 import { Route as AdminAdminImmobiliIdRouteImport } from './routes/_admin.admin.immobili.$id'
 
@@ -89,6 +90,11 @@ const AdminAdminRoute = AdminAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminAdminImmobiliIndexRoute = AdminAdminImmobiliIndexRouteImport.update({
+  id: '/immobili/',
+  path: '/immobili/',
+  getParentRoute: () => AdminAdminRoute,
+} as any)
 const AdminAdminImmobiliNuovoRoute = AdminAdminImmobiliNuovoRouteImport.update({
   id: '/immobili/nuovo',
   path: '/immobili/nuovo',
@@ -115,6 +121,7 @@ export interface FileRoutesByFullPath {
   '/immobili/': typeof ImmobiliIndexRoute
   '/admin/immobili/$id': typeof AdminAdminImmobiliIdRoute
   '/admin/immobili/nuovo': typeof AdminAdminImmobiliNuovoRoute
+  '/admin/immobili/': typeof AdminAdminImmobiliIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -130,6 +137,7 @@ export interface FileRoutesByTo {
   '/immobili': typeof ImmobiliIndexRoute
   '/admin/immobili/$id': typeof AdminAdminImmobiliIdRoute
   '/admin/immobili/nuovo': typeof AdminAdminImmobiliNuovoRoute
+  '/admin/immobili': typeof AdminAdminImmobiliIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -148,6 +156,7 @@ export interface FileRoutesById {
   '/immobili/': typeof ImmobiliIndexRoute
   '/_admin/admin/immobili/$id': typeof AdminAdminImmobiliIdRoute
   '/_admin/admin/immobili/nuovo': typeof AdminAdminImmobiliNuovoRoute
+  '/_admin/admin/immobili/': typeof AdminAdminImmobiliIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -166,6 +175,7 @@ export interface FileRouteTypes {
     | '/immobili/'
     | '/admin/immobili/$id'
     | '/admin/immobili/nuovo'
+    | '/admin/immobili/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -181,6 +191,7 @@ export interface FileRouteTypes {
     | '/immobili'
     | '/admin/immobili/$id'
     | '/admin/immobili/nuovo'
+    | '/admin/immobili'
   id:
     | '__root__'
     | '/'
@@ -198,6 +209,7 @@ export interface FileRouteTypes {
     | '/immobili/'
     | '/_admin/admin/immobili/$id'
     | '/_admin/admin/immobili/nuovo'
+    | '/_admin/admin/immobili/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -306,6 +318,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAdminRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/_admin/admin/immobili/': {
+      id: '/_admin/admin/immobili/'
+      path: '/immobili'
+      fullPath: '/admin/immobili/'
+      preLoaderRoute: typeof AdminAdminImmobiliIndexRouteImport
+      parentRoute: typeof AdminAdminRoute
+    }
     '/_admin/admin/immobili/nuovo': {
       id: '/_admin/admin/immobili/nuovo'
       path: '/immobili/nuovo'
@@ -326,11 +345,13 @@ declare module '@tanstack/react-router' {
 interface AdminAdminRouteChildren {
   AdminAdminImmobiliIdRoute: typeof AdminAdminImmobiliIdRoute
   AdminAdminImmobiliNuovoRoute: typeof AdminAdminImmobiliNuovoRoute
+  AdminAdminImmobiliIndexRoute: typeof AdminAdminImmobiliIndexRoute
 }
 
 const AdminAdminRouteChildren: AdminAdminRouteChildren = {
   AdminAdminImmobiliIdRoute: AdminAdminImmobiliIdRoute,
   AdminAdminImmobiliNuovoRoute: AdminAdminImmobiliNuovoRoute,
+  AdminAdminImmobiliIndexRoute: AdminAdminImmobiliIndexRoute,
 }
 
 const AdminAdminRouteWithChildren = AdminAdminRoute._addFileChildren(
@@ -376,3 +397,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
