@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import type {} from "@tanstack/react-start";
-import { allProperties } from "@/lib/properties";
+import { listPublishedProperties } from "@/lib/public-properties.functions";
 
 const BASE_URL = "";
 
@@ -8,9 +8,10 @@ export const Route = createFileRoute("/sitemap.xml")({
   server: {
     handlers: {
       GET: async () => {
+        const { properties } = await listPublishedProperties();
         const paths = [
           "/", "/immobili", "/territori", "/servizi", "/chi-siamo", "/contatti",
-          ...allProperties.map((p) => `/immobili/${p.id}`),
+          ...properties.map((p) => `/immobili/${p.slug || p.id}`),
         ];
         const urls = paths.map(
           (p) => `  <url>\n    <loc>${BASE_URL}${p}</loc>\n    <changefreq>weekly</changefreq>\n  </url>`
