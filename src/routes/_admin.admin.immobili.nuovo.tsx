@@ -184,12 +184,45 @@ function NewPropertyPage() {
         f.floor_label && f.floor_label in FLOOR_TO_NUMBER
           ? FLOOR_TO_NUMBER[f.floor_label]
           : null;
-      const furnishedBool = f.furnished === "Sì" || f.furnished === "Parzialmente";
+      const furnishedBool = f.furnished ? FURNISHED_TO_BOOL[f.furnished] ?? false : false;
+
+      // Superficie: se "Inserisci valore preciso" → usa il numero, altrimenti
+      // niente intero in colonna (resta solo il range nei features).
+      const sizeNum =
+        f.size_range === SIZE_CUSTOM ? toNum(f.size_sqm_exact) : null;
+      const bedroomsNum =
+        f.bedrooms_label === BEDROOMS_CUSTOM
+          ? toNum(f.bedrooms_exact)
+          : f.bedrooms_label
+            ? BEDROOMS_TO_NUMBER[f.bedrooms_label] ?? null
+            : null;
+      const bathroomsNum =
+        f.bathrooms_label === BATHROOMS_CUSTOM
+          ? toNum(f.bathrooms_exact)
+          : f.bathrooms_label
+            ? BATHROOMS_TO_NUMBER[f.bathrooms_label] ?? null
+            : null;
+
+      // Mappa amenities → colonne boolean note
+      const amenityBools: Record<string, boolean> = {
+        garden: false,
+        terrace: false,
+        balcony: false,
+        garage: false,
+        cellar: false,
+        elevator: false,
+        panoramic_view: false,
+        historic_property: false,
+      };
+      Object.entries(f.amenities).forEach(([label, on]) => {
+        if (!on) return;
+        const col = AMENITY_TO_COLUMN[label];
+        if (col) amenityBools[col] = true;
+      });
 
       const payload = {
         title: f.title.trim(),
         slug: slugify(f.title),
-        // reference_code: assegnato automaticamente dal trigger (FURIA-NNNN)
         property_type: f.property_type || null,
         contract_type: f.contract_type || null,
         price: f.price_on_request ? null : toNum(f.price),
@@ -204,21 +237,14 @@ function NewPropertyPage() {
         postal_code: f.postal_code.trim() || null,
         country: f.country.trim() || null,
         show_full_address: f.show_full_address,
-        size_sqm: toNum(f.size_sqm),
-        bedrooms: toNum(f.bedrooms),
-        bathrooms: toNum(f.bathrooms),
+        size_sqm: sizeNum,
+        bedrooms: bedroomsNum,
+        bathrooms: bathroomsNum,
         floors: floorNum,
         condition: f.condition || null,
         energy_class: f.energy_class || null,
         furnished: furnishedBool,
-        garden: f.garden,
-        terrace: f.terrace,
-        balcony: f.balcony,
-        garage: f.garage,
-        cellar: f.cellar,
-        elevator: f.elevator,
-        panoramic_view: f.panoramic_view,
-        historic_property: f.historic_property,
+        ...amenityBools,
         short_notes: f.short_notes.trim() || null,
         internal_notes: f.internal_notes.trim() || null,
         created_by: userId,
@@ -242,7 +268,6 @@ function NewPropertyPage() {
         if (v.trim()) extraFeatures.push({ property_id: data.id, feature_name: k, feature_value: v.trim() });
       };
       pushIf("heating", f.heating);
-      pushIf("total_floors", f.total_floors);
       pushIf("floor_label", f.floor_label);
       pushIf("furnished_level", f.furnished);
       pushIf("descrizione_libera", f.descrizione_libera);
@@ -251,6 +276,25 @@ function NewPropertyPage() {
       pushIf("target_acquirente", f.target_acquirente);
       pushIf("vista_contesto", f.vista_contesto);
       pushIf("elementi_storici", f.elementi_storici);
+      // Range/label sezione 3
+      pushIf("size_range", f.size_range);
+      pushIf("bedrooms_label", f.bedrooms_label);
+      pushIf("bathrooms_label", f.bathrooms_label);
+      pushIf("total_floors_label", f.total_floors_label);
+      if (f.total_floors_label === TOTAL_FLOORS_CUSTOM) {
+        pushIf("total_floors_exact", f.total_floors_exact);
+      }
+      pushIf("altre_dotazioni", f.altre_dotazioni);
+      // Dotazioni selezionate
+      Object.entries(f.amenities).forEach(([label, on]) => {
+        if (on) {
+          extraFeatures.push({
+            property_id: data.id,
+            feature_name: AMENITY_FEATURE_PREFIX + label,
+            feature_value: label,
+          });
+        }
+      });
       if (extraFeatures.length) {
         const { error: fErr } = await supabase.from("property_features").insert(extraFeatures);
         if (fErr) console.warn("[nuovo] features insert warn:", fErr.message);
