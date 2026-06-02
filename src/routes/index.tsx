@@ -1,20 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
-import { useState } from "react";
-import heroPanoramico from "@/assets/real/hero-pontremoli-castello.jpg";
-import heroIntimo from "@/assets/real/hero-centro-storico.jpg";
-import heroColline from "@/assets/real/hero-pontremoli-colline.jpg";
-import heroBorgoAsset from "@/assets/real/bagnone-borgo.jpg.asset.json";
-import heroCastelloTramontoAsset from "@/assets/real/hero-castello-tramonto.jpg.asset.json";
-import heroCastelloAereoAsset from "@/assets/real/hero-castello-aereo.jpg.asset.json";
-import heroCastelloBorgoAsset from "@/assets/real/hero-castello-borgo.png.asset.json";
 import heroTramontoVignetiAsset from "@/assets/real/hero-tramonto-vigneti.png.asset.json";
 import territoryPontremoli from "@/assets/real/pontremoli-scorcio.jpg";
 import territoryBagnone from "@/assets/real/bagnone-castello.jpg";
 import territoryZeri from "@/assets/real/zeri-monte.jpg";
 import lifestyleFood from "@/assets/real/bagnone-torrente.jpg";
-import { PropertySearch } from "@/components/property-search";
 import { PropertyCard } from "@/components/property-card";
+import { HomeSearchBar } from "@/components/home-search-bar";
 import { listPublishedProperties, type PublicProperty } from "@/lib/public-properties.functions";
 import { ArrowRight, Compass, KeyRound, Sparkles } from "lucide-react";
 
@@ -37,59 +29,13 @@ function Index() {
   const featuredProperties = properties
     .filter((p) => p.featured && p.category === "vendita")
     .slice(0, 6);
-  const [heroVariant, setHeroVariant] = useState<
-    "castelloBorgo" | "tramontoVigneti" | "panoramico" | "intimo" | "colline" | "borgo" | "tramonto" | "aereo"
-  >("castelloBorgo");
-  const heroMap = {
-    castelloBorgo: {
-      src: heroCastelloBorgoAsset.url,
-      alt: "Castello e borgo medievale in pietra della Lunigiana immersi nei boschi",
-      label: "Castello · Borgo",
-    },
-    tramontoVigneti: {
-      src: heroTramontoVignetiAsset.url,
-      alt: "Tramonto infuocato sulle Apuane con vigneti, uliveti e borgo della Lunigiana in lontananza",
-      label: "Tramonto · Vigneti",
-    },
-    panoramico: {
-      src: heroPanoramico,
-      alt: "Pontremoli e il castello del Piagnaro al tramonto, panorama sulla Lunigiana",
-      label: "Panorama · Castello",
-    },
-    intimo: {
-      src: heroIntimo,
-      alt: "Scorcio intimo del centro storico di Pontremoli con ponte sul fiume Magra",
-      label: "Centro storico",
-    },
-    colline: {
-      src: heroColline,
-      alt: "Pontremoli immersa nelle colline verdi della Lunigiana con vista sulle montagne dell'Appennino",
-      label: "Colline · Territorio",
-    },
-    borgo: {
-      src: heroBorgoAsset.url,
-      alt: "Borgo di Bagnone con ponte in pietra sul torrente e case storiche affacciate sull'acqua",
-      label: "Borgo · Bagnone",
-    },
-    tramonto: {
-      src: heroCastelloTramontoAsset.url,
-      alt: "Borgo e castello panoramico della Lunigiana al tramonto, vista aerea sulle colline verso il mare",
-      label: "Tramonto · Castello",
-    },
-    aereo: {
-      src: heroCastelloAereoAsset.url,
-      alt: "Vista aerea ravvicinata del borgo medievale e del castello arroccato sulla collina della Lunigiana",
-      label: "Vista aerea · Borgo",
-    },
-  } as const;
-  const heroSrc = heroMap[heroVariant].src;
-  const heroAlt = heroMap[heroVariant].alt;
+  const heroSrc = heroTramontoVignetiAsset.url;
+  const heroAlt = "Tramonto infuocato sulle Apuane con vigneti, uliveti e borgo della Lunigiana in lontananza";
   return (
     <>
       {/* HERO */}
       <section className="relative isolate -mt-20 flex min-h-[100svh] items-end overflow-hidden">
         <img
-          key={heroVariant}
           src={heroSrc}
           alt={heroAlt}
           width={1920}
@@ -113,29 +59,12 @@ function Index() {
           </div>
 
           <div className="mt-10">
-            <PropertySearch />
-          </div>
-
-          {/* Variant switcher */}
-          <div className="mt-8 flex flex-wrap items-center gap-3">
-            {(Object.keys(heroMap) as Array<keyof typeof heroMap>).map((key) => {
-              const active = heroVariant === key;
-              return (
-                <button
-                  key={key}
-                  type="button"
-                  onClick={() => setHeroVariant(key)}
-                  aria-pressed={active}
-                  className={`rounded-full border px-4 py-2 text-xs uppercase tracking-[0.18em] transition ${
-                    active
-                      ? "border-cream bg-cream/95 text-ink"
-                      : "border-cream/40 text-cream/85 hover:border-cream/80"
-                  }`}
-                >
-                  {heroMap[key].label}
-                </button>
-              );
-            })}
+            <Link
+              to="/immobili"
+              className="inline-flex items-center gap-2 rounded-sm bg-cream px-8 py-4 text-xs uppercase tracking-[0.22em] text-ink transition hover:bg-cream/90"
+            >
+              Cerca la tua casa in Lunigiana <ArrowRight size={14} />
+            </Link>
           </div>
         </div>
       </section>
@@ -186,6 +115,10 @@ function Index() {
               Tutti gli immobili
               <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
             </Link>
+          </div>
+
+          <div className="mt-10">
+            <HomeSearchBar />
           </div>
 
           <div className="mt-14 grid gap-10 md:grid-cols-3">

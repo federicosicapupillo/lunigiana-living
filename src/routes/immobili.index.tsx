@@ -1,11 +1,24 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
+import { zodValidator, fallback } from "@tanstack/zod-adapter";
+import { z } from "zod";
 import { PropertyCard } from "@/components/property-card";
 import { listPublishedProperties, type PublicProperty } from "@/lib/public-properties.functions";
 import { useMemo, useState } from "react";
 
 type PropertyCategory = PublicProperty["category"];
 
+const searchSchema = z.object({
+  type: fallback(z.string(), "").default(""),
+  comune: fallback(z.string(), "").default(""),
+  price: fallback(z.string(), "").default(""),
+  size: fallback(z.string(), "").default(""),
+  rooms: fallback(z.string(), "").default(""),
+  features: fallback(z.string(), "").default(""),
+});
+
 export const Route = createFileRoute("/immobili/")({
+  validateSearch: zodValidator(searchSchema),
   loader: () => listPublishedProperties(),
   head: () => ({
     meta: [
@@ -40,6 +53,8 @@ type SortKey = "featured" | "price-asc" | "price-desc";
 
 function ImmobiliPage() {
   const { properties: allProperties } = Route.useLoaderData() as { properties: PublicProperty[] };
+  const urlSearch = Route.useSearch();
+  const navigate = useNavigate({ from: "/immobili" });
   const uniqueLocations = useMemo(
     () => Array.from(new Set(allProperties.map((p) => p.location).filter(Boolean))).sort(),
     [allProperties],
@@ -48,15 +63,82 @@ function ImmobiliPage() {
   const [location, setLocation] = useState<string>("tutte");
   const [sort, setSort] = useState<SortKey>("featured");
 
+  const parseRange = (v: string): [number | null, number | null] => {
+    if (!v) return [null, null];
+    const [a, b] = v.split("-");
+    const lo = a ? Number(a) : null;
+    const hi = b ? Number(b) : null;
+    return [Number.isFinite(lo as number) ? lo : null, Number.isFinite(hi as number) ? hi : null];
+  };
+
+  const featureTokens: string[] = urlSearch.features
+    ? urlSearch.features.split(",").map((s: string) => s.trim().toLowerCase()).filter(Boolean)
+    : [];
+
+  const hasUrlFilters = !!(
+    urlSearch.type || urlSearch.comune || urlSearch.price ||
+    urlSearch.size || urlSearch.rooms || urlSearch.features
+  );
+
+  const clearUrlFilters = () => {
+    navigate({ search: {} });
+  };
+
   const filtered = useMemo(() => {
     let list = allProperties;
     if (category !== "tutti") list = list.filter((p) => p.category === category);
     if (location !== "tutte") list = list.filter((p) => p.location === location);
+
+    // URL-based filters from home search
+    if (urlSearch.type) {
+      const t = urlSearch.type.toLowerCase();
+      list = list.filter((p) => (p.type || "").toLowerCase().includes(t));
+    }
+    if (urlSearch.comune) {
+      const c = urlSearch.comune.toLowerCase();
+      list = list.filter((p) => (p.location || "").toLowerCase().includes(c));
+    }
+    const [priceLo, priceHi] = parseRange(urlSearch.price);
+    if (priceLo != null || priceHi != null) {
+      list = list.filter((p) => {
+        if (p.priceValue == null) return false;
+        if (priceLo != null && p.priceValue < priceLo) return false;
+        if (priceHi != null && p.priceValue > priceHi) return false;
+        return true;
+      });
+    }
+    const [sizeLo, sizeHi] = parseRange(urlSearch.size);
+    if (sizeLo != null || sizeHi != null) {
+      list = list.filter((p) => {
+        if (p.sqm == null) return false;
+        if (sizeLo != null && p.sqm < sizeLo) return false;
+        if (sizeHi != null && p.sqm > sizeHi) return false;
+        return true;
+      });
+    }
+    if (urlSearch.rooms) {
+      const n = Number(urlSearch.rooms);
+      if (Number.isFinite(n)) {
+        list = list.filter((p) => (p.rooms ?? -1) >= n);
+      }
+    }
+    if (featureTokens.length) {
+      list = list.filter((p) => {
+        const haystack = [
+          ...(p.amenities ?? []),
+          ...(p.highlights ?? []).flatMap((h) => h.items),
+          p.tag ?? "",
+          p.type ?? "",
+        ].join(" ").toLowerCase();
+        return featureTokens.every((tok: string) => haystack.includes(tok));
+      });
+    }
+
     const sorted = [...list];
     if (sort === "price-asc") sorted.sort((a, b) => (a.priceValue ?? Infinity) - (b.priceValue ?? Infinity));
     if (sort === "price-desc") sorted.sort((a, b) => (b.priceValue ?? -1) - (a.priceValue ?? -1));
     return sorted;
-  }, [allProperties, category, location, sort]);
+  }, [allProperties, category, location, sort, urlSearch.type, urlSearch.comune, urlSearch.price, urlSearch.size, urlSearch.rooms, urlSearch.features]);
 
   return (
     <>
@@ -100,7 +182,27 @@ function ImmobiliPage() {
                 ))}
               </select>
             </div>
+            {hasUrlFilters && (
+              <button
+                onClick={clearUrlFilters}
+                className="rounded-sm border border-border bg-card px-3 py-2 text-xs uppercase tracking-[0.18em] text-muted-foreground hover:text-ink"
+              >
+                Rimuovi filtri ricerca
+              </button>
+            )}
           </div>
+          {hasUrlFilters && (
+            <p className="mt-4 text-xs uppercase tracking-[0.18em] text-muted-foreground">
+              Filtri attivi dalla home: {[
+                urlSearch.type,
+                urlSearch.comune,
+                urlSearch.price && "prezzo",
+                urlSearch.size && "superficie",
+                urlSearch.rooms && `${urlSearch.rooms}+ camere`,
+                urlSearch.features,
+              ].filter(Boolean).join(" · ")}
+            </p>
+          )}
         </div>
       </section>
 
