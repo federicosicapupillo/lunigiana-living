@@ -562,7 +562,7 @@ function LocationTab({ prop, update }: { prop: Property; update: (p: Partial<Pro
           municipality: prop.municipality ?? "",
           locality: prop.locality ?? "",
           area_zone: prop.area_zone ?? "",
-          postal_code: (prop as unknown as { postal_code: string | null }).postal_code ?? "",
+          postal_code: prop.postal_code ?? "",
           address: prop.address ?? "",
           show_full_address: prop.show_full_address ?? false,
         }}
