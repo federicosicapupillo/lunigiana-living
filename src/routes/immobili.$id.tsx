@@ -104,6 +104,8 @@ function PropertyDetail() {
             ))}
           </div>
         )}
+        {/* Virtual staging AI CTA — subito dopo la galleria */}
+        <VirtualStaging gallery={p.gallery && p.gallery.length > 0 ? p.gallery : [p.image]} />
       </section>
 
       {/* Body */}
@@ -144,9 +146,6 @@ function PropertyDetail() {
               ))}
             </dl>
           </div>
-
-          {/* Virtual staging AI */}
-          <VirtualStaging gallery={p.gallery && p.gallery.length > 0 ? p.gallery : [p.image]} />
         </div>
 
         {/* Contact card */}
