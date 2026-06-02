@@ -57,6 +57,11 @@
   --color-forest: var(--forest);
   --color-cream: var(--cream);
   --color-ink: var(--ink);
+  --color-warm-cream: var(--warm-cream);
+  --color-warm-sand: var(--warm-sand);
+  --color-warm-ivory: var(--warm-ivory);
+  --color-warm-border: var(--warm-border);
+  --color-ink-soft: var(--ink-soft);
   --font-serif: "Cormorant Garamond", "Times New Roman", serif;
   --font-sans: "Inter", system-ui, sans-serif;
 }
@@ -68,6 +73,13 @@
   --terracotta: oklch(0.58 0.115 38);
   --forest: oklch(0.38 0.055 145);
   --ink: oklch(0.22 0.018 60);
+
+  /* Warm editorial palette (Vivere in Lunigiana) */
+  --warm-cream: #F7F2EA;
+  --warm-sand: #F1E7DA;
+  --warm-ivory: #FBF6F0;
+  --warm-border: #E6D8C8;
+  --ink-soft: #5B4C43;
 
   --background: oklch(0.975 0.012 85);
   --foreground: oklch(0.22 0.018 60);
