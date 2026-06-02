@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { PropertySearch } from "@/components/property-search";
 import { PropertyCard } from "@/components/property-card";
-import { allProperties } from "@/lib/properties";
+import { allProperties, uniqueLocations, type PropertyCategory } from "@/lib/properties";
+import { useMemo, useState } from "react";
 
 export const Route = createFileRoute("/immobili")({
   head: () => ({
@@ -16,7 +16,30 @@ export const Route = createFileRoute("/immobili")({
   component: ImmobiliPage,
 });
 
+const CATEGORIES: { id: PropertyCategory | "tutti"; label: string }[] = [
+  { id: "tutti", label: "Tutti" },
+  { id: "vendita", label: "Vendite" },
+  { id: "affitto", label: "Affitti" },
+  { id: "scelti-per-voi", label: "Scelti per voi" },
+];
+
+type SortKey = "featured" | "price-asc" | "price-desc";
+
 function ImmobiliPage() {
+  const [category, setCategory] = useState<PropertyCategory | "tutti">("tutti");
+  const [location, setLocation] = useState<string>("tutte");
+  const [sort, setSort] = useState<SortKey>("featured");
+
+  const filtered = useMemo(() => {
+    let list = allProperties;
+    if (category !== "tutti") list = list.filter((p) => p.category === category);
+    if (location !== "tutte") list = list.filter((p) => p.location === location);
+    const sorted = [...list];
+    if (sort === "price-asc") sorted.sort((a, b) => (a.priceValue ?? Infinity) - (b.priceValue ?? Infinity));
+    if (sort === "price-desc") sorted.sort((a, b) => (b.priceValue ?? -1) - (a.priceValue ?? -1));
+    return sorted;
+  }, [category, location, sort]);
+
   return (
     <>
       <section className="border-b border-border bg-muted/40 pb-12 pt-32 md:pt-40">
@@ -26,11 +49,39 @@ function ImmobiliPage() {
             La nostra selezione di case in Lunigiana.
           </h1>
           <p className="mt-5 max-w-2xl text-base leading-relaxed text-foreground/75">
-            Una raccolta curata di immobili, scelti per posizione, carattere e
-            qualità del vivere. Affina la ricerca per trovare il tuo posto.
+            {allProperties.length} immobili reali importati dal nostro archivio.
+            Filtra per categoria o comune per trovare il tuo posto.
           </p>
-          <div className="mt-10">
-            <PropertySearch variant="page" />
+
+          <div className="mt-10 flex flex-wrap items-center gap-x-8 gap-y-4">
+            <div className="flex flex-wrap gap-2">
+              {CATEGORIES.map((c) => (
+                <button
+                  key={c.id}
+                  onClick={() => setCategory(c.id)}
+                  className={`rounded-sm border px-4 py-2 text-xs uppercase tracking-[0.18em] transition ${
+                    category === c.id
+                      ? "border-primary bg-primary text-primary-foreground"
+                      : "border-border bg-card text-foreground hover:border-primary/50"
+                  }`}
+                >
+                  {c.label}
+                </button>
+              ))}
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="eyebrow text-[0.6rem]">Comune</span>
+              <select
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                className="rounded-sm border border-border bg-card px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary"
+              >
+                <option value="tutte">Tutti i comuni</option>
+                {uniqueLocations.map((l) => (
+                  <option key={l} value={l}>{l}</option>
+                ))}
+              </select>
+            </div>
           </div>
         </div>
       </section>
@@ -38,21 +89,33 @@ function ImmobiliPage() {
       <section className="container-editorial py-20">
         <div className="mb-10 flex items-end justify-between border-b border-border pb-5">
           <p className="text-sm text-muted-foreground">
-            <span className="font-serif text-lg text-ink">{allProperties.length}</span>{" "}
+            <span className="font-serif text-lg text-ink">{filtered.length}</span>{" "}
             immobili disponibili
           </p>
-          <select className="bg-transparent text-sm text-foreground focus:outline-none">
-            <option>Più recenti</option>
-            <option>Prezzo crescente</option>
-            <option>Prezzo decrescente</option>
+          <select
+            value={sort}
+            onChange={(e) => setSort(e.target.value as SortKey)}
+            className="bg-transparent text-sm text-foreground focus:outline-none"
+          >
+            <option value="featured">In evidenza</option>
+            <option value="price-asc">Prezzo crescente</option>
+            <option value="price-desc">Prezzo decrescente</option>
           </select>
         </div>
 
-        <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-3">
-          {allProperties.map((p) => (
-            <PropertyCard key={p.id} p={p} />
-          ))}
-        </div>
+        {filtered.length === 0 ? (
+          <div className="py-24 text-center">
+            <p className="font-serif text-2xl text-muted-foreground">
+              Nessun immobile corrisponde ai filtri selezionati.
+            </p>
+          </div>
+        ) : (
+          <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-3">
+            {filtered.map((p) => (
+              <PropertyCard key={p.id} p={p} />
+            ))}
+          </div>
+        )}
 
         <div className="mt-24 text-center">
           <p className="font-serif text-2xl italic text-foreground/70">
