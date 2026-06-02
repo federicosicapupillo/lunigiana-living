@@ -1,13 +1,31 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-const STYLE_PROMPTS: Record<string, string> = {
+const STRUCTURE_RULE =
+  "ABSOLUTE STRUCTURAL FIDELITY: preserve the original photograph's architecture, perspective, camera angle, focal length, framing, proportions and spatial nature EXACTLY. Do NOT close open spaces, do NOT add walls, ceilings, windows, doors or openings that are not already in the photo, do NOT remove existing openings, do NOT transform outdoor spaces into indoor rooms or vice versa, do NOT change the function or typology of the space. Keep existing walls, floors, ceilings (or sky), railings, columns, beams, structural elements, views and landscape outside windows or beyond railings identical. Only restyle: furniture, decor, textiles, finishes, lighting, plants and small accessories that are coherent with the existing space.";
+
+const INDOOR_STYLES: Record<string, string> = {
   minimal:
-    "Restage this exact room as a minimal, bright, contemporary interior: neutral palette (warm whites, soft greys, pale oak), essential furniture, clean lines, airy and uncluttered, refined Scandinavian-Italian sensibility. Keep the original architecture, walls, windows, ceiling height, floor layout and camera angle perfectly identical — only change furniture, decor, textiles, lighting and finishes. Photorealistic interior photography, soft natural daylight.",
+    "Restage this INTERIOR room as a minimal, bright, contemporary Italian interior: neutral palette (warm whites, soft greys, pale oak), essential furniture, clean lines, airy and uncluttered, refined Scandinavian-Italian sensibility, soft natural daylight. Photorealistic interior photography.",
   rustico:
-    "Restage this exact room as an elegant rustic interior in a characterful Lunigiana home: warm and authentic, natural materials, aged oak and chestnut wood, exposed stone accents, linen and wool textiles, handcrafted ceramics, soft warm lighting, cozy and welcoming atmosphere. Keep the original architecture, walls, windows, ceiling height, floor layout and camera angle perfectly identical — only change furniture, decor, textiles, lighting and finishes. Photorealistic interior photography.",
+    "Restage this INTERIOR room as an elegant rustic interior in a characterful Lunigiana home: warm and authentic, natural materials, aged oak and chestnut wood, exposed stone accents, linen and wool textiles, handcrafted ceramics, soft warm lighting, cozy and welcoming. Photorealistic interior photography.",
   luxury:
-    "Restage this exact room as a sophisticated luxury interior: premium designer furniture, refined palette (deep neutrals, brass and bronze accents), marble and travertine details, fine upholstery in velvet and bouclé, layered curated lighting, high-end contemporary look. Keep the original architecture, walls, windows, ceiling height, floor layout and camera angle perfectly identical — only change furniture, decor, textiles, lighting and finishes. Photorealistic editorial interior photography.",
+    "Restage this INTERIOR room as a sophisticated luxury interior: premium designer furniture, refined palette (deep neutrals, brass and bronze accents), marble and travertine details, fine upholstery in velvet and bouclé, layered curated lighting, high-end contemporary editorial look. Photorealistic interior photography.",
 };
+
+const OUTDOOR_STYLES: Record<string, string> = {
+  minimal:
+    "Restyle this OUTDOOR space (terrace, balcony, loggia, portico, courtyard, garden or external area) as a minimal contemporary outdoor lounge: keep the space fully OPEN to the sky/landscape, preserve railings, parapets, columns, paving, existing walls and the view beyond. Add only outdoor-appropriate elements: low-profile teak or powder-coated furniture, neutral outdoor textiles, simple potted greenery, discreet outdoor lighting. Natural daylight, photorealistic outdoor architectural photography.",
+  rustico:
+    "Restyle this OUTDOOR space as a warm rustic Lunigiana outdoor area: keep the space fully OPEN, preserve stone walls, terracotta or stone paving, railings, beams, pergolas and the surrounding landscape. Add only outdoor elements: solid wood or wrought-iron furniture, linen cushions, terracotta planters with Mediterranean plants (olive, lavender, rosemary), lanterns, a wooden table set for outdoor dining. Warm natural light, photorealistic outdoor photography.",
+  luxury:
+    "Restyle this OUTDOOR space as a refined luxury outdoor area: keep it fully OPEN to sky and landscape, preserve all structural elements (railings, columns, parapets, paving, pergolas, view). Add only premium outdoor elements: designer outdoor sofas in performance fabric, travertine or stone coffee tables, sculptural planters, layered outdoor lighting, refined neutral palette with bronze accents. Editorial outdoor photography, natural light.",
+};
+
+function buildPrompt(space: "interno" | "esterno", style: string): string | null {
+  const map = space === "esterno" ? OUTDOOR_STYLES : INDOOR_STYLES;
+  if (!map[style]) return null;
+  return `${STRUCTURE_RULE}\n\n${map[style]}`;
+}
 
 async function fetchAsDataUrl(url: string, origin: string): Promise<string> {
   const absolute = url.startsWith("http") ? url : new URL(url, origin).toString();
@@ -26,13 +44,20 @@ export const Route = createFileRoute("/api/virtual-staging")({
     handlers: {
       POST: async ({ request }) => {
         try {
-          const { imageUrl, style } = (await request.json()) as {
+          const { imageUrl, style, space } = (await request.json()) as {
             imageUrl?: string;
             style?: string;
+            space?: "interno" | "esterno";
           };
-          if (!imageUrl || !style || !STYLE_PROMPTS[style]) {
+          const spaceType: "interno" | "esterno" =
+            space === "esterno" ? "esterno" : "interno";
+          const prompt = imageUrl && style ? buildPrompt(spaceType, style) : null;
+          if (!imageUrl || !style || !prompt) {
             return new Response(
-              JSON.stringify({ error: "imageUrl e style (minimal | rustico | luxury) richiesti" }),
+              JSON.stringify({
+                error:
+                  "imageUrl, space (interno | esterno) e style (minimal | rustico | luxury) richiesti",
+              }),
               { status: 400, headers: { "Content-Type": "application/json" } },
             );
           }
@@ -62,7 +87,7 @@ export const Route = createFileRoute("/api/virtual-staging")({
                   {
                     role: "user",
                     content: [
-                      { type: "text", text: STYLE_PROMPTS[style] },
+                      { type: "text", text: prompt },
                       { type: "image_url", image_url: { url: dataUrl } },
                     ],
                   },

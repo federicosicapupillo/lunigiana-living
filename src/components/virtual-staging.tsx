@@ -18,6 +18,7 @@ import {
 
 type Style = "minimal" | "rustico" | "luxury";
 type CompareMode = "side" | "slider" | "toggle";
+type Space = "interno" | "esterno";
 
 const STYLES: { id: Style; label: string; description: string }[] = [
   {
@@ -95,6 +96,7 @@ function StagingDialog({
 }) {
   const [photoIndex, setPhotoIndex] = useState(0);
   const [style, setStyle] = useState<Style>("minimal");
+  const [space, setSpace] = useState<Space>("interno");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -111,7 +113,7 @@ function StagingDialog({
       const res = await fetch("/api/virtual-staging", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ imageUrl: sourceUrl, style }),
+        body: JSON.stringify({ imageUrl: sourceUrl, style, space }),
       });
       const json = (await res.json()) as { image?: string; error?: string };
       if (!res.ok || !json.image) {
@@ -174,7 +176,54 @@ function StagingDialog({
                 ))}
               </div>
 
-              <div className="eyebrow mt-8 text-muted-foreground">2. Scegli lo stile</div>
+              <div className="eyebrow mt-8 text-muted-foreground">
+                2. Tipo di ambiente
+              </div>
+              <div className="mt-3 grid grid-cols-2 gap-2">
+                {(
+                  [
+                    {
+                      id: "interno" as Space,
+                      label: "Interno",
+                      hint: "Stanze, soggiorni, camere, cucine",
+                    },
+                    {
+                      id: "esterno" as Space,
+                      label: "Esterno",
+                      hint: "Terrazzi, balconi, logge, corti, giardini",
+                    },
+                  ]
+                ).map((s) => {
+                  const selected = space === s.id;
+                  return (
+                    <button
+                      key={s.id}
+                      type="button"
+                      onClick={() => {
+                        setSpace(s.id);
+                        setResult(null);
+                        setError(null);
+                      }}
+                      className={`rounded-sm border p-3 text-left transition ${
+                        selected
+                          ? "border-primary bg-primary/5"
+                          : "border-border bg-card hover:border-primary/50"
+                      }`}
+                    >
+                      <div className="font-serif text-base text-ink">{s.label}</div>
+                      <p className="mt-1 text-[0.7rem] leading-snug text-muted-foreground">
+                        {s.hint}
+                      </p>
+                    </button>
+                  );
+                })}
+              </div>
+              <p className="mt-2 text-[0.7rem] leading-relaxed text-muted-foreground">
+                Selezione importante: il rendering manterrà sempre la struttura
+                reale della foto (terrazzo resta terrazzo, stanza resta stanza).
+              </p>
+
+              <div className="eyebrow mt-8 text-muted-foreground">3. Scegli lo stile</div>
               <div className="mt-3 space-y-2">
                 {STYLES.map((s) => {
                   const selected = style === s.id;
