@@ -24,7 +24,7 @@ function AdminLoginPage() {
 
   useEffect(() => {
     if (!loading && session && isAdmin) {
-      navigate({ to: "/admin" });
+      navigate({ to: "/admin/immobili" });
     }
   }, [session, isAdmin, loading, navigate]);
 
@@ -36,7 +36,7 @@ function AdminLoginPage() {
         const { error } = await supabase.auth.signUp({
           email,
           password,
-          options: { emailRedirectTo: `${window.location.origin}/admin` },
+          options: { emailRedirectTo: `${window.location.origin}/admin/immobili` },
         });
         if (error) throw error;
         toast.success("Account creato. Controlla l'email per confermare.");

@@ -130,7 +130,7 @@ function PropertyEditor() {
     ]);
     if (e1 || !p) {
       toast.error("Immobile non trovato.");
-      navigate({ to: "/admin" });
+      navigate({ to: "/admin/immobili" });
       return;
     }
     setProp(p as Property);
@@ -192,7 +192,7 @@ function PropertyEditor() {
     const { error } = await supabase.from("properties").delete().eq("id", id);
     if (error) return toast.error(error.message);
     toast.success("Immobile eliminato");
-    navigate({ to: "/admin" });
+    navigate({ to: "/admin/immobili" });
   };
 
   const generate = async () => {
