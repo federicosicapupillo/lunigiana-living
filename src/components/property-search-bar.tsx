@@ -275,10 +275,16 @@ export function PropertySearchBar({
         <option value="">Tutti i comuni</option>
         {comuniList.map((c) => <option key={c} value={c}>{c}</option>)}
       </SelectField>
-      <InputField label="Prezzo da" value={state.price_min} placeholder="Da €"
-        onChange={(v) => setState({ ...state, price_min: sanitizePrice(v) })} />
-      <InputField label="Prezzo a" value={state.price_max} placeholder="A €"
-        onChange={(v) => setState({ ...state, price_max: sanitizePrice(v) })} />
+      <SelectField label="Prezzo da" value={state.price_min}
+        onChange={(v) => setState({ ...state, price_min: v })}
+        placeholder="Da €">
+        {PRICE_MIN_OPTS.map((p) => <option key={p.label} value={p.value}>{p.label}</option>)}
+      </SelectField>
+      <SelectField label="Prezzo a" value={state.price_max}
+        onChange={(v) => setState({ ...state, price_max: v })}
+        placeholder="A €">
+        {PRICE_MAX_OPTS.map((p) => <option key={p.label} value={p.value}>{p.label}</option>)}
+      </SelectField>
 
       <SelectField label="Superficie" value={state.size} onChange={(v) => setState({ ...state, size: v })}>
         {SIZE_RANGES.map((p) => <option key={p.label} value={p.value}>{p.label}</option>)}
