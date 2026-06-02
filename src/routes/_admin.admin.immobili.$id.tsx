@@ -274,9 +274,9 @@ function PropertyEditor() {
   }
 
   return (
-    <div className="mx-auto max-w-7xl px-6 py-8">
+    <div className="mx-auto max-w-7xl px-4 py-5 pb-28 sm:px-6 sm:py-8 sm:pb-8">
       {/* Header */}
-      <div className="flex flex-wrap items-start justify-between gap-4 border-b border-border pb-6">
+      <div className="flex flex-col gap-4 border-b border-border pb-5 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between sm:pb-6">
         <div className="min-w-0 flex-1">
           <Link
             to="/admin/immobili"
@@ -287,7 +287,7 @@ function PropertyEditor() {
           <input
             value={prop.title}
             onChange={(e) => update({ title: e.target.value })}
-            className="mt-3 w-full bg-transparent font-serif text-3xl text-ink focus:outline-none"
+            className="mt-3 w-full bg-transparent font-serif text-2xl text-ink focus:outline-none sm:text-3xl"
           />
           <div className="mt-2 flex items-center gap-3 text-xs text-muted-foreground">
             <span>{STATUS_LABELS[prop.status]}</span>
@@ -295,7 +295,7 @@ function PropertyEditor() {
             <span>{prop.reference_code || "Nessun codice"}</span>
           </div>
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="hidden flex-wrap gap-2 sm:flex">
           <button
             onClick={() => save()}
             disabled={saving}
@@ -328,12 +328,12 @@ function PropertyEditor() {
       </div>
 
       {/* Tabs */}
-      <div className="mt-6 flex flex-wrap gap-1 border-b border-border">
+      <div className="mt-6 -mx-4 flex gap-1 overflow-x-auto border-b border-border px-4 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0">
         {TABS.map((t) => (
           <button
             key={t.id}
             onClick={() => setTab(t.id)}
-            className={`-mb-px border-b-2 px-4 py-2.5 text-sm transition ${
+            className={`-mb-px shrink-0 whitespace-nowrap border-b-2 px-3 py-2.5 text-sm transition sm:px-4 ${
               tab === t.id
                 ? "border-primary text-primary"
                 : "border-transparent text-muted-foreground hover:text-ink"
@@ -371,6 +371,39 @@ function PropertyEditor() {
           />
         )}
       </div>
+
+      {/* Barra azioni mobile fissa */}
+      <div className="fixed inset-x-0 bottom-0 z-30 flex gap-2 border-t border-border bg-background/95 p-3 backdrop-blur sm:hidden">
+        <button
+          onClick={() => save()}
+          disabled={saving}
+          className="inline-flex flex-1 items-center justify-center gap-2 rounded-sm border border-border bg-background px-3 py-2.5 text-xs uppercase tracking-wider hover:border-primary/50 disabled:opacity-50"
+        >
+          {saving ? <Loader2 size={13} className="animate-spin" /> : <Save size={13} />}
+          Salva
+        </button>
+        <button
+          onClick={() => changeStatus("ready")}
+          disabled={prop.status === "ready"}
+          className="inline-flex flex-1 items-center justify-center gap-1 rounded-sm border border-blue-300 bg-blue-50 px-3 py-2.5 text-xs uppercase tracking-wider text-blue-900 disabled:opacity-50"
+        >
+          <CheckCircle2 size={13} /> Pronto
+        </button>
+        <button
+          onClick={() => changeStatus("published")}
+          disabled={prop.status === "published"}
+          className="inline-flex flex-1 items-center justify-center gap-1 rounded-sm bg-emerald-700 px-3 py-2.5 text-xs uppercase tracking-wider text-white disabled:opacity-50"
+        >
+          <Globe2 size={13} /> Pubblica
+        </button>
+        <button
+          onClick={deleteProperty}
+          aria-label="Elimina"
+          className="inline-flex items-center justify-center rounded-sm border border-destructive/30 px-3 py-2.5 text-destructive"
+        >
+          <Trash2 size={13} />
+        </button>
+      </div>
     </div>
   );
 }
@@ -379,7 +412,7 @@ function PropertyEditor() {
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="rounded-sm border border-border bg-card p-6">
+    <div className="rounded-sm border border-border bg-card p-4 sm:p-6">
       <h3 className="font-serif text-lg text-ink">{title}</h3>
       <div className="mt-5 grid gap-4 md:grid-cols-2">{children}</div>
     </div>
@@ -404,7 +437,7 @@ function Field({
 }
 
 const inputCls =
-  "w-full rounded-sm border border-border bg-background px-3 py-2 text-sm focus:border-primary focus:outline-none";
+  "w-full rounded-sm border border-border bg-background px-3 py-2.5 text-base focus:border-primary focus:outline-none sm:py-2 sm:text-sm";
 
 function TextInput({
   value,
