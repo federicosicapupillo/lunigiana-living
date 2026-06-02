@@ -14,13 +14,18 @@ export type PublicProperty = {
   priceValue: number | null;
   type: string;
   sqm: number | null;
+  sqmLabel: string | null;
   rooms: number | null;
+  roomsLabel: string | null;
   bathrooms: number | null;
+  bathroomsLabel: string | null;
   floor: string | null;
   image: string;
   gallery: string[];
   description: string;
   attributes: Record<string, string>;
+  amenities: string[];
+  altreDotazioni: string | null;
   category: "vendita" | "affitto" | "scelti-per-voi";
   featured: boolean;
   tag?: string;
@@ -111,10 +116,25 @@ function adapt(
   const gallery = sortedImages.map((i) => signedMap[i.storage_path]).filter(Boolean);
   const cover = gallery[0] ?? PLACEHOLDER;
   const attrs: Record<string, string> = {};
+  const amenities: string[] = [];
+  let altre: string | null = null;
   for (const f of features) {
-    if (f.feature_value) attrs[f.feature_name] = f.feature_value;
+    if (!f.feature_value) continue;
+    if (f.feature_name.startsWith("amenity:")) {
+      amenities.push(f.feature_value);
+      continue;
+    }
+    if (f.feature_name === "altre_dotazioni") {
+      altre = f.feature_value;
+      continue;
+    }
+    attrs[f.feature_name] = f.feature_value;
   }
   const location = [p.municipality, p.area_zone].filter(Boolean).join(" · ") || "Lunigiana";
+  const sqmLabel = attrs["size_range"] || (p.size_sqm != null ? `${p.size_sqm} m²` : null);
+  const roomsLabel = attrs["bedrooms_label"] || (p.bedrooms != null ? String(p.bedrooms) : null);
+  const bathroomsLabel = attrs["bathrooms_label"] || (p.bathrooms != null ? String(p.bathrooms) : null);
+  const floor = attrs["floor_label"] || (p.floors != null ? String(p.floors) : null);
   return {
     id: p.id,
     slug: p.slug,
@@ -125,13 +145,18 @@ function adapt(
     priceValue: p.price_on_request ? null : p.price,
     type: p.property_type || "Immobile",
     sqm: p.size_sqm,
+    sqmLabel,
     rooms: p.bedrooms,
+    roomsLabel,
     bathrooms: p.bathrooms,
-    floor: p.floors != null ? String(p.floors) : null,
+    bathroomsLabel,
+    floor,
     image: cover,
     gallery: gallery.length ? gallery : [PLACEHOLDER],
     description: description?.edited_description || description?.generated_description || p.short_notes || "",
     attributes: attrs,
+    amenities,
+    altreDotazioni: altre,
     category: deriveCategory(p.contract_type),
     featured: false,
     tag: buildTag(p),
