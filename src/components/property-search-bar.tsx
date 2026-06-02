@@ -36,6 +36,19 @@ const SORT_OPTS = [
   { label: "Superficie decrescente", value: "size-desc" },
 ];
 
+const PRICE_STEPS = [50000, 100000, 150000, 200000, 250000, 300000, 400000, 500000, 750000, 1000000];
+const fmtPrice = (n: number) => `${n.toLocaleString("it-IT")} €`;
+const PRICE_MIN_OPTS = [
+  { label: "Nessun minimo", value: "" },
+  ...PRICE_STEPS.map((n) => ({ label: fmtPrice(n), value: String(n) })),
+  { label: "Oltre 1.000.000 €", value: "1000001" },
+];
+const PRICE_MAX_OPTS = [
+  { label: "Nessun massimo", value: "" },
+  ...PRICE_STEPS.map((n) => ({ label: fmtPrice(n), value: String(n) })),
+  { label: "Oltre 1.000.000 €", value: "1000001" },
+];
+
 const FEATURE_GROUPS: { label: string; items: string[] }[] = [
   {
     label: "Esterni",
@@ -97,11 +110,6 @@ const EMPTY: SearchValues = {
   type: "", comune: "", price_min: "", price_max: "",
   size: "", rooms: "", features: [], sort: "recent",
 };
-
-function sanitizePrice(v: string): string {
-  const cleaned = v.replace(/[^0-9]/g, "");
-  return cleaned;
-}
 
 export interface PropertySearchBarProps {
   initial?: Partial<SearchValues>;
