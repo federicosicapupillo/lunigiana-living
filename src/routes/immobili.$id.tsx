@@ -171,6 +171,34 @@ function PropertyDetail() {
               )}
             </div>
           )}
+
+          {/* Highlights: punti di forza, target, atmosfera, architettonici */}
+          {p.highlights && p.highlights.length > 0 && (
+            <div className="mt-12 space-y-8">
+              {p.highlights.map((h) => (
+                <div key={h.key}>
+                  <span className="eyebrow">{h.label}</span>
+                  {h.items.length > 0 && (
+                    <ul className="mt-4 flex flex-wrap gap-2">
+                      {h.items.map((it) => (
+                        <li
+                          key={it}
+                          className="rounded-sm border border-primary/20 bg-primary/5 px-3 py-1.5 text-xs tracking-wide text-ink"
+                        >
+                          {it}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                  {h.note && (
+                    <p className="mt-4 whitespace-pre-line text-sm leading-relaxed text-foreground/85">
+                      {h.note}
+                    </p>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Contact card */}
