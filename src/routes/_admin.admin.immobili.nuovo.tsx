@@ -335,6 +335,22 @@ function NewPropertyPage() {
           <Field label="Titolo annuncio" full required>
             <TextInput value={f.title} onChange={(v) => upd("title", v)} placeholder="Es. Casale in pietra con vista sulle Apuane" />
           </Field>
+          <Field label="Tipologia immobile" full required>
+            <SelectInput
+              value={f.property_type}
+              onChange={(v) => upd("property_type", v)}
+              options={PROPERTY_TYPES.map((o) => ({ value: o, label: o }))}
+              placeholder="Seleziona tipologia immobile"
+            />
+          </Field>
+          <Field label="Descrizione libera" full>
+            <TextArea
+              value={f.descrizione_libera}
+              onChange={(v) => upd("descrizione_libera", v)}
+              rows={5}
+              placeholder="Scrivi qui una descrizione personalizzata dell'immobile, del contesto, della vista, del terreno, delle potenzialità o di altri dettagli importanti…"
+            />
+          </Field>
           <Field label="Codice riferimento">
             <TextInput value={f.reference_code} onChange={(v) => upd("reference_code", v)} placeholder="RIF-2026-014" />
           </Field>
@@ -347,13 +363,6 @@ function NewPropertyPage() {
                 { value: "ready", label: "Pronto" },
                 { value: "published", label: "Pubblicato" },
               ]}
-            />
-          </Field>
-          <Field label="Tipologia immobile">
-            <SelectInput
-              value={f.property_type}
-              onChange={(v) => upd("property_type", v)}
-              options={PROPERTY_TYPES.map((o) => ({ value: o, label: o }))}
             />
           </Field>
           <Field label="Contratto">
