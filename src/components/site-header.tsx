@@ -15,7 +15,7 @@ const nav = [
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
   return (
-    <header className="sticky top-0 z-40 border-b border-border/60 bg-background/85 backdrop-blur-md">
+    <header className="sticky top-0 z-40 border-b border-warm-border/70 bg-warm-cream/90 backdrop-blur-md">
       <div className="container-editorial flex h-20 items-center justify-between">
         <Link to="/" className="group flex items-center" aria-label="Furia Immobiliare — Home">
           <img
@@ -30,19 +30,17 @@ export function SiteHeader() {
             <Link
               key={n.to}
               to={n.to}
-              className="text-sm tracking-wide text-foreground/75 transition-colors hover:text-primary"
-              activeProps={{ className: "text-primary" }}
+              className="group relative text-sm tracking-wide text-ink/75 transition-colors hover:text-primary"
+              activeProps={{ className: "text-primary [&>span:last-child]:scale-x-100" }}
               activeOptions={{ exact: n.to === "/" }}
             >
-              {n.label}
+              <span>{n.label}</span>
+              <span className="pointer-events-none absolute -bottom-1 left-0 h-px w-full origin-left scale-x-0 bg-primary transition-transform duration-300 group-hover:scale-x-100" />
             </Link>
           ))}
         </nav>
 
-        <Link
-          to="/contatti"
-          className="hidden rounded-sm bg-primary px-5 py-2.5 text-xs uppercase tracking-[0.18em] text-primary-foreground transition-colors hover:bg-primary/90 lg:inline-block"
-        >
+        <Link to="/contatti" className="btn-primary hidden !py-2.5 !px-5 lg:inline-flex">
           Parla con noi
         </Link>
 
@@ -68,11 +66,7 @@ export function SiteHeader() {
                 {n.label}
               </Link>
             ))}
-            <Link
-              to="/contatti"
-              onClick={() => setOpen(false)}
-              className="mt-3 rounded-sm bg-primary px-5 py-3 text-center text-xs uppercase tracking-[0.18em] text-primary-foreground"
-            >
+            <Link to="/contatti" onClick={() => setOpen(false)} className="btn-primary mt-3">
               Parla con noi
             </Link>
           </nav>
