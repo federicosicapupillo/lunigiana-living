@@ -51,67 +51,81 @@ function TerritoriPage() {
         </div>
       </section>
 
-      <section className="container-editorial grid gap-12 py-24 md:grid-cols-12 md:py-32">
-        <div className="md:col-span-5">
-          <span className="eyebrow">Il luogo</span>
-          <h2 className="mt-3 font-serif text-4xl text-ink md:text-5xl">
-            Tra Toscana, Liguria<br /><em className="italic">ed Emilia.</em>
-          </h2>
-          <p className="mt-6 text-sm uppercase tracking-[0.2em] text-muted-foreground">
-            Massa-Carrara · alta valle del Magra
-          </p>
-        </div>
-        <div className="space-y-5 text-base leading-relaxed text-foreground/85 md:col-span-6 md:col-start-7">
-          <p>
-            La Lunigiana è una valle stretta fra l'Appennino tosco-emiliano e
-            le Alpi Apuane, attraversata dal fiume Magra e dalla via Francigena.
-            Per secoli è stata terra di passaggio: pellegrini diretti a Roma,
-            mercanti, pastori, eserciti. Da quel transito sono nate pievi
-            romaniche, castelli Malaspina e una rete fittissima di borghi in
-            pietra arroccati sui crinali.
-          </p>
-          <p>
-            Oggi è uno dei pochi luoghi in Italia dove i centri storici
-            medievali sono ancora abitati davvero — non solo visitati — e dove
-            il prezzo di una casa di carattere non ha perso il senso delle
-            proporzioni. Un'ora dal mare delle Cinque Terre, un'ora dalle piste
-            dell'Abetone, mezz'ora dai marmi di Carrara: la Lunigiana è centrale
-            proprio perché sembra appartata.
-          </p>
+      <section className="bg-warm-cream">
+        <div className="container-editorial grid gap-12 py-24 md:grid-cols-12 md:py-32">
+          <div className="md:col-span-5">
+            <span className="eyebrow">Il luogo</span>
+            <h2 className="mt-3 font-serif text-4xl text-ink md:text-5xl">
+              Tra Toscana, Liguria<br /><em className="italic">ed Emilia.</em>
+            </h2>
+            <p className="mt-6 text-sm uppercase tracking-[0.2em] text-muted-foreground">
+              Massa-Carrara · alta valle del Magra
+            </p>
+            <div className="mt-8 h-px w-16 bg-warm-border" />
+          </div>
+          <div className="space-y-5 text-[1.0625rem] leading-[1.75] text-foreground/85 md:col-span-6 md:col-start-7">
+            <p>
+              La Lunigiana è una valle stretta fra l'Appennino tosco-emiliano e
+              le Alpi Apuane, attraversata dal fiume Magra e dalla via Francigena.
+              Per secoli è stata terra di passaggio: pellegrini diretti a Roma,
+              mercanti, pastori, eserciti. Da quel transito sono nate pievi
+              romaniche, castelli Malaspina e una rete fittissima di borghi in
+              pietra arroccati sui crinali.
+            </p>
+            <p>
+              Oggi è uno dei pochi luoghi in Italia dove i centri storici
+              medievali sono ancora abitati davvero — non solo visitati — e dove
+              il prezzo di una casa di carattere non ha perso il senso delle
+              proporzioni. Un'ora dal mare delle Cinque Terre, un'ora dalle piste
+              dell'Abetone, mezz'ora dai marmi di Carrara: la Lunigiana è centrale
+              proprio perché sembra appartata.
+            </p>
+          </div>
         </div>
       </section>
 
-      <section className="border-y border-border/60 bg-card">
-        <div className="container-editorial grid gap-10 py-20 md:grid-cols-3 md:py-24">
-          {[
-            {
-              icon: MapPin,
-              title: "Posizione strategica",
-              body: "Casello A15 della Cisa, stazione di Pontremoli sulla Parma-La Spezia, aeroporti di Pisa e Genova a circa un'ora. Milano in poco più di due ore di auto.",
-            },
-            {
-              icon: Mountain,
-              title: "Paesaggio intatto",
-              body: "Parco Nazionale dell'Appennino Tosco-Emiliano, Apuane, foreste di castagni e faggi, fiumi balneabili. Una densità abitativa fra le più basse del centro Italia.",
-            },
-            {
-              icon: Sparkles,
-              title: "Qualità della vita",
-              body: "Servizi essenziali in ogni capoluogo, scuole, sanità di prossimità, mercati settimanali, una scena gastronomica autentica (testaroli, panigacci, funghi di Borgotaro, agnello di Zeri).",
-            },
-          ].map(({ icon: Icon, title, body }) => (
-            <div key={title}>
-              <div className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-primary/10 text-primary">
-                <Icon size={20} />
+      <section className="bg-warm-sand">
+        <div className="container-editorial py-20 md:py-28">
+          <div className="max-w-2xl">
+            <span className="eyebrow">Perché qui</span>
+            <h2 className="mt-3 font-serif text-3xl text-ink md:text-4xl">
+              Tre ragioni per <em className="italic">sceglierla.</em>
+            </h2>
+          </div>
+          <div className="mt-12 grid gap-6 md:mt-16 md:grid-cols-3">
+            {[
+              {
+                icon: MapPin,
+                title: "Posizione strategica",
+                body: "Casello A15 della Cisa, stazione di Pontremoli sulla Parma-La Spezia, aeroporti di Pisa e Genova a circa un'ora. Milano in poco più di due ore di auto.",
+              },
+              {
+                icon: Mountain,
+                title: "Paesaggio intatto",
+                body: "Parco Nazionale dell'Appennino Tosco-Emiliano, Apuane, foreste di castagni e faggi, fiumi balneabili. Una densità abitativa fra le più basse del centro Italia.",
+              },
+              {
+                icon: Sparkles,
+                title: "Qualità della vita",
+                body: "Servizi essenziali in ogni capoluogo, scuole, sanità di prossimità, mercati settimanali, una scena gastronomica autentica (testaroli, panigacci, funghi di Borgotaro, agnello di Zeri).",
+              },
+            ].map(({ icon: Icon, title, body }) => (
+              <div
+                key={title}
+                className="rounded-md border border-warm-border/70 bg-warm-ivory p-8 shadow-[0_1px_2px_rgba(42,33,28,0.04)] transition hover:shadow-[0_8px_24px_-12px_rgba(42,33,28,0.18)] md:p-10"
+              >
+                <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
+                  <Icon size={22} />
+                </div>
+                <h3 className="mt-6 font-serif text-2xl text-ink">{title}</h3>
+                <p className="mt-4 text-[0.95rem] leading-relaxed text-foreground/80">{body}</p>
               </div>
-              <h3 className="mt-5 font-serif text-2xl text-ink">{title}</h3>
-              <p className="mt-3 text-sm leading-relaxed text-foreground/80">{body}</p>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </section>
 
-      <section className="bg-muted/40 py-24 md:py-32">
+      <section className="bg-warm-ivory py-24 md:py-32">
         <div className="container-editorial">
           <span className="eyebrow">I borghi</span>
           <h2 className="mt-3 max-w-3xl font-serif text-4xl text-ink md:text-5xl">
@@ -151,14 +165,16 @@ function TerritoriPage() {
         </div>
       </section>
 
-      <section className="container-editorial grid gap-12 py-24 md:grid-cols-12 md:py-32">
-        <div className="md:col-span-5">
-          <span className="eyebrow">Comprare in Lunigiana</span>
-          <h2 className="mt-3 font-serif text-4xl text-ink md:text-5xl">
-            Cosa si trova,<br /><em className="italic">e a che condizioni.</em>
-          </h2>
-        </div>
-        <div className="space-y-5 text-base leading-relaxed text-foreground/85 md:col-span-6 md:col-start-7">
+      <section className="bg-warm-cream">
+        <div className="container-editorial grid gap-12 py-24 md:grid-cols-12 md:py-32">
+          <div className="md:col-span-5">
+            <span className="eyebrow">Comprare in Lunigiana</span>
+            <h2 className="mt-3 font-serif text-4xl text-ink md:text-5xl">
+              Cosa si trova,<br /><em className="italic">e a che condizioni.</em>
+            </h2>
+            <div className="mt-8 h-px w-16 bg-warm-border" />
+          </div>
+          <div className="space-y-5 text-[1.0625rem] leading-[1.75] text-foreground/85 md:col-span-6 md:col-start-7">
           <p>
             Il mercato lunigianese non assomiglia a quello di Lucca o della
             Versilia. Qui si trovano ancora case di paese in pietra a vista,
@@ -174,6 +190,7 @@ function TerritoriPage() {
             Sono proprio gli aspetti su cui ti accompagniamo, perché una bella
             foto da sola non basta a dire se quella casa è davvero per te.
           </p>
+          </div>
         </div>
       </section>
 

@@ -66,54 +66,52 @@ function ChiSiamoPage() {
         </figure>
       </section>
 
-      <section className="container-editorial py-20 md:py-28">
-        <div className="mx-auto max-w-3xl space-y-6 text-center">
-          <span className="eyebrow">Il nostro modo di lavorare</span>
-          <h2 className="font-serif text-3xl text-ink md:text-5xl">
-            Persone, prima degli immobili.
-          </h2>
-        </div>
+      <section className="bg-warm-sand">
+        <div className="container-editorial py-20 md:py-28">
+          <div className="mx-auto max-w-3xl space-y-4 text-center">
+            <span className="eyebrow">Il nostro modo di lavorare</span>
+            <h2 className="font-serif text-3xl text-ink md:text-5xl">
+              Persone, prima degli immobili.
+            </h2>
+          </div>
 
-        <div className="mt-16 grid gap-10 md:grid-cols-3">
-          {[
-            {
-              t: "Ascolto",
-              b: "Prima di proporre una casa, ascoltiamo il modo in cui vuoi vivere.",
-            },
-            {
-              t: "Territorio",
-              b: "Conosciamo la Lunigiana non solo come mercato, ma come luogo da abitare.",
-            },
-            {
-              t: "Cura",
-              b: "Ogni immobile viene raccontato con attenzione, rispetto e sensibilità.",
-            },
-          ].map((s) => (
-            <div key={s.t} className="border-t border-border pt-6">
-              <h3 className="font-serif text-2xl text-ink">{s.t}</h3>
-              <p className="mt-3 text-sm leading-relaxed text-foreground/75">{s.b}</p>
-            </div>
-          ))}
-        </div>
-      </section>
+          <div className="mt-14 grid gap-6 md:grid-cols-3">
+            {[
+              { t: "Ascolto", b: "Prima di proporre una casa, ascoltiamo il modo in cui vuoi vivere." },
+              { t: "Territorio", b: "Conosciamo la Lunigiana non solo come mercato, ma come luogo da abitare." },
+              { t: "Cura", b: "Ogni immobile viene raccontato con attenzione, rispetto e sensibilità." },
+            ].map((s) => (
+              <div
+                key={s.t}
+                className="rounded-md border border-warm-border/70 bg-warm-ivory p-8 shadow-[0_1px_2px_rgba(42,33,28,0.04)] transition hover:shadow-[0_8px_24px_-12px_rgba(42,33,28,0.18)] md:p-10"
+              >
+                <div className="h-px w-10 bg-primary/60" />
+                <h3 className="mt-5 font-serif text-2xl text-ink">{s.t}</h3>
+                <p className="mt-3 text-[0.95rem] leading-relaxed text-foreground/80">{s.b}</p>
+              </div>
+            ))}
+          </div>
 
-      <section className="container-editorial pb-24 md:pb-32">
-        <div className="grid gap-12 md:grid-cols-3">
-          {[
-            { n: "30+", l: "Anni sul territorio", b: "Una presenza continua a Pontremoli e in tutta la Lunigiana." },
-            { n: "500+", l: "Famiglie accompagnate", b: "Compratori italiani e internazionali che hanno scelto questa terra." },
-            { n: "6", l: "Comuni di riferimento", b: "Pontremoli, Villafranca, Filattiera, Mulazzo, Bagnone, Zeri." },
-          ].map((s) => (
-            <div key={s.l} className="border-t border-border pt-6">
-              <div className="font-serif text-6xl text-primary">{s.n}</div>
-              <div className="mt-3 eyebrow">{s.l}</div>
-              <p className="mt-3 text-sm leading-relaxed text-foreground/75">{s.b}</p>
-            </div>
-          ))}
+          <div className="mt-12 grid gap-6 md:mt-16 md:grid-cols-3">
+            {[
+              { n: "30+", l: "Anni sul territorio", b: "Una presenza continua a Pontremoli e in tutta la Lunigiana." },
+              { n: "500+", l: "Famiglie accompagnate", b: "Compratori italiani e internazionali che hanno scelto questa terra." },
+              { n: "6", l: "Comuni di riferimento", b: "Pontremoli, Villafranca, Filattiera, Mulazzo, Bagnone, Zeri." },
+            ].map((s) => (
+              <div
+                key={s.l}
+                className="rounded-md border border-warm-border/70 bg-warm-cream p-8 text-center md:p-10"
+              >
+                <div className="font-serif text-5xl text-primary md:text-6xl">{s.n}</div>
+                <div className="mt-3 eyebrow">{s.l}</div>
+                <p className="mt-3 text-[0.9rem] leading-relaxed text-foreground/75">{s.b}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
-      <section className="container-editorial pb-32">
+      <section className="container-editorial py-24 md:py-32">
         <blockquote className="mx-auto max-w-3xl text-center">
           <p className="font-serif text-3xl italic leading-relaxed text-ink md:text-4xl">
             "Hanno trovato non una casa, ma il nostro posto.
