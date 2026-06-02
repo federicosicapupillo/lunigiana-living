@@ -179,7 +179,7 @@ function NewPropertyPage() {
       const payload = {
         title: f.title.trim(),
         slug: slugify(f.title),
-        reference_code: f.reference_code.trim() || null,
+        // reference_code: assegnato automaticamente dal trigger (FURIA-NNNN)
         property_type: f.property_type || null,
         contract_type: f.contract_type || null,
         price: f.price_on_request ? null : toNum(f.price),
@@ -189,11 +189,11 @@ function NewPropertyPage() {
         province: f.province.trim() || null,
         region: f.region.trim() || null,
         address: f.address.trim() || null,
+        locality: f.locality.trim() || null,
         area_zone: f.area_zone.trim() || null,
         postal_code: f.postal_code.trim() || null,
         country: f.country.trim() || null,
-        latitude: toNum(f.latitude),
-        longitude: toNum(f.longitude),
+        show_full_address: f.show_full_address,
         size_sqm: toNum(f.size_sqm),
         bedrooms: toNum(f.bedrooms),
         bathrooms: toNum(f.bathrooms),
