@@ -8,6 +8,7 @@ import heroBorgoAsset from "@/assets/real/bagnone-borgo.jpg.asset.json";
 import heroCastelloTramontoAsset from "@/assets/real/hero-castello-tramonto.jpg.asset.json";
 import heroCastelloAereoAsset from "@/assets/real/hero-castello-aereo.jpg.asset.json";
 import heroCastelloBorgoAsset from "@/assets/real/hero-castello-borgo.png.asset.json";
+import heroTramontoVignetiAsset from "@/assets/real/hero-tramonto-vigneti.png.asset.json";
 import territoryPontremoli from "@/assets/real/pontremoli-scorcio.jpg";
 import territoryBagnone from "@/assets/real/bagnone-castello.jpg";
 import territoryZeri from "@/assets/real/zeri-monte.jpg";
@@ -32,13 +33,18 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   const [heroVariant, setHeroVariant] = useState<
-    "castelloBorgo" | "panoramico" | "intimo" | "colline" | "borgo" | "tramonto" | "aereo"
+    "castelloBorgo" | "tramontoVigneti" | "panoramico" | "intimo" | "colline" | "borgo" | "tramonto" | "aereo"
   >("castelloBorgo");
   const heroMap = {
     castelloBorgo: {
       src: heroCastelloBorgoAsset.url,
       alt: "Castello e borgo medievale in pietra della Lunigiana immersi nei boschi",
       label: "Castello · Borgo",
+    },
+    tramontoVigneti: {
+      src: heroTramontoVignetiAsset.url,
+      alt: "Tramonto infuocato sulle Apuane con vigneti, uliveti e borgo della Lunigiana in lontananza",
+      label: "Tramonto · Vigneti",
     },
     panoramico: {
       src: heroPanoramico,
