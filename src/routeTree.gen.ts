@@ -22,6 +22,7 @@ import { Route as ImmobiliIdRouteImport } from './routes/immobili.$id'
 import { Route as ApiVirtualStagingRouteImport } from './routes/api/virtual-staging'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
 import { Route as AdminAdminRouteImport } from './routes/_admin.admin'
+import { Route as AdminAdminImmobiliNuovoRouteImport } from './routes/_admin.admin.immobili.nuovo'
 import { Route as AdminAdminImmobiliIdRouteImport } from './routes/_admin.admin.immobili.$id'
 
 const TerritoriRoute = TerritoriRouteImport.update({
@@ -88,6 +89,11 @@ const AdminAdminRoute = AdminAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminAdminImmobiliNuovoRoute = AdminAdminImmobiliNuovoRouteImport.update({
+  id: '/immobili/nuovo',
+  path: '/immobili/nuovo',
+  getParentRoute: () => AdminAdminRoute,
+} as any)
 const AdminAdminImmobiliIdRoute = AdminAdminImmobiliIdRouteImport.update({
   id: '/immobili/$id',
   path: '/immobili/$id',
@@ -108,6 +114,7 @@ export interface FileRoutesByFullPath {
   '/immobili/$id': typeof ImmobiliIdRoute
   '/immobili/': typeof ImmobiliIndexRoute
   '/admin/immobili/$id': typeof AdminAdminImmobiliIdRoute
+  '/admin/immobili/nuovo': typeof AdminAdminImmobiliNuovoRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -122,6 +129,7 @@ export interface FileRoutesByTo {
   '/immobili/$id': typeof ImmobiliIdRoute
   '/immobili': typeof ImmobiliIndexRoute
   '/admin/immobili/$id': typeof AdminAdminImmobiliIdRoute
+  '/admin/immobili/nuovo': typeof AdminAdminImmobiliNuovoRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -139,6 +147,7 @@ export interface FileRoutesById {
   '/immobili/$id': typeof ImmobiliIdRoute
   '/immobili/': typeof ImmobiliIndexRoute
   '/_admin/admin/immobili/$id': typeof AdminAdminImmobiliIdRoute
+  '/_admin/admin/immobili/nuovo': typeof AdminAdminImmobiliNuovoRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -156,6 +165,7 @@ export interface FileRouteTypes {
     | '/immobili/$id'
     | '/immobili/'
     | '/admin/immobili/$id'
+    | '/admin/immobili/nuovo'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -170,6 +180,7 @@ export interface FileRouteTypes {
     | '/immobili/$id'
     | '/immobili'
     | '/admin/immobili/$id'
+    | '/admin/immobili/nuovo'
   id:
     | '__root__'
     | '/'
@@ -186,6 +197,7 @@ export interface FileRouteTypes {
     | '/immobili/$id'
     | '/immobili/'
     | '/_admin/admin/immobili/$id'
+    | '/_admin/admin/immobili/nuovo'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -294,6 +306,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAdminRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/_admin/admin/immobili/nuovo': {
+      id: '/_admin/admin/immobili/nuovo'
+      path: '/immobili/nuovo'
+      fullPath: '/admin/immobili/nuovo'
+      preLoaderRoute: typeof AdminAdminImmobiliNuovoRouteImport
+      parentRoute: typeof AdminAdminRoute
+    }
     '/_admin/admin/immobili/$id': {
       id: '/_admin/admin/immobili/$id'
       path: '/immobili/$id'
@@ -306,10 +325,12 @@ declare module '@tanstack/react-router' {
 
 interface AdminAdminRouteChildren {
   AdminAdminImmobiliIdRoute: typeof AdminAdminImmobiliIdRoute
+  AdminAdminImmobiliNuovoRoute: typeof AdminAdminImmobiliNuovoRoute
 }
 
 const AdminAdminRouteChildren: AdminAdminRouteChildren = {
   AdminAdminImmobiliIdRoute: AdminAdminImmobiliIdRoute,
+  AdminAdminImmobiliNuovoRoute: AdminAdminImmobiliNuovoRoute,
 }
 
 const AdminAdminRouteWithChildren = AdminAdminRoute._addFileChildren(
@@ -355,3 +376,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
