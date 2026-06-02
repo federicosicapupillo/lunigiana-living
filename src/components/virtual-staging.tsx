@@ -489,7 +489,7 @@ function SideBySide({
   return (
     <div className="grid gap-3 sm:grid-cols-2">
       <Pane src={before} caption="Prima · originale" onOpen={onOpenBefore} />
-      <Pane src={after} caption={`Dopo · stile ${style}`} onOpen={onOpenAfter} />
+      <Pane src={after} caption={`Dopo · restyling ${style}`} onOpen={onOpenAfter} />
     </div>
   );
 }
@@ -567,7 +567,7 @@ function SliderCompare({ before, after }: { before: string; after: string }) {
         Prima
       </span>
       <span className="absolute right-3 top-3 rounded-sm bg-primary/90 px-2.5 py-1 text-[0.6rem] uppercase tracking-[0.2em] text-primary-foreground backdrop-blur">
-        Dopo
+        Dopo · restyling AI
       </span>
     </div>
   );
