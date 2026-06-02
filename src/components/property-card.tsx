@@ -28,6 +28,7 @@ export function PropertyCard({ p }: { p: PropertyCardData }) {
           src={p.image}
           alt={p.title}
           loading="lazy"
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
           watermarkSize="md"
           className="h-full w-full object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-105"
         />
