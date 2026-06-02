@@ -21,19 +21,20 @@ function ChiSiamoPage() {
         <div className="md:col-span-7">
           <span className="eyebrow">Chi siamo</span>
           <h1 className="mt-3 font-serif text-5xl leading-[1.05] text-ink md:text-7xl">
-            Una famiglia,<br /><em className="font-normal italic">una terra,</em><br />un mestiere antico.
+            Una presenza vera,<br /><em className="font-normal italic">dal primo passo</em><br />alla firma finale.
           </h1>
         </div>
         <div className="space-y-5 text-base leading-relaxed text-foreground/85 md:col-span-5 md:pt-12">
           <p>
-            Furia Immobiliare nasce a Pontremoli, nel cuore della Lunigiana. La
-            nostra è una storia di radici: siamo cresciuti qui, conosciamo le
-            persone, le strade, le case e i loro silenzi.
+            Furia Immobiliare è guidata dalla Dott.ssa Furia Elena, che ha
+            fondato l'agenzia con un'idea chiara: offrire a Pontremoli e in
+            tutta la Lunigiana un servizio immobiliare diverso — meno
+            affrettato, più attento.
           </p>
           <p>
-            Lavoriamo con poche case, ma scelte. Preferiamo accompagnare bene
-            che vendere in fretta. Crediamo che una casa non sia solo un bene,
-            ma un modo di stare al mondo.
+            Non ci limitiamo a mostrare case. Ascoltiamo prima di tutto,
+            capiamo cosa cercate e poi camminiamo insieme, con calma e
+            competenza, fino al rogito notarile.
           </p>
         </div>
       </section>
@@ -44,6 +45,41 @@ function ChiSiamoPage() {
       </figure>
 
       <section className="container-editorial py-24 md:py-32">
+        <div className="mx-auto max-w-3xl space-y-6 text-center">
+          <span className="eyebrow">Il nostro modo di lavorare</span>
+          <p className="text-base leading-relaxed text-foreground/85">
+            Conosciamo ogni strada, ogni borgo, ogni proprietà che proponiamo.
+            Seguiamo le compravendite e le locazioni con professionalità e un
+            tratto personale che solo chi vive veramente il territorio può
+            offrire. Ogni consulenza è su misura, perché ogni cliente ha una
+            storia diversa.
+          </p>
+        </div>
+
+        <div className="mt-16 grid gap-10 md:grid-cols-3">
+          {[
+            {
+              t: "Ascolto prima di tutto",
+              b: "Capire il vostro progetto è il nostro primo passo. Solo dopo cerchiamo l'immobile giusto.",
+            },
+            {
+              t: "Conoscenza del territorio",
+              b: "Ogni borgo, ogni proprietà, ogni dettaglio che conta. La Lunigiana la conosciamo davvero.",
+            },
+            {
+              t: "Presenza costante",
+              b: "Dalla prima visita all'assistenza tecnico-contrattuale: sempre al vostro fianco, fino al rogito.",
+            },
+          ].map((s) => (
+            <div key={s.t} className="border-t border-border pt-6">
+              <h3 className="font-serif text-2xl text-ink">{s.t}</h3>
+              <p className="mt-3 text-sm leading-relaxed text-foreground/75">{s.b}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="container-editorial pb-24 md:pb-32">
         <div className="grid gap-12 md:grid-cols-3">
           {[
             { n: "30+", l: "Anni sul territorio", b: "Una presenza continua a Pontremoli e in tutta la Lunigiana." },
