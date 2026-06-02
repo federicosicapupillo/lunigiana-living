@@ -7,6 +7,7 @@ import heroColline from "@/assets/real/hero-pontremoli-colline.jpg";
 import heroBorgoAsset from "@/assets/real/bagnone-borgo.jpg.asset.json";
 import heroCastelloTramontoAsset from "@/assets/real/hero-castello-tramonto.jpg.asset.json";
 import heroCastelloAereoAsset from "@/assets/real/hero-castello-aereo.jpg.asset.json";
+import heroCastelloBorgoAsset from "@/assets/real/hero-castello-borgo.png.asset.json";
 import territoryPontremoli from "@/assets/real/pontremoli-scorcio.jpg";
 import territoryBagnone from "@/assets/real/bagnone-castello.jpg";
 import territoryZeri from "@/assets/real/zeri-monte.jpg";
@@ -31,9 +32,14 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   const [heroVariant, setHeroVariant] = useState<
-    "panoramico" | "intimo" | "colline" | "borgo" | "tramonto" | "aereo"
-  >("panoramico");
+    "castelloBorgo" | "panoramico" | "intimo" | "colline" | "borgo" | "tramonto" | "aereo"
+  >("castelloBorgo");
   const heroMap = {
+    castelloBorgo: {
+      src: heroCastelloBorgoAsset.url,
+      alt: "Castello e borgo medievale in pietra della Lunigiana immersi nei boschi",
+      label: "Castello · Borgo",
+    },
     panoramico: {
       src: heroPanoramico,
       alt: "Pontremoli e il castello del Piagnaro al tramonto, panorama sulla Lunigiana",
