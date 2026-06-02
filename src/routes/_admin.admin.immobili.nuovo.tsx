@@ -293,7 +293,9 @@ function NewPropertyPage() {
                 {STATUS_LABELS[f.status]}
               </span>
               <span>·</span>
-              <span>{f.reference_code || "Nessun codice"}</span>
+              <span className="italic text-muted-foreground">
+                Riferimento generato al salvataggio
+              </span>
             </div>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -351,9 +353,6 @@ function NewPropertyPage() {
               rows={5}
               placeholder="Scrivi qui una descrizione personalizzata dell'immobile, del contesto, della vista, del terreno, delle potenzialità o di altri dettagli importanti…"
             />
-          </Field>
-          <Field label="Codice riferimento">
-            <TextInput value={f.reference_code} onChange={(v) => upd("reference_code", v)} placeholder="RIF-2026-014" />
           </Field>
           <Field label="Stato annuncio">
             <SelectInput
