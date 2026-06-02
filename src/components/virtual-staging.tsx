@@ -19,6 +19,7 @@ import {
 type Style = "minimal" | "rustico" | "luxury";
 type CompareMode = "side" | "slider" | "toggle";
 type Space = "interno" | "esterno";
+type Intensity = "decisa" | "delicata";
 
 const STYLES: { id: Style; label: string; description: string }[] = [
   {
@@ -97,6 +98,7 @@ function StagingDialog({
   const [photoIndex, setPhotoIndex] = useState(0);
   const [style, setStyle] = useState<Style>("minimal");
   const [space, setSpace] = useState<Space>("interno");
+  const [intensity, setIntensity] = useState<Intensity>("decisa");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -113,7 +115,7 @@ function StagingDialog({
       const res = await fetch("/api/virtual-staging", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ imageUrl: sourceUrl, style, space }),
+        body: JSON.stringify({ imageUrl: sourceUrl, style, space, intensity }),
       });
       const json = (await res.json()) as { image?: string; error?: string };
       if (!res.ok || !json.image) {
