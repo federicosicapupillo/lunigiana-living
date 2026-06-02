@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Plus, Search, Loader2, ImageOff } from "lucide-react";
@@ -32,7 +32,7 @@ function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [q, setQ] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | "draft" | "ready" | "published">("all");
-  const navigate = useNavigate();
+  // navigation handled by <Link> components
 
   const load = async () => {
     setLoading(true);
@@ -91,28 +91,7 @@ function AdminDashboard() {
     });
   }, [rows, q, statusFilter]);
 
-  const createNew = async () => {
-    const t = toast.loading("Creazione nuovo immobile…");
-    try {
-      const { data: sessionData } = await supabase.auth.getSession();
-      const userId = sessionData.session?.user.id ?? null;
-      const { data, error } = await supabase
-        .from("properties")
-        .insert({ title: "Nuovo immobile", created_by: userId })
-        .select("id")
-        .single();
-      if (error) {
-        console.error("[admin] insert property failed:", error);
-        toast.error(`Impossibile creare l'immobile: ${error.message}`, { id: t });
-        return;
-      }
-      toast.success("Immobile creato", { id: t });
-      navigate({ to: "/admin/immobili/$id", params: { id: data.id } });
-    } catch (err) {
-      console.error("[admin] createNew threw:", err);
-      toast.error(err instanceof Error ? err.message : "Errore sconosciuto", { id: t });
-    }
-  };
+  // "+ Nuovo immobile" ora apre la pagina dedicata di creazione (Link sotto).
 
   const counts = useMemo(
     () => ({
@@ -133,12 +112,12 @@ function AdminDashboard() {
             {counts.all} totali · {counts.published} pubblicati · {counts.ready} pronti · {counts.draft} in bozza
           </p>
         </div>
-        <button
-          onClick={createNew}
+        <Link
+          to="/admin/immobili/nuovo"
           className="inline-flex items-center gap-2 rounded-sm bg-primary px-5 py-2.5 text-xs uppercase tracking-[0.18em] text-primary-foreground hover:bg-primary/90"
         >
           <Plus size={15} /> Nuovo immobile
-        </button>
+        </Link>
       </div>
 
       <div className="mt-8 flex flex-wrap items-center gap-3 border-b border-border pb-4">
