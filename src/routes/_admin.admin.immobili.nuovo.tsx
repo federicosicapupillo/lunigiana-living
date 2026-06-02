@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import {
@@ -21,9 +21,8 @@ import {
   HEATING_OPTIONS,
   FLOOR_OPTIONS,
   FLOOR_TO_NUMBER,
-  REGIONS,
-  PROVINCES,
 } from "@/lib/admin/property-constants";
+import { LocationFields, EMPTY_LOCATION, type LocationValue } from "@/components/admin/location-fields";
 
 export const Route = createFileRoute("/_admin/admin/immobili/nuovo")({
   head: () => ({
