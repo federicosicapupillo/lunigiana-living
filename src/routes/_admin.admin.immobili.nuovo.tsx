@@ -162,6 +162,10 @@ function NewPropertyPage() {
       toast.error("Il titolo è obbligatorio");
       return null;
     }
+    if (!f.property_type) {
+      toast.error("La tipologia immobile è obbligatoria");
+      return null;
+    }
     setSaving(true);
     const t = toast.loading("Salvataggio in corso…");
     try {
