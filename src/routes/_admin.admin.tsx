@@ -92,16 +92,26 @@ function AdminDashboard() {
   }, [rows, q, statusFilter]);
 
   const createNew = async () => {
-    const { data, error } = await supabase
-      .from("properties")
-      .insert({ title: "Nuovo immobile" })
-      .select("id")
-      .single();
-    if (error) {
-      toast.error(error.message);
-      return;
+    const t = toast.loading("Creazione nuovo immobile…");
+    try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const userId = sessionData.session?.user.id ?? null;
+      const { data, error } = await supabase
+        .from("properties")
+        .insert({ title: "Nuovo immobile", created_by: userId })
+        .select("id")
+        .single();
+      if (error) {
+        console.error("[admin] insert property failed:", error);
+        toast.error(`Impossibile creare l'immobile: ${error.message}`, { id: t });
+        return;
+      }
+      toast.success("Immobile creato", { id: t });
+      navigate({ to: "/admin/immobili/$id", params: { id: data.id } });
+    } catch (err) {
+      console.error("[admin] createNew threw:", err);
+      toast.error(err instanceof Error ? err.message : "Errore sconosciuto", { id: t });
     }
-    navigate({ to: "/admin/immobili/$id", params: { id: data.id } });
   };
 
   const counts = useMemo(

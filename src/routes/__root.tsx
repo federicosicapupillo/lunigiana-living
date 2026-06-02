@@ -13,6 +13,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { SiteHeader } from "../components/site-header";
 import { SiteFooter } from "../components/site-footer";
+import { Toaster } from "../components/ui/sonner";
 
 function NotFoundComponent() {
   return (
@@ -115,16 +116,22 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  // Admin area renders its own chrome (header/sidebar). Skip the public
+  // SiteHeader/SiteFooter for any /admin* URL so the back-office isn't wrapped
+  // by the marketing layout.
+  const isAdminArea =
+    typeof window !== "undefined" && window.location.pathname.startsWith("/admin");
 
   return (
     <QueryClientProvider client={queryClient}>
       <div className="flex min-h-screen flex-col bg-background text-foreground">
-        <SiteHeader />
+        {!isAdminArea && <SiteHeader />}
         <main className="flex-1">
           <Outlet />
         </main>
-        <SiteFooter />
+        {!isAdminArea && <SiteFooter />}
       </div>
+      <Toaster />
     </QueryClientProvider>
   );
 }
