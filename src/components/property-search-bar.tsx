@@ -224,7 +224,7 @@ export function PropertySearchBar({
   const featLabel = featCount ? `${featCount} selezionate` : "Tutte";
 
   const ContractTabs = (
-    <div className="inline-flex flex-wrap gap-1 rounded-sm border border-border bg-card p-1">
+    <div className="inline-flex flex-wrap gap-1 rounded-md border border-warm-border bg-warm-ivory p-1 shadow-[0_1px_0_rgba(36,23,17,0.04)]">
       {([
         { id: "", label: "Tutti" },
         { id: "vendita", label: "Vendita" },
@@ -236,10 +236,10 @@ export function PropertySearchBar({
             key={t.id || "all"}
             type="button"
             onClick={() => setState({ ...state, contract: t.id })}
-            className={`rounded-sm px-5 py-2 text-xs uppercase tracking-[0.18em] transition ${
+            className={`rounded-[3px] px-5 py-2 text-[0.7rem] font-medium uppercase tracking-[0.2em] transition-all ${
               active
-                ? "bg-primary text-primary-foreground"
-                : "bg-transparent text-muted-foreground hover:text-ink"
+                ? "bg-primary text-primary-foreground shadow-[0_4px_12px_-6px_rgba(184,106,75,0.6)]"
+                : "bg-transparent text-muted-foreground hover:bg-warm-sand hover:text-ink"
             }`}
           >
             {t.label}
@@ -253,14 +253,14 @@ export function PropertySearchBar({
     <button
       type="button"
       onClick={() => setState({ ...state, featured: !state.featured })}
-      className={`inline-flex items-center gap-2 rounded-sm border px-4 py-2 text-xs uppercase tracking-[0.18em] transition ${
+      className={`inline-flex items-center gap-2 rounded-md border px-4 py-2 text-[0.7rem] font-medium uppercase tracking-[0.2em] transition-all ${
         state.featured
-          ? "border-primary bg-primary/10 text-primary"
-          : "border-border bg-card text-muted-foreground hover:text-ink"
+          ? "border-primary bg-primary text-primary-foreground shadow-[0_4px_12px_-6px_rgba(184,106,75,0.55)]"
+          : "border-warm-border bg-warm-ivory text-muted-foreground hover:border-primary/50 hover:text-ink"
       }`}
       aria-pressed={state.featured}
     >
-      <Star size={13} className={state.featured ? "fill-primary" : ""} />
+      <Star size={13} className={state.featured ? "fill-current" : ""} />
       Solo scelti per voi
     </button>
   );
@@ -414,18 +414,15 @@ export function PropertySearchBar({
           {Fields}
           {Chips}
           {ErrorMsg}
-          <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border bg-muted/30 px-4 py-3">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-t border-warm-border bg-warm-sand/60 px-4 py-3">
             <button
               type="button"
               onClick={reset}
-              className="text-xs uppercase tracking-[0.18em] text-muted-foreground hover:text-ink"
+              className="text-[0.7rem] uppercase tracking-[0.2em] text-muted-foreground transition-colors hover:text-ink"
             >
               Reset filtri
             </button>
-            <button
-              type="submit"
-              className="inline-flex items-center gap-2 rounded-sm bg-primary px-8 py-3 text-xs uppercase tracking-[0.22em] text-primary-foreground transition hover:bg-primary/90"
-            >
+            <button type="submit" className="btn-primary">
               <Search size={14} /> Cerca
             </button>
           </div>
@@ -465,16 +462,13 @@ export function PropertySearchBar({
               {Chips}
               {ErrorMsg}
               <div className="flex flex-col gap-3 p-5">
-                <button
-                  type="submit"
-                  className="inline-flex items-center justify-center gap-2 rounded-sm bg-primary px-8 py-4 text-xs uppercase tracking-[0.22em] text-primary-foreground"
-                >
+                <button type="submit" className="btn-primary w-full">
                   <Search size={14} /> Cerca
                 </button>
                 <button
                   type="button"
                   onClick={reset}
-                  className="text-xs uppercase tracking-[0.18em] text-muted-foreground"
+                  className="text-[0.7rem] uppercase tracking-[0.2em] text-muted-foreground"
                 >
                   Reset filtri
                 </button>
