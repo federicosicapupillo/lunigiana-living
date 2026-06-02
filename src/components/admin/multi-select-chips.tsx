@@ -56,11 +56,13 @@ export function MultiSelectChips({
 
   return (
     <div className="block">
-      <span className="block text-xs uppercase tracking-wider text-muted-foreground">
-        {label}
-      </span>
+      {label ? (
+        <span className="block text-xs uppercase tracking-wider text-muted-foreground">
+          {label}
+        </span>
+      ) : null}
 
-      <div className="relative mt-1" ref={wrapRef}>
+      <div className={`relative ${label ? "mt-1" : ""}`} ref={wrapRef}>
         <button
           type="button"
           onClick={() => setOpen((o) => !o)}
