@@ -39,7 +39,6 @@ type Status = "draft" | "ready" | "published";
 type FormState = {
   // Sezione 1
   title: string;
-  reference_code: string;
   property_type: string;
   descrizione_libera: string;
   contract_type: string;
@@ -51,11 +50,11 @@ type FormState = {
   province: string;
   region: string;
   address: string;
+  locality: string;
   area_zone: string;
   postal_code: string;
   country: string;
-  latitude: string;
-  longitude: string;
+  show_full_address: boolean;
   // Sezione 3
   size_sqm: string;
   bedrooms: string;
