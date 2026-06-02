@@ -1,6 +1,9 @@
-import property1 from "@/assets/property-1.jpg";
-import property2 from "@/assets/property-2.jpg";
-import property3 from "@/assets/property-3.jpg";
+import property1 from "@/assets/real/bagnone-centro.jpg";
+import property2 from "@/assets/real/pontremoli-scorcio.jpg";
+import property3 from "@/assets/real/villafranca-panorama.jpg";
+import property4 from "@/assets/real/filattiera.jpg";
+import property5 from "@/assets/real/mulazzo.jpg";
+import property6 from "@/assets/real/bagnone-torrente.jpg";
 import type { Property } from "@/components/property-card";
 
 export const featuredProperties: Property[] = [
@@ -49,7 +52,7 @@ export const allProperties: Property[] = [
     type: "Rustico",
     sqm: 180,
     rooms: 4,
-    image: property1,
+    image: property4,
   },
   {
     id: "appartamento-mulazzo",
@@ -59,7 +62,7 @@ export const allProperties: Property[] = [
     type: "Appartamento",
     sqm: 95,
     rooms: 3,
-    image: property2,
+    image: property5,
   },
   {
     id: "villa-zeri",
@@ -69,7 +72,7 @@ export const allProperties: Property[] = [
     type: "Casa indipendente",
     sqm: 160,
     rooms: 3,
-    image: property3,
+    image: property6,
     tag: "Con giardino",
   },
 ];

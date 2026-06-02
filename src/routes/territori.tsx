@@ -1,17 +1,16 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import heroImg from "@/assets/hero-lunigiana.jpg";
-import pontremoli from "@/assets/territory-pontremoli.jpg";
-import bagnone from "@/assets/territory-bagnone.jpg";
-import zeri from "@/assets/territory-zeri.jpg";
-import food from "@/assets/lifestyle-food.jpg";
+import heroImg from "@/assets/real/villafranca-panorama.jpg";
+import pontremoli from "@/assets/real/pontremoli-scorcio.jpg";
+import bagnone from "@/assets/real/bagnone-castello.jpg";
+import zeri from "@/assets/real/zeri-monte.jpg";
+import villafranca from "@/assets/real/villafranca-ponte.jpg";
+import filattiera from "@/assets/real/filattiera.jpg";
+import mulazzo from "@/assets/real/mulazzo.jpg";
 import { territories } from "@/lib/properties";
 import { ArrowRight } from "lucide-react";
 
 const imageBySlug: Record<string, string> = {
-  pontremoli, bagnone, zeri,
-  villafranca: food,
-  filattiera: heroImg,
-  mulazzo: pontremoli,
+  pontremoli, bagnone, zeri, villafranca, filattiera, mulazzo,
 };
 
 export const Route = createFileRoute("/territori")({

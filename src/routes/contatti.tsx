@@ -33,21 +33,21 @@ function ContattiPage() {
               <MapPin size={18} className="mt-0.5 text-primary" />
               <div>
                 <div className="eyebrow text-[0.65rem]">Agenzia</div>
-                <div className="mt-1 text-foreground/85">Piazza della Repubblica<br />54027 Pontremoli (MS)</div>
+                <div className="mt-1 text-foreground/85">Furia Immobiliare di Furia Elena<br />Via Pirandello 7<br />54027 Pontremoli (MS)</div>
               </div>
             </li>
             <li className="flex items-start gap-4">
               <Phone size={18} className="mt-0.5 text-primary" />
               <div>
-                <div className="eyebrow text-[0.65rem]">Telefono</div>
-                <div className="mt-1 text-foreground/85">+39 0187 000 000</div>
+                <div className="eyebrow text-[0.65rem]">Telefono · Cellulare</div>
+                <div className="mt-1 text-foreground/85">0187 830229<br />320 7019985</div>
               </div>
             </li>
             <li className="flex items-start gap-4">
               <Mail size={18} className="mt-0.5 text-primary" />
               <div>
                 <div className="eyebrow text-[0.65rem]">Email</div>
-                <div className="mt-1 text-foreground/85">info@furiaimmobiliare.it</div>
+                <div className="mt-1 text-foreground/85">furiaimmobiliare@libero.it</div>
               </div>
             </li>
           </ul>

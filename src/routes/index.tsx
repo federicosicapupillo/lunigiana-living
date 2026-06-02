@@ -1,10 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
-import heroImg from "@/assets/hero-lunigiana.jpg";
-import territoryPontremoli from "@/assets/territory-pontremoli.jpg";
-import territoryBagnone from "@/assets/territory-bagnone.jpg";
-import territoryZeri from "@/assets/territory-zeri.jpg";
-import lifestyleFood from "@/assets/lifestyle-food.jpg";
+import heroImg from "@/assets/real/hero-bagnone.jpg";
+import territoryPontremoli from "@/assets/real/pontremoli-scorcio.jpg";
+import territoryBagnone from "@/assets/real/bagnone-castello.jpg";
+import territoryZeri from "@/assets/real/zeri-monte.jpg";
+import lifestyleFood from "@/assets/real/bagnone-torrente.jpg";
 import { PropertySearch } from "@/components/property-search";
 import { PropertyCard } from "@/components/property-card";
 import { featuredProperties } from "@/lib/properties";

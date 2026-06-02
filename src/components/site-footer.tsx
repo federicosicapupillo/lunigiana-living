@@ -15,10 +15,11 @@ export function SiteFooter() {
         <div>
           <div className="eyebrow text-cream/60">Contatti</div>
           <ul className="mt-4 space-y-2 text-sm text-cream/85">
-            <li>Piazza della Repubblica</li>
+            <li>Via Pirandello 7</li>
             <li>54027 Pontremoli (MS)</li>
-            <li className="pt-2">+39 0187 000 000</li>
-            <li>info@furiaimmobiliare.it</li>
+            <li className="pt-2">Tel. 0187 830229</li>
+            <li>Cell. 320 7019985</li>
+            <li>furiaimmobiliare@libero.it</li>
           </ul>
         </div>
 
@@ -35,8 +36,8 @@ export function SiteFooter() {
 
       <div className="border-t border-cream/10">
         <div className="container-editorial flex flex-col gap-2 py-6 text-xs text-cream/55 md:flex-row md:items-center md:justify-between">
-          <span>© {new Date().getFullYear()} Furia Immobiliare. Tutti i diritti riservati.</span>
-          <span>P.IVA 00000000000 · Pontremoli, Lunigiana</span>
+          <span>© {new Date().getFullYear()} Furia Immobiliare di Furia Elena. Tutti i diritti riservati.</span>
+          <span>Pontremoli · Lunigiana</span>
         </div>
       </div>
     </footer>
