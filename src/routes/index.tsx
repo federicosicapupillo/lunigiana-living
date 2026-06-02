@@ -15,10 +15,11 @@ import territoryZeri from "@/assets/real/zeri-monte.jpg";
 import lifestyleFood from "@/assets/real/bagnone-torrente.jpg";
 import { PropertySearch } from "@/components/property-search";
 import { PropertyCard } from "@/components/property-card";
-import { featuredProperties } from "@/lib/properties";
+import { listPublishedProperties, type PublicProperty } from "@/lib/public-properties.functions";
 import { ArrowRight, Compass, KeyRound, Sparkles } from "lucide-react";
 
 export const Route = createFileRoute("/")({
+  loader: () => listPublishedProperties(),
   head: () => ({
     meta: [
       { title: "Furia Immobiliare — Case di carattere in Lunigiana" },
