@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
-import heroTramontoVignetiAsset from "@/assets/real/hero-tramonto-vigneti.png.asset.json";
+import heroTramontoVignetiAsset from "@/assets/real/hero-tramonto-ulivi.png.asset.json";
 import territoryPontremoli from "@/assets/real/pontremoli-lunigiana-v2.png.asset.json";
 import territoryBagnone from "@/assets/real/bagnone-lunigiana.png.asset.json";
 import territoryZeri from "@/assets/real/zeri-lunigiana.png.asset.json";
