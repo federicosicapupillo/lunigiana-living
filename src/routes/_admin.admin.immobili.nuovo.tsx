@@ -279,10 +279,13 @@ function NewPropertyPage() {
       pushIf("furnished_level", f.furnished);
       pushIf("descrizione_libera", f.descrizione_libera);
       pushIf("long_description", f.long_description);
-      pushIf("punti_di_forza", f.punti_di_forza);
-      pushIf("target_acquirente", f.target_acquirente);
-      pushIf("vista_contesto", f.vista_contesto);
-      pushIf("elementi_storici", f.elementi_storici);
+      // Multi-select narrative fields → JSON
+      (Object.keys(f.multi) as MultiSelectKey[]).forEach((k) => {
+        const serialized = serializeMultiSelect(f.multi[k]);
+        if (serialized) {
+          extraFeatures.push({ property_id: data.id, feature_name: k, feature_value: serialized });
+        }
+      });
       // Range/label sezione 3
       pushIf("size_range", f.size_range);
       pushIf("bedrooms_label", f.bedrooms_label);
