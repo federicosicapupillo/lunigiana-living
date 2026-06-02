@@ -1,20 +1,20 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import heroImg from "@/assets/real/villafranca-panorama.jpg";
-import pontremoli from "@/assets/real/pontremoli-scorcio.jpg";
+import pontremoliAsset from "@/assets/real/pontremoli-lunigiana.png.asset.json";
 import bagnoneAsset from "@/assets/real/bagnone-lunigiana.png.asset.json";
 import zeriAsset from "@/assets/real/zeri-lunigiana.png.asset.json";
 import villafrancaAsset from "@/assets/real/villafranca-lunigiana.png.asset.json";
-import filattiera from "@/assets/real/filattiera.jpg";
+import filattieraAsset from "@/assets/real/filattiera-lunigiana.png.asset.json";
 import mulazzoAsset from "@/assets/real/mulazzo-lunigiana.png.asset.json";
 import { territories } from "@/lib/properties";
 import { ArrowRight, MapPin, Mountain, Sparkles } from "lucide-react";
 
 const imageBySlug: Record<string, string> = {
-  pontremoli,
+  pontremoli: pontremoliAsset.url,
   bagnone: bagnoneAsset.url,
   zeri: zeriAsset.url,
   villafranca: villafrancaAsset.url,
-  filattiera,
+  filattiera: filattieraAsset.url,
   mulazzo: mulazzoAsset.url,
 };
 
