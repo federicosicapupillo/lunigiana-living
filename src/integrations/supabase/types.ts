@@ -40,6 +40,7 @@ export type Database = {
           longitude: number | null
           municipality: string | null
           panoramic_view: boolean
+          postal_code: string | null
           price: number | null
           price_on_request: boolean
           property_type: string | null
@@ -79,6 +80,7 @@ export type Database = {
           longitude?: number | null
           municipality?: string | null
           panoramic_view?: boolean
+          postal_code?: string | null
           price?: number | null
           price_on_request?: boolean
           property_type?: string | null
@@ -118,6 +120,7 @@ export type Database = {
           longitude?: number | null
           municipality?: string | null
           panoramic_view?: boolean
+          postal_code?: string | null
           price?: number | null
           price_on_request?: boolean
           property_type?: string | null
