@@ -11,9 +11,9 @@ type Props = ImgHTMLAttributes<HTMLImageElement> & {
 };
 
 const SIZE_CLASSES: Record<Size, string> = {
-  sm: "w-[28%] max-w-[80px] min-w-[40px]",
-  md: "w-[20%] max-w-[140px] min-w-[64px]",
-  lg: "w-[16%] max-w-[200px] min-w-[80px]",
+  sm: "w-[30%] max-w-[90px] min-w-[48px]",
+  md: "w-[26%] max-w-[160px] min-w-[80px]",
+  lg: "w-[22%] max-w-[240px] min-w-[100px]",
 };
 
 /**
@@ -40,7 +40,7 @@ export function WatermarkedImage({
           draggable={false}
           loading="lazy"
           className={cn(
-            "pointer-events-none absolute bottom-2 right-2 select-none object-contain opacity-25 mix-blend-multiply drop-shadow-[0_1px_2px_rgba(255,255,255,0.4)] md:bottom-3 md:right-3",
+            "pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 select-none object-contain opacity-20 mix-blend-multiply drop-shadow-[0_1px_2px_rgba(255,255,255,0.4)]",
             SIZE_CLASSES[watermarkSize],
           )}
         />
