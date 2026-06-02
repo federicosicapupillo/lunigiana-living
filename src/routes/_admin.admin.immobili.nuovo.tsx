@@ -462,13 +462,64 @@ function NewPropertyPage() {
         {/* SEZIONE 3 */}
         <Section title="3. Caratteristiche principali" subtitle="Dati tecnici e dotazioni">
           <Field label="Superficie (mq)">
-            <NumberInput value={f.size_sqm} onChange={(v) => upd("size_sqm", v)} />
+            <SelectInput
+              value={f.size_range}
+              onChange={(v) => upd("size_range", v)}
+              options={[
+                ...SIZE_RANGE_OPTIONS.map((o) => ({ value: o, label: o })),
+                { value: SIZE_CUSTOM, label: SIZE_CUSTOM },
+              ]}
+              placeholder="Seleziona superficie"
+            />
+            {f.size_range === SIZE_CUSTOM && (
+              <div className="mt-2">
+                <NumberInput
+                  value={f.size_sqm_exact}
+                  onChange={(v) => upd("size_sqm_exact", v)}
+                  placeholder="Es. 145"
+                />
+              </div>
+            )}
           </Field>
           <Field label="Camere">
-            <NumberInput value={f.bedrooms} onChange={(v) => upd("bedrooms", v)} />
+            <SelectInput
+              value={f.bedrooms_label}
+              onChange={(v) => upd("bedrooms_label", v)}
+              options={[
+                ...BEDROOMS_OPTIONS.map((o) => ({ value: o, label: o })),
+                { value: BEDROOMS_CUSTOM, label: BEDROOMS_CUSTOM },
+              ]}
+              placeholder="Seleziona camere"
+            />
+            {f.bedrooms_label === BEDROOMS_CUSTOM && (
+              <div className="mt-2">
+                <NumberInput
+                  value={f.bedrooms_exact}
+                  onChange={(v) => upd("bedrooms_exact", v)}
+                  placeholder="Numero camere"
+                />
+              </div>
+            )}
           </Field>
           <Field label="Bagni">
-            <NumberInput value={f.bathrooms} onChange={(v) => upd("bathrooms", v)} />
+            <SelectInput
+              value={f.bathrooms_label}
+              onChange={(v) => upd("bathrooms_label", v)}
+              options={[
+                ...BATHROOMS_OPTIONS.map((o) => ({ value: o, label: o })),
+                { value: BATHROOMS_CUSTOM, label: BATHROOMS_CUSTOM },
+              ]}
+              placeholder="Seleziona bagni"
+            />
+            {f.bathrooms_label === BATHROOMS_CUSTOM && (
+              <div className="mt-2">
+                <NumberInput
+                  value={f.bathrooms_exact}
+                  onChange={(v) => upd("bathrooms_exact", v)}
+                  placeholder="Numero bagni"
+                />
+              </div>
+            )}
           </Field>
           <Field label="Piano dell'immobile">
             <SelectInput
@@ -479,13 +530,31 @@ function NewPropertyPage() {
             />
           </Field>
           <Field label="Totale piani edificio">
-            <NumberInput value={f.total_floors} onChange={(v) => upd("total_floors", v)} />
+            <SelectInput
+              value={f.total_floors_label}
+              onChange={(v) => upd("total_floors_label", v)}
+              options={[
+                ...TOTAL_FLOORS_OPTIONS.map((o) => ({ value: o, label: o })),
+                { value: TOTAL_FLOORS_CUSTOM, label: TOTAL_FLOORS_CUSTOM },
+              ]}
+              placeholder="Seleziona piani edificio"
+            />
+            {f.total_floors_label === TOTAL_FLOORS_CUSTOM && (
+              <div className="mt-2">
+                <NumberInput
+                  value={f.total_floors_exact}
+                  onChange={(v) => upd("total_floors_exact", v)}
+                  placeholder="Numero piani"
+                />
+              </div>
+            )}
           </Field>
           <Field label="Stato manutenzione">
             <SelectInput
               value={f.condition}
               onChange={(v) => upd("condition", v)}
               options={CONDITIONS.map((o) => ({ value: o, label: o }))}
+              placeholder="Seleziona stato"
             />
           </Field>
           <Field label="Classe energetica">
@@ -493,6 +562,7 @@ function NewPropertyPage() {
               value={f.energy_class}
               onChange={(v) => upd("energy_class", v)}
               options={ENERGY_CLASSES.map((o) => ({ value: o, label: o }))}
+              placeholder="Seleziona classe"
             />
           </Field>
           <Field label="Riscaldamento">
@@ -512,18 +582,41 @@ function NewPropertyPage() {
             />
           </Field>
 
-          <div className="md:col-span-2">
-            <span className="block text-xs uppercase tracking-wider text-muted-foreground">Dotazioni</span>
-            <div className="mt-2 grid grid-cols-2 gap-2 md:grid-cols-3">
-              <Toggle label="Giardino" value={f.garden} onChange={(v) => upd("garden", v)} />
-              <Toggle label="Terrazza" value={f.terrace} onChange={(v) => upd("terrace", v)} />
-              <Toggle label="Balcone" value={f.balcony} onChange={(v) => upd("balcony", v)} />
-              <Toggle label="Garage" value={f.garage} onChange={(v) => upd("garage", v)} />
-              <Toggle label="Cantina" value={f.cellar} onChange={(v) => upd("cellar", v)} />
-              <Toggle label="Ascensore" value={f.elevator} onChange={(v) => upd("elevator", v)} />
-              <Toggle label="Vista panoramica" value={f.panoramic_view} onChange={(v) => upd("panoramic_view", v)} />
-              <Toggle label="Immobile storico" value={f.historic_property} onChange={(v) => upd("historic_property", v)} />
+          <div className="md:col-span-2 space-y-6">
+            <div>
+              <span className="block text-xs uppercase tracking-wider text-muted-foreground">Dotazioni</span>
+              <p className="mt-1 text-xs text-muted-foreground">Seleziona tutte le dotazioni presenti. Tap per attivare/disattivare.</p>
             </div>
+            {AMENITY_GROUPS.map((group) => (
+              <div key={group.title}>
+                <div className="mb-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-ink/70">
+                  {group.title}
+                </div>
+                <div className="grid grid-cols-2 gap-2 md:grid-cols-3">
+                  {group.items.map((label) => (
+                    <Toggle
+                      key={label}
+                      label={label}
+                      value={!!f.amenities[label]}
+                      onChange={(v) =>
+                        setF((s) => ({
+                          ...s,
+                          amenities: { ...s.amenities, [label]: v },
+                        }))
+                      }
+                    />
+                  ))}
+                </div>
+              </div>
+            ))}
+            <Field label="Altre dotazioni" full>
+              <TextArea
+                value={f.altre_dotazioni}
+                onChange={(v) => upd("altre_dotazioni", v)}
+                rows={3}
+                placeholder="Scrivi eventuali dotazioni particolari non presenti nell'elenco…"
+              />
+            </Field>
           </div>
         </Section>
 
