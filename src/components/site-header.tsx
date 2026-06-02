@@ -40,19 +40,6 @@ export function SiteHeader() {
           ))}
         </nav>
 
-        <div className="hidden items-center gap-3 lg:flex">
-          <Link
-            to="/admin/login"
-            className="inline-flex items-center gap-1.5 rounded-sm border border-primary px-3 py-2 text-xs font-medium tracking-wide text-primary transition-colors hover:bg-primary hover:text-primary-foreground"
-          >
-            <Lock size={13} strokeWidth={2} />
-            Area riservata
-          </Link>
-          <Link to="/contatti" className="btn-primary !py-2 !px-5">
-            Parla con noi
-          </Link>
-        </div>
-
         <button
           aria-label="Apri menu"
           onClick={() => setOpen((v) => !v)}
@@ -75,17 +62,6 @@ export function SiteHeader() {
                 {n.label}
               </Link>
             ))}
-            <Link
-              to="/admin/login"
-              onClick={() => setOpen(false)}
-              className="mt-2 inline-flex items-center justify-center gap-1.5 rounded-sm border border-primary px-4 py-2.5 text-sm font-medium tracking-wide text-primary transition-colors hover:bg-primary hover:text-primary-foreground"
-            >
-              <Lock size={14} strokeWidth={2} />
-              Area riservata
-            </Link>
-            <Link to="/contatti" onClick={() => setOpen(false)} className="btn-primary mt-3">
-              Parla con noi
-            </Link>
           </nav>
         </div>
       )}
