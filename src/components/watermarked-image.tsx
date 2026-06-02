@@ -11,9 +11,9 @@ type Props = ImgHTMLAttributes<HTMLImageElement> & {
 };
 
 const SIZE_CLASSES: Record<Size, string> = {
-  sm: "w-[28%] max-w-[80px] min-w-[40px]",
-  md: "w-[20%] max-w-[140px] min-w-[64px]",
-  lg: "w-[16%] max-w-[200px] min-w-[80px]",
+  sm: "w-[30%] max-w-[90px] min-w-[48px]",
+  md: "w-[26%] max-w-[160px] min-w-[80px]",
+  lg: "w-[22%] max-w-[240px] min-w-[100px]",
 };
 
 /**
