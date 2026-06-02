@@ -163,7 +163,7 @@ function PropertyDetail() {
                 const data = new FormData(form);
                 const body = encodeURIComponent(
                   `Richiesta informazioni per: ${p.reference} — ${p.title} (${p.location})\n\n` +
-                  `Nome: ${data.get("nome")}\nTelefono: ${data.get("telefono")}\n\nMessaggio:\n${data.get("messaggio")}`,
+                  `Nome: ${data.get("nome")}\nEmail: ${data.get("email")}\nTelefono: ${data.get("telefono")}\n\nMessaggio:\n${data.get("messaggio")}`,
                 );
                 window.location.href = `mailto:furiaimmobiliare@libero.it?subject=Richiesta ${p.reference}&body=${body}`;
               }}
@@ -174,7 +174,7 @@ function PropertyDetail() {
               <input name="telefono" placeholder="Telefono (facoltativo)" className="w-full rounded-sm border border-border bg-background px-4 py-3 text-sm focus:border-primary focus:outline-none" />
               <textarea name="messaggio" rows={4} placeholder="Vorrei avere maggiori informazioni..." className="w-full rounded-sm border border-border bg-background px-4 py-3 text-sm focus:border-primary focus:outline-none" />
               <button type="submit" className="w-full rounded-sm bg-primary px-6 py-4 text-xs uppercase tracking-[0.22em] text-primary-foreground transition hover:bg-primary/90">
-                Invia richiesta
+                Richiedi informazioni o visita
               </button>
             </form>
 
