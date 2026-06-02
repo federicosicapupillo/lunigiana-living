@@ -5,6 +5,7 @@ import heroPanoramico from "@/assets/real/hero-pontremoli-castello.jpg";
 import heroIntimo from "@/assets/real/hero-centro-storico.jpg";
 import heroColline from "@/assets/real/hero-pontremoli-colline.jpg";
 import heroBorgoAsset from "@/assets/real/bagnone-borgo.jpg.asset.json";
+import heroCastelloTramontoAsset from "@/assets/real/hero-castello-tramonto.jpg.asset.json";
 import territoryPontremoli from "@/assets/real/pontremoli-scorcio.jpg";
 import territoryBagnone from "@/assets/real/bagnone-castello.jpg";
 import territoryZeri from "@/assets/real/zeri-monte.jpg";
@@ -28,7 +29,7 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
-  const [heroVariant, setHeroVariant] = useState<"panoramico" | "intimo" | "colline" | "borgo">("panoramico");
+  const [heroVariant, setHeroVariant] = useState<"panoramico" | "intimo" | "colline" | "borgo" | "tramonto">("panoramico");
   const heroMap = {
     panoramico: {
       src: heroPanoramico,
@@ -49,6 +50,11 @@ function Index() {
       src: heroBorgoAsset.url,
       alt: "Borgo di Bagnone con ponte in pietra sul torrente e case storiche affacciate sull'acqua",
       label: "Borgo · Bagnone",
+    },
+    tramonto: {
+      src: heroCastelloTramontoAsset.url,
+      alt: "Borgo e castello panoramico della Lunigiana al tramonto, vista aerea sulle colline verso il mare",
+      label: "Tramonto · Castello",
     },
   } as const;
   const heroSrc = heroMap[heroVariant].src;
