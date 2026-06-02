@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import {
@@ -17,6 +17,12 @@ import {
   ENERGY_CLASSES,
   CONDITIONS,
   STATUS_LABELS,
+  FURNISHED_OPTIONS,
+  HEATING_OPTIONS,
+  FLOOR_OPTIONS,
+  FLOOR_TO_NUMBER,
+  REGIONS,
+  PROVINCES,
 } from "@/lib/admin/property-constants";
 
 export const Route = createFileRoute("/_admin/admin/immobili/nuovo")({
@@ -54,12 +60,12 @@ type FormState = {
   size_sqm: string;
   bedrooms: string;
   bathrooms: string;
-  floors: string;
+  floor_label: string;
   total_floors: string;
   condition: string;
   energy_class: string;
   heating: string;
-  furnished: boolean;
+  furnished: string; // "Sì" | "No" | "Parzialmente" | ""
   garden: boolean;
   terrace: boolean;
   balcony: boolean;
@@ -98,12 +104,12 @@ const empty: FormState = {
   size_sqm: "",
   bedrooms: "",
   bathrooms: "",
-  floors: "",
+  floor_label: "",
   total_floors: "",
   condition: "",
   energy_class: "",
   heating: "",
-  furnished: false,
+  furnished: "",
   garden: false,
   terrace: false,
   balcony: false,
@@ -161,6 +167,12 @@ function NewPropertyPage() {
       const userId = sessionData.session?.user.id ?? null;
       const status = overrideStatus ?? f.status;
 
+      const floorNum =
+        f.floor_label && f.floor_label in FLOOR_TO_NUMBER
+          ? FLOOR_TO_NUMBER[f.floor_label]
+          : null;
+      const furnishedBool = f.furnished === "Sì" || f.furnished === "Parzialmente";
+
       const payload = {
         title: f.title.trim(),
         slug: slugify(f.title),
@@ -182,10 +194,10 @@ function NewPropertyPage() {
         size_sqm: toNum(f.size_sqm),
         bedrooms: toNum(f.bedrooms),
         bathrooms: toNum(f.bathrooms),
-        floors: toNum(f.floors),
+        floors: floorNum,
         condition: f.condition || null,
         energy_class: f.energy_class || null,
-        furnished: f.furnished,
+        furnished: furnishedBool,
         garden: f.garden,
         terrace: f.terrace,
         balcony: f.balcony,
@@ -218,6 +230,8 @@ function NewPropertyPage() {
       };
       pushIf("heating", f.heating);
       pushIf("total_floors", f.total_floors);
+      pushIf("floor_label", f.floor_label);
+      pushIf("furnished_level", f.furnished);
       pushIf("long_description", f.long_description);
       pushIf("punti_di_forza", f.punti_di_forza);
       pushIf("target_acquirente", f.target_acquirente);
