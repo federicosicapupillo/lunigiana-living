@@ -125,8 +125,8 @@ function TerritoriPage() {
         </div>
       </section>
 
-      <section className="bg-warm-ivory py-24 md:py-32">
-        <div className="container-editorial">
+      <section className="bg-warm-ivory pb-0 pt-24 md:pt-32">
+        <div className="container-editorial pb-20 md:pb-28">
           <span className="eyebrow">I borghi</span>
           <h2 className="mt-3 max-w-3xl font-serif text-4xl text-ink md:text-5xl">
             Sei luoghi,<br /><em className="italic">sei atmosfere diverse.</em>
@@ -138,31 +138,45 @@ function TerritoriPage() {
             stessa storia di un mulino sul torrente di Bagnone. Ti aiutiamo a
             riconoscere queste differenze prima di scegliere dove cercare casa.
           </p>
-
-          <div className="mt-16 space-y-24">
-            {territories.map((t, i) => (
-              <article key={t.slug}
-                className={`grid gap-10 md:grid-cols-12 md:items-center ${i % 2 ? "md:[&>figure]:order-2" : ""}`}>
-                <figure className="overflow-hidden rounded-sm md:col-span-7">
-                  <img src={imageBySlug[t.slug]} alt={t.name} loading="lazy"
-                    className="aspect-[4/3] w-full object-cover" />
-                </figure>
-                <div className="md:col-span-5">
-                  <div className="eyebrow">{t.name}</div>
-                  <h3 className="mt-3 font-serif text-3xl leading-tight text-ink md:text-4xl">
-                    {t.tagline}
-                  </h3>
-                  <p className="mt-5 text-base leading-relaxed text-foreground/80">{t.body}</p>
-                  <Link to="/immobili"
-                    className="group mt-6 inline-flex items-center gap-2 text-sm uppercase tracking-[0.2em] text-primary">
-                    Immobili a {t.name}
-                    <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
-                  </Link>
-                </div>
-              </article>
-            ))}
-          </div>
         </div>
+
+        {territories.map((t, i) => {
+          const bands = ["bg-warm-soft", "bg-warm-sand", "bg-warm-cream"];
+          const bg = bands[i % bands.length];
+          return (
+            <div key={t.slug} className={`${bg} border-t border-warm-border/60`}>
+              <div className="container-editorial py-20 md:py-28">
+                <article
+                  className={`grid gap-10 md:grid-cols-12 md:items-center ${i % 2 ? "md:[&>figure]:order-2" : ""}`}
+                >
+                  <figure className="overflow-hidden rounded-sm shadow-[0_18px_40px_-24px_rgba(36,23,17,0.35)] md:col-span-7">
+                    <img
+                      src={imageBySlug[t.slug]}
+                      alt={t.name}
+                      loading="lazy"
+                      className="aspect-[4/3] w-full object-cover"
+                    />
+                  </figure>
+                  <div className="md:col-span-5">
+                    <div className="eyebrow">{t.name}</div>
+                    <h3 className="mt-3 font-serif text-3xl leading-tight text-ink md:text-4xl">
+                      {t.tagline}
+                    </h3>
+                    <div className="mt-5 h-px w-12 bg-warm-border" />
+                    <p className="mt-5 text-base leading-relaxed text-foreground/80">{t.body}</p>
+                    <Link
+                      to="/immobili"
+                      className="group mt-6 inline-flex items-center gap-2 text-sm uppercase tracking-[0.2em] text-primary"
+                    >
+                      Immobili a {t.name}
+                      <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
+                    </Link>
+                  </div>
+                </article>
+              </div>
+            </div>
+          );
+        })}
       </section>
 
       <section className="bg-warm-cream">
