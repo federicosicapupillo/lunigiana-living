@@ -15,10 +15,14 @@ import { Route as ServiziRouteImport } from './routes/servizi'
 import { Route as ImmobiliRouteImport } from './routes/immobili'
 import { Route as ContattiRouteImport } from './routes/contatti'
 import { Route as ChiSiamoRouteImport } from './routes/chi-siamo'
+import { Route as AdminRouteImport } from './routes/_admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ImmobiliIndexRouteImport } from './routes/immobili.index'
 import { Route as ImmobiliIdRouteImport } from './routes/immobili.$id'
 import { Route as ApiVirtualStagingRouteImport } from './routes/api/virtual-staging'
+import { Route as AdminLoginRouteImport } from './routes/admin.login'
+import { Route as AdminAdminRouteImport } from './routes/_admin.admin'
+import { Route as AdminAdminImmobiliIdRouteImport } from './routes/_admin.admin.immobili.$id'
 
 const TerritoriRoute = TerritoriRouteImport.update({
   id: '/territori',
@@ -50,6 +54,10 @@ const ChiSiamoRoute = ChiSiamoRouteImport.update({
   path: '/chi-siamo',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/_admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -70,6 +78,21 @@ const ApiVirtualStagingRoute = ApiVirtualStagingRouteImport.update({
   path: '/api/virtual-staging',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminLoginRoute = AdminLoginRouteImport.update({
+  id: '/admin/login',
+  path: '/admin/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminAdminRoute = AdminAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminAdminImmobiliIdRoute = AdminAdminImmobiliIdRouteImport.update({
+  id: '/immobili/$id',
+  path: '/immobili/$id',
+  getParentRoute: () => AdminAdminRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -79,9 +102,12 @@ export interface FileRoutesByFullPath {
   '/servizi': typeof ServiziRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/territori': typeof TerritoriRoute
+  '/admin': typeof AdminAdminRouteWithChildren
+  '/admin/login': typeof AdminLoginRoute
   '/api/virtual-staging': typeof ApiVirtualStagingRoute
   '/immobili/$id': typeof ImmobiliIdRoute
   '/immobili/': typeof ImmobiliIndexRoute
+  '/admin/immobili/$id': typeof AdminAdminImmobiliIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -90,22 +116,29 @@ export interface FileRoutesByTo {
   '/servizi': typeof ServiziRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/territori': typeof TerritoriRoute
+  '/admin': typeof AdminAdminRouteWithChildren
+  '/admin/login': typeof AdminLoginRoute
   '/api/virtual-staging': typeof ApiVirtualStagingRoute
   '/immobili/$id': typeof ImmobiliIdRoute
   '/immobili': typeof ImmobiliIndexRoute
+  '/admin/immobili/$id': typeof AdminAdminImmobiliIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_admin': typeof AdminRouteWithChildren
   '/chi-siamo': typeof ChiSiamoRoute
   '/contatti': typeof ContattiRoute
   '/immobili': typeof ImmobiliRouteWithChildren
   '/servizi': typeof ServiziRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/territori': typeof TerritoriRoute
+  '/_admin/admin': typeof AdminAdminRouteWithChildren
+  '/admin/login': typeof AdminLoginRoute
   '/api/virtual-staging': typeof ApiVirtualStagingRoute
   '/immobili/$id': typeof ImmobiliIdRoute
   '/immobili/': typeof ImmobiliIndexRoute
+  '/_admin/admin/immobili/$id': typeof AdminAdminImmobiliIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -117,9 +150,12 @@ export interface FileRouteTypes {
     | '/servizi'
     | '/sitemap.xml'
     | '/territori'
+    | '/admin'
+    | '/admin/login'
     | '/api/virtual-staging'
     | '/immobili/$id'
     | '/immobili/'
+    | '/admin/immobili/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -128,31 +164,40 @@ export interface FileRouteTypes {
     | '/servizi'
     | '/sitemap.xml'
     | '/territori'
+    | '/admin'
+    | '/admin/login'
     | '/api/virtual-staging'
     | '/immobili/$id'
     | '/immobili'
+    | '/admin/immobili/$id'
   id:
     | '__root__'
     | '/'
+    | '/_admin'
     | '/chi-siamo'
     | '/contatti'
     | '/immobili'
     | '/servizi'
     | '/sitemap.xml'
     | '/territori'
+    | '/_admin/admin'
+    | '/admin/login'
     | '/api/virtual-staging'
     | '/immobili/$id'
     | '/immobili/'
+    | '/_admin/admin/immobili/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRouteWithChildren
   ChiSiamoRoute: typeof ChiSiamoRoute
   ContattiRoute: typeof ContattiRoute
   ImmobiliRoute: typeof ImmobiliRouteWithChildren
   ServiziRoute: typeof ServiziRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TerritoriRoute: typeof TerritoriRoute
+  AdminLoginRoute: typeof AdminLoginRoute
   ApiVirtualStagingRoute: typeof ApiVirtualStagingRoute
 }
 
@@ -200,6 +245,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ChiSiamoRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_admin': {
+      id: '/_admin'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -228,8 +280,51 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiVirtualStagingRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/login': {
+      id: '/admin/login'
+      path: '/admin/login'
+      fullPath: '/admin/login'
+      preLoaderRoute: typeof AdminLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_admin/admin': {
+      id: '/_admin/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminAdminRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/_admin/admin/immobili/$id': {
+      id: '/_admin/admin/immobili/$id'
+      path: '/immobili/$id'
+      fullPath: '/admin/immobili/$id'
+      preLoaderRoute: typeof AdminAdminImmobiliIdRouteImport
+      parentRoute: typeof AdminAdminRoute
+    }
   }
 }
+
+interface AdminAdminRouteChildren {
+  AdminAdminImmobiliIdRoute: typeof AdminAdminImmobiliIdRoute
+}
+
+const AdminAdminRouteChildren: AdminAdminRouteChildren = {
+  AdminAdminImmobiliIdRoute: AdminAdminImmobiliIdRoute,
+}
+
+const AdminAdminRouteWithChildren = AdminAdminRoute._addFileChildren(
+  AdminAdminRouteChildren,
+)
+
+interface AdminRouteChildren {
+  AdminAdminRoute: typeof AdminAdminRouteWithChildren
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminAdminRoute: AdminAdminRouteWithChildren,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
 interface ImmobiliRouteChildren {
   ImmobiliIdRoute: typeof ImmobiliIdRoute
@@ -247,14 +342,26 @@ const ImmobiliRouteWithChildren = ImmobiliRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRouteWithChildren,
   ChiSiamoRoute: ChiSiamoRoute,
   ContattiRoute: ContattiRoute,
   ImmobiliRoute: ImmobiliRouteWithChildren,
   ServiziRoute: ServiziRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TerritoriRoute: TerritoriRoute,
+  AdminLoginRoute: AdminLoginRoute,
   ApiVirtualStagingRoute: ApiVirtualStagingRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
