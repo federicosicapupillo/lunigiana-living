@@ -28,7 +28,10 @@ export const Route = createFileRoute("/")({
       { property: "og:title", content: "Furia Immobiliare — Case di carattere in Lunigiana" },
       { property: "og:description", content: "Trova il tuo posto in Lunigiana. Immobili scelti per chi cerca autenticità, panorama e qualità del vivere." },
     ],
-    links: [{ rel: "canonical", href: "/" }],
+    links: [
+      { rel: "canonical", href: "/" },
+      { rel: "preload", as: "image", href: heroTramontoVignetiAsset.url, fetchpriority: "high" },
+    ],
   }),
   component: Index,
 });
