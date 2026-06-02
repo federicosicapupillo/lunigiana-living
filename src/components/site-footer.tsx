@@ -31,10 +31,13 @@ export function SiteFooter() {
         <div>
           <div className="eyebrow text-cream/60">Naviga</div>
           <ul className="mt-4 space-y-2 text-sm text-cream/85">
+            <li><Link to="/" className="hover:text-cream">Home</Link></li>
             <li><Link to="/immobili" className="hover:text-cream">Immobili</Link></li>
             <li><Link to="/territori" className="hover:text-cream">Vivere in Lunigiana</Link></li>
             <li><Link to="/servizi" className="hover:text-cream">Servizi</Link></li>
             <li><Link to="/chi-siamo" className="hover:text-cream">Chi siamo</Link></li>
+            <li><Link to="/contatti" className="hover:text-cream">Contatti</Link></li>
+            <li><Link to="/admin/login" className="hover:text-cream">Area riservata</Link></li>
           </ul>
         </div>
       </div>
