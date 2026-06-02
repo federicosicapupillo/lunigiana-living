@@ -21,6 +21,20 @@ import {
   HEATING_OPTIONS,
   FLOOR_OPTIONS,
   FLOOR_TO_NUMBER,
+  SIZE_RANGE_OPTIONS,
+  SIZE_CUSTOM,
+  BEDROOMS_OPTIONS,
+  BEDROOMS_CUSTOM,
+  BEDROOMS_TO_NUMBER,
+  BATHROOMS_OPTIONS,
+  BATHROOMS_CUSTOM,
+  BATHROOMS_TO_NUMBER,
+  TOTAL_FLOORS_OPTIONS,
+  TOTAL_FLOORS_CUSTOM,
+  AMENITY_GROUPS,
+  AMENITY_TO_COLUMN,
+  AMENITY_FEATURE_PREFIX,
+  FURNISHED_TO_BOOL,
 } from "@/lib/admin/property-constants";
 import { LocationFields, EMPTY_LOCATION, type LocationValue } from "@/components/admin/location-fields";
 
@@ -55,24 +69,22 @@ type FormState = {
   postal_code: string;
   country: string;
   show_full_address: boolean;
-  // Sezione 3
-  size_sqm: string;
-  bedrooms: string;
-  bathrooms: string;
+  // Sezione 3 — selezioni rapide + valore preciso
+  size_range: string;
+  size_sqm_exact: string;
+  bedrooms_label: string;
+  bedrooms_exact: string;
+  bathrooms_label: string;
+  bathrooms_exact: string;
   floor_label: string;
-  total_floors: string;
+  total_floors_label: string;
+  total_floors_exact: string;
   condition: string;
   energy_class: string;
   heating: string;
-  furnished: string; // "Sì" | "No" | "Parzialmente" | ""
-  garden: boolean;
-  terrace: boolean;
-  balcony: boolean;
-  garage: boolean;
-  cellar: boolean;
-  elevator: boolean;
-  panoramic_view: boolean;
-  historic_property: boolean;
+  furnished: string;
+  amenities: Record<string, boolean>;
+  altre_dotazioni: string;
   // Sezione 4
   short_notes: string;
   long_description: string;
@@ -100,23 +112,21 @@ const empty: FormState = {
   postal_code: "",
   country: "Italia",
   show_full_address: false,
-  size_sqm: "",
-  bedrooms: "",
-  bathrooms: "",
+  size_range: "",
+  size_sqm_exact: "",
+  bedrooms_label: "",
+  bedrooms_exact: "",
+  bathrooms_label: "",
+  bathrooms_exact: "",
   floor_label: "",
-  total_floors: "",
+  total_floors_label: "",
+  total_floors_exact: "",
   condition: "",
   energy_class: "",
   heating: "",
   furnished: "",
-  garden: false,
-  terrace: false,
-  balcony: false,
-  garage: false,
-  cellar: false,
-  elevator: false,
-  panoramic_view: false,
-  historic_property: false,
+  amenities: {},
+  altre_dotazioni: "",
   short_notes: "",
   long_description: "",
   internal_notes: "",
@@ -174,12 +184,45 @@ function NewPropertyPage() {
         f.floor_label && f.floor_label in FLOOR_TO_NUMBER
           ? FLOOR_TO_NUMBER[f.floor_label]
           : null;
-      const furnishedBool = f.furnished === "Sì" || f.furnished === "Parzialmente";
+      const furnishedBool = f.furnished ? FURNISHED_TO_BOOL[f.furnished] ?? false : false;
+
+      // Superficie: se "Inserisci valore preciso" → usa il numero, altrimenti
+      // niente intero in colonna (resta solo il range nei features).
+      const sizeNum =
+        f.size_range === SIZE_CUSTOM ? toNum(f.size_sqm_exact) : null;
+      const bedroomsNum =
+        f.bedrooms_label === BEDROOMS_CUSTOM
+          ? toNum(f.bedrooms_exact)
+          : f.bedrooms_label
+            ? BEDROOMS_TO_NUMBER[f.bedrooms_label] ?? null
+            : null;
+      const bathroomsNum =
+        f.bathrooms_label === BATHROOMS_CUSTOM
+          ? toNum(f.bathrooms_exact)
+          : f.bathrooms_label
+            ? BATHROOMS_TO_NUMBER[f.bathrooms_label] ?? null
+            : null;
+
+      // Mappa amenities → colonne boolean note
+      const amenityBools: Record<string, boolean> = {
+        garden: false,
+        terrace: false,
+        balcony: false,
+        garage: false,
+        cellar: false,
+        elevator: false,
+        panoramic_view: false,
+        historic_property: false,
+      };
+      Object.entries(f.amenities).forEach(([label, on]) => {
+        if (!on) return;
+        const col = AMENITY_TO_COLUMN[label];
+        if (col) amenityBools[col] = true;
+      });
 
       const payload = {
         title: f.title.trim(),
         slug: slugify(f.title),
-        // reference_code: assegnato automaticamente dal trigger (FURIA-NNNN)
         property_type: f.property_type || null,
         contract_type: f.contract_type || null,
         price: f.price_on_request ? null : toNum(f.price),
@@ -194,21 +237,14 @@ function NewPropertyPage() {
         postal_code: f.postal_code.trim() || null,
         country: f.country.trim() || null,
         show_full_address: f.show_full_address,
-        size_sqm: toNum(f.size_sqm),
-        bedrooms: toNum(f.bedrooms),
-        bathrooms: toNum(f.bathrooms),
+        size_sqm: sizeNum,
+        bedrooms: bedroomsNum,
+        bathrooms: bathroomsNum,
         floors: floorNum,
         condition: f.condition || null,
         energy_class: f.energy_class || null,
         furnished: furnishedBool,
-        garden: f.garden,
-        terrace: f.terrace,
-        balcony: f.balcony,
-        garage: f.garage,
-        cellar: f.cellar,
-        elevator: f.elevator,
-        panoramic_view: f.panoramic_view,
-        historic_property: f.historic_property,
+        ...amenityBools,
         short_notes: f.short_notes.trim() || null,
         internal_notes: f.internal_notes.trim() || null,
         created_by: userId,
@@ -232,7 +268,6 @@ function NewPropertyPage() {
         if (v.trim()) extraFeatures.push({ property_id: data.id, feature_name: k, feature_value: v.trim() });
       };
       pushIf("heating", f.heating);
-      pushIf("total_floors", f.total_floors);
       pushIf("floor_label", f.floor_label);
       pushIf("furnished_level", f.furnished);
       pushIf("descrizione_libera", f.descrizione_libera);
@@ -241,6 +276,25 @@ function NewPropertyPage() {
       pushIf("target_acquirente", f.target_acquirente);
       pushIf("vista_contesto", f.vista_contesto);
       pushIf("elementi_storici", f.elementi_storici);
+      // Range/label sezione 3
+      pushIf("size_range", f.size_range);
+      pushIf("bedrooms_label", f.bedrooms_label);
+      pushIf("bathrooms_label", f.bathrooms_label);
+      pushIf("total_floors_label", f.total_floors_label);
+      if (f.total_floors_label === TOTAL_FLOORS_CUSTOM) {
+        pushIf("total_floors_exact", f.total_floors_exact);
+      }
+      pushIf("altre_dotazioni", f.altre_dotazioni);
+      // Dotazioni selezionate
+      Object.entries(f.amenities).forEach(([label, on]) => {
+        if (on) {
+          extraFeatures.push({
+            property_id: data.id,
+            feature_name: AMENITY_FEATURE_PREFIX + label,
+            feature_value: label,
+          });
+        }
+      });
       if (extraFeatures.length) {
         const { error: fErr } = await supabase.from("property_features").insert(extraFeatures);
         if (fErr) console.warn("[nuovo] features insert warn:", fErr.message);
@@ -408,13 +462,64 @@ function NewPropertyPage() {
         {/* SEZIONE 3 */}
         <Section title="3. Caratteristiche principali" subtitle="Dati tecnici e dotazioni">
           <Field label="Superficie (mq)">
-            <NumberInput value={f.size_sqm} onChange={(v) => upd("size_sqm", v)} />
+            <SelectInput
+              value={f.size_range}
+              onChange={(v) => upd("size_range", v)}
+              options={[
+                ...SIZE_RANGE_OPTIONS.map((o) => ({ value: o, label: o })),
+                { value: SIZE_CUSTOM, label: SIZE_CUSTOM },
+              ]}
+              placeholder="Seleziona superficie"
+            />
+            {f.size_range === SIZE_CUSTOM && (
+              <div className="mt-2">
+                <NumberInput
+                  value={f.size_sqm_exact}
+                  onChange={(v) => upd("size_sqm_exact", v)}
+                  placeholder="Es. 145"
+                />
+              </div>
+            )}
           </Field>
           <Field label="Camere">
-            <NumberInput value={f.bedrooms} onChange={(v) => upd("bedrooms", v)} />
+            <SelectInput
+              value={f.bedrooms_label}
+              onChange={(v) => upd("bedrooms_label", v)}
+              options={[
+                ...BEDROOMS_OPTIONS.map((o) => ({ value: o, label: o })),
+                { value: BEDROOMS_CUSTOM, label: BEDROOMS_CUSTOM },
+              ]}
+              placeholder="Seleziona camere"
+            />
+            {f.bedrooms_label === BEDROOMS_CUSTOM && (
+              <div className="mt-2">
+                <NumberInput
+                  value={f.bedrooms_exact}
+                  onChange={(v) => upd("bedrooms_exact", v)}
+                  placeholder="Numero camere"
+                />
+              </div>
+            )}
           </Field>
           <Field label="Bagni">
-            <NumberInput value={f.bathrooms} onChange={(v) => upd("bathrooms", v)} />
+            <SelectInput
+              value={f.bathrooms_label}
+              onChange={(v) => upd("bathrooms_label", v)}
+              options={[
+                ...BATHROOMS_OPTIONS.map((o) => ({ value: o, label: o })),
+                { value: BATHROOMS_CUSTOM, label: BATHROOMS_CUSTOM },
+              ]}
+              placeholder="Seleziona bagni"
+            />
+            {f.bathrooms_label === BATHROOMS_CUSTOM && (
+              <div className="mt-2">
+                <NumberInput
+                  value={f.bathrooms_exact}
+                  onChange={(v) => upd("bathrooms_exact", v)}
+                  placeholder="Numero bagni"
+                />
+              </div>
+            )}
           </Field>
           <Field label="Piano dell'immobile">
             <SelectInput
@@ -425,13 +530,31 @@ function NewPropertyPage() {
             />
           </Field>
           <Field label="Totale piani edificio">
-            <NumberInput value={f.total_floors} onChange={(v) => upd("total_floors", v)} />
+            <SelectInput
+              value={f.total_floors_label}
+              onChange={(v) => upd("total_floors_label", v)}
+              options={[
+                ...TOTAL_FLOORS_OPTIONS.map((o) => ({ value: o, label: o })),
+                { value: TOTAL_FLOORS_CUSTOM, label: TOTAL_FLOORS_CUSTOM },
+              ]}
+              placeholder="Seleziona piani edificio"
+            />
+            {f.total_floors_label === TOTAL_FLOORS_CUSTOM && (
+              <div className="mt-2">
+                <NumberInput
+                  value={f.total_floors_exact}
+                  onChange={(v) => upd("total_floors_exact", v)}
+                  placeholder="Numero piani"
+                />
+              </div>
+            )}
           </Field>
           <Field label="Stato manutenzione">
             <SelectInput
               value={f.condition}
               onChange={(v) => upd("condition", v)}
               options={CONDITIONS.map((o) => ({ value: o, label: o }))}
+              placeholder="Seleziona stato"
             />
           </Field>
           <Field label="Classe energetica">
@@ -439,6 +562,7 @@ function NewPropertyPage() {
               value={f.energy_class}
               onChange={(v) => upd("energy_class", v)}
               options={ENERGY_CLASSES.map((o) => ({ value: o, label: o }))}
+              placeholder="Seleziona classe"
             />
           </Field>
           <Field label="Riscaldamento">
@@ -458,18 +582,41 @@ function NewPropertyPage() {
             />
           </Field>
 
-          <div className="md:col-span-2">
-            <span className="block text-xs uppercase tracking-wider text-muted-foreground">Dotazioni</span>
-            <div className="mt-2 grid grid-cols-2 gap-2 md:grid-cols-3">
-              <Toggle label="Giardino" value={f.garden} onChange={(v) => upd("garden", v)} />
-              <Toggle label="Terrazza" value={f.terrace} onChange={(v) => upd("terrace", v)} />
-              <Toggle label="Balcone" value={f.balcony} onChange={(v) => upd("balcony", v)} />
-              <Toggle label="Garage" value={f.garage} onChange={(v) => upd("garage", v)} />
-              <Toggle label="Cantina" value={f.cellar} onChange={(v) => upd("cellar", v)} />
-              <Toggle label="Ascensore" value={f.elevator} onChange={(v) => upd("elevator", v)} />
-              <Toggle label="Vista panoramica" value={f.panoramic_view} onChange={(v) => upd("panoramic_view", v)} />
-              <Toggle label="Immobile storico" value={f.historic_property} onChange={(v) => upd("historic_property", v)} />
+          <div className="md:col-span-2 space-y-6">
+            <div>
+              <span className="block text-xs uppercase tracking-wider text-muted-foreground">Dotazioni</span>
+              <p className="mt-1 text-xs text-muted-foreground">Seleziona tutte le dotazioni presenti. Tap per attivare/disattivare.</p>
             </div>
+            {AMENITY_GROUPS.map((group) => (
+              <div key={group.title}>
+                <div className="mb-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-ink/70">
+                  {group.title}
+                </div>
+                <div className="grid grid-cols-2 gap-2 md:grid-cols-3">
+                  {group.items.map((label) => (
+                    <Toggle
+                      key={label}
+                      label={label}
+                      value={!!f.amenities[label]}
+                      onChange={(v) =>
+                        setF((s) => ({
+                          ...s,
+                          amenities: { ...s.amenities, [label]: v },
+                        }))
+                      }
+                    />
+                  ))}
+                </div>
+              </div>
+            ))}
+            <Field label="Altre dotazioni" full>
+              <TextArea
+                value={f.altre_dotazioni}
+                onChange={(v) => upd("altre_dotazioni", v)}
+                rows={3}
+                placeholder="Scrivi eventuali dotazioni particolari non presenti nell'elenco…"
+              />
+            </Field>
           </div>
         </Section>
 

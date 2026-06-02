@@ -25,6 +25,24 @@ import {
   NARRATIVE_FIELDS,
   LENGTH_OPTIONS,
   TONE_OPTIONS,
+  FLOOR_OPTIONS,
+  FLOOR_TO_NUMBER,
+  HEATING_OPTIONS,
+  FURNISHED_OPTIONS,
+  FURNISHED_TO_BOOL,
+  SIZE_RANGE_OPTIONS,
+  SIZE_CUSTOM,
+  BEDROOMS_OPTIONS,
+  BEDROOMS_CUSTOM,
+  BEDROOMS_TO_NUMBER,
+  BATHROOMS_OPTIONS,
+  BATHROOMS_CUSTOM,
+  BATHROOMS_TO_NUMBER,
+  TOTAL_FLOORS_OPTIONS,
+  TOTAL_FLOORS_CUSTOM,
+  AMENITY_GROUPS,
+  AMENITY_TO_COLUMN,
+  AMENITY_FEATURE_PREFIX,
 } from "@/lib/admin/property-constants";
 
 type Property = {
@@ -322,8 +340,12 @@ function PropertyEditor() {
       <div className="mt-8">
         {tab === "main" && <MainTab prop={prop} update={update} features={features} setFeatures={setFeatures} />}
         {tab === "location" && <LocationTab prop={prop} update={update} />}
-        {tab === "features" && <FeaturesTab prop={prop} update={update} />}
-        {tab === "amenities" && <AmenitiesTab prop={prop} update={update} />}
+        {tab === "features" && (
+          <FeaturesTab prop={prop} update={update} features={features} setFeatures={setFeatures} />
+        )}
+        {tab === "amenities" && (
+          <AmenitiesTab prop={prop} update={update} features={features} setFeatures={setFeatures} />
+        )}
         {tab === "photos" && <ImageUploader propertyId={id} />}
         {tab === "narrative" && <NarrativeTab features={features} setFeatures={setFeatures} />}
         {tab === "description" && (
@@ -574,63 +596,262 @@ function LocationTab({ prop, update }: { prop: Property; update: (p: Partial<Pro
   );
 }
 
-function FeaturesTab({ prop, update }: { prop: Property; update: (p: Partial<Property>) => void }) {
+function FeaturesTab({
+  prop,
+  update,
+  features,
+  setFeatures,
+}: {
+  prop: Property;
+  update: (p: Partial<Property>) => void;
+  features: Record<string, string>;
+  setFeatures: React.Dispatch<React.SetStateAction<Record<string, string>>>;
+}) {
+  // Helpers — leggono i label salvati nei features; con fallback sui valori
+  // numerici della tabella properties per gli annunci creati prima del refactor.
+  const setF = (k: string, v: string) =>
+    setFeatures((m) => ({ ...m, [k]: v }));
+
+  const sizeRange = features.size_range ?? (prop.size_sqm != null ? SIZE_CUSTOM : "");
+  const bedroomsLabel =
+    features.bedrooms_label ?? (prop.bedrooms != null ? BEDROOMS_CUSTOM : "");
+  const bathroomsLabel =
+    features.bathrooms_label ?? (prop.bathrooms != null ? BATHROOMS_CUSTOM : "");
+  const totalFloorsLabel =
+    features.total_floors_label ?? "";
+  const floorLabel = features.floor_label ?? "";
+  const heating = features.heating ?? "";
+  const furnishedLevel =
+    features.furnished_level ?? (prop.furnished ? "Arredato" : "");
+
   return (
     <Section title="Caratteristiche immobile">
-      <Field label="Superficie (m²)">
-        <NumberInput value={prop.size_sqm} onChange={(v) => update({ size_sqm: v })} />
+      <Field label="Superficie (mq)">
+        <SelectStringInput
+          value={sizeRange}
+          onChange={(v) => {
+            setF("size_range", v);
+            if (v !== SIZE_CUSTOM) update({ size_sqm: null });
+          }}
+          options={[...SIZE_RANGE_OPTIONS, SIZE_CUSTOM]}
+          placeholder="Seleziona superficie"
+        />
+        {sizeRange === SIZE_CUSTOM && (
+          <div className="mt-2">
+            <NumberInput value={prop.size_sqm} onChange={(v) => update({ size_sqm: v })} />
+          </div>
+        )}
       </Field>
-      <Field label="Camere da letto">
-        <NumberInput value={prop.bedrooms} onChange={(v) => update({ bedrooms: v })} />
+
+      <Field label="Camere">
+        <SelectStringInput
+          value={bedroomsLabel}
+          onChange={(v) => {
+            setF("bedrooms_label", v);
+            if (v === BEDROOMS_CUSTOM) return;
+            update({ bedrooms: v ? BEDROOMS_TO_NUMBER[v] ?? null : null });
+          }}
+          options={[...BEDROOMS_OPTIONS, BEDROOMS_CUSTOM]}
+          placeholder="Seleziona camere"
+        />
+        {bedroomsLabel === BEDROOMS_CUSTOM && (
+          <div className="mt-2">
+            <NumberInput value={prop.bedrooms} onChange={(v) => update({ bedrooms: v })} />
+          </div>
+        )}
       </Field>
+
       <Field label="Bagni">
-        <NumberInput value={prop.bathrooms} onChange={(v) => update({ bathrooms: v })} />
+        <SelectStringInput
+          value={bathroomsLabel}
+          onChange={(v) => {
+            setF("bathrooms_label", v);
+            if (v === BATHROOMS_CUSTOM) return;
+            update({ bathrooms: v ? BATHROOMS_TO_NUMBER[v] ?? null : null });
+          }}
+          options={[...BATHROOMS_OPTIONS, BATHROOMS_CUSTOM]}
+          placeholder="Seleziona bagni"
+        />
+        {bathroomsLabel === BATHROOMS_CUSTOM && (
+          <div className="mt-2">
+            <NumberInput value={prop.bathrooms} onChange={(v) => update({ bathrooms: v })} />
+          </div>
+        )}
       </Field>
-      <Field label="Piani">
-        <NumberInput value={prop.floors} onChange={(v) => update({ floors: v })} />
+
+      <Field label="Piano dell'immobile">
+        <SelectStringInput
+          value={floorLabel}
+          onChange={(v) => {
+            setF("floor_label", v);
+            const n = v && v in FLOOR_TO_NUMBER ? FLOOR_TO_NUMBER[v] : null;
+            update({ floors: n });
+          }}
+          options={[...FLOOR_OPTIONS]}
+          placeholder="Seleziona piano"
+        />
       </Field>
+
+      <Field label="Totale piani edificio">
+        <SelectStringInput
+          value={totalFloorsLabel}
+          onChange={(v) => setF("total_floors_label", v)}
+          options={[...TOTAL_FLOORS_OPTIONS, TOTAL_FLOORS_CUSTOM]}
+          placeholder="Seleziona piani edificio"
+        />
+        {totalFloorsLabel === TOTAL_FLOORS_CUSTOM && (
+          <div className="mt-2">
+            <TextInput
+              value={features.total_floors_exact ?? ""}
+              onChange={(v) => setF("total_floors_exact", v)}
+              placeholder="Numero piani"
+              type="number"
+            />
+          </div>
+        )}
+      </Field>
+
+      <Field label="Stato manutenzione">
+        <SelectInput
+          value={prop.condition}
+          onChange={(v) => update({ condition: v })}
+          options={CONDITIONS}
+          placeholder="Seleziona stato"
+        />
+      </Field>
+
       <Field label="Classe energetica">
         <SelectInput
           value={prop.energy_class}
           onChange={(v) => update({ energy_class: v })}
           options={ENERGY_CLASSES}
+          placeholder="Seleziona classe"
         />
       </Field>
-      <Field label="Stato dell'immobile">
-        <SelectInput
-          value={prop.condition}
-          onChange={(v) => update({ condition: v })}
-          options={CONDITIONS}
+
+      <Field label="Riscaldamento">
+        <SelectStringInput
+          value={heating}
+          onChange={(v) => setF("heating", v)}
+          options={[...HEATING_OPTIONS]}
+          placeholder="Seleziona riscaldamento"
+        />
+      </Field>
+
+      <Field label="Arredato">
+        <SelectStringInput
+          value={furnishedLevel}
+          onChange={(v) => {
+            setF("furnished_level", v);
+            update({ furnished: v ? FURNISHED_TO_BOOL[v] ?? false : false });
+          }}
+          options={[...FURNISHED_OPTIONS]}
+          placeholder="Seleziona stato arredo"
         />
       </Field>
     </Section>
   );
 }
 
-function AmenitiesTab({ prop, update }: { prop: Property; update: (p: Partial<Property>) => void }) {
-  const items: Array<{ key: keyof Property; label: string }> = [
-    { key: "panoramic_view", label: "Vista panoramica" },
-    { key: "historic_property", label: "Immobile storico" },
-    { key: "garden", label: "Giardino" },
-    { key: "terrace", label: "Terrazzo" },
-    { key: "balcony", label: "Balcone" },
-    { key: "garage", label: "Garage" },
-    { key: "cellar", label: "Cantina" },
-    { key: "elevator", label: "Ascensore" },
-    { key: "furnished", label: "Arredato" },
-  ];
+/** Select non-nullable in stringa, con placeholder. */
+function SelectStringInput({
+  value,
+  onChange,
+  options,
+  placeholder,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  options: readonly string[];
+  placeholder?: string;
+}) {
   return (
-    <div className="rounded-sm border border-border bg-card p-6">
-      <h3 className="font-serif text-lg text-ink">Dotazioni</h3>
-      <div className="mt-5 grid grid-cols-2 gap-3 md:grid-cols-3">
-        {items.map((i) => (
-          <Toggle
-            key={i.key as string}
-            label={i.label}
-            value={prop[i.key] as boolean}
-            onChange={(v) => update({ [i.key]: v } as Partial<Property>)}
+    <select value={value} onChange={(e) => onChange(e.target.value)} className={inputCls}>
+      <option value="">{placeholder ?? "—"}</option>
+      {options.map((o) => (
+        <option key={o} value={o}>
+          {o}
+        </option>
+      ))}
+    </select>
+  );
+}
+
+function AmenitiesTab({
+  prop,
+  update,
+  features,
+  setFeatures,
+}: {
+  prop: Property;
+  update: (p: Partial<Property>) => void;
+  features: Record<string, string>;
+  setFeatures: React.Dispatch<React.SetStateAction<Record<string, string>>>;
+}) {
+  // Una dotazione è selezionata se esiste il feature `amenity:<label>` oppure,
+  // per retrocompat, se la colonna boolean corrispondente su `properties` è true.
+  const isOn = (label: string): boolean => {
+    if (features[AMENITY_FEATURE_PREFIX + label]) return true;
+    const col = AMENITY_TO_COLUMN[label];
+    if (col && (prop as unknown as Record<string, unknown>)[col] === true) return true;
+    return false;
+  };
+
+  const toggle = (label: string, on: boolean) => {
+    setFeatures((m) => {
+      const next = { ...m };
+      const key = AMENITY_FEATURE_PREFIX + label;
+      if (on) next[key] = label;
+      else delete next[key];
+      return next;
+    });
+    const col = AMENITY_TO_COLUMN[label];
+    if (col) update({ [col]: on } as Partial<Property>);
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="rounded-sm border border-border bg-card p-6">
+        <h3 className="font-serif text-lg text-ink">Dotazioni</h3>
+        <p className="mt-1 text-xs text-muted-foreground">
+          Seleziona tutte le dotazioni presenti. Tap per attivare/disattivare.
+        </p>
+        <div className="mt-6 space-y-6">
+          {AMENITY_GROUPS.map((group) => (
+            <div key={group.title}>
+              <div className="mb-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-ink/70">
+                {group.title}
+              </div>
+              <div className="grid grid-cols-2 gap-2 md:grid-cols-3">
+                {group.items.map((label) => (
+                  <Toggle
+                    key={label}
+                    label={label}
+                    value={isOn(label)}
+                    onChange={(v) => toggle(label, v)}
+                  />
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="rounded-sm border border-border bg-card p-6">
+        <label className="block">
+          <span className="block text-xs uppercase tracking-wider text-muted-foreground">
+            Altre dotazioni
+          </span>
+          <textarea
+            value={features.altre_dotazioni ?? ""}
+            onChange={(e) =>
+              setFeatures((m) => ({ ...m, altre_dotazioni: e.target.value }))
+            }
+            rows={3}
+            placeholder="Scrivi eventuali dotazioni particolari non presenti nell'elenco…"
+            className={`${inputCls} mt-1`}
           />
-        ))}
+        </label>
       </div>
     </div>
   );

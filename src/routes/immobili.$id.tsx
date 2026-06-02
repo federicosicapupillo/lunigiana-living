@@ -120,9 +120,9 @@ function PropertyDetail() {
           {/* Quick facts */}
           <div className="mt-12 grid grid-cols-2 gap-px overflow-hidden rounded-sm bg-border md:grid-cols-4">
             {[
-              { icon: Maximize2, label: "Superficie", value: p.sqm ? `${p.sqm} m²` : "—" },
-              { icon: BedDouble, label: "Locali", value: p.rooms ?? "—" },
-              { icon: Bath, label: "Bagni", value: p.bathrooms ?? "—" },
+              { icon: Maximize2, label: "Superficie", value: p.sqmLabel ?? (p.sqm ? `${p.sqm} m²` : "—") },
+              { icon: BedDouble, label: "Camere", value: p.roomsLabel ?? "—" },
+              { icon: Bath, label: "Bagni", value: p.bathroomsLabel ?? "—" },
               { icon: Building2, label: "Piano", value: p.floor || "—" },
             ].map((f) => (
               <div key={f.label} className="bg-card p-5">
@@ -146,6 +146,31 @@ function PropertyDetail() {
               ))}
             </dl>
           </div>
+
+          {/* Dotazioni */}
+          {(p.amenities.length > 0 || p.altreDotazioni) && (
+            <div className="mt-12">
+              <span className="eyebrow">Dotazioni</span>
+              <h2 className="mt-3 font-serif text-3xl text-ink">Cosa offre</h2>
+              {p.amenities.length > 0 && (
+                <ul className="mt-6 flex flex-wrap gap-2">
+                  {p.amenities.map((a) => (
+                    <li
+                      key={a}
+                      className="rounded-sm border border-border bg-card px-3 py-1.5 text-xs uppercase tracking-wider text-ink"
+                    >
+                      {a}
+                    </li>
+                  ))}
+                </ul>
+              )}
+              {p.altreDotazioni && (
+                <p className="mt-6 whitespace-pre-line text-sm leading-relaxed text-foreground/85">
+                  {p.altreDotazioni}
+                </p>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Contact card */}

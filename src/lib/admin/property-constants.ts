@@ -30,56 +30,274 @@ export const ENERGY_CLASSES = [
   "E",
   "F",
   "G",
-  "In fase di definizione",
   "Esente",
+  "In fase di rilascio",
+  "Non disponibile",
 ] as const;
 
 export const CONDITIONS = [
-  "Nuovo",
-  "Ristrutturato",
   "Ottimo",
   "Buono",
   "Abitabile",
   "Da ristrutturare",
-  "Grezzo",
+  "Parzialmente ristrutturato",
+  "Ristrutturato",
+  "Nuova costruzione",
+  "In costruzione",
+  "Da ultimare",
+  "Rustico da recuperare",
 ] as const;
 
-export const FURNISHED_OPTIONS = ["Sì", "No", "Parzialmente"] as const;
+export const FURNISHED_OPTIONS = [
+  "Non arredato",
+  "Arredato",
+  "Parzialmente arredato",
+  "Cucina arredata",
+  "Su richiesta",
+  "Da concordare",
+] as const;
 export type FurnishedOption = (typeof FURNISHED_OPTIONS)[number];
+
+/** Mappa il livello di arredo al boolean salvato in `properties.furnished`. */
+export const FURNISHED_TO_BOOL: Record<string, boolean> = {
+  "Non arredato": false,
+  "Arredato": true,
+  "Parzialmente arredato": true,
+  "Cucina arredata": true,
+  "Su richiesta": false,
+  "Da concordare": false,
+};
 
 export const HEATING_OPTIONS = [
   "Autonomo",
   "Centralizzato",
-  "Assente",
+  "A pavimento",
   "Pompa di calore",
-  "Altro",
+  "Stufa a pellet",
+  "Camino",
+  "Termocamino",
+  "GPL",
+  "Metano",
+  "Gasolio",
+  "Elettrico",
+  "Solare termico",
+  "Assente",
+  "Da verificare",
 ] as const;
 
 export const FLOOR_OPTIONS = [
-  "Seminterrato",
-  "Terra",
-  "Rialzato",
-  "1",
-  "2",
-  "3",
-  "4",
-  "5+",
+  "Piano terra",
+  "Primo piano",
+  "Secondo piano",
+  "Terzo piano",
+  "Quarto piano",
   "Ultimo piano",
+  "Attico",
+  "Su più livelli",
+  "Seminterrato",
+  "Interrato",
+  "Rialzato",
+  "Non applicabile",
 ] as const;
 
 /** Mappa il label piano al valore numerico salvato in `properties.floors`.
  * `null` significa: non salvare un intero (solo il label resta nei features). */
 export const FLOOR_TO_NUMBER: Record<string, number | null> = {
-  Seminterrato: -1,
-  Terra: 0,
-  Rialzato: 0,
-  "1": 1,
-  "2": 2,
-  "3": 3,
-  "4": 4,
-  "5+": 5,
+  "Piano terra": 0,
+  "Primo piano": 1,
+  "Secondo piano": 2,
+  "Terzo piano": 3,
+  "Quarto piano": 4,
   "Ultimo piano": null,
+  "Attico": null,
+  "Su più livelli": null,
+  "Seminterrato": -1,
+  "Interrato": -1,
+  "Rialzato": 0,
+  "Non applicabile": null,
 };
+
+/* ---------- Range / opzioni "facili" sezione 3 ---------- */
+
+export const SIZE_RANGE_OPTIONS = [
+  "Fino a 50 mq",
+  "50 - 80 mq",
+  "80 - 120 mq",
+  "120 - 160 mq",
+  "160 - 200 mq",
+  "200 - 300 mq",
+  "300 - 500 mq",
+  "Oltre 500 mq",
+] as const;
+export const SIZE_CUSTOM = "Inserisci valore preciso";
+
+export const BEDROOMS_OPTIONS = [
+  "Monolocale / ambiente unico",
+  "1 camera",
+  "2 camere",
+  "3 camere",
+  "4 camere",
+  "5 camere",
+  "Più di 5 camere",
+] as const;
+export const BEDROOMS_CUSTOM = "Inserisci valore personalizzato";
+
+/** Mappa label camere → intero (null = non rappresentabile). */
+export const BEDROOMS_TO_NUMBER: Record<string, number | null> = {
+  "Monolocale / ambiente unico": 0,
+  "1 camera": 1,
+  "2 camere": 2,
+  "3 camere": 3,
+  "4 camere": 4,
+  "5 camere": 5,
+  "Più di 5 camere": 6,
+};
+
+export const BATHROOMS_OPTIONS = [
+  "1 bagno",
+  "2 bagni",
+  "3 bagni",
+  "4 bagni",
+  "Più di 4 bagni",
+] as const;
+export const BATHROOMS_CUSTOM = "Inserisci valore personalizzato";
+
+export const BATHROOMS_TO_NUMBER: Record<string, number | null> = {
+  "1 bagno": 1,
+  "2 bagni": 2,
+  "3 bagni": 3,
+  "4 bagni": 4,
+  "Più di 4 bagni": 5,
+};
+
+export const TOTAL_FLOORS_OPTIONS = [
+  "1 piano",
+  "2 piani",
+  "3 piani",
+  "4 piani",
+  "5 piani",
+  "Più di 5 piani",
+  "Non applicabile",
+] as const;
+export const TOTAL_FLOORS_CUSTOM = "Inserisci valore personalizzato";
+
+/* ---------- Dotazioni raggruppate ---------- */
+
+export const AMENITY_GROUPS: Array<{ title: string; items: readonly string[] }> = [
+  {
+    title: "Esterni",
+    items: [
+      "Giardino",
+      "Giardino privato",
+      "Corte privata",
+      "Terreno",
+      "Uliveto",
+      "Vigneto",
+      "Bosco",
+      "Terrazza",
+      "Terrazza panoramica",
+      "Balcone",
+      "Loggia",
+      "Portico",
+      "Patio",
+      "Veranda",
+      "Piscina",
+      "Possibilità piscina",
+      "Vista panoramica",
+      "Vista montagne",
+      "Vista mare",
+      "Vista borgo",
+      "Vista fiume",
+    ],
+  },
+  {
+    title: "Pertinenze",
+    items: [
+      "Garage",
+      "Posto auto",
+      "Posto auto coperto",
+      "Cantina",
+      "Taverna",
+      "Soffitta",
+      "Mansarda",
+      "Deposito",
+      "Legnaia",
+      "Fienile",
+      "Annesso agricolo",
+      "Dependence",
+      "Locale tecnico",
+    ],
+  },
+  {
+    title: "Comfort e impianti",
+    items: [
+      "Camino",
+      "Stufa",
+      "Aria condizionata",
+      "Pannelli solari",
+      "Fotovoltaico",
+      "Impianto allarme",
+      "Videosorveglianza",
+      "Domotica",
+      "Internet / fibra",
+      "Cancello automatico",
+      "Doppi vetri",
+      "Zanzariere",
+      "Porta blindata",
+    ],
+  },
+  {
+    title: "Accessibilità",
+    items: [
+      "Ascensore",
+      "Accesso disabili",
+      "Ingresso indipendente",
+      "Strada privata",
+      "Facile accesso auto",
+      "Vicino ai servizi",
+      "Vicino al centro",
+      "Posizione riservata",
+    ],
+  },
+  {
+    title: "Caratteristiche speciali",
+    items: [
+      "Immobile storico",
+      "Casale in pietra",
+      "Rustico",
+      "Travature a vista",
+      "Pavimenti originali",
+      "Soffitti affrescati",
+      "Torretta",
+      "Mura storiche",
+      "Ideale per B&B",
+      "Ideale per agriturismo",
+      "Ideale come seconda casa",
+      "Ideale per investimento",
+      "Proprietà divisibile",
+      "Possibilità ampliamento",
+      "Possibilità cambio destinazione d'uso",
+    ],
+  },
+];
+
+export const ALL_AMENITIES: string[] = AMENITY_GROUPS.flatMap((g) => g.items as string[]);
+
+/** Mappa dotazione → colonna boolean su `properties` (per backward-compat / filtri). */
+export const AMENITY_TO_COLUMN: Record<string, string> = {
+  "Giardino": "garden",
+  "Giardino privato": "garden",
+  "Terrazza": "terrace",
+  "Terrazza panoramica": "terrace",
+  "Balcone": "balcony",
+  "Garage": "garage",
+  "Cantina": "cellar",
+  "Ascensore": "elevator",
+  "Vista panoramica": "panoramic_view",
+  "Immobile storico": "historic_property",
+};
+
+export const AMENITY_FEATURE_PREFIX = "amenity:";
 
 export const REGIONS = [
   "Abruzzo",
