@@ -33,6 +33,10 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
+  const { properties } = Route.useLoaderData() as { properties: PublicProperty[] };
+  const featuredProperties = properties
+    .filter((p) => p.featured && p.category === "vendita")
+    .slice(0, 6);
   const [heroVariant, setHeroVariant] = useState<
     "castelloBorgo" | "tramontoVigneti" | "panoramico" | "intimo" | "colline" | "borgo" | "tramonto" | "aereo"
   >("castelloBorgo");
