@@ -1,81 +1,137 @@
-import property1 from "@/assets/real/bagnone-centro.jpg";
-import property2 from "@/assets/real/pontremoli-scorcio.jpg";
-import property3 from "@/assets/real/villafranca-panorama.jpg";
-import property4 from "@/assets/real/filattiera.jpg";
-import property5 from "@/assets/real/mulazzo.jpg";
-import property6 from "@/assets/real/bagnone-torrente.jpg";
-import type { Property } from "@/components/property-card";
+import rawData from "@/data/properties.json";
 
-export const featuredProperties: Property[] = [
-  {
-    id: "casolare-bagnone",
-    title: "Casolare con uliveto",
-    location: "Bagnone, Lunigiana",
-    price: "€ 485.000",
-    type: "Casa di pietra restaurata",
-    sqm: 240,
-    rooms: 4,
-    image: property1,
-    tag: "In evidenza",
-  },
-  {
-    id: "borgo-pontremoli",
-    title: "Casa nel borgo storico",
-    location: "Pontremoli, centro",
-    price: "€ 215.000",
-    type: "Casa di carattere",
-    sqm: 130,
-    rooms: 3,
-    image: property2,
-    tag: "Nuovo",
-  },
-  {
-    id: "villa-villafranca",
-    title: "Villa con vista valle",
-    location: "Villafranca in Lunigiana",
-    price: "€ 720.000",
-    type: "Villa panoramica",
-    sqm: 320,
-    rooms: 5,
-    image: property3,
-    tag: "Vista aperta",
-  },
-];
+export type PropertyCategory = "vendita" | "affitto" | "scelti-per-voi";
 
-export const allProperties: Property[] = [
-  ...featuredProperties,
-  {
-    id: "rustico-filattiera",
-    title: "Rustico da reinterpretare",
-    location: "Filattiera",
-    price: "€ 168.000",
-    type: "Rustico",
-    sqm: 180,
-    rooms: 4,
-    image: property4,
-  },
-  {
-    id: "appartamento-mulazzo",
-    title: "Appartamento con terrazzo",
-    location: "Mulazzo",
-    price: "€ 135.000",
-    type: "Appartamento",
-    sqm: 95,
-    rooms: 3,
-    image: property5,
-  },
-  {
-    id: "villa-zeri",
-    title: "Casa tra i boschi",
-    location: "Zeri",
-    price: "€ 295.000",
-    type: "Casa indipendente",
-    sqm: 160,
-    rooms: 3,
-    image: property6,
-    tag: "Con giardino",
-  },
-];
+export interface RawProperty {
+  id: number;
+  reference: string;
+  title: string;
+  location: string;
+  price_eur: number | null;
+  price_label: string | null;
+  description: string;
+  attributes: Record<string, string>;
+  cover: string | null;
+  gallery: string[];
+  category: PropertyCategory;
+  featured: boolean;
+}
+
+export interface Property {
+  id: number;
+  slug: string;
+  reference: string;
+  title: string;
+  location: string;
+  price: string;
+  priceValue: number | null;
+  type: string;
+  sqm: number | null;
+  rooms: number | null;
+  bathrooms: number | null;
+  floor: string | null;
+  image: string;
+  gallery: string[];
+  description: string;
+  attributes: Record<string, string>;
+  category: PropertyCategory;
+  featured: boolean;
+  tag?: string;
+}
+
+const PLACEHOLDER =
+  "data:image/svg+xml;utf8," +
+  encodeURIComponent(
+    `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 3'><rect width='4' height='3' fill='%23e8e4dd'/></svg>`,
+  );
+
+function slugify(input: string): string {
+  return input
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+}
+
+function intAttr(attrs: Record<string, string>, key: string): number | null {
+  const v = attrs[key];
+  if (!v) return null;
+  const m = v.match(/\d+/);
+  return m ? parseInt(m[0], 10) : null;
+}
+
+function formatPrice(p: RawProperty): string {
+  if (!p.price_eur) return "Info in agenzia";
+  const n = p.price_eur;
+  const formatted = new Intl.NumberFormat("it-IT").format(n);
+  return p.category === "affitto" ? `€ ${formatted} / mese` : `€ ${formatted}`;
+}
+
+function buildTag(p: RawProperty): string | undefined {
+  if (p.category === "affitto") return "Affitto";
+  if (p.category === "scelti-per-voi") return "Scelti per voi";
+  if (p.featured) return "In evidenza";
+  return undefined;
+}
+
+function titleCase(s: string): string {
+  if (!s) return s;
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
+function adapt(r: RawProperty): Property {
+  const ref = r.reference.replace(/\s+/g, "-");
+  return {
+    id: r.id,
+    slug: `${slugify(ref)}-${slugify(r.title || "immobile")}`.slice(0, 80),
+    reference: r.reference,
+    title: titleCase(r.title || "Immobile"),
+    location: r.location || "Lunigiana",
+    price: formatPrice(r),
+    priceValue: r.price_eur,
+    type: r.attributes["Tipologia"] || "Immobile",
+    sqm: intAttr(r.attributes, "Superficie"),
+    rooms: intAttr(r.attributes, "Locali"),
+    bathrooms: intAttr(r.attributes, "Bagni"),
+    floor: r.attributes["Piano"] || null,
+    image: r.cover || (r.gallery[0] ?? PLACEHOLDER),
+    gallery: r.gallery.length ? r.gallery : r.cover ? [r.cover] : [],
+    description: r.description || "",
+    attributes: r.attributes,
+    category: r.category,
+    featured: r.featured,
+    tag: buildTag(r),
+  };
+}
+
+export const allProperties: Property[] = (rawData as unknown as RawProperty[])
+  .map(adapt)
+  .sort((a, b) => {
+    // Featured first, then by price desc, undefined last
+    if (a.featured !== b.featured) return a.featured ? -1 : 1;
+    return (b.priceValue ?? -1) - (a.priceValue ?? -1);
+  });
+
+export const featuredProperties: Property[] = allProperties
+  .filter((p) => p.featured && p.category === "vendita")
+  .slice(0, 6);
+
+export const propertiesByCategory = (cat: PropertyCategory | "tutti") =>
+  cat === "tutti" ? allProperties : allProperties.filter((p) => p.category === cat);
+
+export const getPropertyById = (id: number | string): Property | undefined => {
+  const n = typeof id === "string" ? parseInt(id, 10) : id;
+  return allProperties.find((p) => p.id === n);
+};
+
+export const uniqueLocations = Array.from(
+  new Set(allProperties.map((p) => p.location).filter(Boolean)),
+).sort();
+
+export const uniqueTypes = Array.from(
+  new Set(allProperties.map((p) => p.type).filter(Boolean)),
+).sort();
 
 export const territories = [
   {
