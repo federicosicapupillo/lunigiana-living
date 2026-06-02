@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
+import logoAsset from "@/assets/furia-logo.png.asset.json";
 
 const nav = [
   { to: "/", label: "Home" },
@@ -16,9 +17,12 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-40 border-b border-border/60 bg-background/85 backdrop-blur-md">
       <div className="container-editorial flex h-20 items-center justify-between">
-        <Link to="/" className="group flex flex-col leading-none">
-          <span className="font-serif text-2xl tracking-tight text-ink">Furia</span>
-          <span className="eyebrow mt-1 text-[0.6rem]">Immobiliare · Lunigiana</span>
+        <Link to="/" className="group flex items-center" aria-label="Furia Immobiliare — Home">
+          <img
+            src={logoAsset.url}
+            alt="Furia Immobiliare"
+            className="h-12 w-auto md:h-14"
+          />
         </Link>
 
         <nav className="hidden items-center gap-9 lg:flex">
