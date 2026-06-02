@@ -4,11 +4,20 @@ import heroTramontoVignetiAsset from "@/assets/real/hero-tramonto-vigneti.png.as
 import territoryPontremoli from "@/assets/real/pontremoli-scorcio.jpg";
 import territoryBagnone from "@/assets/real/bagnone-castello.jpg";
 import territoryZeri from "@/assets/real/zeri-monte.jpg";
-import lifestyleFood from "@/assets/real/bagnone-torrente.jpg";
 import { PropertyCard } from "@/components/property-card";
 import { HomeSearchBar } from "@/components/home-search-bar";
 import { listPublishedProperties, type PublicProperty } from "@/lib/public-properties.functions";
 import { ArrowRight, Compass, KeyRound, Sparkles } from "lucide-react";
+import { useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+  DialogClose,
+} from "@/components/ui/dialog";
 
 export const Route = createFileRoute("/")({
   loader: () => listPublishedProperties(),
@@ -25,6 +34,7 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
+  const [open, setOpen] = useState(false);
   const { properties } = Route.useLoaderData() as { properties: PublicProperty[] };
   const featuredProperties = properties
     .filter((p) => p.featured && p.category === "vendita")
