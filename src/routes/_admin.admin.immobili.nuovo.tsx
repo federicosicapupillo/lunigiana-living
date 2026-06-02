@@ -36,6 +36,14 @@ import {
   AMENITY_FEATURE_PREFIX,
   FURNISHED_TO_BOOL,
 } from "@/lib/admin/property-constants";
+import {
+  MULTI_SELECT_FIELDS,
+  EMPTY_MULTI,
+  serializeMultiSelect,
+  type MultiSelectValue,
+  type MultiSelectKey,
+} from "@/lib/admin/property-constants";
+import { MultiSelectChips } from "@/components/admin/multi-select-chips";
 import { LocationFields, EMPTY_LOCATION, type LocationValue } from "@/components/admin/location-fields";
 
 export const Route = createFileRoute("/_admin/admin/immobili/nuovo")({
