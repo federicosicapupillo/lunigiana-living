@@ -44,6 +44,7 @@ type Property = {
   country: string | null;
   locality: string | null;
   show_full_address: boolean;
+  postal_code: string | null;
   size_sqm: number | null;
   bedrooms: number | null;
   bathrooms: number | null;
