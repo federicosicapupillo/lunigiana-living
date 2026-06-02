@@ -15,6 +15,7 @@ import {
 import { useServerFn } from "@tanstack/react-start";
 import { generateDescription } from "@/lib/ai-description.functions";
 import { ImageUploader } from "@/components/admin/image-uploader";
+import { LocationFields } from "@/components/admin/location-fields";
 import {
   PROPERTY_TYPES,
   CONTRACT_TYPES,
@@ -41,6 +42,9 @@ type Property = {
   province: string | null;
   region: string | null;
   country: string | null;
+  locality: string | null;
+  show_full_address: boolean;
+  postal_code: string | null;
   size_sqm: number | null;
   bedrooms: number | null;
   bathrooms: number | null;
@@ -484,10 +488,12 @@ function MainTab({
         <TextInput value={prop.slug} onChange={(v) => update({ slug: v })} placeholder="auto da titolo se vuoto" />
       </Field>
       <Field label="Codice riferimento">
-        <TextInput
-          value={prop.reference_code}
-          onChange={(v) => update({ reference_code: v })}
-          placeholder="Es. RIF-2026-014"
+        <input
+          type="text"
+          value={prop.reference_code ?? ""}
+          readOnly
+          disabled
+          className={`${inputCls} cursor-not-allowed bg-muted/40 text-muted-foreground`}
         />
       </Field>
       <Field label="Tipologia immobile">
@@ -551,27 +557,19 @@ function MainTab({
 function LocationTab({ prop, update }: { prop: Property; update: (p: Partial<Property>) => void }) {
   return (
     <Section title="Localizzazione">
-      <Field label="Comune">
-        <TextInput value={prop.municipality} onChange={(v) => update({ municipality: v })} />
-      </Field>
-      <Field label="Zona / frazione">
-        <TextInput value={prop.area_zone} onChange={(v) => update({ area_zone: v })} />
-      </Field>
-      <Field label="Indirizzo" full>
-        <TextInput value={prop.address} onChange={(v) => update({ address: v })} />
-      </Field>
-      <Field label="Provincia">
-        <TextInput value={prop.province} onChange={(v) => update({ province: v })} placeholder="Es. MS" />
-      </Field>
-      <Field label="Regione">
-        <TextInput value={prop.region} onChange={(v) => update({ region: v })} />
-      </Field>
-      <Field label="Latitudine">
-        <NumberInput value={prop.latitude} onChange={(v) => update({ latitude: v })} step={0.000001} />
-      </Field>
-      <Field label="Longitudine">
-        <NumberInput value={prop.longitude} onChange={(v) => update({ longitude: v })} step={0.000001} />
-      </Field>
+      <LocationFields
+        value={{
+          region: prop.region ?? "",
+          province: prop.province ?? "",
+          municipality: prop.municipality ?? "",
+          locality: prop.locality ?? "",
+          area_zone: prop.area_zone ?? "",
+          postal_code: prop.postal_code ?? "",
+          address: prop.address ?? "",
+          show_full_address: prop.show_full_address ?? false,
+        }}
+        onChange={(patch) => update(patch as Partial<Property>)}
+      />
     </Section>
   );
 }

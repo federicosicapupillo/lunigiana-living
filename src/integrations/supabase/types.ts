@@ -37,6 +37,7 @@ export type Database = {
           id: string
           internal_notes: string | null
           latitude: number | null
+          locality: string | null
           longitude: number | null
           municipality: string | null
           panoramic_view: boolean
@@ -48,6 +49,7 @@ export type Database = {
           reference_code: string | null
           region: string | null
           short_notes: string | null
+          show_full_address: boolean
           size_sqm: number | null
           slug: string | null
           status: Database["public"]["Enums"]["property_status"]
@@ -77,6 +79,7 @@ export type Database = {
           id?: string
           internal_notes?: string | null
           latitude?: number | null
+          locality?: string | null
           longitude?: number | null
           municipality?: string | null
           panoramic_view?: boolean
@@ -88,6 +91,7 @@ export type Database = {
           reference_code?: string | null
           region?: string | null
           short_notes?: string | null
+          show_full_address?: boolean
           size_sqm?: number | null
           slug?: string | null
           status?: Database["public"]["Enums"]["property_status"]
@@ -117,6 +121,7 @@ export type Database = {
           id?: string
           internal_notes?: string | null
           latitude?: number | null
+          locality?: string | null
           longitude?: number | null
           municipality?: string | null
           panoramic_view?: boolean
@@ -128,6 +133,7 @@ export type Database = {
           reference_code?: string | null
           region?: string | null
           short_notes?: string | null
+          show_full_address?: boolean
           size_sqm?: number | null
           slug?: string | null
           status?: Database["public"]["Enums"]["property_status"]

@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import {
@@ -21,9 +21,8 @@ import {
   HEATING_OPTIONS,
   FLOOR_OPTIONS,
   FLOOR_TO_NUMBER,
-  REGIONS,
-  PROVINCES,
 } from "@/lib/admin/property-constants";
+import { LocationFields, EMPTY_LOCATION, type LocationValue } from "@/components/admin/location-fields";
 
 export const Route = createFileRoute("/_admin/admin/immobili/nuovo")({
   head: () => ({
@@ -40,7 +39,6 @@ type Status = "draft" | "ready" | "published";
 type FormState = {
   // Sezione 1
   title: string;
-  reference_code: string;
   property_type: string;
   descrizione_libera: string;
   contract_type: string;
@@ -52,11 +50,11 @@ type FormState = {
   province: string;
   region: string;
   address: string;
+  locality: string;
   area_zone: string;
   postal_code: string;
   country: string;
-  latitude: string;
-  longitude: string;
+  show_full_address: boolean;
   // Sezione 3
   size_sqm: string;
   bedrooms: string;
@@ -87,7 +85,6 @@ type FormState = {
 
 const empty: FormState = {
   title: "",
-  reference_code: "",
   property_type: "",
   descrizione_libera: "",
   contract_type: "",
@@ -96,13 +93,13 @@ const empty: FormState = {
   status: "draft",
   municipality: "",
   province: "",
-  region: "Toscana",
+  region: "",
   address: "",
+  locality: "",
   area_zone: "",
   postal_code: "",
   country: "Italia",
-  latitude: "",
-  longitude: "",
+  show_full_address: false,
   size_sqm: "",
   bedrooms: "",
   bathrooms: "",
@@ -182,7 +179,7 @@ function NewPropertyPage() {
       const payload = {
         title: f.title.trim(),
         slug: slugify(f.title),
-        reference_code: f.reference_code.trim() || null,
+        // reference_code: assegnato automaticamente dal trigger (FURIA-NNNN)
         property_type: f.property_type || null,
         contract_type: f.contract_type || null,
         price: f.price_on_request ? null : toNum(f.price),
@@ -192,11 +189,11 @@ function NewPropertyPage() {
         province: f.province.trim() || null,
         region: f.region.trim() || null,
         address: f.address.trim() || null,
+        locality: f.locality.trim() || null,
         area_zone: f.area_zone.trim() || null,
         postal_code: f.postal_code.trim() || null,
         country: f.country.trim() || null,
-        latitude: toNum(f.latitude),
-        longitude: toNum(f.longitude),
+        show_full_address: f.show_full_address,
         size_sqm: toNum(f.size_sqm),
         bedrooms: toNum(f.bedrooms),
         bathrooms: toNum(f.bathrooms),
@@ -296,7 +293,9 @@ function NewPropertyPage() {
                 {STATUS_LABELS[f.status]}
               </span>
               <span>·</span>
-              <span>{f.reference_code || "Nessun codice"}</span>
+              <span className="italic text-muted-foreground">
+                Riferimento generato al salvataggio
+              </span>
             </div>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -355,9 +354,6 @@ function NewPropertyPage() {
               placeholder="Scrivi qui una descrizione personalizzata dell'immobile, del contesto, della vista, del terreno, delle potenzialità o di altri dettagli importanti…"
             />
           </Field>
-          <Field label="Codice riferimento">
-            <TextInput value={f.reference_code} onChange={(v) => upd("reference_code", v)} placeholder="RIF-2026-014" />
-          </Field>
           <Field label="Stato annuncio">
             <SelectInput
               value={f.status}
@@ -392,42 +388,21 @@ function NewPropertyPage() {
 
         {/* SEZIONE 2 */}
         <Section title="2. Localizzazione" subtitle="Dove si trova l'immobile">
-          <Field label="Comune">
-            <TextInput value={f.municipality} onChange={(v) => upd("municipality", v)} placeholder="Es. Pietrasanta" />
-          </Field>
-          <Field label="Provincia">
-            <ProvinceCombobox
-              value={f.province}
-              onChange={(v) => upd("province", v)}
-              placeholder="Cerca provincia o sigla (es. MS, Lucca)"
-            />
-          </Field>
-          <Field label="Regione">
-            <SelectInput
-              value={f.region}
-              onChange={(v) => upd("region", v)}
-              options={REGIONS.map((o) => ({ value: o, label: o }))}
-              placeholder="Seleziona regione"
-            />
-          </Field>
-          <Field label="Nazione">
-            <TextInput value={f.country} onChange={(v) => upd("country", v)} />
-          </Field>
-          <Field label="Indirizzo" full>
-            <TextInput value={f.address} onChange={(v) => upd("address", v)} placeholder="Via, numero civico" />
-          </Field>
-          <Field label="Zona / località">
-            <TextInput value={f.area_zone} onChange={(v) => upd("area_zone", v)} placeholder="Es. Strettoia, Marina di Pietrasanta" />
-          </Field>
-          <Field label="CAP">
-            <TextInput value={f.postal_code} onChange={(v) => upd("postal_code", v)} placeholder="55045" />
-          </Field>
-          <Field label="Latitudine">
-            <NumberInput value={f.latitude} onChange={(v) => upd("latitude", v)} step={0.000001} placeholder="43.9456" />
-          </Field>
-          <Field label="Longitudine">
-            <NumberInput value={f.longitude} onChange={(v) => upd("longitude", v)} step={0.000001} placeholder="10.2280" />
-          </Field>
+          <LocationFields
+            value={{
+              region: f.region,
+              province: f.province,
+              municipality: f.municipality,
+              locality: f.locality,
+              area_zone: f.area_zone,
+              postal_code: f.postal_code,
+              address: f.address,
+              show_full_address: f.show_full_address,
+            }}
+            onChange={(patch) =>
+              setF((s) => ({ ...s, ...patch }))
+            }
+          />
         </Section>
 
         {/* SEZIONE 3 */}
@@ -777,94 +752,4 @@ function Toggle({
   );
 }
 
-/** Combobox ricercabile per la Provincia (sigla o nome). Salva la sigla (es. "MS"). */
-function ProvinceCombobox({
-  value,
-  onChange,
-  placeholder,
-}: {
-  value: string;
-  onChange: (v: string) => void;
-  placeholder?: string;
-}) {
-  const [open, setOpen] = useState(false);
-  const [q, setQ] = useState("");
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  // Mostra "MS — Massa-Carrara" se value è una sigla riconosciuta
-  const selected = PROVINCES.find((p) => p.code === value);
-  const display = selected ? `${selected.code} — ${selected.name}` : value;
-
-  useEffect(() => {
-    if (!open) setQ("");
-  }, [open]);
-
-  useEffect(() => {
-    const onDocClick = (e: MouseEvent) => {
-      if (!containerRef.current?.contains(e.target as Node)) setOpen(false);
-    };
-    document.addEventListener("mousedown", onDocClick);
-    return () => document.removeEventListener("mousedown", onDocClick);
-  }, []);
-
-  const needle = q.trim().toLowerCase();
-  const filtered = needle
-    ? PROVINCES.filter(
-        (p) =>
-          p.code.toLowerCase().includes(needle) ||
-          p.name.toLowerCase().includes(needle),
-      ).slice(0, 80)
-    : PROVINCES;
-
-  return (
-    <div ref={containerRef} className="relative">
-      <input
-        type="text"
-        value={open ? q : display}
-        onChange={(e) => {
-          setQ(e.target.value);
-          setOpen(true);
-        }}
-        onFocus={() => setOpen(true)}
-        placeholder={placeholder ?? "Cerca provincia"}
-        className={inputCls}
-        aria-autocomplete="list"
-        aria-expanded={open}
-      />
-      {open && (
-        <ul
-          role="listbox"
-          className="absolute z-30 mt-1 max-h-64 w-full overflow-auto rounded-sm border border-border bg-card shadow-md"
-        >
-          {filtered.length === 0 ? (
-            <li className="px-3 py-2 text-xs text-muted-foreground">Nessun risultato</li>
-          ) : (
-            filtered.map((p) => {
-              const active = p.code === value;
-              return (
-                <li key={p.code}>
-                  <button
-                    type="button"
-                    onMouseDown={(e) => {
-                      e.preventDefault();
-                      onChange(p.code);
-                      setOpen(false);
-                    }}
-                    className={`flex w-full items-center justify-between px-3 py-1.5 text-left text-sm transition hover:bg-muted ${
-                      active ? "bg-primary/5 text-ink" : "text-foreground"
-                    }`}
-                  >
-                    <span>{p.name}</span>
-                    <span className="text-xs uppercase tracking-wider text-muted-foreground">
-                      {p.code}
-                    </span>
-                  </button>
-                </li>
-              );
-            })
-          )}
-        </ul>
-      )}
-    </div>
-  );
-}
+/* ProvinceCombobox rimosso: la cascata Regione/Provincia/Comune/CAP è gestita da LocationFields */
