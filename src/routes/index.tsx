@@ -3,6 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import heroPanoramico from "@/assets/real/hero-pontremoli-castello.jpg";
 import heroIntimo from "@/assets/real/hero-centro-storico.jpg";
+import heroColline from "@/assets/real/hero-pontremoli-colline.jpg";
 import territoryPontremoli from "@/assets/real/pontremoli-scorcio.jpg";
 import territoryBagnone from "@/assets/real/bagnone-castello.jpg";
 import territoryZeri from "@/assets/real/zeri-monte.jpg";
@@ -26,12 +27,26 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
-  const [heroVariant, setHeroVariant] = useState<"panoramico" | "intimo">("panoramico");
-  const isPanoramico = heroVariant === "panoramico";
-  const heroSrc = isPanoramico ? heroPanoramico : heroIntimo;
-  const heroAlt = isPanoramico
-    ? "Pontremoli e il castello del Piagnaro al tramonto, panorama sulla Lunigiana"
-    : "Scorcio intimo del centro storico di Pontremoli con ponte sul fiume Magra";
+  const [heroVariant, setHeroVariant] = useState<"panoramico" | "intimo" | "colline">("panoramico");
+  const heroMap = {
+    panoramico: {
+      src: heroPanoramico,
+      alt: "Pontremoli e il castello del Piagnaro al tramonto, panorama sulla Lunigiana",
+      label: "Panorama · Castello",
+    },
+    intimo: {
+      src: heroIntimo,
+      alt: "Scorcio intimo del centro storico di Pontremoli con ponte sul fiume Magra",
+      label: "Centro storico",
+    },
+    colline: {
+      src: heroColline,
+      alt: "Pontremoli immersa nelle colline verdi della Lunigiana con vista sulle montagne dell'Appennino",
+      label: "Colline · Territorio",
+    },
+  } as const;
+  const heroSrc = heroMap[heroVariant].src;
+  const heroAlt = heroMap[heroVariant].alt;
   return (
     <>
       {/* HERO */}
@@ -65,31 +80,25 @@ function Index() {
           </div>
 
           {/* Variant switcher */}
-          <div className="mt-8 flex items-center gap-3">
-            <button
-              type="button"
-              onClick={() => setHeroVariant("panoramico")}
-              aria-pressed={isPanoramico}
-              className={`rounded-full border px-4 py-2 text-xs uppercase tracking-[0.18em] transition ${
-                isPanoramico
-                  ? "border-cream bg-cream/95 text-ink"
-                  : "border-cream/40 text-cream/85 hover:border-cream/80"
-              }`}
-            >
-              Panorama · Castello
-            </button>
-            <button
-              type="button"
-              onClick={() => setHeroVariant("intimo")}
-              aria-pressed={!isPanoramico}
-              className={`rounded-full border px-4 py-2 text-xs uppercase tracking-[0.18em] transition ${
-                !isPanoramico
-                  ? "border-cream bg-cream/95 text-ink"
-                  : "border-cream/40 text-cream/85 hover:border-cream/80"
-              }`}
-            >
-              Centro storico
-            </button>
+          <div className="mt-8 flex flex-wrap items-center gap-3">
+            {(Object.keys(heroMap) as Array<keyof typeof heroMap>).map((key) => {
+              const active = heroVariant === key;
+              return (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => setHeroVariant(key)}
+                  aria-pressed={active}
+                  className={`rounded-full border px-4 py-2 text-xs uppercase tracking-[0.18em] transition ${
+                    active
+                      ? "border-cream bg-cream/95 text-ink"
+                      : "border-cream/40 text-cream/85 hover:border-cream/80"
+                  }`}
+                >
+                  {heroMap[key].label}
+                </button>
+              );
+            })}
           </div>
         </div>
       </section>
