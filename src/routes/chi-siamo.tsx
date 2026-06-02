@@ -21,20 +21,23 @@ function ChiSiamoPage() {
         <div className="md:col-span-7">
           <span className="eyebrow">Chi siamo</span>
           <h1 className="mt-3 font-serif text-5xl leading-[1.05] text-ink md:text-7xl">
-            Una presenza vera,<br /><em className="font-normal italic">dal primo passo</em><br />alla firma finale.
+            Un volto,<br /><em className="font-normal italic">una voce,</em><br />una presenza.
           </h1>
         </div>
         <div className="space-y-5 text-base leading-relaxed text-foreground/85 md:col-span-5 md:pt-12">
           <p>
-            Furia Immobiliare è guidata dalla Dott.ssa Furia Elena, che ha
-            fondato l'agenzia con un'idea chiara: offrire a Pontremoli e in
-            tutta la Lunigiana un servizio immobiliare diverso — meno
-            affrettato, più attento.
+            Dietro Furia Immobiliare c'è Elena: un volto, una voce e una
+            presenza costante per chi sceglie di vendere, acquistare o affittare
+            casa in Lunigiana.
           </p>
           <p>
-            Non ci limitiamo a mostrare case. Ascoltiamo prima di tutto,
-            capiamo cosa cercate e poi camminiamo insieme, con calma e
-            competenza, fino al rogito notarile.
+            Crediamo che una casa non sia solo metri quadri, ma un pezzo di
+            vita, per questo mettiamo al centro le persone prima degli immobili.
+          </p>
+          <p>
+            Ti ascoltiamo, ti consigliamo e ti accompagniamo in ogni fase della
+            pratica, con consulenze pensate su di te e assistenza
+            tecnico-contrattuale completa.
           </p>
         </div>
       </section>
@@ -46,29 +49,27 @@ function ChiSiamoPage() {
 
       <section className="container-editorial py-24 md:py-32">
         <div className="mx-auto max-w-3xl space-y-6 text-center">
-          <span className="eyebrow">Il nostro modo di lavorare</span>
+          <span className="eyebrow">Il nostro impegno</span>
           <p className="text-base leading-relaxed text-foreground/85">
-            Conosciamo ogni strada, ogni borgo, ogni proprietà che proponiamo.
-            Seguiamo le compravendite e le locazioni con professionalità e un
-            tratto personale che solo chi vive veramente il territorio può
-            offrire. Ogni consulenza è su misura, perché ogni cliente ha una
-            storia diversa.
+            Dal primo incontro fino al rogito notarile, l'obiettivo è farti
+            sentire seguito, informato e sereno, con accanto un riferimento
+            chiaro, presente e affidabile.
           </p>
         </div>
 
         <div className="mt-16 grid gap-10 md:grid-cols-3">
           {[
             {
-              t: "Ascolto prima di tutto",
-              b: "Capire il vostro progetto è il nostro primo passo. Solo dopo cerchiamo l'immobile giusto.",
+              t: "Persone prima degli immobili",
+              b: "Ogni cliente ha una storia diversa. Ascoltiamo prima di tutto, perché solo così si trova la casa giusta.",
             },
             {
-              t: "Conoscenza del territorio",
-              b: "Ogni borgo, ogni proprietà, ogni dettaglio che conta. La Lunigiana la conosciamo davvero.",
+              t: "Consulenza su misura",
+              b: "Consulenze pensate su di te e assistenza tecnico-contrattuale completa, adattata alle tue esigenze.",
             },
             {
-              t: "Presenza costante",
-              b: "Dalla prima visita all'assistenza tecnico-contrattuale: sempre al vostro fianco, fino al rogito.",
+              t: "Presenza fino al rogito",
+              b: "Ti accompagniamo in ogni fase della pratica: dal primo incontro alla firma davanti al notaio, sempre al tuo fianco.",
             },
           ].map((s) => (
             <div key={s.t} className="border-t border-border pt-6">
