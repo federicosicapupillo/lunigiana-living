@@ -340,8 +340,12 @@ function PropertyEditor() {
       <div className="mt-8">
         {tab === "main" && <MainTab prop={prop} update={update} features={features} setFeatures={setFeatures} />}
         {tab === "location" && <LocationTab prop={prop} update={update} />}
-        {tab === "features" && <FeaturesTab prop={prop} update={update} />}
-        {tab === "amenities" && <AmenitiesTab prop={prop} update={update} />}
+        {tab === "features" && (
+          <FeaturesTab prop={prop} update={update} features={features} setFeatures={setFeatures} />
+        )}
+        {tab === "amenities" && (
+          <AmenitiesTab prop={prop} update={update} features={features} setFeatures={setFeatures} />
+        )}
         {tab === "photos" && <ImageUploader propertyId={id} />}
         {tab === "narrative" && <NarrativeTab features={features} setFeatures={setFeatures} />}
         {tab === "description" && (
