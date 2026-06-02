@@ -5,6 +5,7 @@ import heroPanoramico from "@/assets/real/hero-pontremoli-castello.jpg";
 import heroIntimo from "@/assets/real/hero-centro-storico.jpg";
 import heroColline from "@/assets/real/hero-pontremoli-colline.jpg";
 import heroBorgoAsset from "@/assets/real/bagnone-borgo.jpg.asset.json";
+import borgoTramontoAsset from "@/assets/borgo-tramonto.jpg.asset.json";
 import territoryPontremoli from "@/assets/real/pontremoli-scorcio.jpg";
 import territoryBagnone from "@/assets/real/bagnone-castello.jpg";
 import territoryZeri from "@/assets/real/zeri-monte.jpg";
@@ -139,6 +140,35 @@ function Index() {
       </section>
 
       {/* FEATURED PROPERTIES */}
+      {/* EDITORIAL FULL-WIDTH IMAGE */}
+      <section className="relative isolate overflow-hidden">
+        <img
+          src={borgoTramontoAsset.url}
+          alt="Borgo medievale e castello della Lunigiana al tramonto, con vista sulle colline e il mare in lontananza"
+          loading="lazy"
+          width={1920}
+          height={1080}
+          className="h-[70svh] min-h-[460px] w-full object-cover md:h-[85svh]"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-ink/30 to-transparent" />
+        <div className="absolute inset-x-0 bottom-0">
+          <div className="container-editorial pb-12 md:pb-20">
+            <div className="max-w-2xl">
+              <span className="eyebrow text-cream/80">Il paesaggio · Lunigiana</span>
+              <h2 className="mt-4 font-serif text-4xl leading-[1.05] text-cream md:text-6xl">
+                Dove la pietra<br />
+                <em className="font-normal italic">incontra la luce.</em>
+              </h2>
+              <p className="mt-5 max-w-xl text-base leading-relaxed text-cream/85 md:text-lg">
+                Borghi sospesi tra cielo e bosco, castelli che guardano il mare
+                da lontano. Comprare casa qui significa scegliere un orizzonte,
+                prima ancora che quattro mura.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section className="bg-muted/40 py-24 md:py-32">
         <div className="container-editorial">
           <div className="flex flex-wrap items-end justify-between gap-6">
