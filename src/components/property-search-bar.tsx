@@ -276,13 +276,11 @@ export function PropertySearchBar({
         {comuniList.map((c) => <option key={c} value={c}>{c}</option>)}
       </SelectField>
       <SelectField label="Prezzo da" value={state.price_min}
-        onChange={(v) => setState({ ...state, price_min: v })}
-        placeholder="Da €">
+        onChange={(v) => setState({ ...state, price_min: v })}>
         {PRICE_MIN_OPTS.map((p) => <option key={p.label} value={p.value}>{p.label}</option>)}
       </SelectField>
       <SelectField label="Prezzo a" value={state.price_max}
-        onChange={(v) => setState({ ...state, price_max: v })}
-        placeholder="A €">
+        onChange={(v) => setState({ ...state, price_max: v })}>
         {PRICE_MAX_OPTS.map((p) => <option key={p.label} value={p.value}>{p.label}</option>)}
       </SelectField>
 
