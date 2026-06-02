@@ -648,38 +648,20 @@ function NewPropertyPage() {
               placeholder="Scrivi qui la descrizione estesa, oppure generala con l'AI dopo aver salvato la bozza."
             />
           </Field>
-          <Field label="Punti di forza">
-            <TextArea
-              value={f.punti_di_forza}
-              onChange={(v) => upd("punti_di_forza", v)}
-              rows={3}
-              placeholder="Es. vista mare, pietra a vista, posizione panoramica"
-            />
-          </Field>
-          <Field label="Target immobile">
-            <TextArea
-              value={f.target_acquirente}
-              onChange={(v) => upd("target_acquirente", v)}
-              rows={3}
-              placeholder="Es. famiglia con bambini, investitore short-let, seconda casa"
-            />
-          </Field>
-          <Field label="Atmosfera / contesto">
-            <TextArea
-              value={f.vista_contesto}
-              onChange={(v) => upd("vista_contesto", v)}
-              rows={3}
-              placeholder="Es. tramonti sulle Apuane, silenzio dei boschi"
-            />
-          </Field>
-          <Field label="Elementi architettonici rilevanti">
-            <TextArea
-              value={f.elementi_storici}
-              onChange={(v) => upd("elementi_storici", v)}
-              rows={3}
-              placeholder="Es. soffitti a volta, camino in pietra, affreschi"
-            />
-          </Field>
+          {MULTI_SELECT_FIELDS.map((ms) => (
+            <Field key={ms.key} label={ms.label} full>
+              <MultiSelectChips
+                label=""
+                placeholder={ms.placeholder}
+                options={ms.options}
+                otherLabel={ms.otherLabel}
+                value={f.multi[ms.key]}
+                onChange={(v) =>
+                  setF((s) => ({ ...s, multi: { ...s.multi, [ms.key]: v } }))
+                }
+              />
+            </Field>
+          ))}
           <Field label="Note interne (non pubbliche)" full>
             <TextArea
               value={f.internal_notes}
