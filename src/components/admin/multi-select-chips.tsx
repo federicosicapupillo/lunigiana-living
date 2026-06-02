@@ -6,18 +6,14 @@ type Props = {
   label: string;
   placeholder: string;
   options: readonly string[];
-  otherLabel: string;
   value: MultiSelectValue;
   onChange: (v: MultiSelectValue) => void;
 };
-
-const OTHER = "Altro";
 
 export function MultiSelectChips({
   label,
   placeholder,
   options,
-  otherLabel,
   value,
   onChange,
 }: Props) {
@@ -25,14 +21,11 @@ export function MultiSelectChips({
   const [query, setQuery] = useState("");
   const wrapRef = useRef<HTMLDivElement>(null);
 
-  const allOptions = useMemo(() => [...options, OTHER], [options]);
-  const otherSelected = value.selected.includes(OTHER);
-
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return allOptions;
-    return allOptions.filter((o) => o.toLowerCase().includes(q));
-  }, [allOptions, query]);
+    if (!q) return options;
+    return options.filter((o) => o.toLowerCase().includes(q));
+  }, [options, query]);
 
   useEffect(() => {
     if (!open) return;
@@ -48,8 +41,7 @@ export function MultiSelectChips({
     const next = has
       ? value.selected.filter((x) => x !== opt)
       : [...value.selected, opt];
-    const altro = !next.includes(OTHER) ? "" : value.altro;
-    onChange({ ...value, selected: next, altro });
+    onChange({ selected: next, altro: "", note: "" });
   };
 
   const removeChip = (opt: string) => toggle(opt);
@@ -142,24 +134,6 @@ export function MultiSelectChips({
           ))}
         </ul>
       )}
-
-      {otherSelected && (
-        <input
-          type="text"
-          value={value.altro}
-          onChange={(e) => onChange({ ...value, altro: e.target.value })}
-          placeholder={otherLabel}
-          className="mt-2 w-full rounded-sm border border-border bg-background px-3 py-2 text-sm focus:border-primary focus:outline-none"
-        />
-      )}
-
-      <textarea
-        value={value.note}
-        onChange={(e) => onChange({ ...value, note: e.target.value })}
-        placeholder="Note aggiuntive — scrivi eventuali dettagli personalizzati non presenti nelle opzioni…"
-        rows={2}
-        className="mt-2 w-full resize-y rounded-sm border border-border bg-background px-3 py-2 text-sm focus:border-primary focus:outline-none"
-      />
     </div>
   );
 }

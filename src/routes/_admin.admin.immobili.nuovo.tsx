@@ -654,7 +654,6 @@ function NewPropertyPage() {
                 label=""
                 placeholder={ms.placeholder}
                 options={ms.options}
-                otherLabel={ms.otherLabel}
                 value={f.multi[ms.key]}
                 onChange={(v) =>
                   setF((s) => ({ ...s, multi: { ...s.multi, [ms.key]: v } }))

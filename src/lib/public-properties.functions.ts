@@ -140,15 +140,14 @@ function adapt(
   }
   const highlights = MULTI_SELECT_FIELDS.map((m) => {
     const parsed = parseMultiSelect(multiRaw[m.key]);
-    const items = [...parsed.selected.filter((s) => s !== "Altro")];
-    if (parsed.altro.trim()) items.push(parsed.altro.trim());
+    const items = parsed.selected.filter((s) => s !== "Altro");
     return {
       key: m.key,
       label: m.label,
       items,
-      note: parsed.note.trim() || null,
+      note: null as string | null,
     };
-  }).filter((h) => h.items.length > 0 || h.note);
+  }).filter((h) => h.items.length > 0);
   const location = [p.municipality, p.area_zone].filter(Boolean).join(" · ") || "Lunigiana";
   const sqmLabel = attrs["size_range"] || (p.size_sqm != null ? `${p.size_sqm} m²` : null);
   const roomsLabel = attrs["bedrooms_label"] || (p.bedrooms != null ? String(p.bedrooms) : null);
