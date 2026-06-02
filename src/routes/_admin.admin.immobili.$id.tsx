@@ -44,6 +44,14 @@ import {
   AMENITY_TO_COLUMN,
   AMENITY_FEATURE_PREFIX,
 } from "@/lib/admin/property-constants";
+import {
+  MULTI_SELECT_FIELDS,
+  parseMultiSelect,
+  serializeMultiSelect,
+  EMPTY_MULTI,
+  type MultiSelectKey,
+} from "@/lib/admin/property-constants";
+import { MultiSelectChips } from "@/components/admin/multi-select-chips";
 
 type Property = {
   id: string;
