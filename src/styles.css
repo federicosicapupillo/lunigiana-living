@@ -207,4 +207,75 @@
       transparent 40%,
       oklch(0.18 0.02 60 / 0.85) 100%);
   }
+
+  /* Premium button system */
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.95rem 1.8rem;
+    border-radius: 0.25rem;
+    background: var(--terracotta);
+    color: var(--primary-foreground);
+    font-size: 0.72rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    font-weight: 500;
+    border: 1px solid transparent;
+    box-shadow: 0 1px 0 rgba(36, 23, 17, 0.06), 0 8px 18px -12px rgba(184, 106, 75, 0.55);
+    transition: background-color .25s ease, box-shadow .25s ease, transform .25s ease;
+  }
+  .btn-primary:hover {
+    background: var(--terracotta-hover);
+    box-shadow: 0 1px 0 rgba(36, 23, 17, 0.08), 0 14px 28px -14px rgba(164, 89, 60, 0.6);
+  }
+  .btn-primary:focus-visible {
+    outline: 2px solid var(--terracotta);
+    outline-offset: 3px;
+  }
+
+  .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.85rem 1.7rem;
+    border-radius: 0.25rem;
+    background: var(--warm-ivory);
+    color: var(--terracotta);
+    font-size: 0.72rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    font-weight: 500;
+    border: 1px solid var(--terracotta);
+    transition: background-color .25s ease, color .25s ease, border-color .25s ease;
+  }
+  .btn-secondary:hover {
+    background: var(--warm-sand);
+    color: var(--terracotta-hover);
+    border-color: var(--terracotta-hover);
+  }
+
+  .btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.8rem 1.4rem;
+    border-radius: 0.25rem;
+    background: transparent;
+    color: var(--ink-soft);
+    font-size: 0.72rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    font-weight: 500;
+    border: 1px solid var(--warm-border);
+    transition: background-color .2s ease, color .2s ease, border-color .2s ease;
+  }
+  .btn-ghost:hover {
+    background: var(--warm-sand);
+    color: var(--ink);
+    border-color: var(--ink-soft);
+  }
 }
