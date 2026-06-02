@@ -96,6 +96,7 @@ type PropertyRow = {
   short_notes: string | null;
   panoramic_view: boolean;
   historic_property: boolean;
+  featured: boolean;
 };
 
 type ImageRow = {
