@@ -90,7 +90,7 @@ function PropertyDetail() {
         </div>
         {p.gallery.length > 1 && (
           <div className="mt-3 grid grid-cols-4 gap-3 md:grid-cols-8">
-            {p.gallery.map((g, i) => (
+            {p.gallery.map((g: string, i: number) => (
               <button
                 key={g + i}
                 onClick={() => setActive(i)}
