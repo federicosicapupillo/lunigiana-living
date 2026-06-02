@@ -54,13 +54,24 @@ function deriveCategory(contract: string | null): PublicProperty["category"] {
   return "vendita";
 }
 
+function isExternalUrl(p: string): boolean {
+  return /^https?:\/\//i.test(p);
+}
+
 async function signMany(paths: string[]): Promise<Record<string, string>> {
   if (paths.length === 0) return {};
+  const map: Record<string, string> = {};
+  // Legacy rows store the full external URL directly in storage_path — pass through.
+  const toSign: string[] = [];
+  for (const p of paths) {
+    if (isExternalUrl(p)) map[p] = p;
+    else toSign.push(p);
+  }
+  if (toSign.length === 0) return map;
   const { data, error } = await supabaseAdmin.storage
     .from("property-images")
-    .createSignedUrls(paths, SIGNED_TTL);
-  if (error || !data) return {};
-  const map: Record<string, string> = {};
+    .createSignedUrls(toSign, SIGNED_TTL);
+  if (error || !data) return map;
   for (const item of data) {
     if (item.path && item.signedUrl) map[item.path] = item.signedUrl;
   }
