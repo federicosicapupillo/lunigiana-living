@@ -1,0 +1,232 @@
+import { createServerFn } from "@tanstack/react-start";
+import { z } from "zod";
+import { supabaseAdmin } from "@/integrations/supabase/client.server";
+
+const SIGNED_TTL = 60 * 60 * 24; // 24h
+
+export type PublicProperty = {
+  id: string;
+  slug: string | null;
+  reference: string;
+  title: string;
+  location: string;
+  price: string;
+  priceValue: number | null;
+  type: string;
+  sqm: number | null;
+  rooms: number | null;
+  bathrooms: number | null;
+  floor: string | null;
+  image: string;
+  gallery: string[];
+  description: string;
+  attributes: Record<string, string>;
+  category: "vendita" | "affitto" | "scelti-per-voi";
+  featured: boolean;
+  tag?: string;
+};
+
+const PLACEHOLDER =
+  "data:image/svg+xml;utf8," +
+  encodeURIComponent(
+    `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 3'><rect width='4' height='3' fill='%23e8e4dd'/></svg>`,
+  );
+
+function formatPrice(price: number | null, priceOnRequest: boolean, contract: string | null): string {
+  if (priceOnRequest || price == null) return "Prezzo su richiesta";
+  const formatted = new Intl.NumberFormat("it-IT", {
+    style: "currency",
+    currency: "EUR",
+    maximumFractionDigits: 0,
+  }).format(price);
+  return contract === "affitto" ? `${formatted} / mese` : formatted;
+}
+
+function deriveCategory(contract: string | null): PublicProperty["category"] {
+  if (contract === "affitto") return "affitto";
+  return "vendita";
+}
+
+async function signMany(paths: string[]): Promise<Record<string, string>> {
+  if (paths.length === 0) return {};
+  const { data, error } = await supabaseAdmin.storage
+    .from("property-images")
+    .createSignedUrls(paths, SIGNED_TTL);
+  if (error || !data) return {};
+  const map: Record<string, string> = {};
+  for (const item of data) {
+    if (item.path && item.signedUrl) map[item.path] = item.signedUrl;
+  }
+  return map;
+}
+
+type PropertyRow = {
+  id: string;
+  slug: string | null;
+  reference_code: string | null;
+  title: string;
+  municipality: string | null;
+  area_zone: string | null;
+  price: number | null;
+  price_on_request: boolean;
+  property_type: string | null;
+  contract_type: string | null;
+  size_sqm: number | null;
+  bedrooms: number | null;
+  bathrooms: number | null;
+  floors: number | null;
+  short_notes: string | null;
+  panoramic_view: boolean;
+  historic_property: boolean;
+};
+
+type ImageRow = {
+  property_id: string;
+  storage_path: string;
+  alt_text: string | null;
+  sort_order: number;
+  is_cover: boolean;
+};
+
+type FeatureRow = { property_id: string; feature_name: string; feature_value: string | null };
+type DescriptionRow = { property_id: string; edited_description: string | null; generated_description: string | null };
+
+function buildTag(p: PropertyRow): string | undefined {
+  if (p.historic_property) return "Storico";
+  if (p.panoramic_view) return "Panoramico";
+  return undefined;
+}
+
+function adapt(
+  p: PropertyRow,
+  images: ImageRow[],
+  features: FeatureRow[],
+  description: DescriptionRow | undefined,
+  signedMap: Record<string, string>,
+): PublicProperty {
+  const sortedImages = [...images].sort((a, b) => {
+    if (a.is_cover !== b.is_cover) return a.is_cover ? -1 : 1;
+    return a.sort_order - b.sort_order;
+  });
+  const gallery = sortedImages.map((i) => signedMap[i.storage_path]).filter(Boolean);
+  const cover = gallery[0] ?? PLACEHOLDER;
+  const attrs: Record<string, string> = {};
+  for (const f of features) {
+    if (f.feature_value) attrs[f.feature_name] = f.feature_value;
+  }
+  const location = [p.municipality, p.area_zone].filter(Boolean).join(" · ") || "Lunigiana";
+  return {
+    id: p.id,
+    slug: p.slug,
+    reference: p.reference_code || p.id.slice(0, 8).toUpperCase(),
+    title: p.title,
+    location,
+    price: formatPrice(p.price, p.price_on_request, p.contract_type),
+    priceValue: p.price_on_request ? null : p.price,
+    type: p.property_type || "Immobile",
+    sqm: p.size_sqm,
+    rooms: p.bedrooms,
+    bathrooms: p.bathrooms,
+    floor: p.floors != null ? String(p.floors) : null,
+    image: cover,
+    gallery: gallery.length ? gallery : [PLACEHOLDER],
+    description: description?.edited_description || description?.generated_description || p.short_notes || "",
+    attributes: attrs,
+    category: deriveCategory(p.contract_type),
+    featured: false,
+    tag: buildTag(p),
+  };
+}
+
+export const listPublishedProperties = createServerFn({ method: "GET" }).handler(async () => {
+  const { data: props, error } = await supabaseAdmin
+    .from("properties")
+    .select(
+      "id, slug, reference_code, title, municipality, area_zone, price, price_on_request, property_type, contract_type, size_sqm, bedrooms, bathrooms, floors, short_notes, panoramic_view, historic_property",
+    )
+    .eq("status", "published")
+    .order("updated_at", { ascending: false });
+  if (error) throw new Error(error.message);
+  const propRows = (props ?? []) as PropertyRow[];
+  if (propRows.length === 0) return { properties: [] as PublicProperty[] };
+
+  const ids = propRows.map((p) => p.id);
+
+  const [imgRes, featRes, descRes] = await Promise.all([
+    supabaseAdmin
+      .from("property_images")
+      .select("property_id, storage_path, alt_text, sort_order, is_cover")
+      .in("property_id", ids),
+    supabaseAdmin
+      .from("property_features")
+      .select("property_id, feature_name, feature_value")
+      .in("property_id", ids),
+    supabaseAdmin
+      .from("property_descriptions")
+      .select("property_id, edited_description, generated_description")
+      .in("property_id", ids),
+  ]);
+
+  const images = (imgRes.data ?? []) as ImageRow[];
+  const features = (featRes.data ?? []) as FeatureRow[];
+  const descriptions = (descRes.data ?? []) as DescriptionRow[];
+
+  const signedMap = await signMany(images.map((i) => i.storage_path));
+
+  const byProp = (arr: { property_id: string }[]) => {
+    const m = new Map<string, any[]>();
+    for (const r of arr) {
+      const list = m.get(r.property_id) ?? [];
+      list.push(r);
+      m.set(r.property_id, list);
+    }
+    return m;
+  };
+  const imgMap = byProp(images);
+  const featMap = byProp(features);
+  const descMap = new Map(descriptions.map((d) => [d.property_id, d]));
+
+  const result = propRows.map((p) =>
+    adapt(p, imgMap.get(p.id) ?? [], featMap.get(p.id) ?? [], descMap.get(p.id), signedMap),
+  );
+  return { properties: result };
+});
+
+export const getPublishedProperty = createServerFn({ method: "GET" })
+  .inputValidator((data: { id: string }) => z.object({ id: z.string().min(1).max(128) }).parse(data))
+  .handler(async ({ data }) => {
+    const { data: p, error } = await supabaseAdmin
+      .from("properties")
+      .select(
+        "id, slug, reference_code, title, municipality, area_zone, price, price_on_request, property_type, contract_type, size_sqm, bedrooms, bathrooms, floors, short_notes, panoramic_view, historic_property",
+      )
+      .eq("status", "published")
+      .or(`id.eq.${data.id},slug.eq.${data.id}`)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    if (!p) return { property: null };
+
+    const propRow = p as PropertyRow;
+    const [imgRes, featRes, descRes] = await Promise.all([
+      supabaseAdmin
+        .from("property_images")
+        .select("property_id, storage_path, alt_text, sort_order, is_cover")
+        .eq("property_id", propRow.id),
+      supabaseAdmin
+        .from("property_features")
+        .select("property_id, feature_name, feature_value")
+        .eq("property_id", propRow.id),
+      supabaseAdmin
+        .from("property_descriptions")
+        .select("property_id, edited_description, generated_description")
+        .eq("property_id", propRow.id)
+        .maybeSingle(),
+    ]);
+
+    const images = (imgRes.data ?? []) as ImageRow[];
+    const features = (featRes.data ?? []) as FeatureRow[];
+    const description = (descRes.data ?? undefined) as DescriptionRow | undefined;
+    const signedMap = await signMany(images.map((i) => i.storage_path));
+
+    return { property: adapt(propRow, images, features, description, signedMap) };
+  });
