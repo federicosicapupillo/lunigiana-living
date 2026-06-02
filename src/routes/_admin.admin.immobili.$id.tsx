@@ -316,7 +316,7 @@ function PropertyEditor() {
       </div>
 
       <div className="mt-8">
-        {tab === "main" && <MainTab prop={prop} update={update} />}
+        {tab === "main" && <MainTab prop={prop} update={update} features={features} setFeatures={setFeatures} />}
         {tab === "location" && <LocationTab prop={prop} update={update} />}
         {tab === "features" && <FeaturesTab prop={prop} update={update} />}
         {tab === "amenities" && <AmenitiesTab prop={prop} update={update} />}
@@ -419,14 +419,16 @@ function SelectInput({
   value,
   onChange,
   options,
+  placeholder,
 }: {
   value: string | null | undefined;
   onChange: (v: string) => void;
   options: readonly string[];
+  placeholder?: string;
 }) {
   return (
     <select value={value ?? ""} onChange={(e) => onChange(e.target.value)} className={inputCls}>
-      <option value="">—</option>
+      <option value="">{placeholder ?? "—"}</option>
       {options.map((o) => (
         <option key={o} value={o}>
           {o}
@@ -465,7 +467,17 @@ function Toggle({
 
 /* ---------- Tabs ---------- */
 
-function MainTab({ prop, update }: { prop: Property; update: (p: Partial<Property>) => void }) {
+function MainTab({
+  prop,
+  update,
+  features,
+  setFeatures,
+}: {
+  prop: Property;
+  update: (p: Partial<Property>) => void;
+  features: Record<string, string>;
+  setFeatures: React.Dispatch<React.SetStateAction<Record<string, string>>>;
+}) {
   return (
     <Section title="Dati principali">
       <Field label="Slug URL">
@@ -478,11 +490,12 @@ function MainTab({ prop, update }: { prop: Property; update: (p: Partial<Propert
           placeholder="Es. RIF-2026-014"
         />
       </Field>
-      <Field label="Tipologia">
+      <Field label="Tipologia immobile">
         <SelectInput
           value={prop.property_type}
           onChange={(v) => update({ property_type: v })}
           options={PROPERTY_TYPES}
+          placeholder="Seleziona tipologia immobile"
         />
       </Field>
       <Field label="Contratto">
@@ -490,6 +503,17 @@ function MainTab({ prop, update }: { prop: Property; update: (p: Partial<Propert
           value={prop.contract_type}
           onChange={(v) => update({ contract_type: v })}
           options={CONTRACT_TYPES}
+        />
+      </Field>
+      <Field label="Descrizione libera" full>
+        <textarea
+          value={features["descrizione_libera"] ?? ""}
+          onChange={(e) =>
+            setFeatures({ ...features, descrizione_libera: e.target.value })
+          }
+          rows={5}
+          placeholder="Scrivi qui una descrizione personalizzata dell'immobile, del contesto, della vista, del terreno, delle potenzialità o di altri dettagli importanti…"
+          className={inputCls}
         />
       </Field>
       <Field label="Prezzo (€)">

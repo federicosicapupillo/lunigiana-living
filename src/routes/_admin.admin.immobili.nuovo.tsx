@@ -42,6 +42,7 @@ type FormState = {
   title: string;
   reference_code: string;
   property_type: string;
+  descrizione_libera: string;
   contract_type: string;
   price: string;
   price_on_request: boolean;
@@ -88,6 +89,7 @@ const empty: FormState = {
   title: "",
   reference_code: "",
   property_type: "",
+  descrizione_libera: "",
   contract_type: "",
   price: "",
   price_on_request: false,
@@ -158,6 +160,10 @@ function NewPropertyPage() {
   const persist = async (overrideStatus?: Status): Promise<string | null> => {
     if (!f.title.trim()) {
       toast.error("Il titolo è obbligatorio");
+      return null;
+    }
+    if (!f.property_type) {
+      toast.error("La tipologia immobile è obbligatoria");
       return null;
     }
     setSaving(true);
@@ -232,6 +238,7 @@ function NewPropertyPage() {
       pushIf("total_floors", f.total_floors);
       pushIf("floor_label", f.floor_label);
       pushIf("furnished_level", f.furnished);
+      pushIf("descrizione_libera", f.descrizione_libera);
       pushIf("long_description", f.long_description);
       pushIf("punti_di_forza", f.punti_di_forza);
       pushIf("target_acquirente", f.target_acquirente);
@@ -332,6 +339,22 @@ function NewPropertyPage() {
           <Field label="Titolo annuncio" full required>
             <TextInput value={f.title} onChange={(v) => upd("title", v)} placeholder="Es. Casale in pietra con vista sulle Apuane" />
           </Field>
+          <Field label="Tipologia immobile" full required>
+            <SelectInput
+              value={f.property_type}
+              onChange={(v) => upd("property_type", v)}
+              options={PROPERTY_TYPES.map((o) => ({ value: o, label: o }))}
+              placeholder="Seleziona tipologia immobile"
+            />
+          </Field>
+          <Field label="Descrizione libera" full>
+            <TextArea
+              value={f.descrizione_libera}
+              onChange={(v) => upd("descrizione_libera", v)}
+              rows={5}
+              placeholder="Scrivi qui una descrizione personalizzata dell'immobile, del contesto, della vista, del terreno, delle potenzialità o di altri dettagli importanti…"
+            />
+          </Field>
           <Field label="Codice riferimento">
             <TextInput value={f.reference_code} onChange={(v) => upd("reference_code", v)} placeholder="RIF-2026-014" />
           </Field>
@@ -344,13 +367,6 @@ function NewPropertyPage() {
                 { value: "ready", label: "Pronto" },
                 { value: "published", label: "Pubblicato" },
               ]}
-            />
-          </Field>
-          <Field label="Tipologia immobile">
-            <SelectInput
-              value={f.property_type}
-              onChange={(v) => upd("property_type", v)}
-              options={PROPERTY_TYPES.map((o) => ({ value: o, label: o }))}
             />
           </Field>
           <Field label="Contratto">
