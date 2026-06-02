@@ -105,7 +105,7 @@ function adapt(r: RawProperty): Property {
   };
 }
 
-export const allProperties: Property[] = (rawData as RawProperty[])
+export const allProperties: Property[] = (rawData as unknown as RawProperty[])
   .map(adapt)
   .sort((a, b) => {
     // Featured first, then by price desc, undefined last
