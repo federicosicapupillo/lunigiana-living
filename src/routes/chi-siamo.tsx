@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import heroImg from "@/assets/real/pontremoli-scorcio.jpg";
+import elenaAsset from "@/assets/elena-furia.png.asset.json";
 
 export const Route = createFileRoute("/chi-siamo")({
   head: () => ({
@@ -17,59 +17,76 @@ export const Route = createFileRoute("/chi-siamo")({
 function ChiSiamoPage() {
   return (
     <>
-      <section className="container-editorial grid gap-16 pb-24 pt-32 md:grid-cols-12 md:pt-40">
-        <div className="md:col-span-7">
+      <section className="container-editorial grid items-center gap-12 pb-20 pt-32 md:grid-cols-12 md:gap-16 md:pt-40">
+        <div className="md:col-span-6 lg:col-span-7">
           <span className="eyebrow">Chi siamo</span>
-          <h1 className="mt-3 font-serif text-5xl leading-[1.05] text-ink md:text-7xl">
-            Un volto,<br /><em className="font-normal italic">una voce,</em><br />una presenza.
+          <h1 className="mt-4 font-serif text-4xl leading-[1.05] text-ink md:text-6xl lg:text-7xl">
+            Una casa non si sceglie<br />
+            <em className="font-normal italic">solo con gli occhi.</em>
           </h1>
+          <div className="mt-8 space-y-5 text-base leading-relaxed text-foreground/85">
+            <p>
+              Furia Immobiliare nasce da un legame profondo con la Lunigiana:
+              i suoi borghi, i suoi silenzi, le sue colline e quel modo di
+              vivere più lento, autentico e umano.
+            </p>
+            <p>
+              Accompagniamo chi cerca una casa non solo a trovare un immobile,
+              ma a riconoscere un luogo in cui sentirsi davvero a casa.
+            </p>
+            <p>
+              Ogni proprietà racconta una storia. Il nostro compito è
+              ascoltarla, valorizzarla e farla incontrare con le persone
+              giuste.
+            </p>
+          </div>
+          <div className="mt-10 flex flex-wrap gap-3">
+            <Link to="/immobili"
+              className="inline-block rounded-sm bg-primary px-7 py-3.5 text-xs uppercase tracking-[0.22em] text-primary-foreground transition hover:opacity-90">
+              Scopri gli immobili
+            </Link>
+            <Link to="/contatti"
+              className="inline-block rounded-sm border border-ink/20 px-7 py-3.5 text-xs uppercase tracking-[0.22em] text-ink transition hover:bg-ink hover:text-cream">
+              Parlaci della casa che cerchi
+            </Link>
+          </div>
         </div>
-        <div className="space-y-5 text-base leading-relaxed text-foreground/85 md:col-span-5 md:pt-12">
-          <p>
-            Dietro Furia Immobiliare c'è Elena: un volto, una voce e una
-            presenza costante per chi sceglie di vendere, acquistare o affittare
-            casa in Lunigiana.
-          </p>
-          <p>
-            Crediamo che una casa non sia solo metri quadri, ma un pezzo di
-            vita, per questo mettiamo al centro le persone prima degli immobili.
-          </p>
-          <p>
-            Ti ascoltiamo, ti consigliamo e ti accompagniamo in ogni fase della
-            pratica, con consulenze pensate su di te e assistenza
-            tecnico-contrattuale completa.
-          </p>
-        </div>
+        <figure className="md:col-span-6 lg:col-span-5">
+          <div className="relative overflow-hidden rounded-sm shadow-xl shadow-ink/10">
+            <img
+              src={elenaAsset.url}
+              alt="Elena di Furia Immobiliare con il suo cane in giardino, Lunigiana"
+              loading="eager"
+              className="aspect-[3/4] w-full object-cover object-top"
+            />
+          </div>
+          <figcaption className="mt-4 eyebrow text-center md:text-left">
+            Elena · Furia Immobiliare
+          </figcaption>
+        </figure>
       </section>
 
-      <figure className="container-editorial">
-        <img src={heroImg} alt="Pontremoli" loading="lazy"
-          className="aspect-[21/9] w-full rounded-sm object-cover" />
-      </figure>
-
-      <section className="container-editorial py-24 md:py-32">
+      <section className="container-editorial py-20 md:py-28">
         <div className="mx-auto max-w-3xl space-y-6 text-center">
-          <span className="eyebrow">Il nostro impegno</span>
-          <p className="text-base leading-relaxed text-foreground/85">
-            Dal primo incontro fino al rogito notarile, l'obiettivo è farti
-            sentire seguito, informato e sereno, con accanto un riferimento
-            chiaro, presente e affidabile.
-          </p>
+          <span className="eyebrow">Il nostro modo di lavorare</span>
+          <h2 className="font-serif text-3xl text-ink md:text-5xl">
+            Persone, prima degli immobili.
+          </h2>
         </div>
 
         <div className="mt-16 grid gap-10 md:grid-cols-3">
           {[
             {
-              t: "Persone prima degli immobili",
-              b: "Ogni cliente ha una storia diversa. Ascoltiamo prima di tutto, perché solo così si trova la casa giusta.",
+              t: "Ascolto",
+              b: "Prima di proporre una casa, ascoltiamo il modo in cui vuoi vivere.",
             },
             {
-              t: "Consulenza su misura",
-              b: "Consulenze pensate su di te e assistenza tecnico-contrattuale completa, adattata alle tue esigenze.",
+              t: "Territorio",
+              b: "Conosciamo la Lunigiana non solo come mercato, ma come luogo da abitare.",
             },
             {
-              t: "Presenza fino al rogito",
-              b: "Ti accompagniamo in ogni fase della pratica: dal primo incontro alla firma davanti al notaio, sempre al tuo fianco.",
+              t: "Cura",
+              b: "Ogni immobile viene raccontato con attenzione, rispetto e sensibilità.",
             },
           ].map((s) => (
             <div key={s.t} className="border-t border-border pt-6">
@@ -105,10 +122,16 @@ function ChiSiamoPage() {
           <footer className="mt-6 eyebrow">Anna e Marco · acquirenti a Bagnone</footer>
         </blockquote>
 
-        <div className="mt-16 text-center">
+        <div className="mt-20 border-t border-border pt-16 text-center">
+          <h2 className="font-serif text-3xl text-ink md:text-5xl">
+            Cerchi una casa in Lunigiana?
+          </h2>
+          <p className="mx-auto mt-5 max-w-xl text-base leading-relaxed text-foreground/80">
+            Raccontaci cosa immagini: ti aiuteremo a trovare il luogo giusto.
+          </p>
           <Link to="/contatti"
-            className="inline-block rounded-sm bg-primary px-8 py-4 text-xs uppercase tracking-[0.22em] text-primary-foreground">
-            Scrivici
+            className="mt-8 inline-block rounded-sm bg-primary px-10 py-4 text-xs uppercase tracking-[0.22em] text-primary-foreground transition hover:opacity-90">
+            Contattaci
           </Link>
         </div>
       </section>
