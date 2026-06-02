@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import {
@@ -17,6 +17,12 @@ import {
   ENERGY_CLASSES,
   CONDITIONS,
   STATUS_LABELS,
+  FURNISHED_OPTIONS,
+  HEATING_OPTIONS,
+  FLOOR_OPTIONS,
+  FLOOR_TO_NUMBER,
+  REGIONS,
+  PROVINCES,
 } from "@/lib/admin/property-constants";
 
 export const Route = createFileRoute("/_admin/admin/immobili/nuovo")({
@@ -54,12 +60,12 @@ type FormState = {
   size_sqm: string;
   bedrooms: string;
   bathrooms: string;
-  floors: string;
+  floor_label: string;
   total_floors: string;
   condition: string;
   energy_class: string;
   heating: string;
-  furnished: boolean;
+  furnished: string; // "Sì" | "No" | "Parzialmente" | ""
   garden: boolean;
   terrace: boolean;
   balcony: boolean;
@@ -98,12 +104,12 @@ const empty: FormState = {
   size_sqm: "",
   bedrooms: "",
   bathrooms: "",
-  floors: "",
+  floor_label: "",
   total_floors: "",
   condition: "",
   energy_class: "",
   heating: "",
-  furnished: false,
+  furnished: "",
   garden: false,
   terrace: false,
   balcony: false,
@@ -161,6 +167,12 @@ function NewPropertyPage() {
       const userId = sessionData.session?.user.id ?? null;
       const status = overrideStatus ?? f.status;
 
+      const floorNum =
+        f.floor_label && f.floor_label in FLOOR_TO_NUMBER
+          ? FLOOR_TO_NUMBER[f.floor_label]
+          : null;
+      const furnishedBool = f.furnished === "Sì" || f.furnished === "Parzialmente";
+
       const payload = {
         title: f.title.trim(),
         slug: slugify(f.title),
@@ -182,10 +194,10 @@ function NewPropertyPage() {
         size_sqm: toNum(f.size_sqm),
         bedrooms: toNum(f.bedrooms),
         bathrooms: toNum(f.bathrooms),
-        floors: toNum(f.floors),
+        floors: floorNum,
         condition: f.condition || null,
         energy_class: f.energy_class || null,
-        furnished: f.furnished,
+        furnished: furnishedBool,
         garden: f.garden,
         terrace: f.terrace,
         balcony: f.balcony,
@@ -218,6 +230,8 @@ function NewPropertyPage() {
       };
       pushIf("heating", f.heating);
       pushIf("total_floors", f.total_floors);
+      pushIf("floor_label", f.floor_label);
+      pushIf("furnished_level", f.furnished);
       pushIf("long_description", f.long_description);
       pushIf("punti_di_forza", f.punti_di_forza);
       pushIf("target_acquirente", f.target_acquirente);
@@ -366,10 +380,19 @@ function NewPropertyPage() {
             <TextInput value={f.municipality} onChange={(v) => upd("municipality", v)} placeholder="Es. Pietrasanta" />
           </Field>
           <Field label="Provincia">
-            <TextInput value={f.province} onChange={(v) => upd("province", v)} placeholder="Es. Lucca" />
+            <ProvinceCombobox
+              value={f.province}
+              onChange={(v) => upd("province", v)}
+              placeholder="Cerca provincia o sigla (es. MS, Lucca)"
+            />
           </Field>
           <Field label="Regione">
-            <TextInput value={f.region} onChange={(v) => upd("region", v)} />
+            <SelectInput
+              value={f.region}
+              onChange={(v) => upd("region", v)}
+              options={REGIONS.map((o) => ({ value: o, label: o }))}
+              placeholder="Seleziona regione"
+            />
           </Field>
           <Field label="Nazione">
             <TextInput value={f.country} onChange={(v) => upd("country", v)} />
@@ -403,7 +426,12 @@ function NewPropertyPage() {
             <NumberInput value={f.bathrooms} onChange={(v) => upd("bathrooms", v)} />
           </Field>
           <Field label="Piano dell'immobile">
-            <NumberInput value={f.floors} onChange={(v) => upd("floors", v)} />
+            <SelectInput
+              value={f.floor_label}
+              onChange={(v) => upd("floor_label", v)}
+              options={FLOOR_OPTIONS.map((o) => ({ value: o, label: o }))}
+              placeholder="Seleziona piano"
+            />
           </Field>
           <Field label="Totale piani edificio">
             <NumberInput value={f.total_floors} onChange={(v) => upd("total_floors", v)} />
@@ -423,13 +451,25 @@ function NewPropertyPage() {
             />
           </Field>
           <Field label="Riscaldamento">
-            <TextInput value={f.heating} onChange={(v) => upd("heating", v)} placeholder="Es. Autonomo a gas, pellet, pompa di calore" />
+            <SelectInput
+              value={f.heating}
+              onChange={(v) => upd("heating", v)}
+              options={HEATING_OPTIONS.map((o) => ({ value: o, label: o }))}
+              placeholder="Seleziona riscaldamento"
+            />
+          </Field>
+          <Field label="Arredato">
+            <SelectInput
+              value={f.furnished}
+              onChange={(v) => upd("furnished", v)}
+              options={FURNISHED_OPTIONS.map((o) => ({ value: o, label: o }))}
+              placeholder="Seleziona stato arredo"
+            />
           </Field>
 
           <div className="md:col-span-2">
             <span className="block text-xs uppercase tracking-wider text-muted-foreground">Dotazioni</span>
             <div className="mt-2 grid grid-cols-2 gap-2 md:grid-cols-3">
-              <Toggle label="Arredato" value={f.furnished} onChange={(v) => upd("furnished", v)} />
               <Toggle label="Giardino" value={f.garden} onChange={(v) => upd("garden", v)} />
               <Toggle label="Terrazza" value={f.terrace} onChange={(v) => upd("terrace", v)} />
               <Toggle label="Balcone" value={f.balcony} onChange={(v) => upd("balcony", v)} />
@@ -677,14 +717,16 @@ function SelectInput({
   value,
   onChange,
   options,
+  placeholder,
 }: {
   value: string;
   onChange: (v: string) => void;
   options: { value: string; label: string }[];
+  placeholder?: string;
 }) {
   return (
     <select value={value} onChange={(e) => onChange(e.target.value)} className={inputCls}>
-      <option value="">—</option>
+      <option value="">{placeholder ?? "—"}</option>
       {options.map((o) => (
         <option key={o.value} value={o.value}>
           {o.label}
@@ -716,5 +758,97 @@ function Toggle({
       <span>{label}</span>
       <span className={`ml-3 h-2.5 w-2.5 rounded-full ${value ? "bg-primary" : "bg-muted-foreground/30"}`} />
     </button>
+  );
+}
+
+/** Combobox ricercabile per la Provincia (sigla o nome). Salva la sigla (es. "MS"). */
+function ProvinceCombobox({
+  value,
+  onChange,
+  placeholder,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  placeholder?: string;
+}) {
+  const [open, setOpen] = useState(false);
+  const [q, setQ] = useState("");
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Mostra "MS — Massa-Carrara" se value è una sigla riconosciuta
+  const selected = PROVINCES.find((p) => p.code === value);
+  const display = selected ? `${selected.code} — ${selected.name}` : value;
+
+  useEffect(() => {
+    if (!open) setQ("");
+  }, [open]);
+
+  useEffect(() => {
+    const onDocClick = (e: MouseEvent) => {
+      if (!containerRef.current?.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("mousedown", onDocClick);
+    return () => document.removeEventListener("mousedown", onDocClick);
+  }, []);
+
+  const needle = q.trim().toLowerCase();
+  const filtered = needle
+    ? PROVINCES.filter(
+        (p) =>
+          p.code.toLowerCase().includes(needle) ||
+          p.name.toLowerCase().includes(needle),
+      ).slice(0, 80)
+    : PROVINCES;
+
+  return (
+    <div ref={containerRef} className="relative">
+      <input
+        type="text"
+        value={open ? q : display}
+        onChange={(e) => {
+          setQ(e.target.value);
+          setOpen(true);
+        }}
+        onFocus={() => setOpen(true)}
+        placeholder={placeholder ?? "Cerca provincia"}
+        className={inputCls}
+        aria-autocomplete="list"
+        aria-expanded={open}
+      />
+      {open && (
+        <ul
+          role="listbox"
+          className="absolute z-30 mt-1 max-h-64 w-full overflow-auto rounded-sm border border-border bg-card shadow-md"
+        >
+          {filtered.length === 0 ? (
+            <li className="px-3 py-2 text-xs text-muted-foreground">Nessun risultato</li>
+          ) : (
+            filtered.map((p) => {
+              const active = p.code === value;
+              return (
+                <li key={p.code}>
+                  <button
+                    type="button"
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      onChange(p.code);
+                      setOpen(false);
+                    }}
+                    className={`flex w-full items-center justify-between px-3 py-1.5 text-left text-sm transition hover:bg-muted ${
+                      active ? "bg-primary/5 text-ink" : "text-foreground"
+                    }`}
+                  >
+                    <span>{p.name}</span>
+                    <span className="text-xs uppercase tracking-wider text-muted-foreground">
+                      {p.code}
+                    </span>
+                  </button>
+                </li>
+              );
+            })
+          )}
+        </ul>
+      )}
+    </div>
   );
 }
