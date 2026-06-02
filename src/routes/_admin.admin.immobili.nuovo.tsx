@@ -388,42 +388,21 @@ function NewPropertyPage() {
 
         {/* SEZIONE 2 */}
         <Section title="2. Localizzazione" subtitle="Dove si trova l'immobile">
-          <Field label="Comune">
-            <TextInput value={f.municipality} onChange={(v) => upd("municipality", v)} placeholder="Es. Pietrasanta" />
-          </Field>
-          <Field label="Provincia">
-            <ProvinceCombobox
-              value={f.province}
-              onChange={(v) => upd("province", v)}
-              placeholder="Cerca provincia o sigla (es. MS, Lucca)"
-            />
-          </Field>
-          <Field label="Regione">
-            <SelectInput
-              value={f.region}
-              onChange={(v) => upd("region", v)}
-              options={REGIONS.map((o) => ({ value: o, label: o }))}
-              placeholder="Seleziona regione"
-            />
-          </Field>
-          <Field label="Nazione">
-            <TextInput value={f.country} onChange={(v) => upd("country", v)} />
-          </Field>
-          <Field label="Indirizzo" full>
-            <TextInput value={f.address} onChange={(v) => upd("address", v)} placeholder="Via, numero civico" />
-          </Field>
-          <Field label="Zona / località">
-            <TextInput value={f.area_zone} onChange={(v) => upd("area_zone", v)} placeholder="Es. Strettoia, Marina di Pietrasanta" />
-          </Field>
-          <Field label="CAP">
-            <TextInput value={f.postal_code} onChange={(v) => upd("postal_code", v)} placeholder="55045" />
-          </Field>
-          <Field label="Latitudine">
-            <NumberInput value={f.latitude} onChange={(v) => upd("latitude", v)} step={0.000001} placeholder="43.9456" />
-          </Field>
-          <Field label="Longitudine">
-            <NumberInput value={f.longitude} onChange={(v) => upd("longitude", v)} step={0.000001} placeholder="10.2280" />
-          </Field>
+          <LocationFields
+            value={{
+              region: f.region,
+              province: f.province,
+              municipality: f.municipality,
+              locality: f.locality,
+              area_zone: f.area_zone,
+              postal_code: f.postal_code,
+              address: f.address,
+              show_full_address: f.show_full_address,
+            }}
+            onChange={(patch) =>
+              setF((s) => ({ ...s, ...patch }))
+            }
+          />
         </Section>
 
         {/* SEZIONE 3 */}
