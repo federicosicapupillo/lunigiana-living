@@ -6,6 +6,7 @@ import heroIntimo from "@/assets/real/hero-centro-storico.jpg";
 import heroColline from "@/assets/real/hero-pontremoli-colline.jpg";
 import heroBorgoAsset from "@/assets/real/bagnone-borgo.jpg.asset.json";
 import heroCastelloTramontoAsset from "@/assets/real/hero-castello-tramonto.jpg.asset.json";
+import heroCastelloAereoAsset from "@/assets/real/hero-castello-aereo.jpg.asset.json";
 import territoryPontremoli from "@/assets/real/pontremoli-scorcio.jpg";
 import territoryBagnone from "@/assets/real/bagnone-castello.jpg";
 import territoryZeri from "@/assets/real/zeri-monte.jpg";
@@ -29,7 +30,9 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
-  const [heroVariant, setHeroVariant] = useState<"panoramico" | "intimo" | "colline" | "borgo" | "tramonto">("panoramico");
+  const [heroVariant, setHeroVariant] = useState<
+    "panoramico" | "intimo" | "colline" | "borgo" | "tramonto" | "aereo"
+  >("panoramico");
   const heroMap = {
     panoramico: {
       src: heroPanoramico,
@@ -55,6 +58,11 @@ function Index() {
       src: heroCastelloTramontoAsset.url,
       alt: "Borgo e castello panoramico della Lunigiana al tramonto, vista aerea sulle colline verso il mare",
       label: "Tramonto · Castello",
+    },
+    aereo: {
+      src: heroCastelloAereoAsset.url,
+      alt: "Vista aerea ravvicinata del borgo medievale e del castello arroccato sulla collina della Lunigiana",
+      label: "Vista aerea · Borgo",
     },
   } as const;
   const heroSrc = heroMap[heroVariant].src;
