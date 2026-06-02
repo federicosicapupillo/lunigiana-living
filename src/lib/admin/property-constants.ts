@@ -454,6 +454,97 @@ export const NARRATIVE_FIELDS = [
 
 export type NarrativeKey = (typeof NARRATIVE_FIELDS)[number]["key"];
 
+// =====================================================================
+// MULTI-SELECT OPTIONS for narrative fields (Punti di forza, Target,
+// Atmosfera/Contesto, Elementi architettonici).
+// =====================================================================
+
+export const STRENGTHS_OPTIONS = [
+  "Vista panoramica","Vista mare","Vista sulle Apuane","Vista montagne","Vista borgo",
+  "Vista fiume","Posizione dominante","Posizione soleggiata","Posizione riservata",
+  "Vicino al centro","Vicino ai servizi","Vicino al mare","A pochi minuti dall'autostrada",
+  "Giardino privato","Terreno","Uliveto","Piscina","Possibilità piscina",
+  "Immobile in pietra","Immobile storico","Ristrutturato","Abitabile subito",
+  "Da personalizzare","Grande potenziale","Ideale come seconda casa",
+  "Ideale per investimento","Ideale per B&B","Ideale per affitti turistici",
+  "Privacy","Silenzio","Natura",
+] as const;
+
+export const TARGETS_OPTIONS = [
+  "Famiglia con bambini","Coppia","Single","Pensionati","Investitore",
+  "Investitore short-let","Acquirente straniero","Seconda casa","Prima casa",
+  "Smart worker","Amanti della natura","Amanti dei borghi","Chi cerca tranquillità",
+  "Chi cerca privacy","Chi vuole vivere vicino al mare ma lontano dal caos",
+  "Gestione B&B","Agriturismo","Casa vacanze","Struttura ricettiva",
+  "Progetto di ristrutturazione",
+] as const;
+
+export const ATMOSPHERE_OPTIONS = [
+  "Borgo storico","Borgo medievale","Campagna","Collina","Montagna","Bosco","Valle",
+  "Vicino al fiume","Vicino ai sentieri","Contesto naturale","Contesto riservato",
+  "Contesto panoramico","Contesto autentico","Zona tranquilla","Silenzio dei boschi",
+  "Tramonti sulle Apuane","Vista aperta","Atmosfera romantica","Atmosfera rustica",
+  "Atmosfera elegante","Atmosfera familiare","Atmosfera mediterranea",
+  "Terrazzamenti","Verde circostante",
+] as const;
+
+export const ARCHITECTURAL_OPTIONS = [
+  "Pietra a vista","Facciata in pietra","Muri storici","Travi in legno",
+  "Travature a vista","Soffitti a volta","Camino in pietra","Camino antico",
+  "Pavimenti originali","Cotto antico","Archi in pietra","Scala in pietra",
+  "Portale storico","Loggiato","Portico","Terrazza panoramica","Cantina voltata",
+  "Taverna","Torretta","Mura medievali","Affreschi","Nicchie originali",
+  "Infissi tradizionali","Elementi rustici","Elementi nobiliari",
+] as const;
+
+export type MultiSelectValue = {
+  selected: string[];
+  altro: string;
+  note: string;
+};
+
+export const EMPTY_MULTI: MultiSelectValue = { selected: [], altro: "", note: "" };
+
+/** Parse a value stored in property_features. Falls back to legacy text → note. */
+export function parseMultiSelect(raw: string | null | undefined): MultiSelectValue {
+  if (!raw) return { ...EMPTY_MULTI };
+  const trimmed = raw.trim();
+  if (!trimmed) return { ...EMPTY_MULTI };
+  if (trimmed.startsWith("{")) {
+    try {
+      const parsed = JSON.parse(trimmed);
+      return {
+        selected: Array.isArray(parsed.selected) ? parsed.selected.filter((x: unknown) => typeof x === "string") : [],
+        altro: typeof parsed.altro === "string" ? parsed.altro : "",
+        note: typeof parsed.note === "string" ? parsed.note : "",
+      };
+    } catch {
+      // fall through
+    }
+  }
+  // Legacy plain text: preserve as note
+  return { selected: [], altro: "", note: trimmed };
+}
+
+/** Serialize for storage. Returns empty string when nothing meaningful. */
+export function serializeMultiSelect(v: MultiSelectValue): string {
+  if (!v.selected.length && !v.altro.trim() && !v.note.trim()) return "";
+  return JSON.stringify({
+    selected: v.selected,
+    altro: v.altro.trim(),
+    note: v.note.trim(),
+  });
+}
+
+export const MULTI_SELECT_FIELDS = [
+  { key: "punti_di_forza", label: "Punti di forza", placeholder: "Seleziona uno o più punti di forza", otherLabel: "Altro punto di forza", options: STRENGTHS_OPTIONS },
+  { key: "target_acquirente", label: "Target immobile", placeholder: "Seleziona uno o più target", otherLabel: "Altro target", options: TARGETS_OPTIONS },
+  { key: "vista_contesto", label: "Atmosfera / Contesto", placeholder: "Seleziona uno o più elementi di atmosfera", otherLabel: "Altro elemento di contesto", options: ATMOSPHERE_OPTIONS },
+  { key: "elementi_storici", label: "Elementi architettonici rilevanti", placeholder: "Seleziona uno o più elementi architettonici", otherLabel: "Altro elemento architettonico", options: ARCHITECTURAL_OPTIONS },
+] as const;
+
+export type MultiSelectKey = (typeof MULTI_SELECT_FIELDS)[number]["key"];
+
 export const LENGTH_OPTIONS = [
   { value: "breve", label: "Breve", hint: "80–120 parole · per annuncio rapido" },
   { value: "media", label: "Media", hint: "180–250 parole · standard portali" },
