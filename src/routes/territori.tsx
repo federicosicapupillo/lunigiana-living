@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import heroAsset from "@/assets/real/lunigiana-hero-tramonto.png.asset.json";
-import pontremoliAsset from "@/assets/real/pontremoli-lunigiana.png.asset.json";
+import pontremoliAsset from "@/assets/real/pontremoli-lunigiana-v2.png.asset.json";
 import bagnoneAsset from "@/assets/real/bagnone-lunigiana.png.asset.json";
 import zeriAsset from "@/assets/real/zeri-lunigiana.png.asset.json";
 import villafrancaAsset from "@/assets/real/villafranca-lunigiana.png.asset.json";
