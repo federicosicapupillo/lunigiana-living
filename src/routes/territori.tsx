@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import heroImg from "@/assets/real/villafranca-panorama.jpg";
+import heroAsset from "@/assets/real/lunigiana-hero-tramonto.png.asset.json";
 import pontremoliAsset from "@/assets/real/pontremoli-lunigiana.png.asset.json";
 import bagnoneAsset from "@/assets/real/bagnone-lunigiana.png.asset.json";
 import zeriAsset from "@/assets/real/zeri-lunigiana.png.asset.json";
@@ -35,7 +35,7 @@ function TerritoriPage() {
   return (
     <>
       <section className="relative isolate -mt-20 flex min-h-[80svh] items-end overflow-hidden">
-        <img src={heroImg} alt="Paesaggio della Lunigiana" className="absolute inset-0 -z-10 h-full w-full object-cover" />
+        <img src={heroAsset.url} alt="Paesaggio della Lunigiana al tramonto" className="absolute inset-0 -z-10 h-full w-full object-cover" />
         <div className="hero-gradient absolute inset-0 -z-10" />
         <div className="container-editorial pb-20 pt-32">
           <span className="eyebrow text-cream/85">Vivere in Lunigiana</span>
