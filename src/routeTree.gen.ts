@@ -16,6 +16,7 @@ import { Route as ImmobiliRouteImport } from './routes/immobili'
 import { Route as ContattiRouteImport } from './routes/contatti'
 import { Route as ChiSiamoRouteImport } from './routes/chi-siamo'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ImmobiliIndexRouteImport } from './routes/immobili.index'
 import { Route as ImmobiliIdRouteImport } from './routes/immobili.$id'
 
 const TerritoriRoute = TerritoriRouteImport.update({
@@ -53,6 +54,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ImmobiliIndexRoute = ImmobiliIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ImmobiliRoute,
+} as any)
 const ImmobiliIdRoute = ImmobiliIdRouteImport.update({
   id: '/$id',
   path: '/$id',
@@ -68,16 +74,17 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/territori': typeof TerritoriRoute
   '/immobili/$id': typeof ImmobiliIdRoute
+  '/immobili/': typeof ImmobiliIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/chi-siamo': typeof ChiSiamoRoute
   '/contatti': typeof ContattiRoute
-  '/immobili': typeof ImmobiliRouteWithChildren
   '/servizi': typeof ServiziRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/territori': typeof TerritoriRoute
   '/immobili/$id': typeof ImmobiliIdRoute
+  '/immobili': typeof ImmobiliIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -89,6 +96,7 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/territori': typeof TerritoriRoute
   '/immobili/$id': typeof ImmobiliIdRoute
+  '/immobili/': typeof ImmobiliIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -101,16 +109,17 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/territori'
     | '/immobili/$id'
+    | '/immobili/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/chi-siamo'
     | '/contatti'
-    | '/immobili'
     | '/servizi'
     | '/sitemap.xml'
     | '/territori'
     | '/immobili/$id'
+    | '/immobili'
   id:
     | '__root__'
     | '/'
@@ -121,6 +130,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/territori'
     | '/immobili/$id'
+    | '/immobili/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -184,6 +194,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/immobili/': {
+      id: '/immobili/'
+      path: '/'
+      fullPath: '/immobili/'
+      preLoaderRoute: typeof ImmobiliIndexRouteImport
+      parentRoute: typeof ImmobiliRoute
+    }
     '/immobili/$id': {
       id: '/immobili/$id'
       path: '/$id'
@@ -196,10 +213,12 @@ declare module '@tanstack/react-router' {
 
 interface ImmobiliRouteChildren {
   ImmobiliIdRoute: typeof ImmobiliIdRoute
+  ImmobiliIndexRoute: typeof ImmobiliIndexRoute
 }
 
 const ImmobiliRouteChildren: ImmobiliRouteChildren = {
   ImmobiliIdRoute: ImmobiliIdRoute,
+  ImmobiliIndexRoute: ImmobiliIndexRoute,
 }
 
 const ImmobiliRouteWithChildren = ImmobiliRoute._addFileChildren(
@@ -218,3 +237,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
