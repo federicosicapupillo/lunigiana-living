@@ -101,38 +101,38 @@ function AdminPropertiesPage() {
   );
 
   return (
-    <div className="mx-auto max-w-7xl px-6 py-10">
+    <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-10">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="font-serif text-4xl text-ink">Immobili</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <h1 className="font-serif text-2xl text-ink sm:text-4xl">Immobili</h1>
+          <p className="mt-1 text-xs text-muted-foreground sm:text-sm">
             {counts.all} totali · {counts.published} pubblicati · {counts.ready} pronti · {counts.draft} in bozza
           </p>
         </div>
         <Link
           to="/admin/immobili/nuovo"
-          className="inline-flex items-center gap-2 rounded-sm bg-primary px-5 py-2.5 text-xs uppercase tracking-[0.18em] text-primary-foreground hover:bg-primary/90"
+          className="inline-flex w-full items-center justify-center gap-2 rounded-sm bg-primary px-4 py-3 text-xs uppercase tracking-[0.18em] text-primary-foreground hover:bg-primary/90 sm:w-auto sm:px-5 sm:py-2.5"
         >
           <Plus size={15} /> Nuovo immobile
         </Link>
       </div>
 
-      <div className="mt-8 flex flex-wrap items-center gap-3 border-b border-border pb-4">
-        <div className="relative min-w-64 flex-1">
+      <div className="mt-6 flex flex-col gap-3 border-b border-border pb-4 sm:mt-8 sm:flex-row sm:flex-wrap sm:items-center">
+        <div className="relative w-full sm:min-w-64 sm:flex-1">
           <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder="Cerca per titolo, comune, tipologia..."
-            className="w-full rounded-sm border border-border bg-background py-2 pl-9 pr-3 text-sm focus:border-primary focus:outline-none"
+            className="w-full rounded-sm border border-border bg-background py-2.5 pl-9 pr-3 text-base focus:border-primary focus:outline-none sm:py-2 sm:text-sm"
           />
         </div>
-        <div className="flex gap-1">
+        <div className="-mx-1 flex gap-1 overflow-x-auto px-1 sm:mx-0 sm:overflow-visible sm:px-0">
           {(["all", "draft", "ready", "published"] as const).map((s) => (
             <button
               key={s}
               onClick={() => setStatusFilter(s)}
-              className={`rounded-sm border px-3 py-1.5 text-xs uppercase tracking-wider transition ${
+              className={`shrink-0 rounded-sm border px-3 py-1.5 text-xs uppercase tracking-wider transition ${
                 statusFilter === s
                   ? "border-primary bg-primary text-primary-foreground"
                   : "border-border text-muted-foreground hover:border-primary/50"
@@ -155,15 +155,15 @@ function AdminPropertiesPage() {
           </p>
         </div>
       ) : (
-        <div className="mt-6 grid gap-4">
+        <div className="mt-6 grid gap-3 sm:gap-4">
           {filtered.map((r) => (
             <Link
               key={r.id}
               to="/admin/immobili/$id"
               params={{ id: r.id }}
-              className="group flex items-center gap-5 rounded-sm border border-border bg-card p-4 transition hover:border-primary/50 hover:shadow-sm"
+              className="group flex items-center gap-3 rounded-sm border border-border bg-card p-3 transition hover:border-primary/50 hover:shadow-sm sm:gap-5 sm:p-4"
             >
-              <div className="h-20 w-28 shrink-0 overflow-hidden rounded-sm bg-muted">
+              <div className="h-16 w-20 shrink-0 overflow-hidden rounded-sm bg-muted sm:h-20 sm:w-28">
                 {r.cover_url ? (
                   <img src={r.cover_url} alt="" className="h-full w-full object-cover" />
                 ) : (
@@ -173,15 +173,22 @@ function AdminPropertiesPage() {
                 )}
               </div>
               <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-3">
-                  <h3 className="truncate font-serif text-lg text-ink">{r.title}</h3>
+                <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                  <h3 className="min-w-0 flex-1 truncate font-serif text-base text-ink sm:text-lg">{r.title}</h3>
                   <StatusBadge status={r.status} />
                 </div>
                 <p className="mt-1 truncate text-xs text-muted-foreground">
                   {[r.property_type, r.municipality].filter(Boolean).join(" · ") || "—"}
                 </p>
+                <div className="mt-1 text-sm text-ink sm:hidden">
+                  {r.price_on_request
+                    ? "Su richiesta"
+                    : r.price
+                      ? `€ ${r.price.toLocaleString("it-IT")}`
+                      : "—"}
+                </div>
               </div>
-              <div className="text-right text-sm">
+              <div className="hidden text-right text-sm sm:block">
                 <div className="text-ink">
                   {r.price_on_request
                     ? "Su richiesta"
