@@ -1,16 +1,21 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import heroImg from "@/assets/real/villafranca-panorama.jpg";
 import pontremoli from "@/assets/real/pontremoli-scorcio.jpg";
-import bagnone from "@/assets/real/bagnone-castello.jpg";
-import zeri from "@/assets/real/zeri-monte.jpg";
-import villafranca from "@/assets/real/villafranca-ponte.jpg";
+import bagnoneAsset from "@/assets/real/bagnone-lunigiana.png.asset.json";
+import zeriAsset from "@/assets/real/zeri-lunigiana.png.asset.json";
+import villafrancaAsset from "@/assets/real/villafranca-lunigiana.png.asset.json";
 import filattiera from "@/assets/real/filattiera.jpg";
-import mulazzo from "@/assets/real/mulazzo.jpg";
+import mulazzoAsset from "@/assets/real/mulazzo-lunigiana.png.asset.json";
 import { territories } from "@/lib/properties";
 import { ArrowRight, MapPin, Mountain, Sparkles } from "lucide-react";
 
 const imageBySlug: Record<string, string> = {
-  pontremoli, bagnone, zeri, villafranca, filattiera, mulazzo,
+  pontremoli,
+  bagnone: bagnoneAsset.url,
+  zeri: zeriAsset.url,
+  villafranca: villafrancaAsset.url,
+  filattiera,
+  mulazzo: mulazzoAsset.url,
 };
 
 export const Route = createFileRoute("/territori")({
