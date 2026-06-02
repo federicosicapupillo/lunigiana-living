@@ -1,8 +1,20 @@
 import { Link } from "@tanstack/react-router";
 import { MapPin, Maximize2, BedDouble, ArrowRight } from "lucide-react";
-import type { Property } from "@/lib/properties";
 
-export function PropertyCard({ p }: { p: Property }) {
+type PropertyCardData = {
+  id: number | string;
+  reference: string;
+  title: string;
+  location: string;
+  type: string;
+  image: string;
+  price: string;
+  sqm?: number | null;
+  rooms?: number | null;
+  tag?: string;
+};
+
+export function PropertyCard({ p }: { p: PropertyCardData }) {
   return (
     <Link
       to="/immobili/$id"
