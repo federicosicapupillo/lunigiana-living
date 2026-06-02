@@ -41,6 +41,8 @@ type Property = {
   province: string | null;
   region: string | null;
   country: string | null;
+  locality: string | null;
+  show_full_address: boolean;
   size_sqm: number | null;
   bedrooms: number | null;
   bathrooms: number | null;
