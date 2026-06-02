@@ -5,9 +5,9 @@ export const Route = createFileRoute("/chi-siamo")({
   head: () => ({
     meta: [
       { title: "Chi siamo — Furia Immobiliare, Pontremoli" },
-      { name: "description", content: "Da Pontremoli accompagniamo chi cerca casa in Lunigiana con competenza, ascolto e conoscenza profonda del territorio." },
+      { name: "description", content: "Dietro Furia Immobiliare c'è Elena: un volto, una voce e una presenza costante per chi sceglie casa in Lunigiana. Consulenze personalizzate e assistenza completa." },
       { property: "og:title", content: "Chi siamo — Furia Immobiliare" },
-      { property: "og:description", content: "La nostra storia: una famiglia, un'agenzia, una terra." },
+      { property: "og:description", content: "Crediamo che una casa non sia solo metri quadri, ma un pezzo di vita. Mettiamo al centro le persone prima degli immobili." },
     ],
     links: [{ rel: "canonical", href: "/chi-siamo" }],
   }),
