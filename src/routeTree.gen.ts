@@ -18,6 +18,7 @@ import { Route as ChiSiamoRouteImport } from './routes/chi-siamo'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ImmobiliIndexRouteImport } from './routes/immobili.index'
 import { Route as ImmobiliIdRouteImport } from './routes/immobili.$id'
+import { Route as ApiVirtualStagingRouteImport } from './routes/api/virtual-staging'
 
 const TerritoriRoute = TerritoriRouteImport.update({
   id: '/territori',
@@ -64,6 +65,11 @@ const ImmobiliIdRoute = ImmobiliIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => ImmobiliRoute,
 } as any)
+const ApiVirtualStagingRoute = ApiVirtualStagingRouteImport.update({
+  id: '/api/virtual-staging',
+  path: '/api/virtual-staging',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -73,6 +79,7 @@ export interface FileRoutesByFullPath {
   '/servizi': typeof ServiziRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/territori': typeof TerritoriRoute
+  '/api/virtual-staging': typeof ApiVirtualStagingRoute
   '/immobili/$id': typeof ImmobiliIdRoute
   '/immobili/': typeof ImmobiliIndexRoute
 }
@@ -83,6 +90,7 @@ export interface FileRoutesByTo {
   '/servizi': typeof ServiziRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/territori': typeof TerritoriRoute
+  '/api/virtual-staging': typeof ApiVirtualStagingRoute
   '/immobili/$id': typeof ImmobiliIdRoute
   '/immobili': typeof ImmobiliIndexRoute
 }
@@ -95,6 +103,7 @@ export interface FileRoutesById {
   '/servizi': typeof ServiziRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/territori': typeof TerritoriRoute
+  '/api/virtual-staging': typeof ApiVirtualStagingRoute
   '/immobili/$id': typeof ImmobiliIdRoute
   '/immobili/': typeof ImmobiliIndexRoute
 }
@@ -108,6 +117,7 @@ export interface FileRouteTypes {
     | '/servizi'
     | '/sitemap.xml'
     | '/territori'
+    | '/api/virtual-staging'
     | '/immobili/$id'
     | '/immobili/'
   fileRoutesByTo: FileRoutesByTo
@@ -118,6 +128,7 @@ export interface FileRouteTypes {
     | '/servizi'
     | '/sitemap.xml'
     | '/territori'
+    | '/api/virtual-staging'
     | '/immobili/$id'
     | '/immobili'
   id:
@@ -129,6 +140,7 @@ export interface FileRouteTypes {
     | '/servizi'
     | '/sitemap.xml'
     | '/territori'
+    | '/api/virtual-staging'
     | '/immobili/$id'
     | '/immobili/'
   fileRoutesById: FileRoutesById
@@ -141,6 +153,7 @@ export interface RootRouteChildren {
   ServiziRoute: typeof ServiziRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TerritoriRoute: typeof TerritoriRoute
+  ApiVirtualStagingRoute: typeof ApiVirtualStagingRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -208,6 +221,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ImmobiliIdRouteImport
       parentRoute: typeof ImmobiliRoute
     }
+    '/api/virtual-staging': {
+      id: '/api/virtual-staging'
+      path: '/api/virtual-staging'
+      fullPath: '/api/virtual-staging'
+      preLoaderRoute: typeof ApiVirtualStagingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -233,6 +253,7 @@ const rootRouteChildren: RootRouteChildren = {
   ServiziRoute: ServiziRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TerritoriRoute: TerritoriRoute,
+  ApiVirtualStagingRoute: ApiVirtualStagingRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

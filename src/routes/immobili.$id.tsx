@@ -2,6 +2,7 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { getPropertyById } from "@/lib/properties";
 import { ArrowLeft, MapPin, Maximize2, BedDouble, Bath, Building2 } from "lucide-react";
 import { useState } from "react";
+import { VirtualStaging } from "@/components/virtual-staging";
 
 export const Route = createFileRoute("/immobili/$id")({
   loader: ({ params }) => {
@@ -143,6 +144,9 @@ function PropertyDetail() {
               ))}
             </dl>
           </div>
+
+          {/* Virtual staging AI */}
+          <VirtualStaging gallery={p.gallery && p.gallery.length > 0 ? p.gallery : [p.image]} />
         </div>
 
         {/* Contact card */}
