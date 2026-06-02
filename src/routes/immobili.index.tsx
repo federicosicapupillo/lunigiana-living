@@ -3,6 +3,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { zodValidator, fallback } from "@tanstack/zod-adapter";
 import { z } from "zod";
 import { PropertyCard } from "@/components/property-card";
+import { PropertySearchBar } from "@/components/property-search-bar";
 import { listPublishedProperties, type PublicProperty } from "@/lib/public-properties.functions";
 import { useMemo, useState } from "react";
 
@@ -11,10 +12,12 @@ type PropertyCategory = PublicProperty["category"];
 const searchSchema = z.object({
   type: fallback(z.string(), "").default(""),
   comune: fallback(z.string(), "").default(""),
-  price: fallback(z.string(), "").default(""),
+  price_min: fallback(z.string(), "").default(""),
+  price_max: fallback(z.string(), "").default(""),
   size: fallback(z.string(), "").default(""),
   rooms: fallback(z.string(), "").default(""),
   features: fallback(z.string(), "").default(""),
+  sort: fallback(z.string(), "").default(""),
 });
 
 export const Route = createFileRoute("/immobili/")({
@@ -49,8 +52,6 @@ const CATEGORIES: { id: PropertyCategory | "tutti"; label: string }[] = [
   { id: "scelti-per-voi", label: "Scelti per voi" },
 ];
 
-type SortKey = "featured" | "price-asc" | "price-desc";
-
 function ImmobiliPage() {
   const { properties: allProperties } = Route.useLoaderData() as { properties: PublicProperty[] };
   const urlSearch = Route.useSearch();
@@ -61,7 +62,8 @@ function ImmobiliPage() {
   );
   const [category, setCategory] = useState<PropertyCategory | "tutti">("tutti");
   const [location, setLocation] = useState<string>("tutte");
-  const [sort, setSort] = useState<SortKey>("featured");
+
+  const sort = urlSearch.sort || "recent";
 
   const parseRange = (v: string): [number | null, number | null] => {
     if (!v) return [null, null];
@@ -76,8 +78,8 @@ function ImmobiliPage() {
     : [];
 
   const hasUrlFilters = !!(
-    urlSearch.type || urlSearch.comune || urlSearch.price ||
-    urlSearch.size || urlSearch.rooms || urlSearch.features
+    urlSearch.type || urlSearch.comune || urlSearch.price_min || urlSearch.price_max ||
+    urlSearch.size || urlSearch.rooms || urlSearch.features || urlSearch.sort
   );
 
   const clearUrlFilters = () => {
@@ -98,12 +100,13 @@ function ImmobiliPage() {
       const c = urlSearch.comune.toLowerCase();
       list = list.filter((p) => (p.location || "").toLowerCase().includes(c));
     }
-    const [priceLo, priceHi] = parseRange(urlSearch.price);
+    const priceLo = urlSearch.price_min ? Number(urlSearch.price_min) : null;
+    const priceHi = urlSearch.price_max ? Number(urlSearch.price_max) : null;
     if (priceLo != null || priceHi != null) {
       list = list.filter((p) => {
         if (p.priceValue == null) return false;
-        if (priceLo != null && p.priceValue < priceLo) return false;
-        if (priceHi != null && p.priceValue > priceHi) return false;
+        if (priceLo != null && Number.isFinite(priceLo) && p.priceValue < priceLo) return false;
+        if (priceHi != null && Number.isFinite(priceHi) && p.priceValue > priceHi) return false;
         return true;
       });
     }
@@ -137,8 +140,10 @@ function ImmobiliPage() {
     const sorted = [...list];
     if (sort === "price-asc") sorted.sort((a, b) => (a.priceValue ?? Infinity) - (b.priceValue ?? Infinity));
     if (sort === "price-desc") sorted.sort((a, b) => (b.priceValue ?? -1) - (a.priceValue ?? -1));
+    if (sort === "size-asc") sorted.sort((a, b) => (a.sqm ?? Infinity) - (b.sqm ?? Infinity));
+    if (sort === "size-desc") sorted.sort((a, b) => (b.sqm ?? -1) - (a.sqm ?? -1));
     return sorted;
-  }, [allProperties, category, location, sort, urlSearch.type, urlSearch.comune, urlSearch.price, urlSearch.size, urlSearch.rooms, urlSearch.features]);
+  }, [allProperties, category, location, sort, urlSearch.type, urlSearch.comune, urlSearch.price_min, urlSearch.price_max, urlSearch.size, urlSearch.rooms, urlSearch.features]);
 
   return (
     <>
@@ -152,6 +157,22 @@ function ImmobiliPage() {
             {allProperties.length} immobili reali importati dal nostro archivio.
             Filtra per categoria o comune per trovare il tuo posto.
           </p>
+
+          <div className="mt-10">
+            <PropertySearchBar
+              comuni={uniqueLocations}
+              initial={{
+                type: urlSearch.type,
+                comune: urlSearch.comune,
+                price_min: urlSearch.price_min,
+                price_max: urlSearch.price_max,
+                size: urlSearch.size,
+                rooms: urlSearch.rooms,
+                features: urlSearch.features ? urlSearch.features.split(",").filter(Boolean) : [],
+                sort: urlSearch.sort || "recent",
+              }}
+            />
+          </div>
 
           <div className="mt-10 flex flex-wrap items-center gap-x-8 gap-y-4">
             <div className="flex flex-wrap gap-2">
@@ -191,18 +212,6 @@ function ImmobiliPage() {
               </button>
             )}
           </div>
-          {hasUrlFilters && (
-            <p className="mt-4 text-xs uppercase tracking-[0.18em] text-muted-foreground">
-              Filtri attivi dalla home: {[
-                urlSearch.type,
-                urlSearch.comune,
-                urlSearch.price && "prezzo",
-                urlSearch.size && "superficie",
-                urlSearch.rooms && `${urlSearch.rooms}+ camere`,
-                urlSearch.features,
-              ].filter(Boolean).join(" · ")}
-            </p>
-          )}
         </div>
       </section>
 
@@ -212,15 +221,6 @@ function ImmobiliPage() {
             <span className="font-serif text-lg text-ink">{filtered.length}</span>{" "}
             immobili disponibili
           </p>
-          <select
-            value={sort}
-            onChange={(e) => setSort(e.target.value as SortKey)}
-            className="bg-transparent text-sm text-foreground focus:outline-none"
-          >
-            <option value="featured">In evidenza</option>
-            <option value="price-asc">Prezzo crescente</option>
-            <option value="price-desc">Prezzo decrescente</option>
-          </select>
         </div>
 
         {filtered.length === 0 ? (

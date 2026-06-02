@@ -1,26 +1,12 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { Search, X, ChevronDown } from "lucide-react";
+import { PROPERTY_TYPES, ALL_AMENITIES } from "@/lib/admin/property-constants";
 
-const TYPES = [
-  "Casale","Rustico","Villa","Casa indipendente","Terratetto","Appartamento",
-  "Attico","Bifamiliare","Semindipendente","Podere","Agriturismo",
-  "Borgo / proprietà storica","Terreno","Locale commerciale",
-];
-
-const COMUNI = [
+const COMUNI_FALLBACK = [
   "Pontremoli","Bagnone","Villafranca in Lunigiana","Mulazzo","Filattiera",
-  "Licciana Nardi","Aulla","Fivizzano","Fosdinovo","Sarzana",
-];
-
-const PRICE_RANGES = [
-  { label: "Qualsiasi prezzo", value: "" },
-  { label: "Fino a 100.000 €", value: "0-100000" },
-  { label: "100.000 € - 200.000 €", value: "100000-200000" },
-  { label: "200.000 € - 300.000 €", value: "200000-300000" },
-  { label: "300.000 € - 500.000 €", value: "300000-500000" },
-  { label: "500.000 € - 800.000 €", value: "500000-800000" },
-  { label: "Oltre 800.000 €", value: "800000-" },
+  "Licciana Nardi","Aulla","Fivizzano","Fosdinovo","Zeri","Tresana",
+  "Podenzana","Comano","Casola in Lunigiana",
 ];
 
 const SIZE_RANGES = [
@@ -41,22 +27,67 @@ const ROOM_OPTS = [
   { label: "5 o più camere", value: "5" },
 ];
 
-const FEATURES = [
-  "Giardino","Terreno","Vista panoramica","Vista mare","Vista montagne",
-  "Piscina","Immobile storico","Casale in pietra","Ristrutturato",
-  "Da ristrutturare","Ideale seconda casa","Ideale investimento",
+const SORT_OPTS = [
+  { label: "Più recenti", value: "recent" },
+  { label: "Prezzo crescente", value: "price-asc" },
+  { label: "Prezzo decrescente", value: "price-desc" },
+  { label: "Superficie crescente", value: "size-asc" },
+  { label: "Superficie decrescente", value: "size-desc" },
 ];
 
-const EMPTY = {
-  type: "", comune: "", price: "", size: "", rooms: "",
-  features: [] as string[],
+export type SearchValues = {
+  type: string;
+  comune: string;
+  price_min: string;
+  price_max: string;
+  size: string;
+  rooms: string;
+  features: string[];
+  sort: string;
 };
 
-export function HomeSearchBar() {
+const EMPTY: SearchValues = {
+  type: "", comune: "", price_min: "", price_max: "",
+  size: "", rooms: "", features: [], sort: "recent",
+};
+
+function sanitizePrice(v: string): string {
+  const cleaned = v.replace(/[^0-9]/g, "");
+  return cleaned;
+}
+
+export interface PropertySearchBarProps {
+  initial?: Partial<SearchValues>;
+  comuni?: string[];
+  /** When true, navigate to /immobili on submit (used on home). When false, stay (used on listing). */
+  navigateOnSubmit?: boolean;
+  onSubmit?: (v: SearchValues) => void;
+  onReset?: () => void;
+}
+
+export function PropertySearchBar({
+  initial,
+  comuni,
+  navigateOnSubmit = true,
+  onSubmit,
+  onReset,
+}: PropertySearchBarProps) {
   const navigate = useNavigate();
-  const [state, setState] = useState(EMPTY);
+  const [state, setState] = useState<SearchValues>({ ...EMPTY, ...initial });
   const [featOpen, setFeatOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Sync when URL-controlled `initial` changes (e.g. user clicks reset on parent).
+  useEffect(() => {
+    setState({ ...EMPTY, ...initial });
+  }, [
+    initial?.type, initial?.comune, initial?.price_min, initial?.price_max,
+    initial?.size, initial?.rooms, initial?.sort,
+    (initial?.features ?? []).join(","),
+  ]);
+
+  const comuniList = comuni && comuni.length ? comuni : COMUNI_FALLBACK;
 
   const toggleFeature = (f: string) =>
     setState((s) => ({
@@ -66,32 +97,60 @@ export function HomeSearchBar() {
         : [...s.features, f],
     }));
 
-  const submit = () => {
-    const search: Record<string, string> = {};
-    if (state.type) search.type = state.type;
-    if (state.comune) search.comune = state.comune;
-    if (state.price) search.price = state.price;
-    if (state.size) search.size = state.size;
-    if (state.rooms) search.rooms = state.rooms;
-    if (state.features.length) search.features = state.features.join(",");
-    navigate({ to: "/immobili", search });
+  const validate = (s: SearchValues): string | null => {
+    if (s.price_min && s.price_max) {
+      const a = Number(s.price_min);
+      const b = Number(s.price_max);
+      if (Number.isFinite(a) && Number.isFinite(b) && a > b) {
+        return "Controlla il range prezzo inserito.";
+      }
+    }
+    return null;
   };
 
-  const reset = () => setState(EMPTY);
+  const buildSearch = (s: SearchValues): Record<string, string> => {
+    const out: Record<string, string> = {};
+    if (s.type) out.type = s.type;
+    if (s.comune) out.comune = s.comune;
+    if (s.price_min) out.price_min = s.price_min;
+    if (s.price_max) out.price_max = s.price_max;
+    if (s.size) out.size = s.size;
+    if (s.rooms) out.rooms = s.rooms;
+    if (s.features.length) out.features = s.features.join(",");
+    if (s.sort && s.sort !== "recent") out.sort = s.sort;
+    return out;
+  };
+
+  const submit = () => {
+    const err = validate(state);
+    setError(err);
+    if (err) return;
+    const search = buildSearch(state);
+    if (navigateOnSubmit) navigate({ to: "/immobili", search });
+    onSubmit?.(state);
+    setMobileOpen(false);
+  };
+
+  const reset = () => {
+    setState(EMPTY);
+    setError(null);
+    if (navigateOnSubmit) navigate({ to: "/immobili", search: {} });
+    onReset?.();
+  };
 
   const featLabel = state.features.length
     ? `${state.features.length} selezionate`
     : "Tutte";
 
   const Body = (
-    <div className="grid grid-cols-1 gap-px bg-border md:grid-cols-6">
+    <div className="grid grid-cols-1 gap-px bg-border md:grid-cols-4 lg:grid-cols-8">
       <SelectField
         label="Tipologia"
         value={state.type}
         onChange={(v) => setState({ ...state, type: v })}
       >
-        <option value="">Tutte le tipologie</option>
-        {TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
+        <option value="">Tutte</option>
+        {PROPERTY_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
       </SelectField>
 
       <SelectField
@@ -100,16 +159,21 @@ export function HomeSearchBar() {
         onChange={(v) => setState({ ...state, comune: v })}
       >
         <option value="">Tutti i comuni</option>
-        {COMUNI.map((c) => <option key={c} value={c}>{c}</option>)}
+        {comuniList.map((c) => <option key={c} value={c}>{c}</option>)}
       </SelectField>
 
-      <SelectField
-        label="Prezzo"
-        value={state.price}
-        onChange={(v) => setState({ ...state, price: v })}
-      >
-        {PRICE_RANGES.map((p) => <option key={p.label} value={p.value}>{p.label}</option>)}
-      </SelectField>
+      <InputField
+        label="Prezzo da"
+        value={state.price_min}
+        placeholder="Da €"
+        onChange={(v) => setState({ ...state, price_min: sanitizePrice(v) })}
+      />
+      <InputField
+        label="Prezzo a"
+        value={state.price_max}
+        placeholder="A €"
+        onChange={(v) => setState({ ...state, price_max: sanitizePrice(v) })}
+      />
 
       <SelectField
         label="Superficie"
@@ -142,7 +206,7 @@ export function HomeSearchBar() {
         {featOpen && (
           <div className="absolute left-0 right-0 top-full z-30 mt-1 max-h-72 overflow-y-auto border border-border bg-card p-3 shadow-xl">
             <div className="grid grid-cols-1 gap-1.5">
-              {FEATURES.map((f) => (
+              {ALL_AMENITIES.map((f) => (
                 <label key={f} className="flex cursor-pointer items-center gap-2 text-sm text-foreground/85 hover:text-ink">
                   <input
                     type="checkbox"
@@ -164,7 +228,37 @@ export function HomeSearchBar() {
           </div>
         )}
       </div>
+
+      <SelectField
+        label="Ordina per"
+        value={state.sort}
+        onChange={(v) => setState({ ...state, sort: v })}
+      >
+        {SORT_OPTS.map((p) => <option key={p.value} value={p.value}>{p.label}</option>)}
+      </SelectField>
     </div>
+  );
+
+  const Chips = state.features.length > 0 && (
+    <div className="flex flex-wrap gap-2 border-t border-border bg-card px-4 py-3">
+      {state.features.map((f) => (
+        <button
+          key={f}
+          type="button"
+          onClick={() => toggleFeature(f)}
+          className="inline-flex items-center gap-1.5 rounded-full border border-border bg-muted/40 px-3 py-1 text-xs text-ink hover:border-primary/50"
+        >
+          {f}
+          <X size={12} />
+        </button>
+      ))}
+    </div>
+  );
+
+  const ErrorMsg = error && (
+    <p className="border-t border-destructive/40 bg-destructive/10 px-4 py-2 text-xs text-destructive">
+      {error}
+    </p>
   );
 
   return (
@@ -175,6 +269,8 @@ export function HomeSearchBar() {
         className="hidden overflow-hidden rounded-sm border border-border bg-card shadow-sm md:block"
       >
         {Body}
+        {Chips}
+        {ErrorMsg}
         <div className="flex items-center justify-between gap-3 border-t border-border bg-muted/30 px-4 py-3">
           <button
             type="button"
@@ -201,24 +297,26 @@ export function HomeSearchBar() {
         >
           <span className="flex items-center gap-2">
             <Search size={16} className="text-primary" />
-            Apri filtri ricerca
+            Filtra immobili
           </span>
           <ChevronDown size={14} />
         </button>
         {mobileOpen && (
           <div className="fixed inset-0 z-50 flex flex-col bg-background">
             <div className="flex items-center justify-between border-b border-border px-5 py-4">
-              <span className="eyebrow text-[0.65rem]">Filtri ricerca</span>
+              <span className="eyebrow text-[0.65rem]">Filtra immobili</span>
               <button type="button" onClick={() => setMobileOpen(false)} aria-label="Chiudi">
                 <X size={20} />
               </button>
             </div>
             <form
-              onSubmit={(e) => { e.preventDefault(); submit(); setMobileOpen(false); }}
-              className="flex-1 overflow-y-auto p-5"
+              onSubmit={(e) => { e.preventDefault(); submit(); }}
+              className="flex-1 overflow-y-auto"
             >
               {Body}
-              <div className="mt-6 flex flex-col gap-3">
+              {Chips}
+              {ErrorMsg}
+              <div className="flex flex-col gap-3 p-5">
                 <button
                   type="submit"
                   className="inline-flex items-center justify-center gap-2 rounded-sm bg-primary px-8 py-4 text-xs uppercase tracking-[0.22em] text-primary-foreground"
@@ -260,3 +358,27 @@ function SelectField({
     </label>
   );
 }
+
+function InputField({
+  label, value, onChange, placeholder,
+}: {
+  label: string; value: string; onChange: (v: string) => void; placeholder?: string;
+}) {
+  return (
+    <label className="flex flex-col gap-1 bg-card px-4 py-3 text-left">
+      <span className="eyebrow text-[0.6rem]">{label}</span>
+      <input
+        type="text"
+        inputMode="numeric"
+        pattern="[0-9]*"
+        value={value}
+        placeholder={placeholder}
+        onChange={(e) => onChange(e.target.value)}
+        className="border-0 bg-transparent p-0 text-sm text-ink placeholder:text-muted-foreground focus:outline-none focus:ring-0"
+      />
+    </label>
+  );
+}
+
+// Backward-compat alias.
+export const HomeSearchBar = PropertySearchBar;

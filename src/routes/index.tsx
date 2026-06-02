@@ -5,7 +5,7 @@ import territoryPontremoli from "@/assets/real/pontremoli-scorcio.jpg";
 import territoryBagnone from "@/assets/real/bagnone-castello.jpg";
 import territoryZeri from "@/assets/real/zeri-monte.jpg";
 import { PropertyCard } from "@/components/property-card";
-import { HomeSearchBar } from "@/components/home-search-bar";
+import { PropertySearchBar } from "@/components/property-search-bar";
 import { listPublishedProperties, type PublicProperty } from "@/lib/public-properties.functions";
 import { ArrowRight, Compass, KeyRound, Sparkles } from "lucide-react";
 import { useState } from "react";
@@ -128,7 +128,7 @@ function Index() {
           </div>
 
           <div className="mt-10">
-            <HomeSearchBar />
+            <PropertySearchBar />
           </div>
 
           <div className="mt-14 grid gap-10 md:grid-cols-3">
