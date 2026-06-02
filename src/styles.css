@@ -68,38 +68,39 @@
 
 :root {
   --radius: 0.25rem;
-  --cream: oklch(0.975 0.012 85);
-  --stone-warm: oklch(0.88 0.018 75);
-  --terracotta: oklch(0.58 0.115 38);
+  --cream: #F6F0E7;
+  --stone-warm: #EFE4D6;
+  --terracotta: #B9654A;
   --forest: oklch(0.38 0.055 145);
-  --ink: oklch(0.22 0.018 60);
+  --ink: #241711;
 
-  /* Warm editorial palette (Vivere in Lunigiana) */
-  --warm-cream: #F7F2EA;
-  --warm-sand: #F1E7DA;
+  /* Warm editorial palette (site-wide) */
+  --warm-cream: #F6F0E7;
+  --warm-sand: #EFE4D6;
   --warm-ivory: #FBF6F0;
-  --warm-border: #E6D8C8;
-  --ink-soft: #5B4C43;
+  --warm-border: #DDCDBA;
+  --ink-soft: #5F5147;
+  --terracotta-hover: #A85A41;
 
-  --background: oklch(0.975 0.012 85);
-  --foreground: oklch(0.22 0.018 60);
-  --card: oklch(0.99 0.008 85);
-  --card-foreground: oklch(0.22 0.018 60);
-  --popover: oklch(0.99 0.008 85);
-  --popover-foreground: oklch(0.22 0.018 60);
-  --primary: oklch(0.58 0.115 38);
-  --primary-foreground: oklch(0.98 0.008 85);
+  --background: #F6F0E7;
+  --foreground: #2C221D;
+  --card: #FBF6F0;
+  --card-foreground: #2C221D;
+  --popover: #FBF6F0;
+  --popover-foreground: #2C221D;
+  --primary: #B9654A;
+  --primary-foreground: #FBF6F0;
   --secondary: oklch(0.38 0.055 145);
-  --secondary-foreground: oklch(0.98 0.008 85);
-  --muted: oklch(0.93 0.012 80);
-  --muted-foreground: oklch(0.45 0.022 65);
-  --accent: oklch(0.88 0.018 75);
-  --accent-foreground: oklch(0.22 0.018 60);
+  --secondary-foreground: #FBF6F0;
+  --muted: #F2E8DC;
+  --muted-foreground: #5F5147;
+  --accent: #EFE4D6;
+  --accent-foreground: #2C221D;
   --destructive: oklch(0.55 0.20 28);
-  --destructive-foreground: oklch(0.98 0.008 85);
-  --border: oklch(0.86 0.015 75);
-  --input: oklch(0.86 0.015 75);
-  --ring: oklch(0.58 0.115 38);
+  --destructive-foreground: #FBF6F0;
+  --border: #DDCDBA;
+  --input: #DDCDBA;
+  --ring: #B9654A;
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
