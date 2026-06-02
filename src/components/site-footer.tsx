@@ -1,11 +1,16 @@
 import { Link } from "@tanstack/react-router";
+import logoAsset from "@/assets/furia-logo.png.asset.json";
 
 export function SiteFooter() {
   return (
     <footer className="mt-24 border-t border-border bg-ink text-cream">
       <div className="container-editorial grid gap-12 py-16 md:grid-cols-4">
         <div className="md:col-span-2">
-          <div className="font-serif text-3xl">Furia Immobiliare</div>
+          <img
+            src={logoAsset.url}
+            alt="Furia Immobiliare"
+            className="h-16 w-auto bg-cream/95 rounded-sm p-2"
+          />
           <p className="mt-4 max-w-md text-sm leading-relaxed text-cream/70">
             Da Pontremoli, accompagniamo chi cerca una casa di carattere in Lunigiana.
             Conosciamo i borghi, le pietre, le valli — e il loro modo di vivere.
