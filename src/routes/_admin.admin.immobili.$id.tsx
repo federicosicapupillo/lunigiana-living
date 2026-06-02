@@ -130,7 +130,7 @@ function PropertyEditor() {
     ]);
     if (e1 || !p) {
       toast.error("Immobile non trovato.");
-      navigate({ to: "/admin" });
+      navigate({ to: "/admin/immobili" });
       return;
     }
     setProp(p as Property);
@@ -192,7 +192,7 @@ function PropertyEditor() {
     const { error } = await supabase.from("properties").delete().eq("id", id);
     if (error) return toast.error(error.message);
     toast.success("Immobile eliminato");
-    navigate({ to: "/admin" });
+    navigate({ to: "/admin/immobili" });
   };
 
   const generate = async () => {
@@ -250,7 +250,7 @@ function PropertyEditor() {
       <div className="flex flex-wrap items-start justify-between gap-4 border-b border-border pb-6">
         <div className="min-w-0 flex-1">
           <Link
-            to="/admin"
+            to="/admin/immobili"
             className="inline-flex items-center gap-1 text-xs uppercase tracking-wider text-muted-foreground hover:text-ink"
           >
             <ArrowLeft size={12} /> Torna all'elenco
