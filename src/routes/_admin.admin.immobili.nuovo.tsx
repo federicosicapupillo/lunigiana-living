@@ -717,14 +717,16 @@ function SelectInput({
   value,
   onChange,
   options,
+  placeholder,
 }: {
   value: string;
   onChange: (v: string) => void;
   options: { value: string; label: string }[];
+  placeholder?: string;
 }) {
   return (
     <select value={value} onChange={(e) => onChange(e.target.value)} className={inputCls}>
-      <option value="">—</option>
+      <option value="">{placeholder ?? "—"}</option>
       {options.map((o) => (
         <option key={o.value} value={o.value}>
           {o.label}
@@ -756,5 +758,97 @@ function Toggle({
       <span>{label}</span>
       <span className={`ml-3 h-2.5 w-2.5 rounded-full ${value ? "bg-primary" : "bg-muted-foreground/30"}`} />
     </button>
+  );
+}
+
+/** Combobox ricercabile per la Provincia (sigla o nome). Salva la sigla (es. "MS"). */
+function ProvinceCombobox({
+  value,
+  onChange,
+  placeholder,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  placeholder?: string;
+}) {
+  const [open, setOpen] = useState(false);
+  const [q, setQ] = useState("");
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Mostra "MS — Massa-Carrara" se value è una sigla riconosciuta
+  const selected = PROVINCES.find((p) => p.code === value);
+  const display = selected ? `${selected.code} — ${selected.name}` : value;
+
+  useEffect(() => {
+    if (!open) setQ("");
+  }, [open]);
+
+  useEffect(() => {
+    const onDocClick = (e: MouseEvent) => {
+      if (!containerRef.current?.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("mousedown", onDocClick);
+    return () => document.removeEventListener("mousedown", onDocClick);
+  }, []);
+
+  const needle = q.trim().toLowerCase();
+  const filtered = needle
+    ? PROVINCES.filter(
+        (p) =>
+          p.code.toLowerCase().includes(needle) ||
+          p.name.toLowerCase().includes(needle),
+      ).slice(0, 80)
+    : PROVINCES;
+
+  return (
+    <div ref={containerRef} className="relative">
+      <input
+        type="text"
+        value={open ? q : display}
+        onChange={(e) => {
+          setQ(e.target.value);
+          setOpen(true);
+        }}
+        onFocus={() => setOpen(true)}
+        placeholder={placeholder ?? "Cerca provincia"}
+        className={inputCls}
+        aria-autocomplete="list"
+        aria-expanded={open}
+      />
+      {open && (
+        <ul
+          role="listbox"
+          className="absolute z-30 mt-1 max-h-64 w-full overflow-auto rounded-sm border border-border bg-card shadow-md"
+        >
+          {filtered.length === 0 ? (
+            <li className="px-3 py-2 text-xs text-muted-foreground">Nessun risultato</li>
+          ) : (
+            filtered.map((p) => {
+              const active = p.code === value;
+              return (
+                <li key={p.code}>
+                  <button
+                    type="button"
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      onChange(p.code);
+                      setOpen(false);
+                    }}
+                    className={`flex w-full items-center justify-between px-3 py-1.5 text-left text-sm transition hover:bg-muted ${
+                      active ? "bg-primary/5 text-ink" : "text-foreground"
+                    }`}
+                  >
+                    <span>{p.name}</span>
+                    <span className="text-xs uppercase tracking-wider text-muted-foreground">
+                      {p.code}
+                    </span>
+                  </button>
+                </li>
+              );
+            })
+          )}
+        </ul>
+      )}
+    </div>
   );
 }
