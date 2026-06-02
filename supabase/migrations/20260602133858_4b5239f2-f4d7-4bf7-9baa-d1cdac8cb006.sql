@@ -1,0 +1,1 @@
+REVOKE ALL ON FUNCTION public.assign_property_reference() FROM PUBLIC, anon, authenticated;
