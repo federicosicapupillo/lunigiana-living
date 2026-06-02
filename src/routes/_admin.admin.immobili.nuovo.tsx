@@ -248,7 +248,7 @@ function NewPropertyPage() {
   };
   const onSaveBack = async () => {
     const id = await persist();
-    if (id) navigate({ to: "/admin" });
+    if (id) navigate({ to: "/admin/immobili" });
   };
   const onPublish = async () => {
     const id = await persist("published");
@@ -260,7 +260,7 @@ function NewPropertyPage() {
       {/* Sticky header */}
       <div className="sticky top-0 z-10 -mx-6 mb-8 border-b border-border bg-background/95 px-6 pb-5 pt-4 backdrop-blur">
         <Link
-          to="/admin"
+          to="/admin/immobili"
           className="inline-flex items-center gap-1 text-xs uppercase tracking-wider text-muted-foreground hover:text-ink"
         >
           <ArrowLeft size={12} /> Torna all'elenco

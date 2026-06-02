@@ -250,7 +250,7 @@ function PropertyEditor() {
       <div className="flex flex-wrap items-start justify-between gap-4 border-b border-border pb-6">
         <div className="min-w-0 flex-1">
           <Link
-            to="/admin"
+            to="/admin/immobili"
             className="inline-flex items-center gap-1 text-xs uppercase tracking-wider text-muted-foreground hover:text-ink"
           >
             <ArrowLeft size={12} /> Torna all'elenco
