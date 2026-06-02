@@ -60,39 +60,41 @@ function PropertyDetail() {
   return (
     <article className="pb-24">
       {/* Header */}
-      <header className="border-b border-border bg-muted/40 pb-10 pt-28 md:pt-36">
+      <header className="border-b border-border bg-muted/40 pb-8 pt-24 sm:pb-10 sm:pt-28 md:pt-36">
         <div className="container-editorial">
           <Link to="/immobili" className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-muted-foreground hover:text-ink">
             <ArrowLeft size={14} /> Torna agli immobili
           </Link>
-          <div className="mt-6 flex flex-wrap items-end justify-between gap-6">
-            <div>
+          <div className="mt-6 flex flex-wrap items-end justify-between gap-4 sm:gap-6">
+            <div className="min-w-0 flex-1">
               <span className="eyebrow">{p.reference} · {p.type}</span>
-              <h1 className="mt-3 font-serif text-4xl text-ink md:text-5xl">{p.title}</h1>
+              <h1 className="mt-3 font-serif text-3xl leading-tight text-ink sm:text-4xl md:text-5xl">{p.title}</h1>
               <div className="mt-3 flex items-center gap-2 text-sm text-muted-foreground">
                 <MapPin size={15} /> {p.location}
               </div>
             </div>
             <div className="text-right">
               <div className="eyebrow text-muted-foreground">{p.category === "affitto" ? "Affitto" : "Prezzo"}</div>
-              <div className="mt-2 font-serif text-3xl text-primary md:text-4xl">{p.price}</div>
+              <div className="mt-2 font-serif text-2xl text-primary sm:text-3xl md:text-4xl">{p.price}</div>
             </div>
           </div>
         </div>
       </header>
 
       {/* Gallery */}
-      <section className="container-editorial mt-10">
+      <section className="container-editorial mt-8 sm:mt-10">
         <div className="overflow-hidden rounded-sm bg-muted">
           <WatermarkedImage
             src={main}
             alt={p.title}
+            fetchPriority="high"
+            sizes="(max-width: 1024px) 100vw, 70vw"
             watermarkSize="lg"
-            className="aspect-[16/10] w-full object-cover"
+            className="aspect-[4/3] w-full object-cover sm:aspect-[16/10]"
           />
         </div>
         {p.gallery.length > 1 && (
-          <div className="mt-3 grid grid-cols-4 gap-3 md:grid-cols-8">
+          <div className="mt-3 grid grid-cols-4 gap-2 sm:gap-3 md:grid-cols-8">
             {p.gallery.map((g: string, i: number) => (
               <button
                 key={g + i}
@@ -101,7 +103,7 @@ function PropertyDetail() {
                   i === active ? "ring-2 ring-primary" : "opacity-75 hover:opacity-100"
                 }`}
               >
-                <WatermarkedImage src={g} alt="" loading="lazy" watermarkSize="sm" className="h-full w-full object-cover" />
+                <WatermarkedImage src={g} alt="" loading="lazy" sizes="120px" watermark={false} className="h-full w-full object-cover" />
               </button>
             ))}
           </div>
@@ -111,10 +113,10 @@ function PropertyDetail() {
       </section>
 
       {/* Body */}
-      <section className="container-editorial mt-16 grid gap-16 md:grid-cols-12">
+      <section className="container-editorial mt-12 grid gap-12 sm:mt-16 sm:gap-16 md:grid-cols-12">
         <div className="md:col-span-7">
           <span className="eyebrow">Descrizione</span>
-          <h2 className="mt-3 font-serif text-3xl text-ink">L'immobile</h2>
+          <h2 className="mt-3 font-serif text-2xl text-ink sm:text-3xl">L'immobile</h2>
           <p className="mt-6 whitespace-pre-line text-base leading-relaxed text-foreground/85">
             {p.description || "Descrizione disponibile in agenzia."}
           </p>
