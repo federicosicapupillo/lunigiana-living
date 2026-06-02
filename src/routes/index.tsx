@@ -1,6 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
-import heroImg from "@/assets/real/hero-bagnone.jpg";
+import { useState } from "react";
+import heroPanoramico from "@/assets/real/hero-pontremoli-castello.jpg";
+import heroIntimo from "@/assets/real/hero-centro-storico.jpg";
 import territoryPontremoli from "@/assets/real/pontremoli-scorcio.jpg";
 import territoryBagnone from "@/assets/real/bagnone-castello.jpg";
 import territoryZeri from "@/assets/real/zeri-monte.jpg";
@@ -24,16 +26,23 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
+  const [heroVariant, setHeroVariant] = useState<"panoramico" | "intimo">("panoramico");
+  const isPanoramico = heroVariant === "panoramico";
+  const heroSrc = isPanoramico ? heroPanoramico : heroIntimo;
+  const heroAlt = isPanoramico
+    ? "Pontremoli e il castello del Piagnaro al tramonto, panorama sulla Lunigiana"
+    : "Scorcio intimo del centro storico di Pontremoli con ponte sul fiume Magra";
   return (
     <>
       {/* HERO */}
       <section className="relative isolate -mt-20 flex min-h-[100svh] items-end overflow-hidden">
         <img
-          src={heroImg}
-          alt="Borgo della Lunigiana al tramonto"
+          key={heroVariant}
+          src={heroSrc}
+          alt={heroAlt}
           width={1920}
-          height={1280}
-          className="absolute inset-0 -z-10 h-full w-full object-cover"
+          height={1080}
+          className="absolute inset-0 -z-10 h-full w-full object-cover animate-in fade-in duration-700"
         />
         <div className="hero-gradient absolute inset-0 -z-10" />
 
@@ -53,6 +62,34 @@ function Index() {
 
           <div className="mt-10">
             <PropertySearch />
+          </div>
+
+          {/* Variant switcher */}
+          <div className="mt-8 flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setHeroVariant("panoramico")}
+              aria-pressed={isPanoramico}
+              className={`rounded-full border px-4 py-2 text-xs uppercase tracking-[0.18em] transition ${
+                isPanoramico
+                  ? "border-cream bg-cream/95 text-ink"
+                  : "border-cream/40 text-cream/85 hover:border-cream/80"
+              }`}
+            >
+              Panorama · Castello
+            </button>
+            <button
+              type="button"
+              onClick={() => setHeroVariant("intimo")}
+              aria-pressed={!isPanoramico}
+              className={`rounded-full border px-4 py-2 text-xs uppercase tracking-[0.18em] transition ${
+                !isPanoramico
+                  ? "border-cream bg-cream/95 text-ink"
+                  : "border-cream/40 text-cream/85 hover:border-cream/80"
+              }`}
+            >
+              Centro storico
+            </button>
           </div>
         </div>
       </section>
