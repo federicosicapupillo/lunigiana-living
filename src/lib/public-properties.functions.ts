@@ -120,7 +120,7 @@ function adapt(
   const attrs: Record<string, string> = {};
   const amenities: string[] = [];
   let altre: string | null = null;
-  const multiKeys = new Set(MULTI_SELECT_FIELDS.map((m) => m.key));
+  const multiKeys: Set<string> = new Set(MULTI_SELECT_FIELDS.map((m) => m.key));
   const multiRaw: Record<string, string> = {};
   for (const f of features) {
     if (!f.feature_value) continue;
@@ -176,6 +176,7 @@ function adapt(
     attributes: attrs,
     amenities,
     altreDotazioni: altre,
+    highlights,
     category: deriveCategory(p.contract_type),
     featured: false,
     tag: buildTag(p),
