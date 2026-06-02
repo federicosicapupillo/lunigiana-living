@@ -1,12 +1,12 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { getPropertyById } from "@/lib/properties";
+import { getPublishedProperty, type PublicProperty } from "@/lib/public-properties.functions";
 import { ArrowLeft, MapPin, Maximize2, BedDouble, Bath, Building2 } from "lucide-react";
 import { useState } from "react";
 import { VirtualStaging } from "@/components/virtual-staging";
 
 export const Route = createFileRoute("/immobili/$id")({
-  loader: ({ params }) => {
-    const property = getPropertyById(params.id);
+  loader: async ({ params }) => {
+    const { property } = await getPublishedProperty({ data: { id: params.id } });
     if (!property) throw notFound();
     return { property };
   },
@@ -52,7 +52,7 @@ const DETAIL_KEYS = [
 ];
 
 function PropertyDetail() {
-  const { property: p } = Route.useLoaderData();
+  const { property: p } = Route.useLoaderData() as { property: PublicProperty };
   const [active, setActive] = useState(0);
   const main = p.gallery[active] || p.image;
 
