@@ -141,43 +141,58 @@ function Index() {
 
       {/* WHY LUNIGIANA */}
       <section className="container-editorial py-24 md:py-32">
-        <div className="grid gap-16 md:grid-cols-12">
-          <div className="md:col-span-5">
+        <div className="grid gap-12 md:grid-cols-12 md:items-center">
+          <div className="md:col-span-8 lg:col-span-7">
             <span className="eyebrow">Vivere in Lunigiana</span>
             <h2 className="mt-4 font-serif text-4xl leading-tight text-ink md:text-5xl">
               Una terra che<br />si misura in passi,<br />non in orari.
             </h2>
-            <p className="mt-6 text-base leading-relaxed text-foreground/80">
+            <p className="mt-6 max-w-xl text-base leading-relaxed text-foreground/80">
               Borghi medievali, castelli sulle colline, pievi romaniche, cammini
               storici, boschi di castagno e una cucina che racconta secoli di
               passaggi. La Lunigiana è una scelta di vita, prima ancora che una
               destinazione.
             </p>
-            <Link
-              to="/territori"
+            <button
+              type="button"
+              onClick={() => setOpen(true)}
               className="mt-8 inline-flex items-center gap-2 rounded-sm bg-ink px-6 py-3.5 text-xs uppercase tracking-[0.2em] text-cream transition hover:bg-ink/90"
             >
               Esplora il territorio <ArrowRight size={14} />
-            </Link>
-          </div>
-
-          <div className="grid gap-6 md:col-span-7 md:grid-cols-2">
-            <figure className="overflow-hidden rounded-sm md:translate-y-12">
-              <img src={territoryBagnone} alt="Castello di Bagnone" loading="lazy"
-                className="aspect-[3/4] w-full object-cover" />
-              <figcaption className="mt-3 font-serif italic text-foreground/70">
-                Il castello di Bagnone tra le nebbie del mattino.
-              </figcaption>
-            </figure>
-            <figure className="overflow-hidden rounded-sm">
-              <img src={lifestyleFood} alt="Cucina di Lunigiana" loading="lazy"
-                className="aspect-[3/4] w-full object-cover" />
-              <figcaption className="mt-3 font-serif italic text-foreground/70">
-                Testaroli, olio nuovo, pane di castagne.
-              </figcaption>
-            </figure>
+            </button>
           </div>
         </div>
+
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogContent className="border-none bg-cream text-ink sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle className="font-serif text-2xl">Stai lasciando Furia Immobiliare</DialogTitle>
+              <DialogDescription className="mt-2 text-foreground/80">
+                Stai per visitare un sito esterno dedicato al territorio e agli itinerari della Lunigiana. Vuoi continuare?
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter className="mt-6 flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+              <DialogClose asChild>
+                <button
+                  type="button"
+                  className="inline-flex items-center justify-center gap-2 rounded-sm border border-ink px-6 py-3 text-xs uppercase tracking-[0.2em] text-ink transition hover:bg-ink hover:text-cream"
+                >
+                  Annulla
+                </button>
+              </DialogClose>
+              <button
+                type="button"
+                onClick={() => {
+                  window.open("https://www.sigeric.it/", "_blank", "noopener,noreferrer");
+                  setOpen(false);
+                }}
+                className="inline-flex items-center justify-center gap-2 rounded-sm bg-ink px-6 py-3 text-xs uppercase tracking-[0.2em] text-cream transition hover:bg-ink/90"
+              >
+                Continua
+              </button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </section>
 
       {/* TERRITORIES STRIP */}
