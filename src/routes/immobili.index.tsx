@@ -1,15 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useNavigate } from "@tanstack/react-router";
 import { zodValidator, fallback } from "@tanstack/zod-adapter";
 import { z } from "zod";
 import { PropertyCard } from "@/components/property-card";
 import { PropertySearchBar } from "@/components/property-search-bar";
 import { listPublishedProperties, type PublicProperty } from "@/lib/public-properties.functions";
-import { useMemo, useState } from "react";
-
-type PropertyCategory = PublicProperty["category"];
+import { useMemo } from "react";
 
 const searchSchema = z.object({
+  contract: fallback(z.string(), "").default(""),
+  featured: fallback(z.string(), "").default(""),
   type: fallback(z.string(), "").default(""),
   comune: fallback(z.string(), "").default(""),
   price_min: fallback(z.string(), "").default(""),
@@ -45,23 +44,13 @@ export const Route = createFileRoute("/immobili/")({
   component: ImmobiliPage,
 });
 
-const CATEGORIES: { id: PropertyCategory | "tutti"; label: string }[] = [
-  { id: "tutti", label: "Tutti" },
-  { id: "vendita", label: "Vendite" },
-  { id: "affitto", label: "Affitti" },
-  { id: "scelti-per-voi", label: "Scelti per voi" },
-];
-
 function ImmobiliPage() {
   const { properties: allProperties } = Route.useLoaderData() as { properties: PublicProperty[] };
   const urlSearch = Route.useSearch();
-  const navigate = useNavigate({ from: "/immobili" });
   const uniqueLocations = useMemo(
     () => Array.from(new Set(allProperties.map((p) => p.location).filter(Boolean))).sort(),
     [allProperties],
   );
-  const [category, setCategory] = useState<PropertyCategory | "tutti">("tutti");
-  const [location, setLocation] = useState<string>("tutte");
 
   const sort = urlSearch.sort || "recent";
 
@@ -77,21 +66,16 @@ function ImmobiliPage() {
     ? urlSearch.features.split(",").map((s: string) => s.trim().toLowerCase()).filter(Boolean)
     : [];
 
-  const hasUrlFilters = !!(
-    urlSearch.type || urlSearch.comune || urlSearch.price_min || urlSearch.price_max ||
-    urlSearch.size || urlSearch.rooms || urlSearch.features || urlSearch.sort
-  );
-
-  const clearUrlFilters = () => {
-    navigate({ search: {} });
-  };
-
   const filtered = useMemo(() => {
     let list = allProperties;
-    if (category !== "tutti") list = list.filter((p) => p.category === category);
-    if (location !== "tutte") list = list.filter((p) => p.location === location);
 
-    // URL-based filters from home search
+    if (urlSearch.contract === "vendita" || urlSearch.contract === "affitto") {
+      list = list.filter((p) => p.category === urlSearch.contract);
+    }
+    if (urlSearch.featured === "1") {
+      list = list.filter((p) => p.featured);
+    }
+
     if (urlSearch.type) {
       const t = urlSearch.type.toLowerCase();
       list = list.filter((p) => (p.type || "").toLowerCase().includes(t));
@@ -143,7 +127,7 @@ function ImmobiliPage() {
     if (sort === "size-asc") sorted.sort((a, b) => (a.sqm ?? Infinity) - (b.sqm ?? Infinity));
     if (sort === "size-desc") sorted.sort((a, b) => (b.sqm ?? -1) - (a.sqm ?? -1));
     return sorted;
-  }, [allProperties, category, location, sort, urlSearch.type, urlSearch.comune, urlSearch.price_min, urlSearch.price_max, urlSearch.size, urlSearch.rooms, urlSearch.features]);
+  }, [allProperties, sort, urlSearch.contract, urlSearch.featured, urlSearch.type, urlSearch.comune, urlSearch.price_min, urlSearch.price_max, urlSearch.size, urlSearch.rooms, urlSearch.features]);
 
   return (
     <>
@@ -162,6 +146,8 @@ function ImmobiliPage() {
             <PropertySearchBar
               comuni={uniqueLocations}
               initial={{
+                contract: (urlSearch.contract === "vendita" || urlSearch.contract === "affitto") ? urlSearch.contract : "",
+                featured: urlSearch.featured === "1",
                 type: urlSearch.type,
                 comune: urlSearch.comune,
                 price_min: urlSearch.price_min,
@@ -172,45 +158,6 @@ function ImmobiliPage() {
                 sort: urlSearch.sort || "recent",
               }}
             />
-          </div>
-
-          <div className="mt-10 flex flex-wrap items-center gap-x-8 gap-y-4">
-            <div className="flex flex-wrap gap-2">
-              {CATEGORIES.map((c) => (
-                <button
-                  key={c.id}
-                  onClick={() => setCategory(c.id)}
-                  className={`rounded-sm border px-4 py-2 text-xs uppercase tracking-[0.18em] transition ${
-                    category === c.id
-                      ? "border-primary bg-primary text-primary-foreground"
-                      : "border-border bg-card text-foreground hover:border-primary/50"
-                  }`}
-                >
-                  {c.label}
-                </button>
-              ))}
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="eyebrow text-[0.6rem]">Comune</span>
-              <select
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                className="rounded-sm border border-border bg-card px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary"
-              >
-                <option value="tutte">Tutti i comuni</option>
-                {uniqueLocations.map((l: string) => (
-                  <option key={l} value={l}>{l}</option>
-                ))}
-              </select>
-            </div>
-            {hasUrlFilters && (
-              <button
-                onClick={clearUrlFilters}
-                className="rounded-sm border border-border bg-card px-3 py-2 text-xs uppercase tracking-[0.18em] text-muted-foreground hover:text-ink"
-              >
-                Rimuovi filtri ricerca
-              </button>
-            )}
           </div>
         </div>
       </section>

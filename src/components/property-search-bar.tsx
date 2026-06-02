@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useNavigate } from "@tanstack/react-router";
-import { Search, X, ChevronDown } from "lucide-react";
-import { PROPERTY_TYPES, ALL_AMENITIES } from "@/lib/admin/property-constants";
+import { Search, X, ChevronDown, Star } from "lucide-react";
+import { PROPERTY_TYPES } from "@/lib/admin/property-constants";
 
 const COMUNI_FALLBACK = [
   "Pontremoli","Bagnone","Villafranca in Lunigiana","Mulazzo","Filattiera",
@@ -35,7 +36,52 @@ const SORT_OPTS = [
   { label: "Superficie decrescente", value: "size-desc" },
 ];
 
+const FEATURE_GROUPS: { label: string; items: string[] }[] = [
+  {
+    label: "Esterni",
+    items: [
+      "Giardino","Giardino privato","Corte privata","Terreno","Uliveto","Vigneto","Bosco",
+      "Terrazza","Terrazza panoramica","Balcone","Loggia","Portico","Patio","Veranda",
+      "Piscina","Possibilità piscina","Vista panoramica","Vista montagne","Vista mare",
+      "Vista borgo","Vista fiume",
+    ],
+  },
+  {
+    label: "Pertinenze",
+    items: [
+      "Garage","Posto auto","Posto auto coperto","Cantina","Taverna","Soffitta","Mansarda",
+      "Deposito","Legnaia","Fienile","Annesso agricolo","Dependence","Locale tecnico",
+    ],
+  },
+  {
+    label: "Comfort e impianti",
+    items: [
+      "Camino","Stufa","Aria condizionata","Pannelli solari","Fotovoltaico","Impianto allarme",
+      "Videosorveglianza","Domotica","Internet / fibra","Cancello automatico","Doppi vetri",
+      "Zanzariere","Porta blindata",
+    ],
+  },
+  {
+    label: "Accessibilità",
+    items: [
+      "Ascensore","Accesso disabili","Ingresso indipendente","Strada privata",
+      "Facile accesso auto","Vicino ai servizi","Vicino al centro","Posizione riservata",
+    ],
+  },
+  {
+    label: "Caratteristiche speciali",
+    items: [
+      "Immobile storico","Casale in pietra","Rustico","Travature a vista","Pavimenti originali",
+      "Soffitti affrescati","Torretta","Mura storiche","Ideale per B&B","Ideale per agriturismo",
+      "Ideale come seconda casa","Ideale per investimento","Proprietà divisibile",
+      "Possibilità ampliamento","Possibilità cambio destinazione d'uso",
+    ],
+  },
+];
+
 export type SearchValues = {
+  contract: "" | "vendita" | "affitto";
+  featured: boolean;
   type: string;
   comune: string;
   price_min: string;
@@ -47,6 +93,7 @@ export type SearchValues = {
 };
 
 const EMPTY: SearchValues = {
+  contract: "", featured: false,
   type: "", comune: "", price_min: "", price_max: "",
   size: "", rooms: "", features: [], sort: "recent",
 };
@@ -77,15 +124,40 @@ export function PropertySearchBar({
   const [featOpen, setFeatOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const featTriggerRef = useRef<HTMLButtonElement>(null);
+  const [featCoords, setFeatCoords] = useState<{ top: number; left: number; width: number } | null>(null);
 
   // Sync when URL-controlled `initial` changes (e.g. user clicks reset on parent).
   useEffect(() => {
     setState({ ...EMPTY, ...initial });
   }, [
+    initial?.contract, initial?.featured,
     initial?.type, initial?.comune, initial?.price_min, initial?.price_max,
     initial?.size, initial?.rooms, initial?.sort,
     (initial?.features ?? []).join(","),
   ]);
+
+  useLayoutEffect(() => {
+    if (!featOpen) return;
+    const update = () => {
+      const el = featTriggerRef.current;
+      if (!el) return;
+      const r = el.getBoundingClientRect();
+      const width = Math.max(r.width, 380);
+      const left = Math.min(
+        r.left + window.scrollX,
+        window.scrollX + window.innerWidth - width - 12,
+      );
+      setFeatCoords({ top: r.bottom + window.scrollY + 6, left, width });
+    };
+    update();
+    window.addEventListener("resize", update);
+    window.addEventListener("scroll", update, true);
+    return () => {
+      window.removeEventListener("resize", update);
+      window.removeEventListener("scroll", update, true);
+    };
+  }, [featOpen]);
 
   const comuniList = comuni && comuni.length ? comuni : COMUNI_FALLBACK;
 
@@ -110,6 +182,8 @@ export function PropertySearchBar({
 
   const buildSearch = (s: SearchValues): Record<string, string> => {
     const out: Record<string, string> = {};
+    if (s.contract) out.contract = s.contract;
+    if (s.featured) out.featured = "1";
     if (s.type) out.type = s.type;
     if (s.comune) out.comune = s.comune;
     if (s.price_min) out.price_min = s.price_min;
@@ -138,110 +212,99 @@ export function PropertySearchBar({
     onReset?.();
   };
 
-  const featLabel = state.features.length
-    ? `${state.features.length} selezionate`
-    : "Tutte";
+  const featCount = state.features.length;
+  const featLabel = featCount ? `${featCount} selezionate` : "Tutte";
 
-  const Body = (
-    <div className="grid grid-cols-1 gap-px bg-border md:grid-cols-4 lg:grid-cols-8">
-      <SelectField
-        label="Tipologia"
-        value={state.type}
-        onChange={(v) => setState({ ...state, type: v })}
-      >
+  const ContractTabs = (
+    <div className="inline-flex flex-wrap gap-1 rounded-sm border border-border bg-card p-1">
+      {([
+        { id: "", label: "Tutti" },
+        { id: "vendita", label: "Vendita" },
+        { id: "affitto", label: "Affitto" },
+      ] as const).map((t) => {
+        const active = state.contract === t.id;
+        return (
+          <button
+            key={t.id || "all"}
+            type="button"
+            onClick={() => setState({ ...state, contract: t.id })}
+            className={`rounded-sm px-5 py-2 text-xs uppercase tracking-[0.18em] transition ${
+              active
+                ? "bg-primary text-primary-foreground"
+                : "bg-transparent text-muted-foreground hover:text-ink"
+            }`}
+          >
+            {t.label}
+          </button>
+        );
+      })}
+    </div>
+  );
+
+  const FeaturedToggle = (
+    <button
+      type="button"
+      onClick={() => setState({ ...state, featured: !state.featured })}
+      className={`inline-flex items-center gap-2 rounded-sm border px-4 py-2 text-xs uppercase tracking-[0.18em] transition ${
+        state.featured
+          ? "border-primary bg-primary/10 text-primary"
+          : "border-border bg-card text-muted-foreground hover:text-ink"
+      }`}
+      aria-pressed={state.featured}
+    >
+      <Star size={13} className={state.featured ? "fill-primary" : ""} />
+      Solo scelti per voi
+    </button>
+  );
+
+  const Fields = (
+    <div className="grid grid-cols-1 gap-px bg-border sm:grid-cols-2 lg:grid-cols-4">
+      <SelectField label="Tipologia" value={state.type} onChange={(v) => setState({ ...state, type: v })}>
         <option value="">Tutte</option>
         {PROPERTY_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
       </SelectField>
-
-      <SelectField
-        label="Comune"
-        value={state.comune}
-        onChange={(v) => setState({ ...state, comune: v })}
-      >
+      <SelectField label="Comune" value={state.comune} onChange={(v) => setState({ ...state, comune: v })}>
         <option value="">Tutti i comuni</option>
         {comuniList.map((c) => <option key={c} value={c}>{c}</option>)}
       </SelectField>
+      <InputField label="Prezzo da" value={state.price_min} placeholder="Da €"
+        onChange={(v) => setState({ ...state, price_min: sanitizePrice(v) })} />
+      <InputField label="Prezzo a" value={state.price_max} placeholder="A €"
+        onChange={(v) => setState({ ...state, price_max: sanitizePrice(v) })} />
 
-      <InputField
-        label="Prezzo da"
-        value={state.price_min}
-        placeholder="Da €"
-        onChange={(v) => setState({ ...state, price_min: sanitizePrice(v) })}
-      />
-      <InputField
-        label="Prezzo a"
-        value={state.price_max}
-        placeholder="A €"
-        onChange={(v) => setState({ ...state, price_max: sanitizePrice(v) })}
-      />
-
-      <SelectField
-        label="Superficie"
-        value={state.size}
-        onChange={(v) => setState({ ...state, size: v })}
-      >
+      <SelectField label="Superficie" value={state.size} onChange={(v) => setState({ ...state, size: v })}>
         {SIZE_RANGES.map((p) => <option key={p.label} value={p.value}>{p.label}</option>)}
       </SelectField>
-
-      <SelectField
-        label="Camere"
-        value={state.rooms}
-        onChange={(v) => setState({ ...state, rooms: v })}
-      >
+      <SelectField label="Camere" value={state.rooms} onChange={(v) => setState({ ...state, rooms: v })}>
         {ROOM_OPTS.map((p) => <option key={p.label} value={p.value}>{p.label}</option>)}
       </SelectField>
 
-      <div className="relative flex flex-col gap-1 bg-card px-4 py-3 text-left">
+      <div className="flex min-w-0 flex-col gap-1 bg-card px-4 py-3 text-left">
         <span className="eyebrow text-[0.6rem]">Caratteristiche</span>
         <button
+          ref={featTriggerRef}
           type="button"
           onClick={() => setFeatOpen((o) => !o)}
-          className="flex items-center justify-between bg-transparent text-sm text-ink focus:outline-none"
+          className="flex w-full items-center justify-between gap-2 bg-transparent text-sm text-ink focus:outline-none"
         >
-          <span className={state.features.length ? "text-ink" : "text-muted-foreground"}>
+          <span className={`truncate ${featCount ? "text-ink" : "text-muted-foreground"}`}>
             {featLabel}
           </span>
-          <ChevronDown size={14} className={`transition ${featOpen ? "rotate-180" : ""}`} />
+          <ChevronDown size={14} className={`shrink-0 transition ${featOpen ? "rotate-180" : ""}`} />
         </button>
-        {featOpen && (
-          <div className="absolute left-0 right-0 top-full z-30 mt-1 max-h-72 overflow-y-auto border border-border bg-card p-3 shadow-xl">
-            <div className="grid grid-cols-1 gap-1.5">
-              {ALL_AMENITIES.map((f) => (
-                <label key={f} className="flex cursor-pointer items-center gap-2 text-sm text-foreground/85 hover:text-ink">
-                  <input
-                    type="checkbox"
-                    checked={state.features.includes(f)}
-                    onChange={() => toggleFeature(f)}
-                    className="h-3.5 w-3.5 accent-primary"
-                  />
-                  {f}
-                </label>
-              ))}
-            </div>
-            <button
-              type="button"
-              onClick={() => setFeatOpen(false)}
-              className="mt-3 w-full rounded-sm bg-ink py-2 text-xs uppercase tracking-[0.18em] text-cream"
-            >
-              Conferma
-            </button>
-          </div>
-        )}
       </div>
 
-      <SelectField
-        label="Ordina per"
-        value={state.sort}
-        onChange={(v) => setState({ ...state, sort: v })}
-      >
+      <SelectField label="Ordina per" value={state.sort} onChange={(v) => setState({ ...state, sort: v })}>
         {SORT_OPTS.map((p) => <option key={p.value} value={p.value}>{p.label}</option>)}
       </SelectField>
     </div>
   );
 
+  const visibleChips = state.features.slice(0, 3);
+  const remainingChips = state.features.length - visibleChips.length;
   const Chips = state.features.length > 0 && (
-    <div className="flex flex-wrap gap-2 border-t border-border bg-card px-4 py-3">
-      {state.features.map((f) => (
+    <div className="flex flex-wrap items-center gap-2 border-t border-border bg-card px-4 py-3">
+      {visibleChips.map((f) => (
         <button
           key={f}
           type="button"
@@ -252,6 +315,15 @@ export function PropertySearchBar({
           <X size={12} />
         </button>
       ))}
+      {remainingChips > 0 && (
+        <button
+          type="button"
+          onClick={() => setFeatOpen(true)}
+          className="rounded-full border border-border bg-muted/40 px-3 py-1 text-xs text-muted-foreground hover:text-ink"
+        >
+          + altre {remainingChips}
+        </button>
+      )}
     </div>
   );
 
@@ -261,32 +333,92 @@ export function PropertySearchBar({
     </p>
   );
 
+  const FeaturesPortal = featOpen && featCoords && typeof document !== "undefined"
+    ? createPortal(
+        <>
+          <div
+            className="fixed inset-0 z-[80]"
+            onClick={() => setFeatOpen(false)}
+            aria-hidden
+          />
+          <div
+            className="absolute z-[81] max-h-[60vh] overflow-y-auto rounded-sm border border-border bg-card p-4 shadow-2xl"
+            style={{ top: featCoords.top, left: featCoords.left, width: featCoords.width }}
+          >
+            <div className="space-y-4">
+              {FEATURE_GROUPS.map((g) => (
+                <div key={g.label}>
+                  <p className="eyebrow text-[0.6rem] text-primary">{g.label}</p>
+                  <div className="mt-2 grid grid-cols-1 gap-1.5 sm:grid-cols-2">
+                    {g.items.map((f) => (
+                      <label key={f} className="flex cursor-pointer items-center gap-2 text-sm text-foreground/85 hover:text-ink">
+                        <input
+                          type="checkbox"
+                          checked={state.features.includes(f)}
+                          onChange={() => toggleFeature(f)}
+                          className="h-3.5 w-3.5 accent-primary"
+                        />
+                        <span className="leading-tight">{f}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="sticky bottom-0 mt-4 flex items-center justify-between gap-3 border-t border-border bg-card pt-3">
+              <button
+                type="button"
+                onClick={() => setState({ ...state, features: [] })}
+                className="text-xs uppercase tracking-[0.18em] text-muted-foreground hover:text-ink"
+              >
+                Pulisci
+              </button>
+              <button
+                type="button"
+                onClick={() => setFeatOpen(false)}
+                className="rounded-sm bg-ink px-5 py-2 text-xs uppercase tracking-[0.18em] text-cream"
+              >
+                Conferma
+              </button>
+            </div>
+          </div>
+        </>,
+        document.body,
+      )
+    : null;
+
   return (
     <div className="w-full">
       {/* Desktop / tablet */}
-      <form
-        onSubmit={(e) => { e.preventDefault(); submit(); }}
-        className="hidden overflow-hidden rounded-sm border border-border bg-card shadow-sm md:block"
-      >
-        {Body}
-        {Chips}
-        {ErrorMsg}
-        <div className="flex items-center justify-between gap-3 border-t border-border bg-muted/30 px-4 py-3">
-          <button
-            type="button"
-            onClick={reset}
-            className="text-xs uppercase tracking-[0.18em] text-muted-foreground hover:text-ink"
-          >
-            Reset filtri
-          </button>
-          <button
-            type="submit"
-            className="inline-flex items-center gap-2 rounded-sm bg-primary px-8 py-3 text-xs uppercase tracking-[0.22em] text-primary-foreground transition hover:bg-primary/90"
-          >
-            <Search size={14} /> Cerca
-          </button>
+      <div className="hidden md:block">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+          {ContractTabs}
+          {FeaturedToggle}
         </div>
-      </form>
+        <form
+          onSubmit={(e) => { e.preventDefault(); submit(); }}
+          className="overflow-visible rounded-sm border border-border bg-card shadow-sm"
+        >
+          {Fields}
+          {Chips}
+          {ErrorMsg}
+          <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border bg-muted/30 px-4 py-3">
+            <button
+              type="button"
+              onClick={reset}
+              className="text-xs uppercase tracking-[0.18em] text-muted-foreground hover:text-ink"
+            >
+              Reset filtri
+            </button>
+            <button
+              type="submit"
+              className="inline-flex items-center gap-2 rounded-sm bg-primary px-8 py-3 text-xs uppercase tracking-[0.22em] text-primary-foreground transition hover:bg-primary/90"
+            >
+              <Search size={14} /> Cerca
+            </button>
+          </div>
+        </form>
+      </div>
 
       {/* Mobile */}
       <div className="md:hidden">
@@ -302,7 +434,7 @@ export function PropertySearchBar({
           <ChevronDown size={14} />
         </button>
         {mobileOpen && (
-          <div className="fixed inset-0 z-50 flex flex-col bg-background">
+          <div className="fixed inset-0 z-[70] flex flex-col bg-background">
             <div className="flex items-center justify-between border-b border-border px-5 py-4">
               <span className="eyebrow text-[0.65rem]">Filtra immobili</span>
               <button type="button" onClick={() => setMobileOpen(false)} aria-label="Chiudi">
@@ -313,7 +445,11 @@ export function PropertySearchBar({
               onSubmit={(e) => { e.preventDefault(); submit(); }}
               className="flex-1 overflow-y-auto"
             >
-              {Body}
+              <div className="space-y-3 p-5">
+                {ContractTabs}
+                {FeaturedToggle}
+              </div>
+              {Fields}
               {Chips}
               {ErrorMsg}
               <div className="flex flex-col gap-3 p-5">
@@ -335,6 +471,8 @@ export function PropertySearchBar({
           </div>
         )}
       </div>
+
+      {FeaturesPortal}
     </div>
   );
 }
@@ -346,12 +484,12 @@ function SelectField({
   children: React.ReactNode;
 }) {
   return (
-    <label className="flex flex-col gap-1 bg-card px-4 py-3 text-left">
+    <label className="flex min-w-0 flex-col gap-1 bg-card px-4 py-3 text-left">
       <span className="eyebrow text-[0.6rem]">{label}</span>
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="border-0 bg-transparent p-0 text-sm text-ink focus:outline-none focus:ring-0"
+        className="w-full min-w-0 border-0 bg-transparent p-0 text-sm text-ink focus:outline-none focus:ring-0"
       >
         {children}
       </select>
@@ -365,7 +503,7 @@ function InputField({
   label: string; value: string; onChange: (v: string) => void; placeholder?: string;
 }) {
   return (
-    <label className="flex flex-col gap-1 bg-card px-4 py-3 text-left">
+    <label className="flex min-w-0 flex-col gap-1 bg-card px-4 py-3 text-left">
       <span className="eyebrow text-[0.6rem]">{label}</span>
       <input
         type="text"
@@ -374,7 +512,7 @@ function InputField({
         value={value}
         placeholder={placeholder}
         onChange={(e) => onChange(e.target.value)}
-        className="border-0 bg-transparent p-0 text-sm text-ink placeholder:text-muted-foreground focus:outline-none focus:ring-0"
+        className="w-full min-w-0 border-0 bg-transparent p-0 text-sm text-ink placeholder:text-muted-foreground focus:outline-none focus:ring-0"
       />
     </label>
   );
