@@ -872,14 +872,12 @@ function NarrativeTab({
   features: Record<string, string>;
   setFeatures: (v: Record<string, string>) => void;
 }) {
-  const multiKeys = new Set<string>(MULTI_SELECT_FIELDS.map((m) => m.key));
-  const remaining = NARRATIVE_FIELDS.filter((f) => !multiKeys.has(f.key));
   return (
     <div className="rounded-sm border border-border bg-card p-6">
       <h3 className="font-serif text-lg text-ink">Parametri narrativi / commerciali</h3>
       <p className="mt-1 text-xs text-muted-foreground">
-        Queste indicazioni guidano la generazione automatica della descrizione. Non vengono mai
-        pubblicate direttamente, ma orientano lo stile, i contenuti e il tono.
+        Seleziona le voci che meglio descrivono l'immobile. Le selezioni saranno mostrate
+        come badge eleganti nella scheda pubblica.
       </p>
       <div className="mt-6 grid gap-5 md:grid-cols-2">
         {MULTI_SELECT_FIELDS.map((ms) => {
@@ -890,7 +888,6 @@ function NarrativeTab({
               label={ms.label}
               placeholder={ms.placeholder}
               options={ms.options}
-              otherLabel={ms.otherLabel}
               value={val}
               onChange={(v) =>
                 setFeatures({ ...features, [ms.key]: serializeMultiSelect(v) })
@@ -898,22 +895,6 @@ function NarrativeTab({
             />
           );
         })}
-      </div>
-      <div className="mt-6 grid gap-4 md:grid-cols-2">
-        {remaining.map((f) => (
-          <label key={f.key} className="block">
-            <span className="block text-xs uppercase tracking-wider text-muted-foreground">
-              {f.label}
-            </span>
-            <textarea
-              value={features[f.key] ?? ""}
-              onChange={(e) => setFeatures({ ...features, [f.key]: e.target.value })}
-              placeholder={f.placeholder}
-              rows={2}
-              className={`${inputCls} mt-1 min-h-[64px]`}
-            />
-          </label>
-        ))}
       </div>
     </div>
   );
