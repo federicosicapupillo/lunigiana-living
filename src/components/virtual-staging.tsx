@@ -10,6 +10,7 @@ import {
   ArrowLeftRight,
   Check,
   Image as ImageIcon,
+  ArrowLeft,
 } from "lucide-react";
 import {
   Dialog,
