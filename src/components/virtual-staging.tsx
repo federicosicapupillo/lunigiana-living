@@ -19,6 +19,7 @@ import {
 type Style = "minimal" | "rustico" | "luxury";
 type CompareMode = "side" | "slider" | "toggle";
 type Space = "interno" | "esterno";
+type Intensity = "decisa" | "delicata";
 
 const STYLES: { id: Style; label: string; description: string }[] = [
   {
@@ -97,6 +98,7 @@ function StagingDialog({
   const [photoIndex, setPhotoIndex] = useState(0);
   const [style, setStyle] = useState<Style>("minimal");
   const [space, setSpace] = useState<Space>("interno");
+  const [intensity, setIntensity] = useState<Intensity>("decisa");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -113,7 +115,7 @@ function StagingDialog({
       const res = await fetch("/api/virtual-staging", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ imageUrl: sourceUrl, style, space }),
+        body: JSON.stringify({ imageUrl: sourceUrl, style, space, intensity }),
       });
       const json = (await res.json()) as { image?: string; error?: string };
       if (!res.ok || !json.image) {
@@ -247,6 +249,45 @@ function StagingDialog({
                         )}
                       </div>
                       <p className="mt-1 text-xs text-muted-foreground">{s.description}</p>
+                    </button>
+                  );
+                })}
+              </div>
+
+              <div className="eyebrow mt-8 text-muted-foreground">
+                4. Intensità della trasformazione
+              </div>
+              <div className="mt-3 grid grid-cols-2 gap-2">
+                {(
+                  [
+                    {
+                      id: "decisa" as Intensity,
+                      label: "Decisa",
+                      hint: "Restyling completo: arredo, palette e atmosfera cambiano nettamente.",
+                    },
+                    {
+                      id: "delicata" as Intensity,
+                      label: "Delicata",
+                      hint: "Restyling più morbido, qualche elemento originale può rimanere.",
+                    },
+                  ]
+                ).map((s) => {
+                  const selected = intensity === s.id;
+                  return (
+                    <button
+                      key={s.id}
+                      type="button"
+                      onClick={() => setIntensity(s.id)}
+                      className={`rounded-sm border p-3 text-left transition ${
+                        selected
+                          ? "border-primary bg-primary/5"
+                          : "border-border bg-card hover:border-primary/50"
+                      }`}
+                    >
+                      <div className="font-serif text-base text-ink">{s.label}</div>
+                      <p className="mt-1 text-[0.7rem] leading-snug text-muted-foreground">
+                        {s.hint}
+                      </p>
                     </button>
                   );
                 })}
@@ -448,7 +489,7 @@ function SideBySide({
   return (
     <div className="grid gap-3 sm:grid-cols-2">
       <Pane src={before} caption="Prima · originale" onOpen={onOpenBefore} />
-      <Pane src={after} caption={`Dopo · stile ${style}`} onOpen={onOpenAfter} />
+      <Pane src={after} caption={`Dopo · restyling ${style}`} onOpen={onOpenAfter} />
     </div>
   );
 }
@@ -526,7 +567,7 @@ function SliderCompare({ before, after }: { before: string; after: string }) {
         Prima
       </span>
       <span className="absolute right-3 top-3 rounded-sm bg-primary/90 px-2.5 py-1 text-[0.6rem] uppercase tracking-[0.2em] text-primary-foreground backdrop-blur">
-        Dopo
+        Dopo · restyling AI
       </span>
     </div>
   );
