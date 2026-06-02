@@ -1,9 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { PropertyCard } from "@/components/property-card";
-import { allProperties, uniqueLocations, type PropertyCategory } from "@/lib/properties";
+import { listPublishedProperties, type PublicProperty } from "@/lib/public-properties.functions";
 import { useMemo, useState } from "react";
 
+type PropertyCategory = PublicProperty["category"];
+
 export const Route = createFileRoute("/immobili/")({
+  loader: () => listPublishedProperties(),
   head: () => ({
     meta: [
       { title: "Immobili in vendita in Lunigiana — Furia Immobiliare" },
@@ -13,6 +16,16 @@ export const Route = createFileRoute("/immobili/")({
     ],
     links: [{ rel: "canonical", href: "/immobili" }],
   }),
+  errorComponent: ({ error }) => (
+    <div className="container-editorial py-32 text-center">
+      <p className="text-muted-foreground">Errore nel caricamento: {error.message}</p>
+    </div>
+  ),
+  notFoundComponent: () => (
+    <div className="container-editorial py-32 text-center">
+      <p className="text-muted-foreground">Nessun immobile disponibile.</p>
+    </div>
+  ),
   component: ImmobiliPage,
 });
 
@@ -26,6 +39,11 @@ const CATEGORIES: { id: PropertyCategory | "tutti"; label: string }[] = [
 type SortKey = "featured" | "price-asc" | "price-desc";
 
 function ImmobiliPage() {
+  const { properties: allProperties } = Route.useLoaderData();
+  const uniqueLocations = useMemo(
+    () => Array.from(new Set(allProperties.map((p) => p.location).filter(Boolean))).sort(),
+    [allProperties],
+  );
   const [category, setCategory] = useState<PropertyCategory | "tutti">("tutti");
   const [location, setLocation] = useState<string>("tutte");
   const [sort, setSort] = useState<SortKey>("featured");
@@ -38,7 +56,7 @@ function ImmobiliPage() {
     if (sort === "price-asc") sorted.sort((a, b) => (a.priceValue ?? Infinity) - (b.priceValue ?? Infinity));
     if (sort === "price-desc") sorted.sort((a, b) => (b.priceValue ?? -1) - (a.priceValue ?? -1));
     return sorted;
-  }, [category, location, sort]);
+  }, [allProperties, category, location, sort]);
 
   return (
     <>
