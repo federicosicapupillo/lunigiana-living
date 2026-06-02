@@ -36,6 +36,19 @@ const SORT_OPTS = [
   { label: "Superficie decrescente", value: "size-desc" },
 ];
 
+const PRICE_STEPS = [50000, 100000, 150000, 200000, 250000, 300000, 400000, 500000, 750000, 1000000];
+const fmtPrice = (n: number) => `${n.toLocaleString("it-IT")} €`;
+const PRICE_MIN_OPTS = [
+  { label: "Nessun minimo", value: "" },
+  ...PRICE_STEPS.map((n) => ({ label: fmtPrice(n), value: String(n) })),
+  { label: "Oltre 1.000.000 €", value: "1000001" },
+];
+const PRICE_MAX_OPTS = [
+  { label: "Nessun massimo", value: "" },
+  ...PRICE_STEPS.map((n) => ({ label: fmtPrice(n), value: String(n) })),
+  { label: "Oltre 1.000.000 €", value: "1000001" },
+];
+
 const FEATURE_GROUPS: { label: string; items: string[] }[] = [
   {
     label: "Esterni",
@@ -97,11 +110,6 @@ const EMPTY: SearchValues = {
   type: "", comune: "", price_min: "", price_max: "",
   size: "", rooms: "", features: [], sort: "recent",
 };
-
-function sanitizePrice(v: string): string {
-  const cleaned = v.replace(/[^0-9]/g, "");
-  return cleaned;
-}
 
 export interface PropertySearchBarProps {
   initial?: Partial<SearchValues>;
@@ -267,10 +275,14 @@ export function PropertySearchBar({
         <option value="">Tutti i comuni</option>
         {comuniList.map((c) => <option key={c} value={c}>{c}</option>)}
       </SelectField>
-      <InputField label="Prezzo da" value={state.price_min} placeholder="Da €"
-        onChange={(v) => setState({ ...state, price_min: sanitizePrice(v) })} />
-      <InputField label="Prezzo a" value={state.price_max} placeholder="A €"
-        onChange={(v) => setState({ ...state, price_max: sanitizePrice(v) })} />
+      <SelectField label="Prezzo da" value={state.price_min}
+        onChange={(v) => setState({ ...state, price_min: v })}>
+        {PRICE_MIN_OPTS.map((p) => <option key={p.label} value={p.value}>{p.label}</option>)}
+      </SelectField>
+      <SelectField label="Prezzo a" value={state.price_max}
+        onChange={(v) => setState({ ...state, price_max: v })}>
+        {PRICE_MAX_OPTS.map((p) => <option key={p.label} value={p.value}>{p.label}</option>)}
+      </SelectField>
 
       <SelectField label="Superficie" value={state.size} onChange={(v) => setState({ ...state, size: v })}>
         {SIZE_RANGES.map((p) => <option key={p.label} value={p.value}>{p.label}</option>)}
