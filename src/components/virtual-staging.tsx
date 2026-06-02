@@ -8,6 +8,8 @@ import {
   X,
   Download,
   ArrowLeftRight,
+  Check,
+  Image as ImageIcon,
 } from "lucide-react";
 import {
   Dialog,
@@ -22,21 +24,19 @@ type Space = "interno" | "esterno";
 type Intensity = "decisa" | "delicata";
 
 const STYLES: { id: Style; label: string; description: string }[] = [
-  {
-    id: "minimal",
-    label: "Minimal",
-    description: "Pulito, luminoso, essenziale, contemporaneo.",
-  },
-  {
-    id: "rustico",
-    label: "Rustico",
-    description: "Caldo, materico, naturale. Legno, pietra, accoglienza.",
-  },
-  {
-    id: "luxury",
-    label: "Luxury",
-    description: "Raffinato, ricco, finiture premium, look editoriale.",
-  },
+  { id: "minimal", label: "Minimal", description: "Pulito, luminoso, essenziale." },
+  { id: "rustico", label: "Rustico", description: "Caldo, materico, naturale." },
+  { id: "luxury", label: "Luxury", description: "Raffinato, finiture premium." },
+];
+
+const SPACES: { id: Space; label: string }[] = [
+  { id: "interno", label: "Interno" },
+  { id: "esterno", label: "Esterno" },
+];
+
+const INTENSITIES: { id: Intensity; label: string; hint: string }[] = [
+  { id: "decisa", label: "Decisa", hint: "Restyling completo" },
+  { id: "delicata", label: "Delicata", hint: "Tocco morbido" },
 ];
 
 export function VirtualStaging({ gallery }: { gallery: string[] }) {
@@ -107,6 +107,11 @@ function StagingDialog({
 
   const sourceUrl = photos[photoIndex];
 
+  const spaceLabel = SPACES.find((s) => s.id === space)?.label ?? "";
+  const styleLabel = STYLES.find((s) => s.id === style)?.label ?? "";
+  const intensityLabel = INTENSITIES.find((s) => s.id === intensity)?.label ?? "";
+  const summary = `${spaceLabel} · ${styleLabel} · ${intensityLabel}`;
+
   async function generate() {
     setLoading(true);
     setError(null);
@@ -129,273 +134,235 @@ function StagingDialog({
     }
   }
 
+  function resetResult() {
+    setResult(null);
+    setError(null);
+  }
+
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="max-h-[95vh] w-[96vw] max-w-6xl overflow-y-auto p-0 sm:rounded-sm">
-          <div className="border-b border-border bg-muted/40 px-6 py-5 md:px-8">
+          {/* Header */}
+          <div className="border-b border-border bg-muted/30 px-6 py-5 md:px-8">
             <DialogTitle asChild>
               <h2 className="font-serif text-2xl text-ink md:text-3xl">
-                Immagina <em className="italic">questo spazio</em>
+                Crea il rendering della tua foto
               </h2>
             </DialogTitle>
-            <DialogDescription className="mt-1 text-sm text-muted-foreground">
-              Seleziona una stanza, scegli uno stile e genera l'anteprima AI.
+            <DialogDescription className="mt-1.5 text-sm text-muted-foreground">
+              Scegli stile e intensità, oppure clicca direttamente sulla foto per iniziare.
             </DialogDescription>
           </div>
 
-          <div className="grid gap-8 p-6 md:grid-cols-12 md:p-8">
-            {/* LEFT — controls */}
-            <div className="md:col-span-4">
-              <div className="eyebrow text-muted-foreground">1. Scegli la foto</div>
-              <div className="mt-3 grid grid-cols-3 gap-2">
-                {photos.map((g, i) => (
-                  <button
-                    key={g + i}
-                    type="button"
-                    onClick={() => {
-                      setPhotoIndex(i);
-                      setResult(null);
-                      setError(null);
-                    }}
-                    className={`group relative aspect-[4/3] overflow-hidden rounded-sm bg-muted transition ${
-                      i === photoIndex
-                        ? "ring-2 ring-primary ring-offset-2 ring-offset-background"
-                        : "opacity-70 hover:opacity-100"
-                    }`}
-                    aria-label={`Foto ${i + 1}`}
-                  >
-                    <img
-                      src={g}
-                      alt=""
-                      loading="lazy"
-                      className="h-full w-full object-cover"
-                    />
-                    {i === photoIndex && (
-                      <span className="absolute inset-0 bg-primary/10" />
-                    )}
-                  </button>
-                ))}
-              </div>
+          {/* Body — 2 cols on desktop, stack on mobile */}
+          <div className="grid gap-6 p-6 pb-28 md:grid-cols-12 md:gap-8 md:p-8 md:pb-8">
+            {/* LEFT — hero photo + CTA */}
+            <div className="md:col-span-7">
+              {!result ? (
+                <HeroPhoto
+                  src={sourceUrl}
+                  loading={loading}
+                  style={style}
+                  onGenerate={generate}
+                  onOpen={() => setLightbox(sourceUrl)}
+                />
+              ) : (
+                <ResultViewer
+                  before={sourceUrl}
+                  after={result}
+                  style={style}
+                  mode={compareMode}
+                  onModeChange={setCompareMode}
+                  onLightbox={setLightbox}
+                />
+              )}
 
-              <div className="eyebrow mt-8 text-muted-foreground">
-                2. Tipo di ambiente
-              </div>
-              <div className="mt-3 grid grid-cols-2 gap-2">
-                {(
-                  [
-                    {
-                      id: "interno" as Space,
-                      label: "Interno",
-                      hint: "Stanze, soggiorni, camere, cucine",
-                    },
-                    {
-                      id: "esterno" as Space,
-                      label: "Esterno",
-                      hint: "Terrazzi, balconi, logge, corti, giardini",
-                    },
-                  ]
-                ).map((s) => {
-                  const selected = space === s.id;
-                  return (
-                    <button
-                      key={s.id}
-                      type="button"
-                      onClick={() => {
-                        setSpace(s.id);
-                        setResult(null);
-                        setError(null);
-                      }}
-                      className={`rounded-sm border p-3 text-left transition ${
-                        selected
-                          ? "border-primary bg-primary/5"
-                          : "border-border bg-card hover:border-primary/50"
-                      }`}
-                    >
-                      <div className="font-serif text-base text-ink">{s.label}</div>
-                      <p className="mt-1 text-[0.7rem] leading-snug text-muted-foreground">
-                        {s.hint}
-                      </p>
-                    </button>
-                  );
-                })}
-              </div>
-              <p className="mt-2 text-[0.7rem] leading-relaxed text-muted-foreground">
-                Selezione importante: il rendering manterrà sempre la struttura
-                reale della foto (terrazzo resta terrazzo, stanza resta stanza).
-              </p>
-
-              <div className="eyebrow mt-8 text-muted-foreground">3. Scegli lo stile</div>
-              <div className="mt-3 space-y-2">
-                {STYLES.map((s) => {
-                  const selected = style === s.id;
-                  return (
-                    <button
-                      key={s.id}
-                      type="button"
-                      onClick={() => setStyle(s.id)}
-                      className={`w-full rounded-sm border p-4 text-left transition ${
-                        selected
-                          ? "border-primary bg-primary/5"
-                          : "border-border bg-card hover:border-primary/50"
-                      }`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="font-serif text-lg text-ink">{s.label}</span>
-                        {selected && (
-                          <span className="text-[0.65rem] uppercase tracking-[0.18em] text-primary">
-                            Selezionato
-                          </span>
-                        )}
-                      </div>
-                      <p className="mt-1 text-xs text-muted-foreground">{s.description}</p>
-                    </button>
-                  );
-                })}
-              </div>
-
-              <div className="eyebrow mt-8 text-muted-foreground">
-                4. Intensità della trasformazione
-              </div>
-              <div className="mt-3 grid grid-cols-2 gap-2">
-                {(
-                  [
-                    {
-                      id: "decisa" as Intensity,
-                      label: "Decisa",
-                      hint: "Restyling completo: arredo, palette e atmosfera cambiano nettamente.",
-                    },
-                    {
-                      id: "delicata" as Intensity,
-                      label: "Delicata",
-                      hint: "Restyling più morbido, qualche elemento originale può rimanere.",
-                    },
-                  ]
-                ).map((s) => {
-                  const selected = intensity === s.id;
-                  return (
-                    <button
-                      key={s.id}
-                      type="button"
-                      onClick={() => setIntensity(s.id)}
-                      className={`rounded-sm border p-3 text-left transition ${
-                        selected
-                          ? "border-primary bg-primary/5"
-                          : "border-border bg-card hover:border-primary/50"
-                      }`}
-                    >
-                      <div className="font-serif text-base text-ink">{s.label}</div>
-                      <p className="mt-1 text-[0.7rem] leading-snug text-muted-foreground">
-                        {s.hint}
-                      </p>
-                    </button>
-                  );
-                })}
-              </div>
-
-              <button
-                type="button"
-                onClick={generate}
-                disabled={loading}
-                className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-sm bg-primary px-6 py-4 text-xs uppercase tracking-[0.22em] text-primary-foreground transition hover:bg-primary/90 disabled:opacity-60"
-              >
-                {loading ? (
-                  <>
-                    <Loader2 size={16} className="animate-spin" /> Generazione…
-                  </>
-                ) : (
-                  <>
-                    <Wand2 size={16} /> {result ? "Rigenera" : "Genera rendering"}
-                  </>
-                )}
-              </button>
-              {error && <p className="mt-3 text-xs text-destructive">{error}</p>}
-              <p className="mt-3 text-[0.7rem] leading-relaxed text-muted-foreground">
-                Rendering illustrativo, non vincolante. La generazione può richiedere
-                qualche secondo.
-              </p>
-            </div>
-
-            {/* RIGHT — preview */}
-            <div className="md:col-span-8">
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <div className="eyebrow text-muted-foreground">Anteprima</div>
-                {result && (
-                  <div className="inline-flex rounded-sm border border-border bg-card p-1 text-[0.65rem] uppercase tracking-[0.18em]">
-                    {(
-                      [
-                        { id: "side", label: "Affiancato" },
-                        { id: "slider", label: "Slider" },
-                        { id: "toggle", label: "Toggle" },
-                      ] as { id: CompareMode; label: string }[]
-                    ).map((m) => (
+              {/* Thumbnails */}
+              {photos.length > 1 && (
+                <div className="mt-4">
+                  <div className="mb-2 flex items-center justify-between">
+                    <span className="text-[0.7rem] uppercase tracking-[0.18em] text-muted-foreground">
+                      Altre foto dell'immobile
+                    </span>
+                    <span className="text-[0.7rem] text-muted-foreground">
+                      {photoIndex + 1} / {photos.length}
+                    </span>
+                  </div>
+                  <div className="flex gap-2 overflow-x-auto pb-1">
+                    {photos.map((g, i) => (
                       <button
-                        key={m.id}
+                        key={g + i}
                         type="button"
-                        onClick={() => setCompareMode(m.id)}
-                        className={`rounded-sm px-3 py-2 transition ${
-                          compareMode === m.id
-                            ? "bg-primary text-primary-foreground"
-                            : "text-muted-foreground hover:text-ink"
+                        onClick={() => {
+                          setPhotoIndex(i);
+                          resetResult();
+                        }}
+                        className={`relative h-16 w-24 shrink-0 overflow-hidden rounded-sm bg-muted transition ${
+                          i === photoIndex
+                            ? "ring-2 ring-primary ring-offset-2 ring-offset-background"
+                            : "opacity-60 hover:opacity-100"
                         }`}
+                        aria-label={`Foto ${i + 1}`}
                       >
-                        {m.label}
+                        <img
+                          src={g}
+                          alt=""
+                          loading="lazy"
+                          className="h-full w-full object-cover"
+                        />
                       </button>
                     ))}
                   </div>
-                )}
-              </div>
-
-              <div className="mt-3">
-                {!result ? (
-                  <SinglePane
-                    src={sourceUrl}
-                    loading={loading}
-                    style={style}
-                    onOpen={() => setLightbox(sourceUrl)}
-                  />
-                ) : compareMode === "side" ? (
-                  <SideBySide
-                    before={sourceUrl}
-                    after={result}
-                    style={style}
-                    onOpenBefore={() => setLightbox(sourceUrl)}
-                    onOpenAfter={() => setLightbox(result)}
-                  />
-                ) : compareMode === "slider" ? (
-                  <SliderCompare before={sourceUrl} after={result} />
-                ) : (
-                  <TogglePane
-                    before={sourceUrl}
-                    after={result}
-                    style={style}
-                    onOpen={(src) => setLightbox(src)}
-                  />
-                )}
-              </div>
-
-              {result && (
-                <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setResult(null);
-                      setError(null);
-                    }}
-                    className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-muted-foreground hover:text-ink"
-                  >
-                    <RotateCcw size={14} /> Cambia foto o stile
-                  </button>
-                  <a
-                    href={result}
-                    download={`rendering-${style}.png`}
-                    className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-primary hover:underline"
-                  >
-                    <Download size={14} /> Scarica immagine
-                  </a>
                 </div>
               )}
+
+              {/* Primary CTA — desktop only (mobile uses sticky bar) */}
+              <div className="mt-5 hidden md:block">
+                <button
+                  type="button"
+                  onClick={generate}
+                  disabled={loading}
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-sm bg-primary px-6 py-5 text-xs uppercase tracking-[0.22em] text-primary-foreground shadow-sm transition hover:bg-primary/90 disabled:opacity-60"
+                >
+                  {loading ? (
+                    <>
+                      <Loader2 size={18} className="animate-spin" /> Generazione in corso…
+                    </>
+                  ) : (
+                    <>
+                      <Wand2 size={18} /> {result ? "Rigenera rendering" : "Genera rendering"}
+                    </>
+                  )}
+                </button>
+                {error && <p className="mt-3 text-xs text-destructive">{error}</p>}
+                <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
+                  <p className="text-[0.7rem] leading-relaxed text-muted-foreground">
+                    Rendering illustrativo, non vincolante. Richiede qualche secondo.
+                  </p>
+                  {result && (
+                    <div className="flex items-center gap-4">
+                      <button
+                        type="button"
+                        onClick={resetResult}
+                        className="inline-flex items-center gap-1.5 text-[0.7rem] uppercase tracking-[0.18em] text-muted-foreground hover:text-ink"
+                      >
+                        <RotateCcw size={12} /> Reset
+                      </button>
+                      <a
+                        href={result}
+                        download={`rendering-${style}.png`}
+                        className="inline-flex items-center gap-1.5 text-[0.7rem] uppercase tracking-[0.18em] text-primary hover:underline"
+                      >
+                        <Download size={12} /> Scarica
+                      </a>
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
+
+            {/* RIGHT — settings panel */}
+            <aside className="md:col-span-5">
+              <div className="rounded-sm border border-border bg-card/60 p-5">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-serif text-lg text-ink">Impostazioni rendering</h3>
+                </div>
+
+                {/* Summary */}
+                <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/5 px-3 py-1.5 text-[0.7rem] uppercase tracking-[0.18em] text-primary">
+                  <Sparkles size={11} /> {summary}
+                </div>
+
+                <SettingsGroup
+                  step={1}
+                  title="Tipo di ambiente"
+                  hint="Determina se interno o esterno. Il rendering manterrà la struttura reale."
+                >
+                  <div className="grid grid-cols-2 gap-2">
+                    {SPACES.map((s) => (
+                      <Chip
+                        key={s.id}
+                        selected={space === s.id}
+                        onClick={() => {
+                          setSpace(s.id);
+                          resetResult();
+                        }}
+                      >
+                        {s.label}
+                      </Chip>
+                    ))}
+                  </div>
+                </SettingsGroup>
+
+                <SettingsGroup step={2} title="Stile">
+                  <div className="grid grid-cols-3 gap-2">
+                    {STYLES.map((s) => (
+                      <Chip
+                        key={s.id}
+                        selected={style === s.id}
+                        onClick={() => {
+                          setStyle(s.id);
+                          resetResult();
+                        }}
+                      >
+                        {s.label}
+                      </Chip>
+                    ))}
+                  </div>
+                  <p className="mt-2 text-[0.7rem] leading-snug text-muted-foreground">
+                    {STYLES.find((s) => s.id === style)?.description}
+                  </p>
+                </SettingsGroup>
+
+                <SettingsGroup step={3} title="Intensità">
+                  <div className="grid grid-cols-2 gap-2">
+                    {INTENSITIES.map((s) => (
+                      <Chip
+                        key={s.id}
+                        selected={intensity === s.id}
+                        onClick={() => {
+                          setIntensity(s.id);
+                          resetResult();
+                        }}
+                      >
+                        <div className="text-center">
+                          <div>{s.label}</div>
+                          <div className="mt-0.5 text-[0.6rem] normal-case tracking-normal opacity-70">
+                            {s.hint}
+                          </div>
+                        </div>
+                      </Chip>
+                    ))}
+                  </div>
+                </SettingsGroup>
+              </div>
+            </aside>
+          </div>
+
+          {/* Mobile sticky action bar */}
+          <div className="sticky bottom-0 left-0 right-0 z-10 border-t border-border bg-background/95 px-4 py-3 backdrop-blur md:hidden">
+            <div className="mb-2 flex items-center justify-between text-[0.65rem] uppercase tracking-[0.18em] text-muted-foreground">
+              <span>Selezione</span>
+              <span className="text-primary">{summary}</span>
+            </div>
+            <button
+              type="button"
+              onClick={generate}
+              disabled={loading}
+              className="inline-flex w-full items-center justify-center gap-2 rounded-sm bg-primary px-6 py-4 text-xs uppercase tracking-[0.22em] text-primary-foreground shadow-sm transition hover:bg-primary/90 disabled:opacity-60"
+            >
+              {loading ? (
+                <>
+                  <Loader2 size={16} className="animate-spin" /> Generazione…
+                </>
+              ) : (
+                <>
+                  <Wand2 size={16} /> {result ? "Rigenera" : "Genera rendering"}
+                </>
+              )}
+            </button>
+            {error && <p className="mt-2 text-xs text-destructive">{error}</p>}
           </div>
         </DialogContent>
       </Dialog>
@@ -405,24 +372,109 @@ function StagingDialog({
   );
 }
 
-function SinglePane({
+// — Settings group with numbered step —
+function SettingsGroup({
+  step,
+  title,
+  hint,
+  children,
+}: {
+  step: number;
+  title: string;
+  hint?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="mt-5 border-t border-border/60 pt-4 first-of-type:mt-5">
+      <div className="mb-2.5 flex items-center gap-2">
+        <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-ink text-[0.65rem] font-medium text-cream">
+          {step}
+        </span>
+        <span className="text-[0.75rem] font-medium uppercase tracking-[0.16em] text-ink">
+          {title}
+        </span>
+      </div>
+      {children}
+      {hint && (
+        <p className="mt-2 text-[0.7rem] leading-snug text-muted-foreground">{hint}</p>
+      )}
+    </div>
+  );
+}
+
+// — Generic chip selector —
+function Chip({
+  selected,
+  onClick,
+  children,
+}: {
+  selected: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={selected}
+      className={`relative flex items-center justify-center rounded-sm border px-3 py-2.5 text-sm font-medium transition ${
+        selected
+          ? "border-primary bg-primary/10 text-primary"
+          : "border-border bg-background text-ink hover:border-primary/40 hover:bg-muted/40"
+      }`}
+    >
+      {selected && (
+        <Check
+          size={12}
+          className="absolute right-1.5 top-1.5 text-primary"
+          strokeWidth={3}
+        />
+      )}
+      {children}
+    </button>
+  );
+}
+
+// — Hero photo: large, clickable, primary action —
+function HeroPhoto({
   src,
   loading,
   style,
+  onGenerate,
   onOpen,
 }: {
   src: string;
   loading: boolean;
   style: Style;
+  onGenerate: () => void;
   onOpen: () => void;
 }) {
   return (
-    <div className="relative overflow-hidden rounded-sm bg-muted">
-      <img
-        src={src}
-        alt="Foto originale"
-        className="aspect-[16/10] w-full object-cover"
-      />
+    <div className="group relative overflow-hidden rounded-sm bg-muted">
+      <button
+        type="button"
+        onClick={loading ? undefined : onGenerate}
+        disabled={loading}
+        className="block w-full text-left"
+        aria-label="Genera rendering di questa foto"
+      >
+        <img src={src} alt="Foto selezionata" className="aspect-[16/10] w-full object-cover" />
+        {!loading && (
+          <div className="absolute inset-0 flex items-center justify-center bg-ink/0 opacity-0 transition group-hover:bg-ink/40 group-hover:opacity-100">
+            <div className="inline-flex items-center gap-2 rounded-sm bg-cream/95 px-5 py-3 text-xs uppercase tracking-[0.22em] text-ink shadow-lg">
+              <Wand2 size={14} /> Clicca per generare il rendering
+            </div>
+          </div>
+        )}
+        {loading && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-background/85 px-6 text-center">
+            <Loader2 size={32} className="animate-spin text-primary" />
+            <p className="text-sm text-muted-foreground">
+              L'AI sta reinterpretando lo spazio in stile <strong>{style}</strong>…
+            </p>
+          </div>
+        )}
+      </button>
       <button
         type="button"
         onClick={onOpen}
@@ -430,18 +482,77 @@ function SinglePane({
       >
         <Maximize2 size={12} /> Apri grande
       </button>
-      {loading && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-background/85 px-6 text-center">
-          <Loader2 size={32} className="animate-spin text-primary" />
-          <p className="text-sm text-muted-foreground">
-            L'AI sta reinterpretando la stanza in stile <strong>{style}</strong>…
-          </p>
+      {!loading && (
+        <div className="absolute bottom-3 left-3 inline-flex items-center gap-2 rounded-sm bg-background/90 px-3 py-2 text-[0.65rem] uppercase tracking-[0.18em] text-muted-foreground backdrop-blur">
+          <ImageIcon size={12} className="text-primary" /> Foto selezionata
         </div>
       )}
-      {!loading && (
-        <div className="absolute bottom-3 left-3 inline-flex items-center gap-2 rounded-sm bg-background/85 px-3 py-2 text-[0.65rem] uppercase tracking-[0.18em] text-muted-foreground backdrop-blur">
-          <Sparkles size={12} className="text-primary" /> Foto originale · pronta per il rendering
+    </div>
+  );
+}
+
+// — Result viewer with compare modes —
+function ResultViewer({
+  before,
+  after,
+  style,
+  mode,
+  onModeChange,
+  onLightbox,
+}: {
+  before: string;
+  after: string;
+  style: Style;
+  mode: CompareMode;
+  onModeChange: (m: CompareMode) => void;
+  onLightbox: (src: string) => void;
+}) {
+  return (
+    <div>
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+        <span className="text-[0.7rem] uppercase tracking-[0.18em] text-muted-foreground">
+          Confronto prima / dopo
+        </span>
+        <div className="inline-flex rounded-sm border border-border bg-card p-1 text-[0.65rem] uppercase tracking-[0.18em]">
+          {(
+            [
+              { id: "side", label: "Affiancato" },
+              { id: "slider", label: "Slider" },
+              { id: "toggle", label: "Toggle" },
+            ] as { id: CompareMode; label: string }[]
+          ).map((m) => (
+            <button
+              key={m.id}
+              type="button"
+              onClick={() => onModeChange(m.id)}
+              className={`rounded-sm px-3 py-1.5 transition ${
+                mode === m.id
+                  ? "bg-primary text-primary-foreground"
+                  : "text-muted-foreground hover:text-ink"
+              }`}
+            >
+              {m.label}
+            </button>
+          ))}
         </div>
+      </div>
+      {mode === "side" ? (
+        <SideBySide
+          before={before}
+          after={after}
+          style={style}
+          onOpenBefore={() => onLightbox(before)}
+          onOpenAfter={() => onLightbox(after)}
+        />
+      ) : mode === "slider" ? (
+        <SliderCompare before={before} after={after} />
+      ) : (
+        <TogglePane
+          before={before}
+          after={after}
+          style={style}
+          onOpen={(src) => onLightbox(src)}
+        />
       )}
     </div>
   );
