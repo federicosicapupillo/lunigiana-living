@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.ensure_single_cover() FROM PUBLIC, anon, authenticated;

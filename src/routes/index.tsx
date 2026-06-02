@@ -15,10 +15,11 @@ import territoryZeri from "@/assets/real/zeri-monte.jpg";
 import lifestyleFood from "@/assets/real/bagnone-torrente.jpg";
 import { PropertySearch } from "@/components/property-search";
 import { PropertyCard } from "@/components/property-card";
-import { featuredProperties } from "@/lib/properties";
+import { listPublishedProperties, type PublicProperty } from "@/lib/public-properties.functions";
 import { ArrowRight, Compass, KeyRound, Sparkles } from "lucide-react";
 
 export const Route = createFileRoute("/")({
+  loader: () => listPublishedProperties(),
   head: () => ({
     meta: [
       { title: "Furia Immobiliare — Case di carattere in Lunigiana" },
@@ -32,6 +33,10 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
+  const { properties } = Route.useLoaderData() as { properties: PublicProperty[] };
+  const featuredProperties = properties
+    .filter((p) => p.featured && p.category === "vendita")
+    .slice(0, 6);
   const [heroVariant, setHeroVariant] = useState<
     "castelloBorgo" | "tramontoVigneti" | "panoramico" | "intimo" | "colline" | "borgo" | "tramonto" | "aereo"
   >("castelloBorgo");

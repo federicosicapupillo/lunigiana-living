@@ -54,13 +54,24 @@ function deriveCategory(contract: string | null): PublicProperty["category"] {
   return "vendita";
 }
 
+function isExternalUrl(p: string): boolean {
+  return /^https?:\/\//i.test(p);
+}
+
 async function signMany(paths: string[]): Promise<Record<string, string>> {
   if (paths.length === 0) return {};
+  const map: Record<string, string> = {};
+  // Legacy rows store the full external URL directly in storage_path — pass through.
+  const toSign: string[] = [];
+  for (const p of paths) {
+    if (isExternalUrl(p)) map[p] = p;
+    else toSign.push(p);
+  }
+  if (toSign.length === 0) return map;
   const { data, error } = await supabaseAdmin.storage
     .from("property-images")
-    .createSignedUrls(paths, SIGNED_TTL);
-  if (error || !data) return {};
-  const map: Record<string, string> = {};
+    .createSignedUrls(toSign, SIGNED_TTL);
+  if (error || !data) return map;
   for (const item of data) {
     if (item.path && item.signedUrl) map[item.path] = item.signedUrl;
   }
@@ -85,6 +96,7 @@ type PropertyRow = {
   short_notes: string | null;
   panoramic_view: boolean;
   historic_property: boolean;
+  featured: boolean;
 };
 
 type ImageRow = {
@@ -177,7 +189,7 @@ function adapt(
     altreDotazioni: altre,
     highlights,
     category: deriveCategory(p.contract_type),
-    featured: false,
+    featured: !!p.featured,
     tag: buildTag(p),
   };
 }
@@ -186,7 +198,7 @@ export const listPublishedProperties = createServerFn({ method: "GET" }).handler
   const { data: props, error } = await supabaseAdmin
     .from("properties")
     .select(
-      "id, slug, reference_code, title, municipality, area_zone, price, price_on_request, property_type, contract_type, size_sqm, bedrooms, bathrooms, floors, short_notes, panoramic_view, historic_property",
+      "id, slug, reference_code, title, municipality, area_zone, price, price_on_request, property_type, contract_type, size_sqm, bedrooms, bathrooms, floors, short_notes, panoramic_view, historic_property, featured",
     )
     .eq("status", "published")
     .order("updated_at", { ascending: false });
@@ -242,7 +254,7 @@ export const getPublishedProperty = createServerFn({ method: "GET" })
     const { data: p, error } = await supabaseAdmin
       .from("properties")
       .select(
-        "id, slug, reference_code, title, municipality, area_zone, price, price_on_request, property_type, contract_type, size_sqm, bedrooms, bathrooms, floors, short_notes, panoramic_view, historic_property",
+        "id, slug, reference_code, title, municipality, area_zone, price, price_on_request, property_type, contract_type, size_sqm, bedrooms, bathrooms, floors, short_notes, panoramic_view, historic_property, featured",
       )
       .eq("status", "published")
       .or(`id.eq.${data.id},slug.eq.${data.id}`)

@@ -29,6 +29,7 @@ export type Database = {
           created_by: string | null
           elevator: boolean
           energy_class: string | null
+          featured: boolean
           floors: number | null
           furnished: boolean
           garage: boolean
@@ -71,6 +72,7 @@ export type Database = {
           created_by?: string | null
           elevator?: boolean
           energy_class?: string | null
+          featured?: boolean
           floors?: number | null
           furnished?: boolean
           garage?: boolean
@@ -113,6 +115,7 @@ export type Database = {
           created_by?: string | null
           elevator?: boolean
           energy_class?: string | null
+          featured?: boolean
           floors?: number | null
           furnished?: boolean
           garage?: boolean
