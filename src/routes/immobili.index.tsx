@@ -71,8 +71,8 @@ function ImmobiliPage() {
     return [Number.isFinite(lo as number) ? lo : null, Number.isFinite(hi as number) ? hi : null];
   };
 
-  const featureTokens = urlSearch.features
-    ? urlSearch.features.split(",").map((s) => s.trim().toLowerCase()).filter(Boolean)
+  const featureTokens: string[] = urlSearch.features
+    ? urlSearch.features.split(",").map((s: string) => s.trim().toLowerCase()).filter(Boolean)
     : [];
 
   const hasUrlFilters = !!(
@@ -130,7 +130,7 @@ function ImmobiliPage() {
           p.tag ?? "",
           p.type ?? "",
         ].join(" ").toLowerCase();
-        return featureTokens.every((tok) => haystack.includes(tok));
+        return featureTokens.every((tok: string) => haystack.includes(tok));
       });
     }
 
