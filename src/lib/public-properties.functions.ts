@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { MULTI_SELECT_FIELDS, parseMultiSelect } from "@/lib/admin/property-constants";
 
 const SIGNED_TTL = 60 * 60 * 24; // 24h
 
@@ -26,6 +27,7 @@ export type PublicProperty = {
   attributes: Record<string, string>;
   amenities: string[];
   altreDotazioni: string | null;
+  highlights: Array<{ key: string; label: string; items: string[]; note: string | null }>;
   category: "vendita" | "affitto" | "scelti-per-voi";
   featured: boolean;
   tag?: string;
@@ -118,6 +120,8 @@ function adapt(
   const attrs: Record<string, string> = {};
   const amenities: string[] = [];
   let altre: string | null = null;
+  const multiKeys = new Set(MULTI_SELECT_FIELDS.map((m) => m.key));
+  const multiRaw: Record<string, string> = {};
   for (const f of features) {
     if (!f.feature_value) continue;
     if (f.feature_name.startsWith("amenity:")) {
@@ -128,8 +132,23 @@ function adapt(
       altre = f.feature_value;
       continue;
     }
+    if (multiKeys.has(f.feature_name)) {
+      multiRaw[f.feature_name] = f.feature_value;
+      continue;
+    }
     attrs[f.feature_name] = f.feature_value;
   }
+  const highlights = MULTI_SELECT_FIELDS.map((m) => {
+    const parsed = parseMultiSelect(multiRaw[m.key]);
+    const items = [...parsed.selected.filter((s) => s !== "Altro")];
+    if (parsed.altro.trim()) items.push(parsed.altro.trim());
+    return {
+      key: m.key,
+      label: m.label,
+      items,
+      note: parsed.note.trim() || null,
+    };
+  }).filter((h) => h.items.length > 0 || h.note);
   const location = [p.municipality, p.area_zone].filter(Boolean).join(" · ") || "Lunigiana";
   const sqmLabel = attrs["size_range"] || (p.size_sqm != null ? `${p.size_sqm} m²` : null);
   const roomsLabel = attrs["bedrooms_label"] || (p.bedrooms != null ? String(p.bedrooms) : null);
