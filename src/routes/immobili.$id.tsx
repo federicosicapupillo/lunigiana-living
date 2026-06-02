@@ -3,6 +3,7 @@ import { getPublishedProperty, type PublicProperty } from "@/lib/public-properti
 import { ArrowLeft, MapPin, Maximize2, BedDouble, Bath, Building2 } from "lucide-react";
 import { useState } from "react";
 import { VirtualStaging } from "@/components/virtual-staging";
+import { WatermarkedImage } from "@/components/watermarked-image";
 
 export const Route = createFileRoute("/immobili/$id")({
   loader: async ({ params }) => {
@@ -83,9 +84,10 @@ function PropertyDetail() {
       {/* Gallery */}
       <section className="container-editorial mt-10">
         <div className="overflow-hidden rounded-sm bg-muted">
-          <img
+          <WatermarkedImage
             src={main}
             alt={p.title}
+            watermarkSize="lg"
             className="aspect-[16/10] w-full object-cover"
           />
         </div>
@@ -99,7 +101,7 @@ function PropertyDetail() {
                   i === active ? "ring-2 ring-primary" : "opacity-75 hover:opacity-100"
                 }`}
               >
-                <img src={g} alt="" loading="lazy" className="h-full w-full object-cover" />
+                <WatermarkedImage src={g} alt="" loading="lazy" watermarkSize="sm" className="h-full w-full object-cover" />
               </button>
             ))}
           </div>

@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { MapPin, Maximize2, BedDouble, ArrowRight } from "lucide-react";
+import { WatermarkedImage } from "@/components/watermarked-image";
 
 type PropertyCardData = {
   id: number | string;
@@ -23,10 +24,11 @@ export function PropertyCard({ p }: { p: PropertyCardData }) {
       className="group block overflow-hidden rounded-sm bg-card transition-all duration-500 hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
     >
       <div className="relative aspect-[4/3] overflow-hidden bg-muted">
-        <img
+        <WatermarkedImage
           src={p.image}
           alt={p.title}
           loading="lazy"
+          watermarkSize="md"
           className="h-full w-full object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-105"
         />
         {p.tag && (
