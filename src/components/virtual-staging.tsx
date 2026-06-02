@@ -10,6 +10,7 @@ import {
   ArrowLeftRight,
   Check,
   Image as ImageIcon,
+  ArrowLeft,
 } from "lucide-react";
 import {
   Dialog,
@@ -96,6 +97,25 @@ function StagingDialog({
   photos: string[];
 }) {
   const [photoIndex, setPhotoIndex] = useState(0);
+  // On open, mobile users start on a photo-picker step. Desktop skips it.
+  const [showPicker, setShowPicker] = useState(false);
+  const [pendingIndex, setPendingIndex] = useState<number | null>(null);
+  const [pickerError, setPickerError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    if (typeof window === "undefined") return;
+    // Open the picker first on mobile when there's more than one photo.
+    const isMobile = window.matchMedia("(max-width: 767px)").matches;
+    if (isMobile && photos.length > 1) {
+      setShowPicker(true);
+      setPendingIndex(photoIndex);
+      setPickerError(null);
+    } else {
+      setShowPicker(false);
+    }
+  }, [open]);
+
   const [style, setStyle] = useState<Style>("minimal");
   const [space, setSpace] = useState<Space>("interno");
   const [intensity, setIntensity] = useState<Intensity>("decisa");
@@ -139,24 +159,73 @@ function StagingDialog({
     setError(null);
   }
 
+  function confirmPicker() {
+    if (pendingIndex == null) {
+      setPickerError("Seleziona prima una foto.");
+      return;
+    }
+    setPhotoIndex(pendingIndex);
+    resetResult();
+    setShowPicker(false);
+    setPickerError(null);
+  }
+
+  function openPicker() {
+    setPendingIndex(photoIndex);
+    setPickerError(null);
+    setShowPicker(true);
+  }
+
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-h-[95vh] w-[96vw] max-w-6xl overflow-y-auto p-0 sm:rounded-sm">
+        <DialogContent
+          className="
+            fixed left-0 top-0 z-50 grid h-[100svh] w-screen max-w-none translate-x-0 translate-y-0
+            grid-rows-[auto_1fr] gap-0 overflow-hidden rounded-none border-0 bg-background p-0
+            md:left-[50%] md:top-[50%] md:h-auto md:max-h-[95vh] md:w-[96vw] md:max-w-6xl
+            md:translate-x-[-50%] md:translate-y-[-50%] md:overflow-y-auto md:rounded-sm md:border
+          "
+        >
+          {showPicker ? (
+            <PhotoPicker
+              photos={photos}
+              pendingIndex={pendingIndex}
+              currentIndex={photoIndex}
+              error={pickerError}
+              onSelect={(i) => {
+                setPendingIndex(i);
+                setPickerError(null);
+              }}
+              onConfirm={confirmPicker}
+              onCancel={() => onOpenChange(false)}
+            />
+          ) : (
+            <div className="contents">
           {/* Header */}
-          <div className="border-b border-border bg-muted/30 px-6 py-5 md:px-8">
+          <div className="border-b border-border bg-muted/30 px-5 py-4 md:px-8 md:py-5">
             <DialogTitle asChild>
-              <h2 className="font-serif text-2xl text-ink md:text-3xl">
+              <h2 className="font-serif text-xl text-ink sm:text-2xl md:text-3xl">
                 Crea il rendering della tua foto
               </h2>
             </DialogTitle>
             <DialogDescription className="mt-1.5 text-sm text-muted-foreground">
-              Scegli stile e intensità, oppure clicca direttamente sulla foto per iniziare.
+              Scegli stile e intensità, poi genera il rendering della foto selezionata.
             </DialogDescription>
+            {photos.length > 1 && (
+              <button
+                type="button"
+                onClick={openPicker}
+                className="mt-3 inline-flex items-center gap-2 rounded-sm border border-border bg-card px-3 py-2 text-[0.65rem] uppercase tracking-[0.18em] text-ink hover:border-primary/40 md:hidden"
+              >
+                <ImageIcon size={12} className="text-primary" /> Cambia foto
+                <span className="text-muted-foreground">({photoIndex + 1}/{photos.length})</span>
+              </button>
+            )}
           </div>
 
-          {/* Body — 2 cols on desktop, stack on mobile */}
-          <div className="grid gap-6 p-6 pb-28 md:grid-cols-12 md:gap-8 md:p-8 md:pb-8">
+          {/* Body — scrollable area */}
+          <div className="grid gap-6 overflow-y-auto p-5 pb-28 sm:p-6 md:grid-cols-12 md:gap-8 md:p-8 md:pb-8">
             {/* LEFT — hero photo + CTA */}
             <div className="md:col-span-7">
               {!result ? (
@@ -178,9 +247,9 @@ function StagingDialog({
                 />
               )}
 
-              {/* Thumbnails */}
+              {/* Thumbnails — desktop only (mobile uses the picker) */}
               {photos.length > 1 && (
-                <div className="mt-4">
+                <div className="mt-4 hidden md:block">
                   <div className="mb-2 flex items-center justify-between">
                     <span className="text-[0.7rem] uppercase tracking-[0.18em] text-muted-foreground">
                       Altre foto dell'immobile
@@ -341,7 +410,7 @@ function StagingDialog({
           </div>
 
           {/* Mobile sticky action bar */}
-          <div className="sticky bottom-0 left-0 right-0 z-10 border-t border-border bg-background/95 px-4 py-3 backdrop-blur md:hidden">
+          <div className="fixed bottom-0 left-0 right-0 z-10 border-t border-border bg-background/95 px-4 py-3 backdrop-blur md:hidden">
             <div className="mb-2 flex items-center justify-between text-[0.65rem] uppercase tracking-[0.18em] text-muted-foreground">
               <span>Selezione</span>
               <span className="text-primary">{summary}</span>
@@ -364,11 +433,147 @@ function StagingDialog({
             </button>
             {error && <p className="mt-2 text-xs text-destructive">{error}</p>}
           </div>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
 
       <Lightbox src={lightbox} onClose={() => setLightbox(null)} />
     </>
+  );
+}
+
+// — Photo picker (mobile-first full-screen step) —
+function PhotoPicker({
+  photos,
+  pendingIndex,
+  currentIndex,
+  error,
+  onSelect,
+  onConfirm,
+  onCancel,
+}: {
+  photos: string[];
+  pendingIndex: number | null;
+  currentIndex: number;
+  error: string | null;
+  onSelect: (i: number) => void;
+  onConfirm: () => void;
+  onCancel: () => void;
+}) {
+  const empty = photos.length === 0;
+  const preview = pendingIndex != null ? photos[pendingIndex] : null;
+  return (
+    <div className="contents">
+      <div className="flex items-center justify-between gap-3 border-b border-border bg-muted/30 px-5 py-4">
+        <DialogTitle asChild>
+          <h2 className="font-serif text-lg text-ink sm:text-xl">
+            Seleziona la foto per il rendering
+          </h2>
+        </DialogTitle>
+        <DialogDescription className="sr-only">
+          Scegli una foto dell'immobile per creare il rendering AI.
+        </DialogDescription>
+      </div>
+
+      <div className="overflow-y-auto px-5 pb-40 pt-5">
+        {empty ? (
+          <div className="rounded-sm border border-dashed border-border bg-card p-8 text-center">
+            <ImageIcon size={28} className="mx-auto text-muted-foreground" />
+            <p className="mt-3 font-serif text-lg text-ink">
+              Nessuna foto disponibile per il rendering.
+            </p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Carica almeno una foto dell'immobile per usare questa funzione.
+            </p>
+          </div>
+        ) : (
+          <>
+            {preview && (
+              <div className="mb-5 flex items-center gap-3 rounded-sm border border-primary/30 bg-primary/5 p-3">
+                <img
+                  src={preview}
+                  alt=""
+                  className="h-14 w-14 shrink-0 rounded-sm object-cover"
+                />
+                <div className="min-w-0">
+                  <div className="text-[0.65rem] uppercase tracking-[0.18em] text-primary">
+                    Foto selezionata per il rendering
+                  </div>
+                  <div className="text-sm text-ink">
+                    Foto {(pendingIndex ?? 0) + 1} di {photos.length}
+                  </div>
+                </div>
+              </div>
+            )}
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+              {photos.map((g, i) => {
+                const selected = pendingIndex === i;
+                return (
+                  <button
+                    key={g + i}
+                    type="button"
+                    onClick={() => onSelect(i)}
+                    aria-pressed={selected}
+                    className={`group relative aspect-[4/3] overflow-hidden rounded-sm border bg-muted text-left transition ${
+                      selected
+                        ? "border-primary ring-2 ring-primary ring-offset-2 ring-offset-background"
+                        : "border-border hover:border-primary/50"
+                    }`}
+                  >
+                    <img
+                      src={g}
+                      alt={`Foto ${i + 1}`}
+                      loading="lazy"
+                      decoding="async"
+                      className="h-full w-full object-cover"
+                    />
+                    <span className="absolute left-2 top-2 rounded-sm bg-ink/70 px-2 py-0.5 text-[0.6rem] font-medium text-cream backdrop-blur">
+                      {i + 1}
+                    </span>
+                    {selected && (
+                      <span className="absolute right-2 top-2 inline-flex items-center gap-1 rounded-sm bg-primary px-2 py-1 text-[0.6rem] uppercase tracking-[0.18em] text-primary-foreground">
+                        <Check size={11} strokeWidth={3} /> Selezionata
+                      </span>
+                    )}
+                    {i === currentIndex && !selected && (
+                      <span className="absolute bottom-2 left-2 rounded-sm bg-cream/95 px-2 py-0.5 text-[0.6rem] uppercase tracking-[0.18em] text-ink">
+                        Attuale
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </>
+        )}
+      </div>
+
+      <div className="fixed bottom-0 left-0 right-0 z-10 border-t border-border bg-background/95 px-4 py-3 backdrop-blur md:absolute">
+        {error && (
+          <p className="mb-2 text-xs text-destructive" role="alert">
+            {error}
+          </p>
+        )}
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={onCancel}
+            className="inline-flex flex-1 items-center justify-center gap-2 rounded-sm border border-border bg-card px-5 py-3.5 text-xs uppercase tracking-[0.22em] text-ink transition hover:border-primary/40"
+          >
+            <ArrowLeft size={14} /> Annulla
+          </button>
+          <button
+            type="button"
+            onClick={onConfirm}
+            disabled={empty || pendingIndex == null}
+            className="inline-flex flex-[2] items-center justify-center gap-2 rounded-sm bg-primary px-5 py-3.5 text-xs uppercase tracking-[0.22em] text-primary-foreground shadow-sm transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            <Check size={14} /> Conferma foto
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }
 
