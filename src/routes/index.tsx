@@ -5,6 +5,7 @@ import heroPanoramico from "@/assets/real/hero-pontremoli-castello.jpg";
 import heroIntimo from "@/assets/real/hero-centro-storico.jpg";
 import heroColline from "@/assets/real/hero-pontremoli-colline.jpg";
 import heroBorgoAsset from "@/assets/real/bagnone-borgo.jpg.asset.json";
+import borgoTramontoAsset from "@/assets/borgo-tramonto.jpg.asset.json";
 import territoryPontremoli from "@/assets/real/pontremoli-scorcio.jpg";
 import territoryBagnone from "@/assets/real/bagnone-castello.jpg";
 import territoryZeri from "@/assets/real/zeri-monte.jpg";
