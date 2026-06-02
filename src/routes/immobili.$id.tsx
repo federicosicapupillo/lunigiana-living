@@ -3,6 +3,7 @@ import { getPublishedProperty, type PublicProperty } from "@/lib/public-properti
 import { ArrowLeft, MapPin, Maximize2, BedDouble, Bath, Building2 } from "lucide-react";
 import { useState } from "react";
 import { VirtualStaging } from "@/components/virtual-staging";
+import { WatermarkedImage } from "@/components/watermarked-image";
 
 export const Route = createFileRoute("/immobili/$id")({
   loader: async ({ params }) => {
