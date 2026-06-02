@@ -234,6 +234,7 @@ function NewPropertyPage() {
       pushIf("total_floors", f.total_floors);
       pushIf("floor_label", f.floor_label);
       pushIf("furnished_level", f.furnished);
+      pushIf("descrizione_libera", f.descrizione_libera);
       pushIf("long_description", f.long_description);
       pushIf("punti_di_forza", f.punti_di_forza);
       pushIf("target_acquirente", f.target_acquirente);
