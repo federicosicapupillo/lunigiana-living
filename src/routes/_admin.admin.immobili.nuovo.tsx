@@ -724,6 +724,32 @@ function NewPropertyPage() {
           </button>
         </div>
       </div>
+
+      {/* Barra azioni mobile fissa */}
+      <div className="fixed inset-x-0 bottom-0 z-30 flex gap-2 border-t border-border bg-background/95 p-3 backdrop-blur sm:hidden">
+        <button
+          onClick={onSaveDraft}
+          disabled={saving}
+          className="inline-flex flex-1 items-center justify-center gap-2 rounded-sm border border-border bg-background px-3 py-2.5 text-xs uppercase tracking-wider disabled:opacity-50"
+        >
+          {saving ? <Loader2 size={13} className="animate-spin" /> : <Save size={13} />}
+          Bozza
+        </button>
+        <button
+          onClick={onSaveContinue}
+          disabled={saving}
+          className="inline-flex flex-1 items-center justify-center gap-1 rounded-sm bg-primary px-3 py-2.5 text-xs uppercase tracking-wider text-primary-foreground disabled:opacity-50"
+        >
+          <CheckCircle2 size={13} /> Continua
+        </button>
+        <button
+          onClick={onPublish}
+          disabled={saving}
+          className="inline-flex flex-1 items-center justify-center gap-1 rounded-sm bg-emerald-700 px-3 py-2.5 text-xs uppercase tracking-wider text-white disabled:opacity-50"
+        >
+          <Globe2 size={13} /> Pubblica
+        </button>
+      </div>
     </div>
   );
 }
