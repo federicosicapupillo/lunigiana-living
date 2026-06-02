@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { Menu, X, Lock } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import logoAsset from "@/assets/furia-logo.png.asset.json";
 
 const nav = [
