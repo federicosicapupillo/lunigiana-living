@@ -205,9 +205,9 @@ function Index() {
 
           <div className="mt-14 grid gap-px overflow-hidden rounded-sm bg-cream/10 md:grid-cols-3">
             {[
-              { name: "Pontremoli", img: territoryPontremoli, body: "Borgo capoluogo, vita culturale, vie acciottolate." },
-              { name: "Bagnone", img: territoryBagnone, body: "Castello, mercato, sapori antichi." },
-              { name: "Zeri", img: territoryZeri, body: "Boschi profondi, allevamenti, lentezza." },
+                { name: "Pontremoli", img: territoryPontremoli.url, body: "Borgo capoluogo, vita culturale, vie acciottolate." },
+                { name: "Bagnone", img: territoryBagnone.url, body: "Castello, mercato, sapori antichi." },
+                { name: "Zeri", img: territoryZeri.url, body: "Boschi profondi, allevamenti, lentezza." },
             ].map((t) => (
               <Link
                 key={t.name}
