@@ -338,18 +338,18 @@ function NewPropertyPage() {
   };
 
   return (
-    <div className="mx-auto max-w-6xl px-6 py-8">
+    <div className="mx-auto max-w-6xl px-4 py-5 pb-32 sm:px-6 sm:py-8 sm:pb-8">
       {/* Sticky header */}
-      <div className="sticky top-0 z-10 -mx-6 mb-8 border-b border-border bg-background/95 px-6 pb-5 pt-4 backdrop-blur">
+      <div className="sticky top-0 z-10 -mx-4 mb-6 border-b border-border bg-background/95 px-4 pb-4 pt-3 backdrop-blur sm:-mx-6 sm:mb-8 sm:px-6 sm:pb-5 sm:pt-4">
         <Link
           to="/admin/immobili"
           className="inline-flex items-center gap-1 text-xs uppercase tracking-wider text-muted-foreground hover:text-ink"
         >
           <ArrowLeft size={12} /> Torna all'elenco
         </Link>
-        <div className="mt-3 flex flex-wrap items-end justify-between gap-4">
+        <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end sm:justify-between sm:gap-4">
           <div className="min-w-0 flex-1">
-            <h1 className="font-serif text-3xl text-ink">
+            <h1 className="font-serif text-2xl text-ink sm:text-3xl">
               {f.title.trim() || "Nuovo immobile"}
             </h1>
             <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
@@ -362,7 +362,7 @@ function NewPropertyPage() {
               </span>
             </div>
           </div>
-          <div className="flex flex-wrap gap-2">
+          <div className="hidden flex-wrap gap-2 sm:flex">
             <button
               onClick={onSaveDraft}
               disabled={saving}
@@ -740,9 +740,9 @@ function Section({
   children: React.ReactNode;
 }) {
   return (
-    <section className="rounded-sm border border-border bg-card p-6">
+    <section className="rounded-sm border border-border bg-card p-4 sm:p-6">
       <header className="mb-5 border-b border-border pb-3">
-        <h2 className="font-serif text-xl text-ink">{title}</h2>
+        <h2 className="font-serif text-lg text-ink sm:text-xl">{title}</h2>
         {subtitle && <p className="mt-1 text-xs uppercase tracking-wider text-muted-foreground">{subtitle}</p>}
       </header>
       <div className="grid gap-4 md:grid-cols-2">{children}</div>
@@ -772,7 +772,7 @@ function Field({
 }
 
 const inputCls =
-  "w-full rounded-sm border border-border bg-background px-3 py-2 text-sm focus:border-primary focus:outline-none disabled:opacity-50";
+  "w-full rounded-sm border border-border bg-background px-3 py-2.5 text-base focus:border-primary focus:outline-none disabled:opacity-50 sm:py-2 sm:text-sm";
 
 function TextInput({
   value,
