@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { MapPin, Maximize2, BedDouble } from "lucide-react";
+import { MapPin, Maximize2, BedDouble, ArrowRight } from "lucide-react";
 import type { Property } from "@/lib/properties";
 
 export function PropertyCard({ p }: { p: Property }) {
@@ -7,7 +7,8 @@ export function PropertyCard({ p }: { p: Property }) {
     <Link
       to="/immobili/$id"
       params={{ id: String(p.id) }}
-      className="group block overflow-hidden rounded-sm bg-card transition-all duration-500 hover:-translate-y-1"
+      aria-label={`Apri scheda immobile ${p.reference} — ${p.title} a ${p.location}`}
+      className="group block overflow-hidden rounded-sm bg-card transition-all duration-500 hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
     >
       <div className="relative aspect-[4/3] overflow-hidden bg-muted">
         <img
@@ -21,10 +22,15 @@ export function PropertyCard({ p }: { p: Property }) {
             {p.tag}
           </span>
         )}
+        <span className="pointer-events-none absolute inset-x-0 bottom-0 flex items-center justify-end gap-2 bg-gradient-to-t from-ink/75 via-ink/25 to-transparent p-4 text-[0.65rem] uppercase tracking-[0.2em] text-cream opacity-0 transition-opacity duration-500 group-hover:opacity-100">
+          Apri scheda <ArrowRight size={14} />
+        </span>
       </div>
       <div className="px-1 pt-5 pb-2">
         <div className="eyebrow">{p.reference} · {p.type}</div>
-        <h3 className="mt-2 font-serif text-2xl leading-tight text-ink">{p.title}</h3>
+        <h3 className="mt-2 font-serif text-2xl leading-tight text-ink transition-colors group-hover:text-primary">
+          {p.title}
+        </h3>
         <div className="mt-2 flex items-center gap-1.5 text-sm text-muted-foreground">
           <MapPin size={14} /> {p.location}
         </div>
@@ -39,6 +45,10 @@ export function PropertyCard({ p }: { p: Property }) {
           </div>
           <div className="font-serif text-lg text-primary">{p.price}</div>
         </div>
+        <span className="mt-5 flex items-center justify-between rounded-sm bg-ink px-5 py-3 text-[0.7rem] uppercase tracking-[0.2em] text-cream transition group-hover:bg-primary">
+          Vedi immobile
+          <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
+        </span>
       </div>
     </Link>
   );
