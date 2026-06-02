@@ -254,6 +254,45 @@ function StagingDialog({
                 })}
               </div>
 
+              <div className="eyebrow mt-8 text-muted-foreground">
+                4. Intensità della trasformazione
+              </div>
+              <div className="mt-3 grid grid-cols-2 gap-2">
+                {(
+                  [
+                    {
+                      id: "decisa" as Intensity,
+                      label: "Decisa",
+                      hint: "Restyling completo: arredo, palette e atmosfera cambiano nettamente.",
+                    },
+                    {
+                      id: "delicata" as Intensity,
+                      label: "Delicata",
+                      hint: "Restyling più morbido, qualche elemento originale può rimanere.",
+                    },
+                  ]
+                ).map((s) => {
+                  const selected = intensity === s.id;
+                  return (
+                    <button
+                      key={s.id}
+                      type="button"
+                      onClick={() => setIntensity(s.id)}
+                      className={`rounded-sm border p-3 text-left transition ${
+                        selected
+                          ? "border-primary bg-primary/5"
+                          : "border-border bg-card hover:border-primary/50"
+                      }`}
+                    >
+                      <div className="font-serif text-base text-ink">{s.label}</div>
+                      <p className="mt-1 text-[0.7rem] leading-snug text-muted-foreground">
+                        {s.hint}
+                      </p>
+                    </button>
+                  );
+                })}
+              </div>
+
               <button
                 type="button"
                 onClick={generate}
