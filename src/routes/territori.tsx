@@ -7,7 +7,7 @@ import villafranca from "@/assets/real/villafranca-ponte.jpg";
 import filattiera from "@/assets/real/filattiera.jpg";
 import mulazzo from "@/assets/real/mulazzo.jpg";
 import { territories } from "@/lib/properties";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, MapPin, Mountain, Sparkles } from "lucide-react";
 
 const imageBySlug: Record<string, string> = {
   pontremoli, bagnone, zeri, villafranca, filattiera, mulazzo,
@@ -16,10 +16,10 @@ const imageBySlug: Record<string, string> = {
 export const Route = createFileRoute("/territori")({
   head: () => ({
     meta: [
-      { title: "Vivere in Lunigiana — Territori e borghi | Furia Immobiliare" },
-      { name: "description", content: "Pontremoli, Villafranca, Filattiera, Mulazzo, Bagnone, Zeri: scopri le diverse anime della Lunigiana per scegliere dove vivere." },
+      { title: "Vivere in Lunigiana — Borghi, paesaggi e atmosfere | Furia Immobiliare" },
+      { name: "description", content: "Pontremoli, Villafranca, Bagnone, Filattiera, Mulazzo, Zeri: una guida ai borghi della Lunigiana per scegliere con consapevolezza dove vivere o comprare casa." },
       { property: "og:title", content: "Vivere in Lunigiana — Furia Immobiliare" },
-      { property: "og:description", content: "Una guida ai borghi e alle atmosfere della Lunigiana." },
+      { property: "og:description", content: "Sei borghi, sei atmosfere. Una guida sincera alla Lunigiana, scritta da chi questa terra la abita e la racconta ogni giorno." },
     ],
     links: [{ rel: "canonical", href: "/territori" }],
   }),
@@ -37,6 +37,12 @@ function TerritoriPage() {
           <h1 className="mt-4 max-w-3xl font-serif text-5xl leading-[1.05] text-cream md:text-7xl">
             Una terra di confine,<br /><em className="font-normal italic">tre regioni, una luce sola.</em>
           </h1>
+          <p className="mt-6 max-w-2xl text-lg leading-relaxed text-cream/85 md:text-xl">
+            La Lunigiana non è un'idea di Toscana, né di Liguria, né di Emilia.
+            È il punto in cui le tre si incontrano e diventano qualcos'altro:
+            castelli, fiumi, pievi e borghi vivi, dove la casa è ancora una scelta
+            di vita e non solo un investimento.
+          </p>
         </div>
       </section>
 
@@ -44,20 +50,59 @@ function TerritoriPage() {
         <div className="md:col-span-5">
           <span className="eyebrow">Il luogo</span>
           <h2 className="mt-3 font-serif text-4xl text-ink md:text-5xl">
-            Tra Toscana, Liguria ed Emilia.
+            Tra Toscana, Liguria<br /><em className="italic">ed Emilia.</em>
           </h2>
+          <p className="mt-6 text-sm uppercase tracking-[0.2em] text-muted-foreground">
+            Massa-Carrara · alta valle del Magra
+          </p>
         </div>
         <div className="space-y-5 text-base leading-relaxed text-foreground/85 md:col-span-6 md:col-start-7">
           <p>
-            La Lunigiana è una valle stretta tra l'Appennino e le Alpi Apuane,
-            attraversata dal fiume Magra e dalla via Francigena. Per secoli è
-            stata terra di passaggio, di pievi, di castelli Malaspina.
+            La Lunigiana è una valle stretta fra l'Appennino tosco-emiliano e
+            le Alpi Apuane, attraversata dal fiume Magra e dalla via Francigena.
+            Per secoli è stata terra di passaggio: pellegrini diretti a Roma,
+            mercanti, pastori, eserciti. Da quel transito sono nate pievi
+            romaniche, castelli Malaspina e una rete fittissima di borghi in
+            pietra arroccati sui crinali.
           </p>
           <p>
-            Oggi è uno dei pochi luoghi in Italia dove i borghi medievali sono
-            ancora abitati davvero, e dove il prezzo di una casa di carattere
-            non ha ancora perso il senso delle proporzioni.
+            Oggi è uno dei pochi luoghi in Italia dove i centri storici
+            medievali sono ancora abitati davvero — non solo visitati — e dove
+            il prezzo di una casa di carattere non ha perso il senso delle
+            proporzioni. Un'ora dal mare delle Cinque Terre, un'ora dalle piste
+            dell'Abetone, mezz'ora dai marmi di Carrara: la Lunigiana è centrale
+            proprio perché sembra appartata.
           </p>
+        </div>
+      </section>
+
+      <section className="border-y border-border/60 bg-card">
+        <div className="container-editorial grid gap-10 py-20 md:grid-cols-3 md:py-24">
+          {[
+            {
+              icon: MapPin,
+              title: "Posizione strategica",
+              body: "Casello A15 della Cisa, stazione di Pontremoli sulla Parma-La Spezia, aeroporti di Pisa e Genova a circa un'ora. Milano in poco più di due ore di auto.",
+            },
+            {
+              icon: Mountain,
+              title: "Paesaggio intatto",
+              body: "Parco Nazionale dell'Appennino Tosco-Emiliano, Apuane, foreste di castagni e faggi, fiumi balneabili. Una densità abitativa fra le più basse del centro Italia.",
+            },
+            {
+              icon: Sparkles,
+              title: "Qualità della vita",
+              body: "Servizi essenziali in ogni capoluogo, scuole, sanità di prossimità, mercati settimanali, una scena gastronomica autentica (testaroli, panigacci, funghi di Borgotaro, agnello di Zeri).",
+            },
+          ].map(({ icon: Icon, title, body }) => (
+            <div key={title}>
+              <div className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-primary/10 text-primary">
+                <Icon size={20} />
+              </div>
+              <h3 className="mt-5 font-serif text-2xl text-ink">{title}</h3>
+              <p className="mt-3 text-sm leading-relaxed text-foreground/80">{body}</p>
+            </div>
+          ))}
         </div>
       </section>
 
@@ -65,8 +110,15 @@ function TerritoriPage() {
         <div className="container-editorial">
           <span className="eyebrow">I borghi</span>
           <h2 className="mt-3 max-w-3xl font-serif text-4xl text-ink md:text-5xl">
-            Sei luoghi, sei atmosfere diverse.
+            Sei luoghi,<br /><em className="italic">sei atmosfere diverse.</em>
           </h2>
+          <p className="mt-6 max-w-2xl text-base leading-relaxed text-foreground/80">
+            La Lunigiana cambia carattere ogni dieci chilometri. Un borgo
+            commerciale e colto come Pontremoli non somiglia a un'aia di pietra
+            di Zeri, e una loggia rinascimentale di Filattiera non racconta la
+            stessa storia di un mulino sul torrente di Bagnone. Ti aiutiamo a
+            riconoscere queste differenze prima di scegliere dove cercare casa.
+          </p>
 
           <div className="mt-16 space-y-24">
             {territories.map((t, i) => (
@@ -91,6 +143,65 @@ function TerritoriPage() {
               </article>
             ))}
           </div>
+        </div>
+      </section>
+
+      <section className="container-editorial grid gap-12 py-24 md:grid-cols-12 md:py-32">
+        <div className="md:col-span-5">
+          <span className="eyebrow">Comprare in Lunigiana</span>
+          <h2 className="mt-3 font-serif text-4xl text-ink md:text-5xl">
+            Cosa si trova,<br /><em className="italic">e a che condizioni.</em>
+          </h2>
+        </div>
+        <div className="space-y-5 text-base leading-relaxed text-foreground/85 md:col-span-6 md:col-start-7">
+          <p>
+            Il mercato lunigianese non assomiglia a quello di Lucca o della
+            Versilia. Qui si trovano ancora case di paese in pietra a vista,
+            rustici da recuperare con porzioni di terreno, casali isolati con
+            vista sull'Appennino, appartamenti nei centri storici e ville
+            indipendenti in collina. I valori al metro quadro sono fra i più
+            accessibili della Toscana, soprattutto fuori dai centri principali.
+          </p>
+          <p>
+            È un mercato che premia chi sa leggere le sfumature: l'esposizione
+            del versante, lo stato delle strutture portanti, la viabilità
+            invernale, i vincoli paesaggistici, le pratiche edilizie pregresse.
+            Sono proprio gli aspetti su cui ti accompagniamo, perché una bella
+            foto da sola non basta a dire se quella casa è davvero per te.
+          </p>
+        </div>
+      </section>
+
+      <section className="bg-ink py-24 text-cream md:py-32">
+        <div className="container-editorial max-w-3xl text-center">
+          <span className="eyebrow text-cream/70">Trova la tua Lunigiana</span>
+          <h2 className="mt-4 font-serif text-4xl leading-tight md:text-5xl">
+            Non sei sicuro<br />
+            <em className="italic">da dove cominciare?</em>
+          </h2>
+          <p className="mx-auto mt-6 max-w-xl text-base leading-relaxed text-cream/80">
+            Raccontaci come immagini la tua casa, il tempo che vorresti
+            dedicarle e cosa cerchi intorno: borgo vivo, campagna silenziosa,
+            vicinanza al mare o alla montagna. Ti proponiamo i territori e gli
+            immobili più coerenti con la tua idea, senza farti perdere tempo.
+          </p>
+          <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+            <Link
+              to="/contatti"
+              className="inline-flex items-center justify-center gap-2 rounded-sm bg-cream px-8 py-4 text-xs uppercase tracking-[0.22em] text-ink transition hover:bg-cream/90"
+            >
+              Parla con Elena <ArrowRight size={14} />
+            </Link>
+            <Link
+              to="/immobili"
+              className="inline-flex items-center justify-center gap-2 text-xs uppercase tracking-[0.22em] text-cream/85 hover:text-cream"
+            >
+              Vedi gli immobili disponibili
+            </Link>
+          </div>
+          <p className="mt-6 text-[0.7rem] uppercase tracking-[0.2em] text-cream/55">
+            Consulenza iniziale gratuita · risposta entro 24 ore
+          </p>
         </div>
       </section>
     </>
