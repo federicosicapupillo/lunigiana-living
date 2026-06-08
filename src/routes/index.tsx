@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
 import heroTramontoVignetiAsset from "@/assets/real/hero-tramonto-ulivi.png.asset.json";
 import heroPontremoliCentroStorico from "@/assets/real/pontremoli-hero-centro-storico.png.asset.json";
+import heroElenaCometa from "@/assets/elena-furia.png.asset.json";
 import territoryPontremoli from "@/assets/real/pontremoli-lunigiana-v2.png.asset.json";
 import territoryBagnone from "@/assets/real/bagnone-lunigiana.png.asset.json";
 import territoryZeri from "@/assets/real/zeri-lunigiana.png.asset.json";
@@ -51,14 +52,72 @@ function Index() {
     .filter((p) => p.featured && p.category === "vendita")
     .slice(0, 6);
   const isPontremoli = heroVariant === "pontremoli_historic_center";
-  const heroSrc = isPontremoli ? heroPontremoliCentroStorico.url : heroTramontoVignetiAsset.url;
+  const isElena = heroVariant === "elena_cometa";
+  const heroSrc = isElena
+    ? heroElenaCometa.url
+    : isPontremoli
+      ? heroPontremoliCentroStorico.url
+      : heroTramontoVignetiAsset.url;
   const heroAlt = isPontremoli
     ? "Pontremoli: il fiume Magra, il Duomo con cupola in rame, il centro storico e il Castello del Piagnaro sullo sfondo"
+    : isElena
+    ? "Elena Furia con Cometa, volto di Furia Immobiliare in Lunigiana"
     : "Tramonto infuocato sulle Apuane con vigneti, uliveti e borgo della Lunigiana in lontananza";
   const heroObjectPosition = isPontremoli ? "center center" : "center";
   return (
     <>
       {/* HERO */}
+      {isElena ? (
+        <section className="relative isolate -mt-20 overflow-hidden bg-cream">
+          <div className="absolute inset-0 -z-10 bg-gradient-to-br from-cream via-cream to-[hsl(var(--muted))]" />
+          <div className="container-editorial grid min-h-[88svh] grid-cols-1 items-center gap-10 pb-12 pt-32 sm:min-h-[92svh] sm:pb-16 sm:pt-40 md:min-h-[100svh] md:grid-cols-12 md:gap-12 md:pb-24">
+            <div className="md:col-span-6 lg:col-span-6">
+              <span className="eyebrow text-primary">Furia Immobiliare · Lunigiana</span>
+              <h1 className="mt-4 font-serif text-[2.4rem] leading-[1.05] text-ink sm:text-5xl sm:leading-[1.02] md:text-6xl lg:text-7xl">
+                La casa giusta si riconosce<br />
+                <em className="font-normal italic">anche dal cuore.</em>
+              </h1>
+              <p className="mt-5 max-w-xl text-sm leading-relaxed text-foreground/80 sm:text-base md:text-lg">
+                Con Elena e Cometa, Furia Immobiliare accompagna chi cerca una casa
+                autentica in Lunigiana: non solo un immobile, ma un luogo in cui
+                sentirsi davvero a casa.
+              </p>
+              <div className="mt-8 flex flex-wrap items-center gap-3 sm:mt-10 sm:gap-4">
+                <Link
+                  to="/immobili"
+                  className="inline-flex items-center gap-2 rounded-sm bg-ink px-6 py-3.5 text-[0.7rem] uppercase tracking-[0.2em] text-cream transition hover:bg-ink/90 sm:px-8 sm:py-4 sm:text-xs sm:tracking-[0.22em]"
+                >
+                  Cerca la tua casa <ArrowRight size={14} />
+                </Link>
+                <Link
+                  to="/contatti"
+                  className="inline-flex items-center gap-2 rounded-sm border border-ink px-6 py-3.5 text-[0.7rem] uppercase tracking-[0.2em] text-ink transition hover:bg-ink hover:text-cream sm:px-8 sm:py-4 sm:text-xs sm:tracking-[0.22em]"
+                >
+                  Parla con Elena
+                </Link>
+              </div>
+            </div>
+            <div className="md:col-span-6 lg:col-span-6">
+              <div className="relative mx-auto aspect-[4/5] w-full max-w-md overflow-hidden rounded-sm shadow-2xl md:max-w-none">
+                <img
+                  src={heroElenaCometa.url}
+                  alt={heroAlt}
+                  fetchPriority="high"
+                  decoding="async"
+                  loading="eager"
+                  className="absolute inset-0 h-full w-full object-cover"
+                  style={{ objectPosition: "center 30%" }}
+                />
+                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-ink/40 to-transparent p-5">
+                  <div className="text-[0.65rem] uppercase tracking-[0.22em] text-cream/90">
+                    Elena e Cometa · Furia Immobiliare
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      ) : (
       <section className="relative isolate -mt-20 flex min-h-[88svh] items-end overflow-hidden sm:min-h-[92svh] md:min-h-[100svh]">
         <img
           src={heroSrc}
@@ -97,6 +156,7 @@ function Index() {
           </div>
         </div>
       </section>
+      )}
 
       {/* BRAND STATEMENT */}
       <section className="container-editorial grid gap-10 py-16 sm:py-20 md:grid-cols-12 md:gap-12 md:py-32">
