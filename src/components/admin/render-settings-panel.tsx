@@ -45,10 +45,13 @@ export function RenderSettingsPanel({ imageId, initial, onSaved }: Props) {
   const [state, setState] = useState<RenderSettings>(initial);
   const [saving, setSaving] = useState(false);
   const [dirty, setDirty] = useState(false);
+  const [justSaved, setJustSaved] = useState(false);
   const run = useServerFn(saveRenderSettings);
 
   useEffect(() => {
     setState(initial);
+    setDirty(false);
+    setJustSaved(false);
   }, [imageId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const update = <K extends keyof RenderSettings>(k: K, v: RenderSettings[K]) => {
@@ -58,6 +61,7 @@ export function RenderSettingsPanel({ imageId, initial, onSaved }: Props) {
       return next;
     });
     setDirty(true);
+    setJustSaved(false);
   };
 
   const save = async () => {
@@ -65,7 +69,10 @@ export function RenderSettingsPanel({ imageId, initial, onSaved }: Props) {
     try {
       await run({ data: { imageId, settings: state } });
       setDirty(false);
+      setJustSaved(true);
+      toast.success("Impostazioni rendering salvate");
       onSaved?.(state);
+      setTimeout(() => setJustSaved(false), 2500);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Errore salvataggio");
     } finally {
@@ -90,7 +97,12 @@ export function RenderSettingsPanel({ imageId, initial, onSaved }: Props) {
           {!state.photo_type && (
             <span className="ml-1 text-destructive">· da configurare</span>
           )}
-          {dirty && <span className="ml-1 text-primary">· modifiche non salvate</span>}
+          {dirty && !saving && (
+            <span className="ml-1 text-primary">· modifiche non salvate</span>
+          )}
+          {!dirty && state.photo_type && (
+            <span className="ml-1 text-emerald-600">· salvate</span>
+          )}
         </span>
         <ChevronDown
           size={12}
@@ -240,12 +252,32 @@ export function RenderSettingsPanel({ imageId, initial, onSaved }: Props) {
           <button
             type="button"
             onClick={save}
-            disabled={saving || !dirty}
-            className="inline-flex w-full items-center justify-center gap-1 rounded-sm border border-border bg-background px-2 py-1.5 text-[10px] uppercase tracking-wider hover:border-primary/50 disabled:opacity-40"
+            disabled={saving || (!dirty && !justSaved)}
+            className={`inline-flex w-full items-center justify-center gap-1 rounded-sm border px-2 py-1.5 text-[10px] uppercase tracking-wider transition disabled:opacity-50 ${
+              dirty
+                ? "border-primary bg-primary text-primary-foreground hover:bg-primary/90"
+                : "border-border bg-background hover:border-primary/50"
+            }`}
           >
             {saving ? <Loader2 size={12} className="animate-spin" /> : <Save size={12} />}
-            Salva impostazioni
+            {saving
+              ? "Salvataggio…"
+              : dirty
+              ? "Salva impostazioni"
+              : justSaved
+              ? "Impostazioni salvate"
+              : "Impostazioni rendering salvate"}
           </button>
+          {!dirty && state.photo_type && (
+            <p className="text-center text-[10px] text-emerald-600">
+              Foto pronta per il rendering
+            </p>
+          )}
+          {!state.photo_type && (
+            <p className="text-center text-[10px] text-muted-foreground">
+              Seleziona almeno il tipo foto per abilitare il rendering
+            </p>
+          )}
         </div>
       )}
     </div>
