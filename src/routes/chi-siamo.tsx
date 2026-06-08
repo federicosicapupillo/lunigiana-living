@@ -92,7 +92,7 @@ function ChiSiamoPage() {
 
           <div className="mt-12 grid gap-6 md:mt-16 md:grid-cols-3">
             {[
-              { n: "30+", l: "Anni sul territorio", b: "Una presenza continua a Pontremoli e in tutta la Lunigiana." },
+              { n: "18+", l: "Anni sul territorio", b: "Una presenza continua a Pontremoli e in tutta la Lunigiana." },
               { n: "500+", l: "Famiglie accompagnate", b: "Compratori italiani e internazionali che hanno scelto questa terra." },
               { n: "6", l: "Comuni di riferimento", b: "Pontremoli, Villafranca, Filattiera, Mulazzo, Bagnone, Zeri." },
             ].map((s) => (
