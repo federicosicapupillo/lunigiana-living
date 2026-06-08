@@ -10,6 +10,7 @@ import {
 } from "@/lib/site-settings.functions";
 import heroLunigiana from "@/assets/real/hero-tramonto-ulivi.png.asset.json";
 import heroPontremoli from "@/assets/real/pontremoli-hero-centro-storico.png.asset.json";
+import heroElena from "@/assets/elena-furia.png.asset.json";
 
 export const Route = createFileRoute("/_admin/admin/impostazioni")({
   head: () => ({
@@ -33,6 +34,12 @@ const OPTIONS: Array<{ id: HomeHeroVariant; label: string; desc: string; img: st
     label: "Hero Pontremoli centro storico",
     desc: "Foto di Pontremoli con fiume, Duomo e Castello sullo sfondo.",
     img: heroPontremoli.url,
+  },
+  {
+    id: "elena_cometa",
+    label: "Hero Elena e Cometa",
+    desc: "Layout boutique con Elena e Cometa: presenza umana e identità Furia.",
+    img: heroElena.url,
   },
 ];
 
