@@ -256,8 +256,11 @@ export type Database = {
           desired_lighting: string | null
           id: string
           image_url: string
+          import_status: string | null
+          imported_source_url: string | null
           intervention_level: string | null
           is_cover: boolean
+          is_imported: boolean
           photo_category: string | null
           photo_type: string | null
           preserve_structure: boolean
@@ -281,8 +284,11 @@ export type Database = {
           desired_lighting?: string | null
           id?: string
           image_url: string
+          import_status?: string | null
+          imported_source_url?: string | null
           intervention_level?: string | null
           is_cover?: boolean
+          is_imported?: boolean
           photo_category?: string | null
           photo_type?: string | null
           preserve_structure?: boolean
@@ -306,8 +312,11 @@ export type Database = {
           desired_lighting?: string | null
           id?: string
           image_url?: string
+          import_status?: string | null
+          imported_source_url?: string | null
           intervention_level?: string | null
           is_cover?: boolean
+          is_imported?: boolean
           photo_category?: string | null
           photo_type?: string | null
           preserve_structure?: boolean

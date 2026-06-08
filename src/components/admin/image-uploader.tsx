@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { ImagePlus, Star, StarOff, Trash2, ArrowUp, ArrowDown, Loader2, Sparkles, Check } from "lucide-react";
+import { ImagePlus, Star, StarOff, Trash2, ArrowUp, ArrowDown, Loader2, Sparkles, Check, CloudDownload } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import {
   renderPropertyImage,
   setPropertyImagePublished,
+  syncImportedImage,
 } from "@/lib/property-render.functions";
 import { RenderSettingsPanel } from "@/components/admin/render-settings-panel";
 import type { RenderSettings } from "@/lib/render-options";
@@ -21,6 +22,10 @@ type Image = {
   render_status: string;
   render_error: string | null;
   use_rendered: boolean;
+  // import status
+  is_imported: boolean;
+  import_status: string | null;
+  imported_source_url: string | null;
   // render settings
   photo_type: string | null;
   photo_category: string | null;
@@ -57,16 +62,18 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [renderingId, setRenderingId] = useState<string | null>(null);
+  const [syncingId, setSyncingId] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const runRender = useServerFn(renderPropertyImage);
   const runSetPublished = useServerFn(setPropertyImagePublished);
+  const runSync = useServerFn(syncImportedImage);
 
   const load = async () => {
     setLoading(true);
     const { data, error } = await supabase
       .from("property_images")
       .select(
-        "id, image_url, storage_path, alt_text, sort_order, is_cover, rendered_storage_path, render_status, render_error, use_rendered, photo_type, photo_category, render_style, render_goal, room_condition, intervention_level, preserve_structure, desired_lighting, visual_target, render_notes",
+        "id, image_url, storage_path, alt_text, sort_order, is_cover, rendered_storage_path, render_status, render_error, use_rendered, is_imported, import_status, imported_source_url, photo_type, photo_category, render_style, render_goal, room_condition, intervention_level, preserve_structure, desired_lighting, visual_target, render_notes",
       )
       .eq("property_id", propertyId)
       .order("sort_order", { ascending: true });
@@ -202,6 +209,20 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
     }
   };
 
+  const syncImage = async (img: Image) => {
+    setSyncingId(img.id);
+    try {
+      await runSync({ data: { imageId: img.id } });
+      toast.success("Foto sincronizzata nello storage");
+      await load();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Errore sincronizzazione");
+      await load();
+    } finally {
+      setSyncingId(null);
+    }
+  };
+
   return (
     <div>
       <div className="flex items-center justify-between">
@@ -287,6 +308,28 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
                 />
                 {/* Rendering controls */}
                 <div className="space-y-2 rounded-sm border border-border bg-muted/30 p-2">
+                  {img.is_imported && img.import_status !== "synced_to_storage" && (
+                    <div className="rounded-sm border border-orange-300 bg-orange-50 p-2 text-[10px] text-orange-900">
+                      <div className="font-semibold uppercase tracking-wider">Foto importata</div>
+                      <p className="mt-1">
+                        Questa foto proviene dal vecchio sito e non è ancora salvata nello
+                        storage interno. Sincronizzala prima di generare il rendering.
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => syncImage(img)}
+                        disabled={syncingId === img.id}
+                        className="mt-2 inline-flex items-center gap-1 rounded-sm bg-orange-700 px-2 py-1 text-[10px] uppercase tracking-wider text-white hover:bg-orange-800 disabled:opacity-50"
+                      >
+                        {syncingId === img.id ? (
+                          <Loader2 size={11} className="animate-spin" />
+                        ) : (
+                          <CloudDownload size={11} />
+                        )}
+                        Sincronizza foto importata
+                      </button>
+                    </div>
+                  )}
                   <RenderSettingsPanel
                     imageId={img.id}
                     initial={extractSettings(img)}
@@ -295,7 +338,11 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
                     <button
                       type="button"
                       onClick={() => generate(img)}
-                      disabled={renderingId === img.id || !img.photo_type}
+                      disabled={
+                        renderingId === img.id ||
+                        !img.photo_type ||
+                        syncingId === img.id
+                      }
                       className="inline-flex flex-1 items-center justify-center gap-1 rounded-sm bg-primary px-2 py-1.5 text-[10px] uppercase tracking-wider text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
                     >
                       {renderingId === img.id ? (
