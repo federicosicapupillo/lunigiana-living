@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { ImagePlus, Star, StarOff, Trash2, ArrowUp, ArrowDown, Loader2, Sparkles, Check, CloudDownload } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import {
+  checkImageRenderAvailability,
   renderPropertyImage,
   setPropertyImagePublished,
   syncImportedImage,
@@ -14,6 +15,9 @@ import type { RenderSettings } from "@/lib/render-options";
 type Image = {
   id: string;
   image_url: string;
+  original_image_url: string | null;
+  rendered_image_url: string | null;
+  published_image_url: string | null;
   storage_path: string;
   alt_text: string | null;
   sort_order: number;
@@ -38,6 +42,12 @@ type Image = {
   visual_target: string | null;
   render_notes: string | null;
   rendered_signed_url?: string | null;
+  render_availability?: {
+    canRender: boolean;
+    state: "ready_manual" | "imported_external" | "ready_synced" | "sync_error";
+    statusLabel: string;
+    message: string | null;
+  };
 };
 
 const SIGNED_URL_TTL_SECONDS = 60 * 60 * 24 * 365 * 5; // ~5 anni
@@ -67,13 +77,14 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
   const runRender = useServerFn(renderPropertyImage);
   const runSetPublished = useServerFn(setPropertyImagePublished);
   const runSync = useServerFn(syncImportedImage);
+  const runCheckAvailability = useServerFn(checkImageRenderAvailability);
 
   const load = async () => {
     setLoading(true);
     const { data, error } = await supabase
       .from("property_images")
       .select(
-        "id, image_url, storage_path, alt_text, sort_order, is_cover, rendered_storage_path, render_status, render_error, use_rendered, is_imported, import_status, imported_source_url, photo_type, photo_category, render_style, render_goal, room_condition, intervention_level, preserve_structure, desired_lighting, visual_target, render_notes",
+        "id, image_url, original_image_url, rendered_image_url, published_image_url, storage_path, alt_text, sort_order, is_cover, rendered_storage_path, render_status, render_error, use_rendered, is_imported, import_status, imported_source_url, photo_type, photo_category, render_style, render_goal, room_condition, intervention_level, preserve_structure, desired_lighting, visual_target, render_notes",
       )
       .eq("property_id", propertyId)
       .order("sort_order", { ascending: true });
@@ -92,10 +103,25 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
         }
       }
     }
+    const availability = await Promise.all(
+      rows.map(async (r) => {
+        try {
+          return await runCheckAvailability({ data: { imageId: r.id } });
+        } catch {
+          return {
+            canRender: false,
+            state: "sync_error" as const,
+            statusLabel: "Errore sincronizzazione",
+            message: "Impossibile verificare la disponibilità della foto nello storage.",
+          };
+        }
+      }),
+    );
     setImages(
-      rows.map((r) => ({
+      rows.map((r, idx) => ({
         ...r,
         rendered_signed_url: r.rendered_storage_path ? signedMap[r.rendered_storage_path] ?? null : null,
+        render_availability: availability[idx],
       })),
     );
     setLoading(false);
@@ -132,9 +158,14 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
         const { error: insErr } = await supabase.from("property_images").insert({
           property_id: propertyId,
           image_url: signed.signedUrl,
+          original_image_url: signed.signedUrl,
+          published_image_url: signed.signedUrl,
           storage_path: path,
           sort_order: baseOrder + count,
           is_cover: willBeFirstUpload && count === 0,
+          is_imported: false,
+          import_status: "synced_to_storage",
+          render_status: "not_generated",
         });
         if (insErr) toast.error(`Salvataggio metadati: ${insErr.message}`);
         count++;
@@ -182,6 +213,10 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
   };
 
   const generate = async (img: Image) => {
+    if (!img.render_availability?.canRender) {
+      toast.error(img.render_availability?.message ?? "Sincronizza la foto prima di generare il rendering");
+      return;
+    }
     if (!img.photo_type) {
       toast.error("Configura prima le impostazioni rendering (Tipo foto)");
       return;
