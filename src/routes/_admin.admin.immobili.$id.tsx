@@ -7,9 +7,7 @@ import {
   Save,
   Sparkles,
   Loader2,
-  CheckCircle2,
-  Trash2,
-  Globe2,
+  ChevronDown,
   FileText,
 } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
@@ -23,6 +21,8 @@ import {
   CONDITIONS,
   EPI_STATUS_OPTIONS,
   STATUS_LABELS,
+  STATUS_BADGE_CLASSES,
+  type PropertyStatus,
   LENGTH_OPTIONS,
   TONE_OPTIONS,
   FLOOR_OPTIONS,
@@ -52,6 +52,14 @@ import {
   type MultiSelectKey,
 } from "@/lib/admin/property-constants";
 import { MultiSelectChips } from "@/components/admin/multi-select-chips";
+import {
+  availableActions,
+  applyStatusTransition,
+  ACTION_LABELS,
+  CONFIRM_COPY,
+  type StatusAction,
+} from "@/lib/admin/property-status";
+import { ConfirmDialog } from "@/components/admin/confirm-dialog";
 
 type Property = {
   id: string;
@@ -92,7 +100,7 @@ type Property = {
   longitude: number | null;
   short_notes: string | null;
   internal_notes: string | null;
-  status: "draft" | "ready" | "published";
+  status: PropertyStatus;
 };
 
 type Description = {
