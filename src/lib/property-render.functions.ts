@@ -97,6 +97,93 @@ const SettingsSchema = z.object({
   render_notes: z.string().max(500).nullable(),
 });
 
+/**
+ * Scarica una foto da un URL esterno e la carica nello storage interno.
+ * Aggiorna la riga `property_images` impostando storage_path al nuovo path
+ * interno e marcando import_status = 'synced_to_storage'.
+ * Restituisce il nuovo storage_path interno.
+ */
+async function syncImportedImageToBucket(
+  imageId: string,
+  propertyId: string,
+  sourceUrl: string,
+): Promise<{ storagePath: string; mime: string; bytes: Uint8Array }> {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const r = await fetch(sourceUrl);
+  if (!r.ok) {
+    throw new Error(
+      `Questa immagine è stata importata da una fonte esterna e non è ancora disponibile per il rendering. Ricarica o sincronizza la foto. (HTTP ${r.status})`,
+    );
+  }
+  const mime = r.headers.get("content-type") || "image/jpeg";
+  const bytes = new Uint8Array(await r.arrayBuffer());
+  const ext = mime.includes("png") ? "png" : mime.includes("webp") ? "webp" : "jpg";
+  const storagePath = `${propertyId}/imported/${imageId}.${ext}`;
+
+  const { error: upErr } = await supabaseAdmin.storage
+    .from("property-images")
+    .upload(storagePath, bytes, { contentType: mime, upsert: true });
+  if (upErr) {
+    await supabaseAdmin
+      .from("property_images")
+      .update({ import_status: "import_error" })
+      .eq("id", imageId);
+    throw new Error(`Sincronizzazione fallita: ${upErr.message}`);
+  }
+
+  // Firma per 5 anni così image_url resta valido nelle viste pubbliche già fatte.
+  const { data: signed } = await supabaseAdmin.storage
+    .from("property-images")
+    .createSignedUrl(storagePath, 60 * 60 * 24 * 365 * 5);
+
+  await supabaseAdmin
+    .from("property_images")
+    .update({
+      storage_path: storagePath,
+      image_url: signed?.signedUrl ?? sourceUrl,
+      imported_source_url: sourceUrl,
+      is_imported: true,
+      import_status: "synced_to_storage",
+    })
+    .eq("id", imageId);
+
+  return { storagePath, mime, bytes };
+}
+
+export const syncImportedImage = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: { imageId: string }) =>
+    z.object({ imageId: z.string().uuid() }).parse(data),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { supabase, userId } = context;
+    const { data: roleRow } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userId)
+      .eq("role", "admin")
+      .maybeSingle();
+    if (!roleRow) throw new Error("Solo gli admin possono sincronizzare le foto");
+
+    const { data: img, error: imgErr } = await supabaseAdmin
+      .from("property_images")
+      .select("id, property_id, storage_path, imported_source_url, import_status")
+      .eq("id", data.imageId)
+      .maybeSingle();
+    if (imgErr || !img) throw new Error("Immagine non trovata");
+
+    const sourceUrl =
+      img.imported_source_url ??
+      (/^https?:\/\//i.test(img.storage_path) ? img.storage_path : null);
+    if (!sourceUrl) {
+      return { ok: true as const, alreadySynced: true };
+    }
+
+    await syncImportedImageToBucket(img.id, img.property_id, sourceUrl);
+    return { ok: true as const, alreadySynced: false };
+  });
+
 export const renderPropertyImage = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: { imageId: string }) =>
@@ -122,7 +209,7 @@ export const renderPropertyImage = createServerFn({ method: "POST" })
     const { data: img, error: imgErr } = await supabaseAdmin
       .from("property_images")
       .select(
-        "id, property_id, storage_path, photo_type, photo_category, render_style, render_goal, room_condition, intervention_level, preserve_structure, desired_lighting, visual_target, render_notes",
+        "id, property_id, storage_path, imported_source_url, import_status, photo_type, photo_category, render_style, render_goal, room_condition, intervention_level, preserve_structure, desired_lighting, visual_target, render_notes",
       )
       .eq("id", data.imageId)
       .maybeSingle();
@@ -150,18 +237,40 @@ export const renderPropertyImage = createServerFn({ method: "POST" })
     try {
       let bytesIn: Uint8Array;
       let mime = "image/jpeg";
-      if (/^https?:\/\//i.test(img.storage_path)) {
-        const r = await fetch(img.storage_path);
-        if (!r.ok) throw new Error(`Download fallito: HTTP ${r.status}`);
-        mime = r.headers.get("content-type") || mime;
-        bytesIn = new Uint8Array(await r.arrayBuffer());
+      const storagePathIsUrl = /^https?:\/\//i.test(img.storage_path);
+
+      if (storagePathIsUrl) {
+        // Legacy import: sync nel bucket prima di renderizzare.
+        const synced = await syncImportedImageToBucket(
+          img.id,
+          img.property_id,
+          img.imported_source_url ?? img.storage_path,
+        );
+        bytesIn = synced.bytes;
+        mime = synced.mime;
       } else {
         const { data: blob, error: dlErr } = await supabaseAdmin.storage
           .from("property-images")
           .download(img.storage_path);
-        if (dlErr || !blob) throw new Error(`Download fallito: ${dlErr?.message ?? "n/d"}`);
-        mime = blob.type || mime;
-        bytesIn = new Uint8Array(await blob.arrayBuffer());
+        if (dlErr || !blob) {
+          // Path interno mancante: prova un fallback dalla source esterna se presente.
+          if (img.imported_source_url) {
+            const synced = await syncImportedImageToBucket(
+              img.id,
+              img.property_id,
+              img.imported_source_url,
+            );
+            bytesIn = synced.bytes;
+            mime = synced.mime;
+          } else {
+            throw new Error(
+              "Questa immagine è stata importata da una fonte esterna e non è ancora disponibile per il rendering. Ricarica o sincronizza la foto.",
+            );
+          }
+        } else {
+          mime = blob.type || mime;
+          bytesIn = new Uint8Array(await blob.arrayBuffer());
+        }
       }
       let bin = "";
       for (let i = 0; i < bytesIn.length; i++) bin += String.fromCharCode(bytesIn[i]);
