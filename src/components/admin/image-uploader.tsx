@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { ImagePlus, Star, StarOff, Trash2, ArrowUp, ArrowDown, Loader2, Sparkles, Check, CloudDownload } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import {
+  checkImageRenderAvailability,
   renderPropertyImage,
   setPropertyImagePublished,
   syncImportedImage,
@@ -14,6 +15,9 @@ import type { RenderSettings } from "@/lib/render-options";
 type Image = {
   id: string;
   image_url: string;
+  original_image_url: string | null;
+  rendered_image_url: string | null;
+  published_image_url: string | null;
   storage_path: string;
   alt_text: string | null;
   sort_order: number;
@@ -38,6 +42,12 @@ type Image = {
   visual_target: string | null;
   render_notes: string | null;
   rendered_signed_url?: string | null;
+  render_availability?: {
+    canRender: boolean;
+    state: "ready_manual" | "imported_external" | "ready_synced" | "sync_error";
+    statusLabel: string;
+    message: string | null;
+  };
 };
 
 const SIGNED_URL_TTL_SECONDS = 60 * 60 * 24 * 365 * 5; // ~5 anni
@@ -67,13 +77,14 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
   const runRender = useServerFn(renderPropertyImage);
   const runSetPublished = useServerFn(setPropertyImagePublished);
   const runSync = useServerFn(syncImportedImage);
+  const runCheckAvailability = useServerFn(checkImageRenderAvailability);
 
   const load = async () => {
     setLoading(true);
     const { data, error } = await supabase
       .from("property_images")
       .select(
-        "id, image_url, storage_path, alt_text, sort_order, is_cover, rendered_storage_path, render_status, render_error, use_rendered, is_imported, import_status, imported_source_url, photo_type, photo_category, render_style, render_goal, room_condition, intervention_level, preserve_structure, desired_lighting, visual_target, render_notes",
+        "id, image_url, original_image_url, rendered_image_url, published_image_url, storage_path, alt_text, sort_order, is_cover, rendered_storage_path, render_status, render_error, use_rendered, is_imported, import_status, imported_source_url, photo_type, photo_category, render_style, render_goal, room_condition, intervention_level, preserve_structure, desired_lighting, visual_target, render_notes",
       )
       .eq("property_id", propertyId)
       .order("sort_order", { ascending: true });
@@ -92,10 +103,25 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
         }
       }
     }
+    const availability = await Promise.all(
+      rows.map(async (r) => {
+        try {
+          return await runCheckAvailability({ data: { imageId: r.id } });
+        } catch {
+          return {
+            canRender: false,
+            state: "sync_error" as const,
+            statusLabel: "Errore sincronizzazione",
+            message: "Impossibile verificare la disponibilità della foto nello storage.",
+          };
+        }
+      }),
+    );
     setImages(
-      rows.map((r) => ({
+      rows.map((r, idx) => ({
         ...r,
         rendered_signed_url: r.rendered_storage_path ? signedMap[r.rendered_storage_path] ?? null : null,
+        render_availability: availability[idx],
       })),
     );
     setLoading(false);
@@ -132,9 +158,14 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
         const { error: insErr } = await supabase.from("property_images").insert({
           property_id: propertyId,
           image_url: signed.signedUrl,
+          original_image_url: signed.signedUrl,
+          published_image_url: signed.signedUrl,
           storage_path: path,
           sort_order: baseOrder + count,
           is_cover: willBeFirstUpload && count === 0,
+          is_imported: false,
+          import_status: "synced_to_storage",
+          render_status: "not_generated",
         });
         if (insErr) toast.error(`Salvataggio metadati: ${insErr.message}`);
         count++;
@@ -182,6 +213,10 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
   };
 
   const generate = async (img: Image) => {
+    if (!img.render_availability?.canRender) {
+      toast.error(img.render_availability?.message ?? "Sincronizza la foto prima di generare il rendering");
+      return;
+    }
     if (!img.photo_type) {
       toast.error("Configura prima le impostazioni rendering (Tipo foto)");
       return;
@@ -308,18 +343,17 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
                 />
                 {/* Rendering controls */}
                 <div className="space-y-2 rounded-sm border border-border bg-muted/30 p-2">
-                  {img.is_imported && img.import_status !== "synced_to_storage" && (
-                    <div className="rounded-sm border border-orange-300 bg-orange-50 p-2 text-[10px] text-orange-900">
-                      <div className="font-semibold uppercase tracking-wider">Foto importata</div>
-                      <p className="mt-1">
-                        Questa foto proviene dal vecchio sito e non è ancora salvata nello
-                        storage interno. Sincronizzala prima di generare il rendering.
-                      </p>
+                  {img.render_availability && !img.render_availability.canRender && (
+                    <div className="rounded-sm border border-border bg-background p-2 text-[10px] text-foreground">
+                      <div className="font-semibold uppercase tracking-wider">
+                        {img.render_availability.statusLabel}
+                      </div>
+                      <p className="mt-1 text-muted-foreground">{img.render_availability.message}</p>
                       <button
                         type="button"
                         onClick={() => syncImage(img)}
-                        disabled={syncingId === img.id}
-                        className="mt-2 inline-flex items-center gap-1 rounded-sm bg-orange-700 px-2 py-1 text-[10px] uppercase tracking-wider text-white hover:bg-orange-800 disabled:opacity-50"
+                        disabled={syncingId === img.id || img.render_availability.state === "sync_error"}
+                        className="mt-2 inline-flex items-center gap-1 rounded-sm bg-primary px-2 py-1 text-[10px] uppercase tracking-wider text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
                       >
                         {syncingId === img.id ? (
                           <Loader2 size={11} className="animate-spin" />
@@ -328,6 +362,11 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
                         )}
                         Sincronizza foto importata
                       </button>
+                    </div>
+                  )}
+                  {img.render_availability?.canRender && (
+                    <div className="rounded-sm border border-border bg-background p-2 text-[10px] uppercase tracking-wider text-primary">
+                      {img.render_availability.statusLabel}
                     </div>
                   )}
                   <RenderSettingsPanel
@@ -341,7 +380,8 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
                       disabled={
                         renderingId === img.id ||
                         !img.photo_type ||
-                        syncingId === img.id
+                        syncingId === img.id ||
+                        !img.render_availability?.canRender
                       }
                       className="inline-flex flex-1 items-center justify-center gap-1 rounded-sm bg-primary px-2 py-1.5 text-[10px] uppercase tracking-wider text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
                     >
@@ -359,14 +399,14 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
                       className={
                         img.render_status === "error"
                           ? "text-destructive"
-                          : img.render_status === "done"
+                          : img.render_status === "completed"
                           ? "text-primary"
                           : ""
                       }
                     >
-                      {img.render_status === "idle" && "Non generato"}
+                      {(img.render_status === "not_generated" || img.render_status === "idle") && "Non generato"}
                       {img.render_status === "processing" && "In elaborazione"}
-                      {img.render_status === "done" && "Rendering generato"}
+                      {(img.render_status === "completed" || img.render_status === "done") && "Rendering generato"}
                       {img.render_status === "error" && "Errore"}
                     </span>
                   </div>
