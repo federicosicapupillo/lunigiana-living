@@ -545,9 +545,24 @@ export const setPropertyImagePublished = createServerFn({ method: "POST" })
       .eq("role", "admin")
       .maybeSingle();
     if (!roleRow) throw new Error("Solo gli admin");
+    const { data: img, error: imgErr } = await supabaseAdmin
+      .from("property_images")
+      .select("storage_path, rendered_storage_path, original_image_url, rendered_image_url")
+      .eq("id", data.imageId)
+      .maybeSingle();
+    if (imgErr || !img) throw new Error("Immagine non trovata");
+
+    let publishedUrl = data.useRendered ? img.rendered_image_url : img.original_image_url;
+    const fallbackPath = data.useRendered ? img.rendered_storage_path : img.storage_path;
+    if (!publishedUrl && fallbackPath) {
+      const { data: signed } = await supabaseAdmin.storage
+        .from(BUCKET)
+        .createSignedUrl(fallbackPath, SIGNED_URL_TTL_SECONDS);
+      publishedUrl = signed?.signedUrl ?? null;
+    }
     const { error } = await supabaseAdmin
       .from("property_images")
-      .update({ use_rendered: data.useRendered })
+      .update({ use_rendered: data.useRendered, published_image_url: publishedUrl })
       .eq("id", data.imageId);
     if (error) throw new Error(error.message);
     return { ok: true as const };
