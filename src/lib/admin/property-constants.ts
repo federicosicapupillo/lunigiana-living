@@ -474,6 +474,33 @@ export const STATUS_LABELS: Record<string, string> = {
   draft: "Bozza",
   ready: "Pronto",
   published: "Pubblicato",
+  suspended: "Sospeso",
+  sold: "Venduto",
+  rented: "Affittato",
+  archived: "Archiviato",
+  deleted: "Eliminato",
+};
+
+export type PropertyStatus =
+  | "draft"
+  | "ready"
+  | "published"
+  | "suspended"
+  | "sold"
+  | "rented"
+  | "archived"
+  | "deleted";
+
+/** Tailwind classes for the status badge in the admin list. */
+export const STATUS_BADGE_CLASSES: Record<string, string> = {
+  draft: "bg-zinc-100 text-zinc-800 border-zinc-200",
+  ready: "bg-blue-100 text-blue-900 border-blue-200",
+  published: "bg-emerald-100 text-emerald-900 border-emerald-200",
+  suspended: "bg-orange-100 text-orange-900 border-orange-200",
+  sold: "bg-slate-800 text-white border-slate-800",
+  rented: "bg-slate-800 text-white border-slate-800",
+  archived: "bg-zinc-300 text-zinc-900 border-zinc-400",
+  deleted: "bg-red-100 text-red-900 border-red-300",
 };
 
 export const NARRATIVE_FIELDS = [
