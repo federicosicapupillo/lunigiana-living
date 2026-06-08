@@ -124,7 +124,7 @@ function sanitizeRenderingError(err: unknown): string {
 }
 
 async function verifyInternalStorageImage(
-  supabaseAdmin: Awaited<typeof import("@/integrations/supabase/client.server")>["supabaseAdmin"],
+  supabaseAdmin: any,
   img: {
     id: string;
     storage_path: string | null;
@@ -302,20 +302,62 @@ export const syncImportedImage = createServerFn({ method: "POST" })
 
     const { data: img, error: imgErr } = await supabaseAdmin
       .from("property_images")
-      .select("id, property_id, storage_path, imported_source_url, import_status")
+      .select("id, property_id, image_url, original_image_url, storage_path, imported_source_url, import_status, is_imported")
       .eq("id", data.imageId)
       .maybeSingle();
     if (imgErr || !img) throw new Error("Immagine non trovata");
 
     const sourceUrl =
       img.imported_source_url ??
-      (/^https?:\/\//i.test(img.storage_path) ? img.storage_path : null);
+      (isExternalUrl(img.storage_path) ? img.storage_path : null) ??
+      (isExternalUrl(img.original_image_url) ? img.original_image_url : null) ??
+      (isExternalUrl(img.image_url) ? img.image_url : null);
     if (!sourceUrl) {
-      return { ok: true as const, alreadySynced: true };
+      const availability = await verifyInternalStorageImage(supabaseAdmin, img);
+      return { ok: availability.canRender, alreadySynced: availability.canRender, availability };
     }
 
-    await syncImportedImageToBucket(img.id, img.property_id, sourceUrl);
-    return { ok: true as const, alreadySynced: false };
+    try {
+      await syncImportedImageToBucket(img.id, img.property_id, sourceUrl);
+      const availability = await verifyInternalStorageImage(supabaseAdmin, {
+        ...img,
+        storage_path: `${img.property_id}/imported/${img.id}.${sourceUrl.toLowerCase().includes(".png") ? "png" : sourceUrl.toLowerCase().includes(".webp") ? "webp" : "jpg"}`,
+        import_status: "synced_to_storage",
+        is_imported: true,
+      });
+      return { ok: true as const, alreadySynced: false, availability };
+    } catch (err) {
+      await supabaseAdmin
+        .from("property_images")
+        .update({ import_status: "sync_error", render_status: "error", render_error: SYNC_ERROR_MESSAGE })
+        .eq("id", img.id);
+      throw new Error(SYNC_ERROR_MESSAGE);
+    }
+  });
+
+export const checkImageRenderAvailability = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: { imageId: string }) =>
+    z.object({ imageId: z.string().uuid() }).parse(data),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { supabase, userId } = context;
+    const { data: roleRow } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userId)
+      .eq("role", "admin")
+      .maybeSingle();
+    if (!roleRow) throw new Error("Solo gli admin");
+
+    const { data: img, error } = await supabaseAdmin
+      .from("property_images")
+      .select("id, storage_path, imported_source_url, import_status, is_imported")
+      .eq("id", data.imageId)
+      .maybeSingle();
+    if (error || !img) throw new Error("Immagine non trovata");
+    return verifyInternalStorageImage(supabaseAdmin, img);
   });
 
 export const renderPropertyImage = createServerFn({ method: "POST" })
