@@ -1,0 +1,7 @@
+ALTER TABLE public.property_images
+  ADD COLUMN IF NOT EXISTS rendered_storage_path TEXT,
+  ADD COLUMN IF NOT EXISTS render_status TEXT NOT NULL DEFAULT 'idle',
+  ADD COLUMN IF NOT EXISTS render_style TEXT,
+  ADD COLUMN IF NOT EXISTS render_error TEXT,
+  ADD COLUMN IF NOT EXISTS render_created_at TIMESTAMPTZ,
+  ADD COLUMN IF NOT EXISTS use_rendered BOOLEAN NOT NULL DEFAULT false;

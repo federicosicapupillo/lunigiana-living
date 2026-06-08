@@ -239,8 +239,14 @@ export type Database = {
           image_url: string
           is_cover: boolean
           property_id: string
+          render_created_at: string | null
+          render_error: string | null
+          render_status: string
+          render_style: string | null
+          rendered_storage_path: string | null
           sort_order: number
           storage_path: string
+          use_rendered: boolean
         }
         Insert: {
           alt_text?: string | null
@@ -249,8 +255,14 @@ export type Database = {
           image_url: string
           is_cover?: boolean
           property_id: string
+          render_created_at?: string | null
+          render_error?: string | null
+          render_status?: string
+          render_style?: string | null
+          rendered_storage_path?: string | null
           sort_order?: number
           storage_path: string
+          use_rendered?: boolean
         }
         Update: {
           alt_text?: string | null
@@ -259,8 +271,14 @@ export type Database = {
           image_url?: string
           is_cover?: boolean
           property_id?: string
+          render_created_at?: string | null
+          render_error?: string | null
+          render_status?: string
+          render_style?: string | null
+          rendered_storage_path?: string | null
           sort_order?: number
           storage_path?: string
+          use_rendered?: boolean
         }
         Relationships: [
           {

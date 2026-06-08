@@ -107,6 +107,8 @@ type PropertyRow = {
 type ImageRow = {
   property_id: string;
   storage_path: string;
+  rendered_storage_path: string | null;
+  use_rendered: boolean;
   alt_text: string | null;
   sort_order: number;
   is_cover: boolean;
@@ -132,7 +134,12 @@ function adapt(
     if (a.is_cover !== b.is_cover) return a.is_cover ? -1 : 1;
     return a.sort_order - b.sort_order;
   });
-  const gallery = sortedImages.map((i) => signedMap[i.storage_path]).filter(Boolean);
+  const gallery = sortedImages
+    .map((i) => {
+      const path = i.use_rendered && i.rendered_storage_path ? i.rendered_storage_path : i.storage_path;
+      return signedMap[path];
+    })
+    .filter(Boolean);
   const cover = gallery[0] ?? PLACEHOLDER;
   const attrs: Record<string, string> = {};
   const amenities: string[] = [];
@@ -221,7 +228,7 @@ export const listPublishedProperties = createServerFn({ method: "GET" }).handler
   const [imgRes, featRes, descRes] = await Promise.all([
     supabaseAdmin
       .from("property_images")
-      .select("property_id, storage_path, alt_text, sort_order, is_cover")
+      .select("property_id, storage_path, rendered_storage_path, use_rendered, alt_text, sort_order, is_cover")
       .in("property_id", ids),
     supabaseAdmin
       .from("property_features")
@@ -237,7 +244,9 @@ export const listPublishedProperties = createServerFn({ method: "GET" }).handler
   const features = (featRes.data ?? []) as FeatureRow[];
   const descriptions = (descRes.data ?? []) as DescriptionRow[];
 
-  const signedMap = await signMany(images.map((i) => i.storage_path));
+  const signedMap = await signMany(
+    images.flatMap((i) => [i.storage_path, ...(i.rendered_storage_path ? [i.rendered_storage_path] : [])]),
+  );
 
   const byProp = (arr: { property_id: string }[]) => {
     const m = new Map<string, any[]>();
@@ -276,7 +285,7 @@ export const getPublishedProperty = createServerFn({ method: "GET" })
     const [imgRes, featRes, descRes] = await Promise.all([
       supabaseAdmin
         .from("property_images")
-        .select("property_id, storage_path, alt_text, sort_order, is_cover")
+        .select("property_id, storage_path, rendered_storage_path, use_rendered, alt_text, sort_order, is_cover")
         .eq("property_id", propRow.id),
       supabaseAdmin
         .from("property_features")
@@ -292,7 +301,9 @@ export const getPublishedProperty = createServerFn({ method: "GET" })
     const images = (imgRes.data ?? []) as ImageRow[];
     const features = (featRes.data ?? []) as FeatureRow[];
     const description = (descRes.data ?? undefined) as DescriptionRow | undefined;
-    const signedMap = await signMany(images.map((i) => i.storage_path));
+    const signedMap = await signMany(
+      images.flatMap((i) => [i.storage_path, ...(i.rendered_storage_path ? [i.rendered_storage_path] : [])]),
+    );
 
     return { property: adapt(propRow, images, features, description, signedMap) };
   });

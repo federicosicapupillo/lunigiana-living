@@ -1,7 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { ImagePlus, Star, StarOff, Trash2, ArrowUp, ArrowDown, Loader2 } from "lucide-react";
+import { ImagePlus, Star, StarOff, Trash2, ArrowUp, ArrowDown, Loader2, Sparkles, Check } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import {
+  renderPropertyImage,
+  setPropertyImagePublished,
+  RENDER_STYLES,
+  type RenderStyleId,
+} from "@/lib/property-render.functions";
 
 type Image = {
   id: string;
@@ -10,6 +17,12 @@ type Image = {
   alt_text: string | null;
   sort_order: number;
   is_cover: boolean;
+  rendered_storage_path: string | null;
+  render_status: string;
+  render_style: string | null;
+  render_error: string | null;
+  use_rendered: boolean;
+  rendered_signed_url?: string | null;
 };
 
 const SIGNED_URL_TTL_SECONDS = 60 * 60 * 24 * 365 * 5; // ~5 anni
@@ -18,17 +31,42 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
   const [images, setImages] = useState<Image[]>([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
+  const [renderingId, setRenderingId] = useState<string | null>(null);
+  const [styleById, setStyleById] = useState<Record<string, RenderStyleId>>({});
   const fileRef = useRef<HTMLInputElement>(null);
+  const runRender = useServerFn(renderPropertyImage);
+  const runSetPublished = useServerFn(setPropertyImagePublished);
 
   const load = async () => {
     setLoading(true);
     const { data, error } = await supabase
       .from("property_images")
-      .select("id, image_url, storage_path, alt_text, sort_order, is_cover")
+      .select(
+        "id, image_url, storage_path, alt_text, sort_order, is_cover, rendered_storage_path, render_status, render_style, render_error, use_rendered",
+      )
       .eq("property_id", propertyId)
       .order("sort_order", { ascending: true });
     if (error) toast.error(error.message);
-    setImages(data ?? []);
+    const rows = (data ?? []) as Image[];
+    // Sign rendered paths
+    const paths = rows.map((r) => r.rendered_storage_path).filter((p): p is string => !!p);
+    let signedMap: Record<string, string> = {};
+    if (paths.length > 0) {
+      const { data: signed } = await supabase.storage
+        .from("property-images")
+        .createSignedUrls(paths, SIGNED_URL_TTL_SECONDS);
+      if (signed) {
+        for (const s of signed) {
+          if (s.path && s.signedUrl) signedMap[s.path] = s.signedUrl;
+        }
+      }
+    }
+    setImages(
+      rows.map((r) => ({
+        ...r,
+        rendered_signed_url: r.rendered_storage_path ? signedMap[r.rendered_storage_path] ?? null : null,
+      })),
+    );
     setLoading(false);
   };
 
@@ -112,6 +150,31 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
     await supabase.from("property_images").update({ alt_text: alt }).eq("id", id);
   };
 
+  const generate = async (img: Image) => {
+    const style = styleById[img.id] ?? "home_staging";
+    setRenderingId(img.id);
+    try {
+      await runRender({ data: { imageId: img.id, style } });
+      toast.success("Rendering generato");
+      await load();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Errore rendering");
+      await load();
+    } finally {
+      setRenderingId(null);
+    }
+  };
+
+  const togglePublished = async (img: Image, useRendered: boolean) => {
+    try {
+      await runSetPublished({ data: { imageId: img.id, useRendered } });
+      toast.success(useRendered ? "Rendering pubblicato" : "Originale pubblicato");
+      await load();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Errore");
+    }
+  };
+
   return (
     <div>
       <div className="flex items-center justify-between">
@@ -161,8 +224,27 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
                 img.is_cover ? "border-primary" : "border-border"
               }`}
             >
-              <div className="aspect-[4/3] bg-muted">
-                <img src={img.image_url} alt={img.alt_text ?? ""} className="h-full w-full object-cover" />
+              <div className="grid grid-cols-2 gap-px bg-border">
+                <div className="relative aspect-[4/3] bg-muted">
+                  <img src={img.image_url} alt={img.alt_text ?? ""} className="h-full w-full object-cover" />
+                  <span className="absolute left-1 top-1 rounded-sm bg-background/80 px-1.5 py-0.5 text-[9px] uppercase tracking-wider text-muted-foreground">
+                    Originale {!img.use_rendered && "· in uso"}
+                  </span>
+                </div>
+                <div className="relative aspect-[4/3] bg-muted">
+                  {img.rendered_signed_url ? (
+                    <img src={img.rendered_signed_url} alt="Rendering" className="h-full w-full object-cover" />
+                  ) : (
+                    <div className="flex h-full items-center justify-center text-[10px] uppercase tracking-wider text-muted-foreground">
+                      Nessun rendering
+                    </div>
+                  )}
+                  {img.rendered_signed_url && (
+                    <span className="absolute left-1 top-1 rounded-sm bg-background/80 px-1.5 py-0.5 text-[9px] uppercase tracking-wider text-muted-foreground">
+                      Rendering {img.use_rendered && "· in uso"}
+                    </span>
+                  )}
+                </div>
               </div>
               {img.is_cover && (
                 <span className="absolute left-2 top-2 rounded-sm bg-primary px-2 py-0.5 text-[10px] uppercase tracking-wider text-primary-foreground">
@@ -176,6 +258,80 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
                   placeholder="Descrizione (alt text)"
                   className="w-full rounded-sm border border-border bg-background px-2 py-1 text-xs focus:border-primary focus:outline-none"
                 />
+                {/* Rendering controls */}
+                <div className="space-y-2 rounded-sm border border-border bg-muted/30 p-2">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <select
+                      value={styleById[img.id] ?? "home_staging"}
+                      onChange={(e) =>
+                        setStyleById((s) => ({ ...s, [img.id]: e.target.value as RenderStyleId }))
+                      }
+                      className="flex-1 min-w-[140px] rounded-sm border border-border bg-background px-2 py-1 text-xs"
+                      disabled={renderingId === img.id}
+                    >
+                      {RENDER_STYLES.map((s) => (
+                        <option key={s.id} value={s.id}>
+                          {s.label}
+                        </option>
+                      ))}
+                    </select>
+                    <button
+                      type="button"
+                      onClick={() => generate(img)}
+                      disabled={renderingId === img.id}
+                      className="inline-flex items-center gap-1 rounded-sm bg-primary px-2 py-1 text-[10px] uppercase tracking-wider text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
+                    >
+                      {renderingId === img.id ? (
+                        <Loader2 size={12} className="animate-spin" />
+                      ) : (
+                        <Sparkles size={12} />
+                      )}
+                      {img.rendered_storage_path ? "Rigenera" : "Genera"}
+                    </button>
+                  </div>
+                  <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                    Stato:{" "}
+                    <span
+                      className={
+                        img.render_status === "error"
+                          ? "text-destructive"
+                          : img.render_status === "done"
+                          ? "text-primary"
+                          : ""
+                      }
+                    >
+                      {img.render_status === "idle" && "Non generato"}
+                      {img.render_status === "processing" && "In elaborazione"}
+                      {img.render_status === "done" && "Rendering generato"}
+                      {img.render_status === "error" && "Errore"}
+                    </span>
+                  </div>
+                  {img.render_error && (
+                    <div className="text-[10px] text-destructive">{img.render_error}</div>
+                  )}
+                  {img.rendered_storage_path && (
+                    <div className="flex flex-wrap gap-1">
+                      <button
+                        type="button"
+                        onClick={() => togglePublished(img, true)}
+                        disabled={img.use_rendered}
+                        className="inline-flex items-center gap-1 rounded-sm border border-border bg-background px-2 py-1 text-[10px] uppercase tracking-wider hover:border-primary/50 disabled:opacity-40"
+                      >
+                        {img.use_rendered && <Check size={11} className="text-primary" />}
+                        Usa rendering
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => togglePublished(img, false)}
+                        disabled={!img.use_rendered}
+                        className="inline-flex items-center gap-1 rounded-sm border border-border bg-background px-2 py-1 text-[10px] uppercase tracking-wider hover:border-primary/50 disabled:opacity-40"
+                      >
+                        {!img.use_rendered && <Check size={11} className="text-primary" />}
+                        Usa originale
+                      </button>
+                    </div>
+                  )}
+                </div>
                 <div className="flex items-center justify-between">
                   <div className="flex gap-1">
                     <IconBtn onClick={() => move(idx, -1)} disabled={idx === 0} title="Sposta su">

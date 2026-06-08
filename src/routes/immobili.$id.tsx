@@ -2,7 +2,6 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { getPublishedProperty, type PublicProperty } from "@/lib/public-properties.functions";
 import { ArrowLeft, MapPin, Maximize2, BedDouble, Bath, Building2 } from "lucide-react";
 import { useState } from "react";
-import { VirtualStaging } from "@/components/virtual-staging";
 import { WatermarkedImage } from "@/components/watermarked-image";
 
 export const Route = createFileRoute("/immobili/$id")({
@@ -109,8 +108,6 @@ function PropertyDetail() {
             ))}
           </div>
         )}
-        {/* Virtual staging AI CTA — subito dopo la galleria */}
-        <VirtualStaging gallery={p.gallery && p.gallery.length > 0 ? p.gallery : [p.image]} />
       </section>
 
       {/* Body */}
