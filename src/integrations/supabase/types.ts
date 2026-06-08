@@ -235,50 +235,77 @@ export type Database = {
         Row: {
           alt_text: string | null
           created_at: string
+          desired_lighting: string | null
           id: string
           image_url: string
+          intervention_level: string | null
           is_cover: boolean
+          photo_category: string | null
+          photo_type: string | null
+          preserve_structure: boolean
           property_id: string
           render_created_at: string | null
           render_error: string | null
+          render_goal: string | null
+          render_notes: string | null
           render_status: string
           render_style: string | null
           rendered_storage_path: string | null
+          room_condition: string | null
           sort_order: number
           storage_path: string
           use_rendered: boolean
+          visual_target: string | null
         }
         Insert: {
           alt_text?: string | null
           created_at?: string
+          desired_lighting?: string | null
           id?: string
           image_url: string
+          intervention_level?: string | null
           is_cover?: boolean
+          photo_category?: string | null
+          photo_type?: string | null
+          preserve_structure?: boolean
           property_id: string
           render_created_at?: string | null
           render_error?: string | null
+          render_goal?: string | null
+          render_notes?: string | null
           render_status?: string
           render_style?: string | null
           rendered_storage_path?: string | null
+          room_condition?: string | null
           sort_order?: number
           storage_path: string
           use_rendered?: boolean
+          visual_target?: string | null
         }
         Update: {
           alt_text?: string | null
           created_at?: string
+          desired_lighting?: string | null
           id?: string
           image_url?: string
+          intervention_level?: string | null
           is_cover?: boolean
+          photo_category?: string | null
+          photo_type?: string | null
+          preserve_structure?: boolean
           property_id?: string
           render_created_at?: string | null
           render_error?: string | null
+          render_goal?: string | null
+          render_notes?: string | null
           render_status?: string
           render_style?: string | null
           rendered_storage_path?: string | null
+          room_condition?: string | null
           sort_order?: number
           storage_path?: string
           use_rendered?: boolean
+          visual_target?: string | null
         }
         Relationships: [
           {

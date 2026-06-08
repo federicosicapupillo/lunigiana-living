@@ -6,9 +6,9 @@ import { useServerFn } from "@tanstack/react-start";
 import {
   renderPropertyImage,
   setPropertyImagePublished,
-  RENDER_STYLES,
-  type RenderStyleId,
 } from "@/lib/property-render.functions";
+import { RenderSettingsPanel } from "@/components/admin/render-settings-panel";
+import type { RenderSettings } from "@/lib/render-options";
 
 type Image = {
   id: string;
@@ -19,20 +19,44 @@ type Image = {
   is_cover: boolean;
   rendered_storage_path: string | null;
   render_status: string;
-  render_style: string | null;
   render_error: string | null;
   use_rendered: boolean;
+  // render settings
+  photo_type: string | null;
+  photo_category: string | null;
+  render_style: string | null;
+  render_goal: string | null;
+  room_condition: string | null;
+  intervention_level: string | null;
+  preserve_structure: boolean;
+  desired_lighting: string | null;
+  visual_target: string | null;
+  render_notes: string | null;
   rendered_signed_url?: string | null;
 };
 
 const SIGNED_URL_TTL_SECONDS = 60 * 60 * 24 * 365 * 5; // ~5 anni
+
+function extractSettings(img: Image): RenderSettings {
+  return {
+    photo_type: img.photo_type,
+    photo_category: img.photo_category,
+    render_style: img.render_style,
+    render_goal: img.render_goal,
+    room_condition: img.room_condition,
+    intervention_level: img.intervention_level,
+    preserve_structure: img.preserve_structure,
+    desired_lighting: img.desired_lighting,
+    visual_target: img.visual_target,
+    render_notes: img.render_notes,
+  };
+}
 
 export function ImageUploader({ propertyId }: { propertyId: string }) {
   const [images, setImages] = useState<Image[]>([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [renderingId, setRenderingId] = useState<string | null>(null);
-  const [styleById, setStyleById] = useState<Record<string, RenderStyleId>>({});
   const fileRef = useRef<HTMLInputElement>(null);
   const runRender = useServerFn(renderPropertyImage);
   const runSetPublished = useServerFn(setPropertyImagePublished);
@@ -42,7 +66,7 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
     const { data, error } = await supabase
       .from("property_images")
       .select(
-        "id, image_url, storage_path, alt_text, sort_order, is_cover, rendered_storage_path, render_status, render_style, render_error, use_rendered",
+        "id, image_url, storage_path, alt_text, sort_order, is_cover, rendered_storage_path, render_status, render_error, use_rendered, photo_type, photo_category, render_style, render_goal, room_condition, intervention_level, preserve_structure, desired_lighting, visual_target, render_notes",
       )
       .eq("property_id", propertyId)
       .order("sort_order", { ascending: true });
@@ -151,10 +175,13 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
   };
 
   const generate = async (img: Image) => {
-    const style = styleById[img.id] ?? "home_staging";
+    if (!img.photo_type) {
+      toast.error("Configura prima le impostazioni rendering (Tipo foto)");
+      return;
+    }
     setRenderingId(img.id);
     try {
-      await runRender({ data: { imageId: img.id, style } });
+      await runRender({ data: { imageId: img.id } });
       toast.success("Rendering generato");
       await load();
     } catch (err) {
@@ -260,33 +287,23 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
                 />
                 {/* Rendering controls */}
                 <div className="space-y-2 rounded-sm border border-border bg-muted/30 p-2">
+                  <RenderSettingsPanel
+                    imageId={img.id}
+                    initial={extractSettings(img)}
+                  />
                   <div className="flex flex-wrap items-center gap-2">
-                    <select
-                      value={styleById[img.id] ?? "home_staging"}
-                      onChange={(e) =>
-                        setStyleById((s) => ({ ...s, [img.id]: e.target.value as RenderStyleId }))
-                      }
-                      className="flex-1 min-w-[140px] rounded-sm border border-border bg-background px-2 py-1 text-xs"
-                      disabled={renderingId === img.id}
-                    >
-                      {RENDER_STYLES.map((s) => (
-                        <option key={s.id} value={s.id}>
-                          {s.label}
-                        </option>
-                      ))}
-                    </select>
                     <button
                       type="button"
                       onClick={() => generate(img)}
-                      disabled={renderingId === img.id}
-                      className="inline-flex items-center gap-1 rounded-sm bg-primary px-2 py-1 text-[10px] uppercase tracking-wider text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
+                      disabled={renderingId === img.id || !img.photo_type}
+                      className="inline-flex flex-1 items-center justify-center gap-1 rounded-sm bg-primary px-2 py-1.5 text-[10px] uppercase tracking-wider text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
                     >
                       {renderingId === img.id ? (
                         <Loader2 size={12} className="animate-spin" />
                       ) : (
                         <Sparkles size={12} />
                       )}
-                      {img.rendered_storage_path ? "Rigenera" : "Genera"}
+                      {img.rendered_storage_path ? "Rigenera rendering" : "Genera rendering"}
                     </button>
                   </div>
                   <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
