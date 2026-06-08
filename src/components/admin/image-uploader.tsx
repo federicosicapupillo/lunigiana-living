@@ -343,18 +343,17 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
                 />
                 {/* Rendering controls */}
                 <div className="space-y-2 rounded-sm border border-border bg-muted/30 p-2">
-                  {img.is_imported && img.import_status !== "synced_to_storage" && (
-                    <div className="rounded-sm border border-orange-300 bg-orange-50 p-2 text-[10px] text-orange-900">
-                      <div className="font-semibold uppercase tracking-wider">Foto importata</div>
-                      <p className="mt-1">
-                        Questa foto proviene dal vecchio sito e non è ancora salvata nello
-                        storage interno. Sincronizzala prima di generare il rendering.
-                      </p>
+                  {img.render_availability && !img.render_availability.canRender && (
+                    <div className="rounded-sm border border-border bg-background p-2 text-[10px] text-foreground">
+                      <div className="font-semibold uppercase tracking-wider">
+                        {img.render_availability.statusLabel}
+                      </div>
+                      <p className="mt-1 text-muted-foreground">{img.render_availability.message}</p>
                       <button
                         type="button"
                         onClick={() => syncImage(img)}
-                        disabled={syncingId === img.id}
-                        className="mt-2 inline-flex items-center gap-1 rounded-sm bg-orange-700 px-2 py-1 text-[10px] uppercase tracking-wider text-white hover:bg-orange-800 disabled:opacity-50"
+                        disabled={syncingId === img.id || img.render_availability.state === "sync_error"}
+                        className="mt-2 inline-flex items-center gap-1 rounded-sm bg-primary px-2 py-1 text-[10px] uppercase tracking-wider text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
                       >
                         {syncingId === img.id ? (
                           <Loader2 size={11} className="animate-spin" />
@@ -363,6 +362,11 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
                         )}
                         Sincronizza foto importata
                       </button>
+                    </div>
+                  )}
+                  {img.render_availability?.canRender && (
+                    <div className="rounded-sm border border-border bg-background p-2 text-[10px] uppercase tracking-wider text-primary">
+                      {img.render_availability.statusLabel}
                     </div>
                   )}
                   <RenderSettingsPanel
@@ -376,7 +380,8 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
                       disabled={
                         renderingId === img.id ||
                         !img.photo_type ||
-                        syncingId === img.id
+                        syncingId === img.id ||
+                        !img.render_availability?.canRender
                       }
                       className="inline-flex flex-1 items-center justify-center gap-1 rounded-sm bg-primary px-2 py-1.5 text-[10px] uppercase tracking-wider text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
                     >
@@ -394,14 +399,14 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
                       className={
                         img.render_status === "error"
                           ? "text-destructive"
-                          : img.render_status === "done"
+                          : img.render_status === "completed"
                           ? "text-primary"
                           : ""
                       }
                     >
-                      {img.render_status === "idle" && "Non generato"}
+                      {(img.render_status === "not_generated" || img.render_status === "idle") && "Non generato"}
                       {img.render_status === "processing" && "In elaborazione"}
-                      {img.render_status === "done" && "Rendering generato"}
+                      {(img.render_status === "completed" || img.render_status === "done") && "Rendering generato"}
                       {img.render_status === "error" && "Errore"}
                     </span>
                   </div>
