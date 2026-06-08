@@ -35,6 +35,43 @@ export const ENERGY_CLASSES = [
   "Non disponibile",
 ] as const;
 
+/* ---------- Indice di Prestazione Energetica (IPE / EPgl,nren) ---------- */
+
+export const EPI_STATUS_OPTIONS = [
+  { value: "precise_value", label: "Inserisci valore preciso" },
+  { value: "pending_ape", label: "In attesa di APE" },
+  { value: "ape_not_available", label: "APE non disponibile" },
+  { value: "exempt", label: "Immobile esente" },
+  { value: "not_declared", label: "Non dichiarato" },
+] as const;
+
+export type EpiStatus = (typeof EPI_STATUS_OPTIONS)[number]["value"];
+
+/** Format the IPE for display in public pages. Empty/null -> "Non dichiarato". */
+export function formatEpi(
+  status: string | null | undefined,
+  value: number | null | undefined,
+): string {
+  switch (status) {
+    case "precise_value":
+      if (value == null || Number.isNaN(value)) return "Non dichiarato";
+      return `${new Intl.NumberFormat("it-IT", { maximumFractionDigits: 2 }).format(value)} kWh/m² anno`;
+    case "pending_ape":
+      return "In attesa di APE";
+    case "ape_not_available":
+      return "APE non disponibile";
+    case "exempt":
+      return "Immobile esente";
+    case "not_declared":
+    case null:
+    case undefined:
+    case "":
+      return "Non dichiarato";
+    default:
+      return "Non dichiarato";
+  }
+}
+
 export const CONDITIONS = [
   "Ottimo",
   "Buono",

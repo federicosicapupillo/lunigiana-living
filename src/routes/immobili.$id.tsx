@@ -50,6 +50,7 @@ const DETAIL_KEYS = [
   "Riscaldamento", "Cucina", "Stato", "Arredamento", "Box", "Posto auto",
   "Giardino", "Terrazzo", "Balcone", "Cantina", "Ascensore",
   "Infissi interni", "Infissi esterni", "Classe energetica",
+  "IPE",
 ];
 
 function PropertyDetail() {

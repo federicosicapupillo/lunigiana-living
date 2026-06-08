@@ -12,6 +12,7 @@ type PropertyCardData = {
   price: string;
   sqm?: number | null;
   rooms?: number | null;
+  epi?: string;
   tag?: string;
 };
 
@@ -60,6 +61,11 @@ export function PropertyCard({ p }: { p: PropertyCardData }) {
           </div>
           <div className="font-serif text-lg text-primary">{p.price}</div>
         </div>
+        {p.epi && (
+          <div className="mt-2 text-[0.7rem] uppercase tracking-wider text-muted-foreground">
+            IPE: {p.epi}
+          </div>
+        )}
         <span className="mt-5 flex items-center justify-between rounded-sm bg-ink px-5 py-3 text-[0.7rem] uppercase tracking-[0.2em] text-cream transition group-hover:bg-primary">
           Vedi immobile
           <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />

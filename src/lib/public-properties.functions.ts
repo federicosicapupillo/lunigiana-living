@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
-import { MULTI_SELECT_FIELDS, parseMultiSelect } from "@/lib/admin/property-constants";
+import { MULTI_SELECT_FIELDS, parseMultiSelect, formatEpi } from "@/lib/admin/property-constants";
 
 const SIGNED_TTL = 60 * 60 * 24; // 24h
 
@@ -21,6 +21,8 @@ export type PublicProperty = {
   bathrooms: number | null;
   bathroomsLabel: string | null;
   floor: string | null;
+  energyClass: string | null;
+  epi: string;
   image: string;
   gallery: string[];
   description: string;
@@ -97,6 +99,9 @@ type PropertyRow = {
   panoramic_view: boolean;
   historic_property: boolean;
   featured: boolean;
+  energy_class: string | null;
+  energy_performance_index_status: string | null;
+  energy_performance_index_value: number | null;
 };
 
 type ImageRow = {
@@ -165,6 +170,9 @@ function adapt(
   const roomsLabel = attrs["bedrooms_label"] || (p.bedrooms != null ? String(p.bedrooms) : null);
   const bathroomsLabel = attrs["bathrooms_label"] || (p.bathrooms != null ? String(p.bathrooms) : null);
   const floor = attrs["floor_label"] || (p.floors != null ? String(p.floors) : null);
+  const epi = formatEpi(p.energy_performance_index_status, p.energy_performance_index_value);
+  if (p.energy_class) attrs["Classe energetica"] = p.energy_class;
+  attrs["IPE"] = epi;
   return {
     id: p.id,
     slug: p.slug,
@@ -181,6 +189,8 @@ function adapt(
     bathrooms: p.bathrooms,
     bathroomsLabel,
     floor,
+    energyClass: p.energy_class,
+    epi,
     image: cover,
     gallery: gallery.length ? gallery : [PLACEHOLDER],
     description: description?.edited_description || description?.generated_description || p.short_notes || "",
@@ -198,7 +208,7 @@ export const listPublishedProperties = createServerFn({ method: "GET" }).handler
   const { data: props, error } = await supabaseAdmin
     .from("properties")
     .select(
-      "id, slug, reference_code, title, municipality, area_zone, price, price_on_request, property_type, contract_type, size_sqm, bedrooms, bathrooms, floors, short_notes, panoramic_view, historic_property, featured",
+      "id, slug, reference_code, title, municipality, area_zone, price, price_on_request, property_type, contract_type, size_sqm, bedrooms, bathrooms, floors, short_notes, panoramic_view, historic_property, featured, energy_class, energy_performance_index_status, energy_performance_index_value",
     )
     .eq("status", "published")
     .order("updated_at", { ascending: false });
@@ -254,7 +264,7 @@ export const getPublishedProperty = createServerFn({ method: "GET" })
     const { data: p, error } = await supabaseAdmin
       .from("properties")
       .select(
-        "id, slug, reference_code, title, municipality, area_zone, price, price_on_request, property_type, contract_type, size_sqm, bedrooms, bathrooms, floors, short_notes, panoramic_view, historic_property, featured",
+      "id, slug, reference_code, title, municipality, area_zone, price, price_on_request, property_type, contract_type, size_sqm, bedrooms, bathrooms, floors, short_notes, panoramic_view, historic_property, featured, energy_class, energy_performance_index_status, energy_performance_index_value",
       )
       .eq("status", "published")
       .or(`id.eq.${data.id},slug.eq.${data.id}`)

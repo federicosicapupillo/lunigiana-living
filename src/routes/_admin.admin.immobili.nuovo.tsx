@@ -15,6 +15,7 @@ import {
   PROPERTY_TYPES,
   CONTRACT_TYPES,
   ENERGY_CLASSES,
+  EPI_STATUS_OPTIONS,
   CONDITIONS,
   STATUS_LABELS,
   FURNISHED_OPTIONS,
@@ -89,6 +90,8 @@ type FormState = {
   total_floors_exact: string;
   condition: string;
   energy_class: string;
+  epi_status: string;
+  epi_value: string;
   heating: string;
   furnished: string;
   amenities: Record<string, boolean>;
@@ -128,6 +131,8 @@ const empty: FormState = {
   total_floors_exact: "",
   condition: "",
   energy_class: "",
+  epi_status: "",
+  epi_value: "",
   heating: "",
   furnished: "",
   amenities: {},
@@ -250,6 +255,9 @@ function NewPropertyPage() {
         floors: floorNum,
         condition: f.condition || null,
         energy_class: f.energy_class || null,
+        energy_performance_index_status: f.epi_status || null,
+        energy_performance_index_value:
+          f.epi_status === "precise_value" ? toNum(f.epi_value.replace(",", ".")) : null,
         furnished: furnishedBool,
         ...amenityBools,
         short_notes: f.short_notes.trim() || null,
@@ -574,6 +582,32 @@ function NewPropertyPage() {
               options={ENERGY_CLASSES.map((o) => ({ value: o, label: o }))}
               placeholder="Seleziona classe"
             />
+          </Field>
+          <Field label="Indice prestazione energetica">
+            <SelectInput
+              value={f.epi_status}
+              onChange={(v) => {
+                upd("epi_status", v);
+                if (v !== "precise_value") upd("epi_value", "");
+              }}
+              options={EPI_STATUS_OPTIONS.map((o) => ({ value: o.value, label: o.label }))}
+              placeholder="Seleziona"
+            />
+            {f.epi_status === "precise_value" && (
+              <div className="mt-2 flex items-center gap-2">
+                <input
+                  type="text"
+                  inputMode="decimal"
+                  value={f.epi_value}
+                  onChange={(e) => upd("epi_value", e.target.value)}
+                  placeholder="Es. 135"
+                  className="w-full rounded-sm border border-border bg-background px-3 py-2.5 text-base focus:border-primary focus:outline-none sm:py-2 sm:text-sm"
+                />
+                <span className="shrink-0 text-xs uppercase tracking-wider text-muted-foreground">
+                  kWh/m² anno
+                </span>
+              </div>
+            )}
           </Field>
           <Field label="Riscaldamento">
             <SelectInput
