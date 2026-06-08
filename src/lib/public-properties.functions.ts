@@ -106,6 +106,7 @@ type PropertyRow = {
 
 type ImageRow = {
   property_id: string;
+  published_image_url: string | null;
   storage_path: string;
   rendered_storage_path: string | null;
   use_rendered: boolean;
@@ -136,6 +137,7 @@ function adapt(
   });
   const gallery = sortedImages
     .map((i) => {
+      if (i.published_image_url) return i.published_image_url;
       const path = i.use_rendered && i.rendered_storage_path ? i.rendered_storage_path : i.storage_path;
       return signedMap[path];
     })
@@ -228,7 +230,7 @@ export const listPublishedProperties = createServerFn({ method: "GET" }).handler
   const [imgRes, featRes, descRes] = await Promise.all([
     supabaseAdmin
       .from("property_images")
-      .select("property_id, storage_path, rendered_storage_path, use_rendered, alt_text, sort_order, is_cover")
+      .select("property_id, published_image_url, storage_path, rendered_storage_path, use_rendered, alt_text, sort_order, is_cover")
       .in("property_id", ids),
     supabaseAdmin
       .from("property_features")
@@ -285,7 +287,7 @@ export const getPublishedProperty = createServerFn({ method: "GET" })
     const [imgRes, featRes, descRes] = await Promise.all([
       supabaseAdmin
         .from("property_images")
-        .select("property_id, storage_path, rendered_storage_path, use_rendered, alt_text, sort_order, is_cover")
+        .select("property_id, published_image_url, storage_path, rendered_storage_path, use_rendered, alt_text, sort_order, is_cover")
         .eq("property_id", propRow.id),
       supabaseAdmin
         .from("property_features")
