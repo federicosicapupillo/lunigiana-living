@@ -107,6 +107,8 @@ type PropertyRow = {
 type ImageRow = {
   property_id: string;
   storage_path: string;
+  rendered_storage_path: string | null;
+  use_rendered: boolean;
   alt_text: string | null;
   sort_order: number;
   is_cover: boolean;
@@ -132,7 +134,12 @@ function adapt(
     if (a.is_cover !== b.is_cover) return a.is_cover ? -1 : 1;
     return a.sort_order - b.sort_order;
   });
-  const gallery = sortedImages.map((i) => signedMap[i.storage_path]).filter(Boolean);
+  const gallery = sortedImages
+    .map((i) => {
+      const path = i.use_rendered && i.rendered_storage_path ? i.rendered_storage_path : i.storage_path;
+      return signedMap[path];
+    })
+    .filter(Boolean);
   const cover = gallery[0] ?? PLACEHOLDER;
   const attrs: Record<string, string> = {};
   const amenities: string[] = [];
