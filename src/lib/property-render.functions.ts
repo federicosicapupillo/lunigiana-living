@@ -1,50 +1,108 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import {
+  PHOTO_TYPES,
+  INTERNAL_CATEGORIES,
+  EXTERNAL_CATEGORIES,
+  RENDER_STYLES,
+  RENDER_GOALS,
+  ROOM_CONDITIONS,
+  INTERVENTION_LEVELS,
+  LIGHTING_OPTIONS,
+  VISUAL_TARGETS,
+  labelOf,
+  type RenderSettings,
+} from "@/lib/render-options";
 
-export const RENDER_STYLES = [
-  { id: "home_staging", label: "Home staging elegante" },
-  { id: "rustico", label: "Rustico raffinato" },
-  { id: "moderno", label: "Moderno luminoso" },
-  { id: "esterno", label: "Esterno curato" },
-  { id: "giardino", label: "Giardino valorizzato" },
-  { id: "ristrutturazione", label: "Ristrutturazione leggera" },
-  { id: "neutro", label: "Rendering neutro" },
-] as const;
-
-export type RenderStyleId = (typeof RENDER_STYLES)[number]["id"];
-
-const STRUCTURE_RULE =
+const STRUCTURE_STRICT =
   "STRUCTURAL FIDELITY (mandatory): keep the original photograph's architecture, perspective, camera angle, focal length, framing and proportions IDENTICAL. Do not move, add or remove walls, ceilings, floors, windows, doors, stairs, columns, beams or openings. Do not change the function/typology of the space. Preserve the view beyond windows and the structural materials of walls, floor and ceiling.";
 
-const STYLE_PROMPTS: Record<RenderStyleId, string> = {
-  home_staging:
-    "Elegant Italian home staging: refined contemporary furniture, warm neutral palette, soft natural daylight, curated decor, magazine-quality interior photography.",
-  rustico:
-    "Refined rustic Lunigiana interior: aged chestnut wood furniture, natural linen textiles in cream and terracotta, handcrafted ceramics, exposed beams or stone where appropriate, warm tungsten lighting.",
-  moderno:
-    "Modern luminous interior: clean minimal furniture, white and pale oak palette, abundant natural light, sleek matte finishes, sculptural single statement piece, editorial photorealistic photography.",
-  esterno:
-    "Curated outdoor area: tidy paved or stone surfaces, elegant outdoor furniture in neutral tones, large terracotta planters with Mediterranean greenery, warm late-afternoon natural light.",
-  giardino:
-    "Valorized garden: lush manicured lawn, olive trees, lavender and rosemary borders, stone paths, soft natural light, photorealistic landscape photography that elevates the existing garden.",
-  ristrutturazione:
-    "Light refurbishment preview: freshly painted walls in warm white, refinished floors, updated fixtures, clean window frames — same room, visibly cleaner and renovated, no structural changes.",
-  neutro:
-    "Neutral professional real-estate rendering: clean depersonalized styling, neutral palette, soft natural light, minimal essential furniture only, suitable for any buyer.",
+const STRUCTURE_LOOSE =
+  "Keep the camera angle and overall layout of the room recognizable; small adjustments to fixtures and finishes are allowed but do not invent new rooms or openings.";
+
+const INTENSITY_HINT: Record<string, string> = {
+  molto_leggero:
+    "INTENSITY — Very light: preserve the original photo as much as possible; only minor styling improvements, no furniture replacement.",
+  leggero:
+    "INTENSITY — Light: refresh styling, tidy clutter, soft palette adjustments; keep most existing elements.",
+  medio:
+    "INTENSITY — Medium: clear restyling of decor and key furniture pieces, refreshed palette, while keeping the room recognizable.",
+  forte:
+    "INTENSITY — Strong: full restyling of furniture, palette, textiles and lighting; the result must look obviously transformed yet credible and photorealistic.",
 };
 
-function buildPrompt(style: RenderStyleId): string {
-  return `${STRUCTURE_RULE}\n\nSTYLE — ${STYLE_PROMPTS[style]}\n\nThis is a full restyling, not a light retouch: replace existing furniture and decor with a cohesive new set in the chosen style while keeping the room's structure identical.`;
+function joinLabels(parts: (string | null)[]): string {
+  return parts.filter((p): p is string => !!p && p.length > 0).join(" · ");
 }
+
+function buildPrompt(s: RenderSettings): string {
+  const isExternal = s.photo_type === "esterno";
+  const categoryLabel =
+    labelOf(isExternal ? EXTERNAL_CATEGORIES : INTERNAL_CATEGORIES, s.photo_category) ?? "ambiente";
+  const typeLabel = labelOf(PHOTO_TYPES, s.photo_type) ?? (isExternal ? "Esterno" : "Interno");
+  const styleLabel = labelOf(RENDER_STYLES, s.render_style) ?? "Neutro valorizzato";
+  const goalLabel = labelOf(RENDER_GOALS, s.render_goal);
+  const conditionLabel = labelOf(ROOM_CONDITIONS, s.room_condition);
+  const lightingLabel = labelOf(LIGHTING_OPTIONS, s.desired_lighting);
+  const targetLabel = labelOf(VISUAL_TARGETS, s.visual_target);
+  const intensityHint = INTENSITY_HINT[s.intervention_level ?? "medio"] ?? INTENSITY_HINT.medio;
+
+  const structureRule = s.preserve_structure ? STRUCTURE_STRICT : STRUCTURE_LOOSE;
+
+  const sceneLine = `SCENE — Real estate photograph of a ${typeLabel.toLowerCase()} space, specifically a ${categoryLabel.toLowerCase()}.`;
+  const styleLine = `STYLE — Apply a "${styleLabel}" treatment suitable for an Italian real-estate listing.`;
+  const goalLine = goalLabel ? `GOAL — ${goalLabel}.` : "";
+  const conditionLine = conditionLabel
+    ? `CURRENT STATE — The original space is ${conditionLabel.toLowerCase()}; respect that as the starting point.`
+    : "";
+  const lightingLine = lightingLabel ? `LIGHTING — ${lightingLabel}.` : "";
+  const targetLine = targetLabel
+    ? `TARGET BUYER — Optimize emotional appeal for: ${targetLabel}.`
+    : "";
+  const notesLine = s.render_notes ? `NOTES FROM AGENT — ${s.render_notes}` : "";
+
+  const outdoorRule = isExternal
+    ? "OUTDOOR REALISM — Avoid artificial, plastic or over-saturated results. Keep vegetation, paving and architectural elements credible for Lunigiana / Italian Tuscan context."
+    : "";
+
+  const finalCheck =
+    "FINAL CHECK — The result must remain the same physical place from the same camera position, but the styling, decor and atmosphere should align with the requested treatment. Output must be a single photorealistic real-estate photograph.";
+
+  return joinLabels([
+    structureRule,
+    intensityHint,
+    sceneLine,
+    styleLine,
+    goalLine,
+    conditionLine,
+    lightingLine,
+    targetLine,
+    outdoorRule,
+    notesLine,
+    finalCheck,
+  ]).replace(/ · /g, "\n\n");
+}
+
+const SettingsSchema = z.object({
+  photo_type: z.enum(["interno", "esterno"]).nullable(),
+  photo_category: z.string().max(64).nullable(),
+  render_style: z.string().max(64).nullable(),
+  render_goal: z.string().max(64).nullable(),
+  room_condition: z.string().max(64).nullable(),
+  intervention_level: z.string().max(32).nullable(),
+  preserve_structure: z.boolean(),
+  desired_lighting: z.string().max(32).nullable(),
+  visual_target: z.string().max(32).nullable(),
+  render_notes: z.string().max(500).nullable(),
+});
 
 export const renderPropertyImage = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: { imageId: string; style: RenderStyleId }) =>
+  .inputValidator((data: { imageId: string }) =>
     z
       .object({
         imageId: z.string().uuid(),
-        style: z.enum(RENDER_STYLES.map((s) => s.id) as [RenderStyleId, ...RenderStyleId[]]),
       })
       .parse(data),
   )
@@ -63,10 +121,26 @@ export const renderPropertyImage = createServerFn({ method: "POST" })
 
     const { data: img, error: imgErr } = await supabaseAdmin
       .from("property_images")
-      .select("id, property_id, storage_path")
+      .select(
+        "id, property_id, storage_path, photo_type, photo_category, render_style, render_goal, room_condition, intervention_level, preserve_structure, desired_lighting, visual_target, render_notes",
+      )
       .eq("id", data.imageId)
       .maybeSingle();
     if (imgErr || !img) throw new Error("Immagine non trovata");
+    if (!img.photo_type) throw new Error("Seleziona prima il tipo foto (Interno/Esterno)");
+
+    const settings: RenderSettings = {
+      photo_type: img.photo_type,
+      photo_category: img.photo_category,
+      render_style: img.render_style,
+      render_goal: img.render_goal,
+      room_condition: img.room_condition,
+      intervention_level: img.intervention_level,
+      preserve_structure: img.preserve_structure,
+      desired_lighting: img.desired_lighting,
+      visual_target: img.visual_target,
+      render_notes: img.render_notes,
+    };
 
     await supabaseAdmin
       .from("property_images")
@@ -96,7 +170,7 @@ export const renderPropertyImage = createServerFn({ method: "POST" })
       const key = process.env.LOVABLE_API_KEY;
       if (!key) throw new Error("AI non configurata");
 
-      const prompt = buildPrompt(data.style);
+      const prompt = buildPrompt(settings);
       const upstream = await fetch("https://ai.gateway.lovable.dev/v1/images/generations", {
         method: "POST",
         headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
@@ -134,7 +208,6 @@ export const renderPropertyImage = createServerFn({ method: "POST" })
         .update({
           rendered_storage_path: renderedPath,
           render_status: "done",
-          render_style: data.style,
           render_error: null,
           render_created_at: new Date().toISOString(),
         })
@@ -150,6 +223,35 @@ export const renderPropertyImage = createServerFn({ method: "POST" })
         .eq("id", data.imageId);
       throw new Error(msg);
     }
+  });
+
+export const saveRenderSettings = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(
+    (data: { imageId: string; settings: RenderSettings }) =>
+      z
+        .object({
+          imageId: z.string().uuid(),
+          settings: SettingsSchema,
+        })
+        .parse(data),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { supabase, userId } = context;
+    const { data: roleRow } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userId)
+      .eq("role", "admin")
+      .maybeSingle();
+    if (!roleRow) throw new Error("Solo gli admin");
+    const { error } = await supabaseAdmin
+      .from("property_images")
+      .update(data.settings)
+      .eq("id", data.imageId);
+    if (error) throw new Error(error.message);
+    return { ok: true as const };
   });
 
 export const setPropertyImagePublished = createServerFn({ method: "POST" })
