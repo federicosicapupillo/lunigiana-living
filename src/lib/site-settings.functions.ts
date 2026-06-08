@@ -3,7 +3,10 @@ import { z } from "zod";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-export type HomeHeroVariant = "lunigiana_emotional" | "pontremoli_historic_center";
+export type HomeHeroVariant =
+  | "lunigiana_emotional"
+  | "pontremoli_historic_center"
+  | "elena_cometa";
 
 const DEFAULT_VARIANT: HomeHeroVariant = "lunigiana_emotional";
 
@@ -15,16 +18,26 @@ export const getHomeHeroVariant = createServerFn({ method: "GET" }).handler(asyn
     .maybeSingle();
   const value = (data?.value ?? DEFAULT_VARIANT) as HomeHeroVariant;
   const variant: HomeHeroVariant =
-    value === "pontremoli_historic_center" ? "pontremoli_historic_center" : "lunigiana_emotional";
+    value === "pontremoli_historic_center"
+      ? "pontremoli_historic_center"
+      : value === "elena_cometa"
+        ? "elena_cometa"
+        : "lunigiana_emotional";
   return { variant };
 });
 
 export const setHomeHeroVariant = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: { variant: HomeHeroVariant }) =>
-    z
-      .object({ variant: z.enum(["lunigiana_emotional", "pontremoli_historic_center"]) })
-      .parse(data),
+      z
+        .object({
+          variant: z.enum([
+            "lunigiana_emotional",
+            "pontremoli_historic_center",
+            "elena_cometa",
+          ]),
+        })
+        .parse(data),
   )
   .handler(async ({ data, context }) => {
     const { userId } = context;
