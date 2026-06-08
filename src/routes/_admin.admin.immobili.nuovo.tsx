@@ -583,6 +583,32 @@ function NewPropertyPage() {
               placeholder="Seleziona classe"
             />
           </Field>
+          <Field label="Indice prestazione energetica">
+            <SelectInput
+              value={f.epi_status}
+              onChange={(v) => {
+                upd("epi_status", v);
+                if (v !== "precise_value") upd("epi_value", "");
+              }}
+              options={EPI_STATUS_OPTIONS.map((o) => ({ value: o.value, label: o.label }))}
+              placeholder="Seleziona"
+            />
+            {f.epi_status === "precise_value" && (
+              <div className="mt-2 flex items-center gap-2">
+                <input
+                  type="text"
+                  inputMode="decimal"
+                  value={f.epi_value}
+                  onChange={(e) => upd("epi_value", e.target.value)}
+                  placeholder="Es. 135"
+                  className="w-full rounded-sm border border-border bg-background px-3 py-2.5 text-base focus:border-primary focus:outline-none sm:py-2 sm:text-sm"
+                />
+                <span className="shrink-0 text-xs uppercase tracking-wider text-muted-foreground">
+                  kWh/m² anno
+                </span>
+              </div>
+            )}
+          </Field>
           <Field label="Riscaldamento">
             <SelectInput
               value={f.heating}
