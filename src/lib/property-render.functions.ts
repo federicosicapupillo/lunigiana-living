@@ -74,14 +74,24 @@ export const renderPropertyImage = createServerFn({ method: "POST" })
       .eq("id", data.imageId);
 
     try {
-      const { data: blob, error: dlErr } = await supabaseAdmin.storage
-        .from("property-images")
-        .download(img.storage_path);
-      if (dlErr || !blob) throw new Error(`Download fallito: ${dlErr?.message ?? "n/d"}`);
-      const buf = new Uint8Array(await blob.arrayBuffer());
+      let bytesIn: Uint8Array;
+      let mime = "image/jpeg";
+      if (/^https?:\/\//i.test(img.storage_path)) {
+        const r = await fetch(img.storage_path);
+        if (!r.ok) throw new Error(`Download fallito: HTTP ${r.status}`);
+        mime = r.headers.get("content-type") || mime;
+        bytesIn = new Uint8Array(await r.arrayBuffer());
+      } else {
+        const { data: blob, error: dlErr } = await supabaseAdmin.storage
+          .from("property-images")
+          .download(img.storage_path);
+        if (dlErr || !blob) throw new Error(`Download fallito: ${dlErr?.message ?? "n/d"}`);
+        mime = blob.type || mime;
+        bytesIn = new Uint8Array(await blob.arrayBuffer());
+      }
       let bin = "";
-      for (let i = 0; i < buf.length; i++) bin += String.fromCharCode(buf[i]);
-      const dataUrl = `data:${blob.type || "image/jpeg"};base64,${btoa(bin)}`;
+      for (let i = 0; i < bytesIn.length; i++) bin += String.fromCharCode(bytesIn[i]);
+      const dataUrl = `data:${mime};base64,${btoa(bin)}`;
 
       const key = process.env.LOVABLE_API_KEY;
       if (!key) throw new Error("AI non configurata");
