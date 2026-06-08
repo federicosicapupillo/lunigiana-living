@@ -29,6 +29,8 @@ export type Database = {
           created_by: string | null
           elevator: boolean
           energy_class: string | null
+          energy_performance_index_status: string | null
+          energy_performance_index_value: number | null
           featured: boolean
           floors: number | null
           furnished: boolean
@@ -72,6 +74,8 @@ export type Database = {
           created_by?: string | null
           elevator?: boolean
           energy_class?: string | null
+          energy_performance_index_status?: string | null
+          energy_performance_index_value?: number | null
           featured?: boolean
           floors?: number | null
           furnished?: boolean
@@ -115,6 +119,8 @@ export type Database = {
           created_by?: string | null
           elevator?: boolean
           energy_class?: string | null
+          energy_performance_index_status?: string | null
+          energy_performance_index_value?: number | null
           featured?: boolean
           floors?: number | null
           furnished?: boolean
