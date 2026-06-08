@@ -21,6 +21,7 @@ import {
   CONTRACT_TYPES,
   ENERGY_CLASSES,
   CONDITIONS,
+  EPI_STATUS_OPTIONS,
   STATUS_LABELS,
   LENGTH_OPTIONS,
   TONE_OPTIONS,
@@ -75,6 +76,8 @@ type Property = {
   bathrooms: number | null;
   floors: number | null;
   energy_class: string | null;
+  energy_performance_index_status: string | null;
+  energy_performance_index_value: number | null;
   condition: string | null;
   panoramic_view: boolean;
   historic_property: boolean;
