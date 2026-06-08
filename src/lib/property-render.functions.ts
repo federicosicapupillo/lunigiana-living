@@ -192,17 +192,29 @@ async function verifyInternalStorageImage(
     };
   }
 
-  const updatePayload: Record<string, string | null> = {
-    image_url: signed.signedUrl,
-    original_image_url: signed.signedUrl,
-    published_image_url: signed.signedUrl,
-    import_status: "synced_to_storage",
-  };
   if (img.import_status === "sync_error") {
-    updatePayload.render_status = "not_generated";
-    updatePayload.render_error = null;
+    await supabaseAdmin
+      .from("property_images")
+      .update({
+        image_url: signed.signedUrl,
+        original_image_url: signed.signedUrl,
+        published_image_url: signed.signedUrl,
+        import_status: "synced_to_storage",
+        render_status: "not_generated",
+        render_error: null,
+      })
+      .eq("id", img.id);
+  } else {
+    await supabaseAdmin
+      .from("property_images")
+      .update({
+        image_url: signed.signedUrl,
+        original_image_url: signed.signedUrl,
+        published_image_url: signed.signedUrl,
+        import_status: "synced_to_storage",
+      })
+      .eq("id", img.id);
   }
-  await supabaseAdmin.from("property_images").update(updatePayload).eq("id", img.id);
 
   return {
     imageId: img.id,
