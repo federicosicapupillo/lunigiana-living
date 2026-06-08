@@ -308,6 +308,28 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
                 />
                 {/* Rendering controls */}
                 <div className="space-y-2 rounded-sm border border-border bg-muted/30 p-2">
+                  {img.is_imported && img.import_status !== "synced_to_storage" && (
+                    <div className="rounded-sm border border-orange-300 bg-orange-50 p-2 text-[10px] text-orange-900">
+                      <div className="font-semibold uppercase tracking-wider">Foto importata</div>
+                      <p className="mt-1">
+                        Questa foto proviene dal vecchio sito e non è ancora salvata nello
+                        storage interno. Sincronizzala prima di generare il rendering.
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => syncImage(img)}
+                        disabled={syncingId === img.id}
+                        className="mt-2 inline-flex items-center gap-1 rounded-sm bg-orange-700 px-2 py-1 text-[10px] uppercase tracking-wider text-white hover:bg-orange-800 disabled:opacity-50"
+                      >
+                        {syncingId === img.id ? (
+                          <Loader2 size={11} className="animate-spin" />
+                        ) : (
+                          <CloudDownload size={11} />
+                        )}
+                        Sincronizza foto importata
+                      </button>
+                    </div>
+                  )}
                   <RenderSettingsPanel
                     imageId={img.id}
                     initial={extractSettings(img)}
@@ -316,7 +338,11 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
                     <button
                       type="button"
                       onClick={() => generate(img)}
-                      disabled={renderingId === img.id || !img.photo_type}
+                      disabled={
+                        renderingId === img.id ||
+                        !img.photo_type ||
+                        syncingId === img.id
+                      }
                       className="inline-flex flex-1 items-center justify-center gap-1 rounded-sm bg-primary px-2 py-1.5 text-[10px] uppercase tracking-wider text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
                     >
                       {renderingId === img.id ? (
