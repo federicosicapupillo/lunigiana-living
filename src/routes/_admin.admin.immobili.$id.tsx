@@ -219,20 +219,35 @@ function PropertyEditor() {
     if (!silent) toast.success("Salvato");
   };
 
-  const changeStatus = async (status: Property["status"]) => {
-    if (!prop) return;
-    update({ status });
-    const { error } = await supabase.from("properties").update({ status }).eq("id", id);
-    if (error) return toast.error(error.message);
-    toast.success(`Stato aggiornato: ${STATUS_LABELS[status]}`);
+  const [statusMenu, setStatusMenu] = useState(false);
+  const [pendingAction, setPendingAction] = useState<StatusAction | null>(null);
+  const [statusBusy, setStatusBusy] = useState(false);
+
+  const requestAction = (action: StatusAction) => {
+    setStatusMenu(false);
+    if (!CONFIRM_COPY[action]) {
+      void runAction(action);
+      return;
+    }
+    setPendingAction(action);
   };
 
-  const deleteProperty = async () => {
-    if (!confirm("Eliminare definitivamente questo immobile e tutte le sue foto?")) return;
-    const { error } = await supabase.from("properties").delete().eq("id", id);
-    if (error) return toast.error(error.message);
-    toast.success("Immobile eliminato");
-    navigate({ to: "/admin/immobili" });
+  const runAction = async (action: StatusAction) => {
+    if (!prop) return;
+    setStatusBusy(true);
+    const res = await applyStatusTransition(id, action);
+    setStatusBusy(false);
+    setPendingAction(null);
+    if ("error" in res) {
+      toast.error(res.error);
+      return;
+    }
+    toast.success(`${ACTION_LABELS[action]} ✓`);
+    if (action === "hard_delete") {
+      navigate({ to: "/admin/immobili" });
+      return;
+    }
+    update({ status: res.status });
   };
 
   const generate = async () => {
