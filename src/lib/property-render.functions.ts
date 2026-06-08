@@ -318,10 +318,10 @@ export const syncImportedImage = createServerFn({ method: "POST" })
     }
 
     try {
-      await syncImportedImageToBucket(img.id, img.property_id, sourceUrl);
+      const synced = await syncImportedImageToBucket(img.id, img.property_id, sourceUrl);
       const availability = await verifyInternalStorageImage(supabaseAdmin, {
         ...img,
-        storage_path: `${img.property_id}/imported/${img.id}.${sourceUrl.toLowerCase().includes(".png") ? "png" : sourceUrl.toLowerCase().includes(".webp") ? "webp" : "jpg"}`,
+        storage_path: synced.storagePath,
         import_status: "synced_to_storage",
         is_imported: true,
       });
@@ -385,12 +385,21 @@ export const renderPropertyImage = createServerFn({ method: "POST" })
     const { data: img, error: imgErr } = await supabaseAdmin
       .from("property_images")
       .select(
-        "id, property_id, storage_path, imported_source_url, import_status, photo_type, photo_category, render_style, render_goal, room_condition, intervention_level, preserve_structure, desired_lighting, visual_target, render_notes",
+        "id, property_id, storage_path, imported_source_url, import_status, is_imported, use_rendered, photo_type, photo_category, render_style, render_goal, room_condition, intervention_level, preserve_structure, desired_lighting, visual_target, render_notes",
       )
       .eq("id", data.imageId)
       .maybeSingle();
     if (imgErr || !img) throw new Error("Immagine non trovata");
     if (!img.photo_type) throw new Error("Seleziona prima il tipo foto (Interno/Esterno)");
+
+    const availability = await verifyInternalStorageImage(supabaseAdmin, img);
+    if (!availability.canRender) {
+      await supabaseAdmin
+        .from("property_images")
+        .update({ render_status: "not_generated", render_error: availability.message })
+        .eq("id", data.imageId);
+      throw new Error(availability.message ?? IMPORTED_NOT_SYNCED_MESSAGE);
+    }
 
     const settings: RenderSettings = {
       photo_type: img.photo_type,
@@ -413,41 +422,18 @@ export const renderPropertyImage = createServerFn({ method: "POST" })
     try {
       let bytesIn: Uint8Array;
       let mime = "image/jpeg";
-      const storagePathIsUrl = /^https?:\/\//i.test(img.storage_path);
-
-      if (storagePathIsUrl) {
-        // Legacy import: sync nel bucket prima di renderizzare.
-        const synced = await syncImportedImageToBucket(
-          img.id,
-          img.property_id,
-          img.imported_source_url ?? img.storage_path,
-        );
-        bytesIn = synced.bytes;
-        mime = synced.mime;
-      } else {
-        const { data: blob, error: dlErr } = await supabaseAdmin.storage
-          .from("property-images")
-          .download(img.storage_path);
-        if (dlErr || !blob) {
-          // Path interno mancante: prova un fallback dalla source esterna se presente.
-          if (img.imported_source_url) {
-            const synced = await syncImportedImageToBucket(
-              img.id,
-              img.property_id,
-              img.imported_source_url,
-            );
-            bytesIn = synced.bytes;
-            mime = synced.mime;
-          } else {
-            throw new Error(
-              "Questa immagine è stata importata da una fonte esterna e non è ancora disponibile per il rendering. Ricarica o sincronizza la foto.",
-            );
-          }
-        } else {
-          mime = blob.type || mime;
-          bytesIn = new Uint8Array(await blob.arrayBuffer());
-        }
+      const { data: blob, error: dlErr } = await supabaseAdmin.storage
+        .from(BUCKET)
+        .download(img.storage_path);
+      if (dlErr || !blob) {
+        await supabaseAdmin
+          .from("property_images")
+          .update({ import_status: "sync_error", render_status: "error", render_error: IMPORTED_NOT_SYNCED_MESSAGE })
+          .eq("id", data.imageId);
+        throw new Error(IMPORTED_NOT_SYNCED_MESSAGE);
       }
+      mime = blob.type || mime;
+      bytesIn = new Uint8Array(await blob.arrayBuffer());
       let bin = "";
       for (let i = 0; i < bytesIn.length; i++) bin += String.fromCharCode(bytesIn[i]);
       const dataUrl = `data:${mime};base64,${btoa(bin)}`;
@@ -484,15 +470,20 @@ export const renderPropertyImage = createServerFn({ method: "POST" })
       const bytes = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
       const renderedPath = `${img.property_id}/rendered/${img.id}-${Date.now()}.png`;
       const { error: upErr } = await supabaseAdmin.storage
-        .from("property-images")
+        .from(BUCKET)
         .upload(renderedPath, bytes, { contentType: "image/png", upsert: false });
       if (upErr) throw new Error(`Upload rendering fallito: ${upErr.message}`);
+      const { data: renderedSigned } = await supabaseAdmin.storage
+        .from(BUCKET)
+        .createSignedUrl(renderedPath, SIGNED_URL_TTL_SECONDS);
 
       const { error: updErr } = await supabaseAdmin
         .from("property_images")
         .update({
           rendered_storage_path: renderedPath,
-          render_status: "done",
+          rendered_image_url: renderedSigned?.signedUrl ?? null,
+          published_image_url: img.use_rendered ? renderedSigned?.signedUrl ?? null : availability.originalImageUrl,
+          render_status: "completed",
           render_error: null,
           render_created_at: new Date().toISOString(),
         })
@@ -501,7 +492,7 @@ export const renderPropertyImage = createServerFn({ method: "POST" })
 
       return { ok: true as const, renderedPath };
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "Errore";
+      const msg = sanitizeRenderingError(err);
       await supabaseAdmin
         .from("property_images")
         .update({ render_status: "error", render_error: msg })
