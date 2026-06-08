@@ -17,6 +17,7 @@ export type Database = {
       properties: {
         Row: {
           address: string | null
+          archived_at: string | null
           area_zone: string | null
           balcony: boolean
           bathrooms: number | null
@@ -27,6 +28,7 @@ export type Database = {
           country: string | null
           created_at: string
           created_by: string | null
+          deleted_at: string | null
           elevator: boolean
           energy_class: string | null
           energy_performance_index_status: string | null
@@ -49,6 +51,7 @@ export type Database = {
           price_on_request: boolean
           property_type: string | null
           province: string | null
+          published_at: string | null
           reference_code: string | null
           region: string | null
           short_notes: string | null
@@ -56,12 +59,16 @@ export type Database = {
           size_sqm: number | null
           slug: string | null
           status: Database["public"]["Enums"]["property_status"]
+          status_note: string | null
+          status_updated_at: string | null
+          suspended_at: string | null
           terrace: boolean
           title: string
           updated_at: string
         }
         Insert: {
           address?: string | null
+          archived_at?: string | null
           area_zone?: string | null
           balcony?: boolean
           bathrooms?: number | null
@@ -72,6 +79,7 @@ export type Database = {
           country?: string | null
           created_at?: string
           created_by?: string | null
+          deleted_at?: string | null
           elevator?: boolean
           energy_class?: string | null
           energy_performance_index_status?: string | null
@@ -94,6 +102,7 @@ export type Database = {
           price_on_request?: boolean
           property_type?: string | null
           province?: string | null
+          published_at?: string | null
           reference_code?: string | null
           region?: string | null
           short_notes?: string | null
@@ -101,12 +110,16 @@ export type Database = {
           size_sqm?: number | null
           slug?: string | null
           status?: Database["public"]["Enums"]["property_status"]
+          status_note?: string | null
+          status_updated_at?: string | null
+          suspended_at?: string | null
           terrace?: boolean
           title?: string
           updated_at?: string
         }
         Update: {
           address?: string | null
+          archived_at?: string | null
           area_zone?: string | null
           balcony?: boolean
           bathrooms?: number | null
@@ -117,6 +130,7 @@ export type Database = {
           country?: string | null
           created_at?: string
           created_by?: string | null
+          deleted_at?: string | null
           elevator?: boolean
           energy_class?: string | null
           energy_performance_index_status?: string | null
@@ -139,6 +153,7 @@ export type Database = {
           price_on_request?: boolean
           property_type?: string | null
           province?: string | null
+          published_at?: string | null
           reference_code?: string | null
           region?: string | null
           short_notes?: string | null
@@ -146,6 +161,9 @@ export type Database = {
           size_sqm?: number | null
           slug?: string | null
           status?: Database["public"]["Enums"]["property_status"]
+          status_note?: string | null
+          status_updated_at?: string | null
+          suspended_at?: string | null
           terrace?: boolean
           title?: string
           updated_at?: string
@@ -353,7 +371,15 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "editor"
-      property_status: "draft" | "ready" | "published"
+      property_status:
+        | "draft"
+        | "ready"
+        | "published"
+        | "suspended"
+        | "sold"
+        | "rented"
+        | "archived"
+        | "deleted"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -482,7 +508,16 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "editor"],
-      property_status: ["draft", "ready", "published"],
+      property_status: [
+        "draft",
+        "ready",
+        "published",
+        "suspended",
+        "sold",
+        "rented",
+        "archived",
+        "deleted",
+      ],
     },
   },
 } as const

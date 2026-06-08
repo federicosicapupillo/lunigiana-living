@@ -1,9 +1,17 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, Search, Loader2, ImageOff } from "lucide-react";
+import { Plus, Search, Loader2, ImageOff, MoreHorizontal } from "lucide-react";
 import { toast } from "sonner";
-import { STATUS_LABELS } from "@/lib/admin/property-constants";
+import { STATUS_LABELS, STATUS_BADGE_CLASSES, type PropertyStatus } from "@/lib/admin/property-constants";
+import {
+  availableActions,
+  applyStatusTransition,
+  ACTION_LABELS,
+  CONFIRM_COPY,
+  type StatusAction,
+} from "@/lib/admin/property-status";
+import { ConfirmDialog } from "@/components/admin/confirm-dialog";
 
 type Row = {
   id: string;
@@ -12,10 +20,31 @@ type Row = {
   property_type: string | null;
   price: number | null;
   price_on_request: boolean;
-  status: "draft" | "ready" | "published";
+  status: PropertyStatus;
   updated_at: string;
   cover_url: string | null;
 };
+
+type Filter =
+  | "all"
+  | "published"
+  | "draft"
+  | "suspended"
+  | "sold"
+  | "rented"
+  | "archived"
+  | "deleted";
+
+const FILTERS: Array<{ key: Filter; label: string }> = [
+  { key: "all", label: "Tutti" },
+  { key: "published", label: "Pubblicati" },
+  { key: "draft", label: "Bozze" },
+  { key: "suspended", label: "Sospesi" },
+  { key: "sold", label: "Venduti" },
+  { key: "rented", label: "Affittati" },
+  { key: "archived", label: "Archiviati" },
+  { key: "deleted", label: "Cestino" },
+];
 
 export const Route = createFileRoute("/_admin/admin/immobili/")({
   head: () => ({
@@ -31,7 +60,10 @@ function AdminPropertiesPage() {
   const [rows, setRows] = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
   const [q, setQ] = useState("");
-  const [statusFilter, setStatusFilter] = useState<"all" | "draft" | "ready" | "published">("all");
+  const [statusFilter, setStatusFilter] = useState<Filter>("all");
+  const [openMenu, setOpenMenu] = useState<string | null>(null);
+  const [pending, setPending] = useState<{ id: string; action: StatusAction } | null>(null);
+  const [busy, setBusy] = useState(false);
 
   const load = async () => {
     setLoading(true);
@@ -79,7 +111,12 @@ function AdminPropertiesPage() {
 
   const filtered = useMemo(() => {
     return rows.filter((r) => {
-      if (statusFilter !== "all" && r.status !== statusFilter) return false;
+      if (statusFilter === "all") {
+        // Default view hides the trash
+        if (r.status === "deleted") return false;
+      } else if (r.status !== statusFilter) {
+        return false;
+      }
       if (!q.trim()) return true;
       const needle = q.toLowerCase();
       return (
@@ -90,15 +127,44 @@ function AdminPropertiesPage() {
     });
   }, [rows, q, statusFilter]);
 
-  const counts = useMemo(
-    () => ({
-      all: rows.length,
-      draft: rows.filter((r) => r.status === "draft").length,
-      ready: rows.filter((r) => r.status === "ready").length,
-      published: rows.filter((r) => r.status === "published").length,
-    }),
-    [rows],
-  );
+  const counts = useMemo(() => {
+    const c: Record<Filter, number> = {
+      all: rows.filter((r) => r.status !== "deleted").length,
+      published: 0,
+      draft: 0,
+      suspended: 0,
+      sold: 0,
+      rented: 0,
+      archived: 0,
+      deleted: 0,
+    };
+    for (const r of rows) {
+      if (r.status in c) c[r.status as Filter] = (c[r.status as Filter] ?? 0) + 1;
+    }
+    return c;
+  }, [rows]);
+
+  const requestAction = (id: string, action: StatusAction) => {
+    setOpenMenu(null);
+    if (!CONFIRM_COPY[action]) {
+      void runAction(id, action);
+      return;
+    }
+    setPending({ id, action });
+  };
+
+  const runAction = async (id: string, action: StatusAction) => {
+    setBusy(true);
+    const res = await applyStatusTransition(id, action);
+    setBusy(false);
+    setPending(null);
+    if ("error" in res) {
+      toast.error(res.error);
+      return;
+    }
+    toast.success(`${ACTION_LABELS[action]} ✓`);
+    await load();
+  };
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-10">
@@ -106,7 +172,7 @@ function AdminPropertiesPage() {
         <div>
           <h1 className="font-serif text-2xl text-ink sm:text-4xl">Immobili</h1>
           <p className="mt-1 text-xs text-muted-foreground sm:text-sm">
-            {counts.all} totali · {counts.published} pubblicati · {counts.ready} pronti · {counts.draft} in bozza
+            {counts.all} totali · {counts.published} pubblicati · {counts.draft} bozze · {counts.suspended} sospesi · {counts.deleted} nel cestino
           </p>
         </div>
         <Link
@@ -128,17 +194,17 @@ function AdminPropertiesPage() {
           />
         </div>
         <div className="-mx-1 flex gap-1 overflow-x-auto px-1 sm:mx-0 sm:overflow-visible sm:px-0">
-          {(["all", "draft", "ready", "published"] as const).map((s) => (
+          {FILTERS.map((f) => (
             <button
-              key={s}
-              onClick={() => setStatusFilter(s)}
+              key={f.key}
+              onClick={() => setStatusFilter(f.key)}
               className={`shrink-0 rounded-sm border px-3 py-1.5 text-xs uppercase tracking-wider transition ${
-                statusFilter === s
+                statusFilter === f.key
                   ? "border-primary bg-primary text-primary-foreground"
                   : "border-border text-muted-foreground hover:border-primary/50"
               }`}
             >
-              {s === "all" ? "Tutti" : STATUS_LABELS[s]}
+              {f.label} ({counts[f.key] ?? 0})
             </button>
           ))}
         </div>
@@ -157,67 +223,111 @@ function AdminPropertiesPage() {
       ) : (
         <div className="mt-6 grid gap-3 sm:gap-4">
           {filtered.map((r) => (
-            <Link
+            <div
               key={r.id}
-              to="/admin/immobili/$id"
-              params={{ id: r.id }}
-              className="group flex items-center gap-3 rounded-sm border border-border bg-card p-3 transition hover:border-primary/50 hover:shadow-sm sm:gap-5 sm:p-4"
+              className="group relative flex items-center gap-3 rounded-sm border border-border bg-card p-3 transition hover:border-primary/50 hover:shadow-sm sm:gap-5 sm:p-4"
             >
-              <div className="h-16 w-20 shrink-0 overflow-hidden rounded-sm bg-muted sm:h-20 sm:w-28">
-                {r.cover_url ? (
-                  <img src={r.cover_url} alt="" className="h-full w-full object-cover" />
-                ) : (
-                  <div className="flex h-full w-full items-center justify-center text-muted-foreground">
-                    <ImageOff size={20} />
+              <Link
+                to="/admin/immobili/$id"
+                params={{ id: r.id }}
+                className="flex min-w-0 flex-1 items-center gap-3 sm:gap-5"
+              >
+                <div className="h-16 w-20 shrink-0 overflow-hidden rounded-sm bg-muted sm:h-20 sm:w-28">
+                  {r.cover_url ? (
+                    <img src={r.cover_url} alt="" className="h-full w-full object-cover" />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center text-muted-foreground">
+                      <ImageOff size={20} />
+                    </div>
+                  )}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                    <h3 className="min-w-0 flex-1 truncate font-serif text-base text-ink sm:text-lg">{r.title}</h3>
+                    <StatusBadge status={r.status} />
+                  </div>
+                  <p className="mt-1 truncate text-xs text-muted-foreground">
+                    {[r.property_type, r.municipality].filter(Boolean).join(" · ") || "—"}
+                  </p>
+                  <div className="mt-1 text-sm text-ink sm:hidden">
+                    {r.price_on_request
+                      ? "Su richiesta"
+                      : r.price
+                        ? `€ ${r.price.toLocaleString("it-IT")}`
+                        : "—"}
+                  </div>
+                </div>
+                <div className="hidden text-right text-sm sm:block">
+                  <div className="text-ink">
+                    {r.price_on_request
+                      ? "Su richiesta"
+                      : r.price
+                        ? `€ ${r.price.toLocaleString("it-IT")}`
+                        : "—"}
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    agg. {new Date(r.updated_at).toLocaleDateString("it-IT")}
+                  </div>
+                </div>
+              </Link>
+              <div className="relative shrink-0">
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setOpenMenu(openMenu === r.id ? null : r.id);
+                  }}
+                  aria-label="Azioni"
+                  className="inline-flex h-9 w-9 items-center justify-center rounded-sm border border-border text-muted-foreground hover:border-primary/50 hover:text-ink"
+                >
+                  <MoreHorizontal size={16} />
+                </button>
+                {openMenu === r.id && (
+                  <div
+                    className="absolute right-0 top-full z-20 mt-1 w-56 overflow-hidden rounded-sm border border-border bg-card shadow-lg"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {availableActions(r.status).map((act) => (
+                      <button
+                        key={act}
+                        type="button"
+                        onClick={() => requestAction(r.id, act)}
+                        className={`block w-full px-3 py-2 text-left text-xs uppercase tracking-wider hover:bg-muted ${
+                          act === "delete" || act === "hard_delete" ? "text-red-700" : "text-ink"
+                        }`}
+                      >
+                        {ACTION_LABELS[act]}
+                      </button>
+                    ))}
                   </div>
                 )}
               </div>
-              <div className="min-w-0 flex-1">
-                <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-                  <h3 className="min-w-0 flex-1 truncate font-serif text-base text-ink sm:text-lg">{r.title}</h3>
-                  <StatusBadge status={r.status} />
-                </div>
-                <p className="mt-1 truncate text-xs text-muted-foreground">
-                  {[r.property_type, r.municipality].filter(Boolean).join(" · ") || "—"}
-                </p>
-                <div className="mt-1 text-sm text-ink sm:hidden">
-                  {r.price_on_request
-                    ? "Su richiesta"
-                    : r.price
-                      ? `€ ${r.price.toLocaleString("it-IT")}`
-                      : "—"}
-                </div>
-              </div>
-              <div className="hidden text-right text-sm sm:block">
-                <div className="text-ink">
-                  {r.price_on_request
-                    ? "Su richiesta"
-                    : r.price
-                      ? `€ ${r.price.toLocaleString("it-IT")}`
-                      : "—"}
-                </div>
-                <div className="text-xs text-muted-foreground">
-                  agg. {new Date(r.updated_at).toLocaleDateString("it-IT")}
-                </div>
-              </div>
-            </Link>
+            </div>
           ))}
         </div>
       )}
+
+      <ConfirmDialog
+        open={!!pending}
+        busy={busy}
+        title={pending ? CONFIRM_COPY[pending.action]?.title ?? "" : ""}
+        body={pending ? CONFIRM_COPY[pending.action]?.body ?? "" : ""}
+        cancel={pending ? CONFIRM_COPY[pending.action]?.cancel ?? "Annulla" : "Annulla"}
+        confirm={pending ? CONFIRM_COPY[pending.action]?.confirm ?? "Conferma" : "Conferma"}
+        danger={pending ? CONFIRM_COPY[pending.action]?.danger : false}
+        onCancel={() => setPending(null)}
+        onConfirm={() => pending && runAction(pending.id, pending.action)}
+      />
     </div>
   );
 }
 
-function StatusBadge({ status }: { status: "draft" | "ready" | "published" }) {
-  const cls =
-    status === "published"
-      ? "bg-emerald-100 text-emerald-900 border-emerald-200"
-      : status === "ready"
-        ? "bg-blue-100 text-blue-900 border-blue-200"
-        : "bg-amber-100 text-amber-900 border-amber-200";
+function StatusBadge({ status }: { status: PropertyStatus }) {
+  const cls = STATUS_BADGE_CLASSES[status] ?? "bg-zinc-100 text-zinc-800 border-zinc-200";
   return (
     <span className={`rounded-sm border px-2 py-0.5 text-[10px] uppercase tracking-wider ${cls}`}>
-      {STATUS_LABELS[status]}
+      {STATUS_LABELS[status] ?? status}
     </span>
   );
 }

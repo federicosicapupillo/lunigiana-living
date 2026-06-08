@@ -7,9 +7,7 @@ import {
   Save,
   Sparkles,
   Loader2,
-  CheckCircle2,
-  Trash2,
-  Globe2,
+  ChevronDown,
   FileText,
 } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
@@ -23,6 +21,8 @@ import {
   CONDITIONS,
   EPI_STATUS_OPTIONS,
   STATUS_LABELS,
+  STATUS_BADGE_CLASSES,
+  type PropertyStatus,
   LENGTH_OPTIONS,
   TONE_OPTIONS,
   FLOOR_OPTIONS,
@@ -52,6 +52,14 @@ import {
   type MultiSelectKey,
 } from "@/lib/admin/property-constants";
 import { MultiSelectChips } from "@/components/admin/multi-select-chips";
+import {
+  availableActions,
+  applyStatusTransition,
+  ACTION_LABELS,
+  CONFIRM_COPY,
+  type StatusAction,
+} from "@/lib/admin/property-status";
+import { ConfirmDialog } from "@/components/admin/confirm-dialog";
 
 type Property = {
   id: string;
@@ -92,7 +100,7 @@ type Property = {
   longitude: number | null;
   short_notes: string | null;
   internal_notes: string | null;
-  status: "draft" | "ready" | "published";
+  status: PropertyStatus;
 };
 
 type Description = {
@@ -211,20 +219,35 @@ function PropertyEditor() {
     if (!silent) toast.success("Salvato");
   };
 
-  const changeStatus = async (status: Property["status"]) => {
-    if (!prop) return;
-    update({ status });
-    const { error } = await supabase.from("properties").update({ status }).eq("id", id);
-    if (error) return toast.error(error.message);
-    toast.success(`Stato aggiornato: ${STATUS_LABELS[status]}`);
+  const [statusMenu, setStatusMenu] = useState(false);
+  const [pendingAction, setPendingAction] = useState<StatusAction | null>(null);
+  const [statusBusy, setStatusBusy] = useState(false);
+
+  const requestAction = (action: StatusAction) => {
+    setStatusMenu(false);
+    if (!CONFIRM_COPY[action]) {
+      void runAction(action);
+      return;
+    }
+    setPendingAction(action);
   };
 
-  const deleteProperty = async () => {
-    if (!confirm("Eliminare definitivamente questo immobile e tutte le sue foto?")) return;
-    const { error } = await supabase.from("properties").delete().eq("id", id);
-    if (error) return toast.error(error.message);
-    toast.success("Immobile eliminato");
-    navigate({ to: "/admin/immobili" });
+  const runAction = async (action: StatusAction) => {
+    if (!prop) return;
+    setStatusBusy(true);
+    const res = await applyStatusTransition(id, action);
+    setStatusBusy(false);
+    setPendingAction(null);
+    if ("error" in res) {
+      toast.error(res.error);
+      return;
+    }
+    toast.success(`${ACTION_LABELS[action]} ✓`);
+    if (action === "hard_delete") {
+      navigate({ to: "/admin/immobili" });
+      return;
+    }
+    update({ status: res.status });
   };
 
   const generate = async () => {
@@ -293,7 +316,13 @@ function PropertyEditor() {
             className="mt-3 w-full bg-transparent font-serif text-2xl text-ink focus:outline-none sm:text-3xl"
           />
           <div className="mt-2 flex items-center gap-3 text-xs text-muted-foreground">
-            <span>{STATUS_LABELS[prop.status]}</span>
+            <span
+              className={`rounded-sm border px-2 py-0.5 text-[10px] uppercase tracking-wider ${
+                STATUS_BADGE_CLASSES[prop.status] ?? "bg-zinc-100 text-zinc-800 border-zinc-200"
+              }`}
+            >
+              {STATUS_LABELS[prop.status] ?? prop.status}
+            </span>
             <span>·</span>
             <span>{prop.reference_code || "Nessun codice"}</span>
           </div>
@@ -307,26 +336,12 @@ function PropertyEditor() {
             {saving ? <Loader2 size={13} className="animate-spin" /> : <Save size={13} />}
             Salva bozza
           </button>
-          <button
-            onClick={() => changeStatus("ready")}
-            disabled={prop.status === "ready"}
-            className="inline-flex items-center gap-2 rounded-sm border border-blue-300 bg-blue-50 px-4 py-2 text-xs uppercase tracking-wider text-blue-900 hover:bg-blue-100 disabled:opacity-50"
-          >
-            <CheckCircle2 size={13} /> Segna come pronto
-          </button>
-          <button
-            onClick={() => changeStatus("published")}
-            disabled={prop.status === "published"}
-            className="inline-flex items-center gap-2 rounded-sm bg-emerald-700 px-4 py-2 text-xs uppercase tracking-wider text-white hover:bg-emerald-800 disabled:opacity-50"
-          >
-            <Globe2 size={13} /> Pubblica
-          </button>
-          <button
-            onClick={deleteProperty}
-            className="inline-flex items-center gap-2 rounded-sm border border-destructive/30 px-3 py-2 text-xs uppercase tracking-wider text-destructive hover:bg-destructive/10"
-          >
-            <Trash2 size={13} />
-          </button>
+          <StatusActionsButton
+            status={prop.status}
+            open={statusMenu}
+            setOpen={setStatusMenu}
+            onAction={requestAction}
+          />
         </div>
       </div>
 
@@ -385,28 +400,77 @@ function PropertyEditor() {
           {saving ? <Loader2 size={13} className="animate-spin" /> : <Save size={13} />}
           Salva
         </button>
-        <button
-          onClick={() => changeStatus("ready")}
-          disabled={prop.status === "ready"}
-          className="inline-flex flex-1 items-center justify-center gap-1 rounded-sm border border-blue-300 bg-blue-50 px-3 py-2.5 text-xs uppercase tracking-wider text-blue-900 disabled:opacity-50"
-        >
-          <CheckCircle2 size={13} /> Pronto
-        </button>
-        <button
-          onClick={() => changeStatus("published")}
-          disabled={prop.status === "published"}
-          className="inline-flex flex-1 items-center justify-center gap-1 rounded-sm bg-emerald-700 px-3 py-2.5 text-xs uppercase tracking-wider text-white disabled:opacity-50"
-        >
-          <Globe2 size={13} /> Pubblica
-        </button>
-        <button
-          onClick={deleteProperty}
-          aria-label="Elimina"
-          className="inline-flex items-center justify-center rounded-sm border border-destructive/30 px-3 py-2.5 text-destructive"
-        >
-          <Trash2 size={13} />
-        </button>
+        <StatusActionsButton
+          status={prop.status}
+          open={statusMenu}
+          setOpen={setStatusMenu}
+          onAction={requestAction}
+          dropUp
+        />
       </div>
+
+      <ConfirmDialog
+        open={!!pendingAction}
+        busy={statusBusy}
+        title={pendingAction ? CONFIRM_COPY[pendingAction]?.title ?? "" : ""}
+        body={pendingAction ? CONFIRM_COPY[pendingAction]?.body ?? "" : ""}
+        cancel={pendingAction ? CONFIRM_COPY[pendingAction]?.cancel ?? "Annulla" : "Annulla"}
+        confirm={pendingAction ? CONFIRM_COPY[pendingAction]?.confirm ?? "Conferma" : "Conferma"}
+        danger={pendingAction ? CONFIRM_COPY[pendingAction]?.danger : false}
+        onCancel={() => setPendingAction(null)}
+        onConfirm={() => pendingAction && runAction(pendingAction)}
+      />
+    </div>
+  );
+}
+
+function StatusActionsButton({
+  status,
+  open,
+  setOpen,
+  onAction,
+  dropUp,
+}: {
+  status: PropertyStatus;
+  open: boolean;
+  setOpen: (v: boolean) => void;
+  onAction: (a: StatusAction) => void;
+  dropUp?: boolean;
+}) {
+  const actions = availableActions(status);
+  return (
+    <div className="relative flex-1 sm:flex-none">
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        className="inline-flex w-full items-center justify-center gap-2 rounded-sm bg-primary px-4 py-2.5 text-xs uppercase tracking-wider text-primary-foreground hover:bg-primary/90 sm:py-2"
+      >
+        Stato annuncio <ChevronDown size={13} />
+      </button>
+      {open && (
+        <div
+          className={`absolute right-0 z-40 w-60 overflow-hidden rounded-sm border border-border bg-card shadow-lg ${
+            dropUp ? "bottom-full mb-1" : "top-full mt-1"
+          }`}
+        >
+          {actions.length === 0 ? (
+            <div className="px-3 py-2 text-xs text-muted-foreground">Nessuna azione disponibile</div>
+          ) : (
+            actions.map((act) => (
+              <button
+                key={act}
+                type="button"
+                onClick={() => onAction(act)}
+                className={`block w-full px-3 py-2 text-left text-xs uppercase tracking-wider hover:bg-muted ${
+                  act === "delete" || act === "hard_delete" ? "text-red-700" : "text-ink"
+                }`}
+              >
+                {ACTION_LABELS[act]}
+              </button>
+            ))
+          )}
+        </div>
+      )}
     </div>
   );
 }
