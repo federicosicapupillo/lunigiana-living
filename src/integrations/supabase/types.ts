@@ -261,16 +261,19 @@ export type Database = {
           intervention_level: string | null
           is_cover: boolean
           is_imported: boolean
+          original_image_url: string | null
           photo_category: string | null
           photo_type: string | null
           preserve_structure: boolean
           property_id: string
+          published_image_url: string | null
           render_created_at: string | null
           render_error: string | null
           render_goal: string | null
           render_notes: string | null
           render_status: string
           render_style: string | null
+          rendered_image_url: string | null
           rendered_storage_path: string | null
           room_condition: string | null
           sort_order: number
@@ -289,16 +292,19 @@ export type Database = {
           intervention_level?: string | null
           is_cover?: boolean
           is_imported?: boolean
+          original_image_url?: string | null
           photo_category?: string | null
           photo_type?: string | null
           preserve_structure?: boolean
           property_id: string
+          published_image_url?: string | null
           render_created_at?: string | null
           render_error?: string | null
           render_goal?: string | null
           render_notes?: string | null
           render_status?: string
           render_style?: string | null
+          rendered_image_url?: string | null
           rendered_storage_path?: string | null
           room_condition?: string | null
           sort_order?: number
@@ -317,16 +323,19 @@ export type Database = {
           intervention_level?: string | null
           is_cover?: boolean
           is_imported?: boolean
+          original_image_url?: string | null
           photo_category?: string | null
           photo_type?: string | null
           preserve_structure?: boolean
           property_id?: string
+          published_image_url?: string | null
           render_created_at?: string | null
           render_error?: string | null
           render_goal?: string | null
           render_notes?: string | null
           render_status?: string
           render_style?: string | null
+          rendered_image_url?: string | null
           rendered_storage_path?: string | null
           room_condition?: string | null
           sort_order?: number
