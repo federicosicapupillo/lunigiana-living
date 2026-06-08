@@ -198,7 +198,6 @@ async function verifyInternalStorageImage(
       .update({
         image_url: signed.signedUrl,
         original_image_url: signed.signedUrl,
-        published_image_url: signed.signedUrl,
         import_status: "synced_to_storage",
         render_status: "not_generated",
         render_error: null,
@@ -210,7 +209,6 @@ async function verifyInternalStorageImage(
       .update({
         image_url: signed.signedUrl,
         original_image_url: signed.signedUrl,
-        published_image_url: signed.signedUrl,
         import_status: "synced_to_storage",
       })
       .eq("id", img.id);
