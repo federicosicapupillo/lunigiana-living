@@ -192,17 +192,17 @@ async function verifyInternalStorageImage(
     };
   }
 
-  await supabaseAdmin
-    .from("property_images")
-    .update({
-      image_url: signed.signedUrl,
-      original_image_url: signed.signedUrl,
-      published_image_url: signed.signedUrl,
-      import_status: "synced_to_storage",
-      render_status: img.import_status === "sync_error" ? "not_generated" : undefined,
-      render_error: img.import_status === "sync_error" ? null : undefined,
-    })
-    .eq("id", img.id);
+  const updatePayload: Record<string, string | null> = {
+    image_url: signed.signedUrl,
+    original_image_url: signed.signedUrl,
+    published_image_url: signed.signedUrl,
+    import_status: "synced_to_storage",
+  };
+  if (img.import_status === "sync_error") {
+    updatePayload.render_status = "not_generated";
+    updatePayload.render_error = null;
+  }
+  await supabaseAdmin.from("property_images").update(updatePayload).eq("id", img.id);
 
   return {
     imageId: img.id,
@@ -228,39 +228,44 @@ async function syncImportedImageToBucket(
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const r = await fetch(sourceUrl);
   if (!r.ok) {
-    throw new Error(
-      `Questa immagine è stata importata da una fonte esterna e non è ancora disponibile per il rendering. Ricarica o sincronizza la foto. (HTTP ${r.status})`,
-    );
+    throw new Error(SYNC_ERROR_MESSAGE);
   }
   const mime = r.headers.get("content-type") || "image/jpeg";
+  if (!mime.startsWith("image/")) throw new Error(SYNC_ERROR_MESSAGE);
   const bytes = new Uint8Array(await r.arrayBuffer());
+  if (bytes.length === 0) throw new Error(SYNC_ERROR_MESSAGE);
   const ext = mime.includes("png") ? "png" : mime.includes("webp") ? "webp" : "jpg";
   const storagePath = `${propertyId}/imported/${imageId}.${ext}`;
 
   const { error: upErr } = await supabaseAdmin.storage
-    .from("property-images")
+    .from(BUCKET)
     .upload(storagePath, bytes, { contentType: mime, upsert: true });
   if (upErr) {
     await supabaseAdmin
       .from("property_images")
-      .update({ import_status: "import_error" })
+      .update({ import_status: "sync_error", render_status: "error", render_error: SYNC_ERROR_MESSAGE })
       .eq("id", imageId);
-    throw new Error(`Sincronizzazione fallita: ${upErr.message}`);
+    throw new Error(SYNC_ERROR_MESSAGE);
   }
 
   // Firma per 5 anni così image_url resta valido nelle viste pubbliche già fatte.
   const { data: signed } = await supabaseAdmin.storage
-    .from("property-images")
+    .from(BUCKET)
     .createSignedUrl(storagePath, 60 * 60 * 24 * 365 * 5);
+  if (!signed?.signedUrl) throw new Error(SYNC_ERROR_MESSAGE);
 
   await supabaseAdmin
     .from("property_images")
     .update({
       storage_path: storagePath,
-      image_url: signed?.signedUrl ?? sourceUrl,
+      image_url: signed.signedUrl,
+      original_image_url: signed.signedUrl,
+      published_image_url: signed.signedUrl,
       imported_source_url: sourceUrl,
       is_imported: true,
       import_status: "synced_to_storage",
+      render_status: "not_generated",
+      render_error: null,
     })
     .eq("id", imageId);
 
