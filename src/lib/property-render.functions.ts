@@ -97,6 +97,123 @@ const SettingsSchema = z.object({
   render_notes: z.string().max(500).nullable(),
 });
 
+const BUCKET = "property-images";
+const SIGNED_URL_TTL_SECONDS = 60 * 60 * 24 * 365 * 5;
+const IMPORTED_NOT_SYNCED_MESSAGE =
+  "Questa foto è stata importata da una fonte esterna. Prima di generare il rendering, sincronizzala nello storage.";
+const SYNC_ERROR_MESSAGE =
+  "Impossibile recuperare questa foto dalla fonte originale. Ricarica manualmente l’immagine.";
+
+type ImageAvailability = {
+  imageId: string;
+  canRender: boolean;
+  state: "ready_manual" | "imported_external" | "ready_synced" | "sync_error";
+  statusLabel: string;
+  message: string | null;
+  originalImageUrl: string | null;
+};
+
+function isExternalUrl(value: string | null | undefined): boolean {
+  return !!value && /^https?:\/\//i.test(value);
+}
+
+function sanitizeRenderingError(err: unknown): string {
+  const raw = err instanceof Error ? err.message : "Errore rendering";
+  if (/object not found|download fallito|not found/i.test(raw)) return IMPORTED_NOT_SYNCED_MESSAGE;
+  return raw;
+}
+
+async function verifyInternalStorageImage(
+  supabaseAdmin: Awaited<typeof import("@/integrations/supabase/client.server")>["supabaseAdmin"],
+  img: {
+    id: string;
+    storage_path: string | null;
+    is_imported?: boolean | null;
+    import_status?: string | null;
+    imported_source_url?: string | null;
+  },
+): Promise<ImageAvailability> {
+  const importedStatus = img.import_status === "external_only" || img.import_status === "imported_external_only";
+  const isImportedExternal = !!img.is_imported || importedStatus || !!img.imported_source_url;
+  const externalStoragePath = isExternalUrl(img.storage_path);
+
+  if (!img.storage_path || externalStoragePath || importedStatus) {
+    await supabaseAdmin
+      .from("property_images")
+      .update({
+        import_status: "external_only",
+        is_imported: isImportedExternal,
+        imported_source_url: img.imported_source_url ?? (externalStoragePath ? img.storage_path : null),
+        render_status: "not_generated",
+        render_error: null,
+      })
+      .eq("id", img.id);
+    return {
+      imageId: img.id,
+      canRender: false,
+      state: "imported_external",
+      statusLabel: "Foto importata non sincronizzata",
+      message: IMPORTED_NOT_SYNCED_MESSAGE,
+      originalImageUrl: null,
+    };
+  }
+
+  const { data: signed, error: signErr } = await supabaseAdmin.storage
+    .from(BUCKET)
+    .createSignedUrl(img.storage_path, SIGNED_URL_TTL_SECONDS);
+  if (signErr || !signed?.signedUrl) {
+    await supabaseAdmin
+      .from("property_images")
+      .update({ import_status: "sync_error", render_status: "error", render_error: SYNC_ERROR_MESSAGE })
+      .eq("id", img.id);
+    return {
+      imageId: img.id,
+      canRender: false,
+      state: "sync_error",
+      statusLabel: "Errore sincronizzazione",
+      message: SYNC_ERROR_MESSAGE,
+      originalImageUrl: null,
+    };
+  }
+
+  const urlCheck = await fetch(signed.signedUrl, { headers: { Range: "bytes=0-0" } }).catch(() => null);
+  if (!urlCheck || !urlCheck.ok) {
+    await supabaseAdmin
+      .from("property_images")
+      .update({ import_status: "sync_error", render_status: "error", render_error: SYNC_ERROR_MESSAGE })
+      .eq("id", img.id);
+    return {
+      imageId: img.id,
+      canRender: false,
+      state: "sync_error",
+      statusLabel: "Errore sincronizzazione",
+      message: SYNC_ERROR_MESSAGE,
+      originalImageUrl: null,
+    };
+  }
+
+  await supabaseAdmin
+    .from("property_images")
+    .update({
+      image_url: signed.signedUrl,
+      original_image_url: signed.signedUrl,
+      published_image_url: signed.signedUrl,
+      import_status: "synced_to_storage",
+      render_status: img.import_status === "sync_error" ? "not_generated" : undefined,
+      render_error: img.import_status === "sync_error" ? null : undefined,
+    })
+    .eq("id", img.id);
+
+  return {
+    imageId: img.id,
+    canRender: true,
+    state: img.is_imported ? "ready_synced" : "ready_manual",
+    statusLabel: img.is_imported ? "Foto sincronizzata nello storage" : "Foto caricata correttamente",
+    message: null,
+    originalImageUrl: signed.signedUrl,
+  };
+}
+
 /**
  * Scarica una foto da un URL esterno e la carica nello storage interno.
  * Aggiorna la riga `property_images` impostando storage_path al nuovo path
