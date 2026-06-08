@@ -1,12 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
 import heroTramontoVignetiAsset from "@/assets/real/hero-tramonto-ulivi.png.asset.json";
+import heroPontremoliCentroStorico from "@/assets/real/pontremoli-hero-centro-storico.png.asset.json";
 import territoryPontremoli from "@/assets/real/pontremoli-lunigiana-v2.png.asset.json";
 import territoryBagnone from "@/assets/real/bagnone-lunigiana.png.asset.json";
 import territoryZeri from "@/assets/real/zeri-lunigiana.png.asset.json";
 import { PropertyCard } from "@/components/property-card";
 import { PropertySearchBar } from "@/components/property-search-bar";
 import { listPublishedProperties, type PublicProperty } from "@/lib/public-properties.functions";
+import { getHomeHeroVariant, type HomeHeroVariant } from "@/lib/site-settings.functions";
 import { ArrowRight, Compass, KeyRound, Sparkles } from "lucide-react";
 import { useState } from "react";
 import {
@@ -20,7 +22,10 @@ import {
 } from "@/components/ui/dialog";
 
 export const Route = createFileRoute("/")({
-  loader: () => listPublishedProperties(),
+  loader: async () => {
+    const [props, hero] = await Promise.all([listPublishedProperties(), getHomeHeroVariant()]);
+    return { ...props, heroVariant: hero.variant };
+  },
   head: () => ({
     meta: [
       { title: "Furia Immobiliare — Case di carattere in Lunigiana" },
@@ -38,12 +43,19 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   const [open, setOpen] = useState(false);
-  const { properties } = Route.useLoaderData() as { properties: PublicProperty[] };
+  const { properties, heroVariant } = Route.useLoaderData() as {
+    properties: PublicProperty[];
+    heroVariant: HomeHeroVariant;
+  };
   const featuredProperties = properties
     .filter((p) => p.featured && p.category === "vendita")
     .slice(0, 6);
-  const heroSrc = heroTramontoVignetiAsset.url;
-  const heroAlt = "Tramonto infuocato sulle Apuane con vigneti, uliveti e borgo della Lunigiana in lontananza";
+  const isPontremoli = heroVariant === "pontremoli_historic_center";
+  const heroSrc = isPontremoli ? heroPontremoliCentroStorico.url : heroTramontoVignetiAsset.url;
+  const heroAlt = isPontremoli
+    ? "Pontremoli: il fiume Magra, il Duomo con cupola in rame, il centro storico e il Castello del Piagnaro sullo sfondo"
+    : "Tramonto infuocato sulle Apuane con vigneti, uliveti e borgo della Lunigiana in lontananza";
+  const heroObjectPosition = isPontremoli ? "center center" : "center";
   return (
     <>
       {/* HERO */}
@@ -57,6 +69,7 @@ function Index() {
           decoding="async"
           loading="eager"
           className="absolute inset-0 -z-10 h-full w-full object-cover animate-in fade-in duration-700"
+          style={{ objectPosition: heroObjectPosition }}
         />
         <div className="hero-gradient absolute inset-0 -z-10" />
 
