@@ -37,6 +37,21 @@ type Image = {
 
 const SIGNED_URL_TTL_SECONDS = 60 * 60 * 24 * 365 * 5; // ~5 anni
 
+function extractSettings(img: Image): RenderSettings {
+  return {
+    photo_type: img.photo_type,
+    photo_category: img.photo_category,
+    render_style: img.render_style,
+    render_goal: img.render_goal,
+    room_condition: img.room_condition,
+    intervention_level: img.intervention_level,
+    preserve_structure: img.preserve_structure,
+    desired_lighting: img.desired_lighting,
+    visual_target: img.visual_target,
+    render_notes: img.render_notes,
+  };
+}
+
 export function ImageUploader({ propertyId }: { propertyId: string }) {
   const [images, setImages] = useState<Image[]>([]);
   const [loading, setLoading] = useState(true);
