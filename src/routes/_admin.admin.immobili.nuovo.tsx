@@ -90,6 +90,8 @@ type FormState = {
   total_floors_exact: string;
   condition: string;
   energy_class: string;
+  epi_status: string;
+  epi_value: string;
   heating: string;
   furnished: string;
   amenities: Record<string, boolean>;
@@ -129,6 +131,8 @@ const empty: FormState = {
   total_floors_exact: "",
   condition: "",
   energy_class: "",
+  epi_status: "",
+  epi_value: "",
   heating: "",
   furnished: "",
   amenities: {},
@@ -251,6 +255,9 @@ function NewPropertyPage() {
         floors: floorNum,
         condition: f.condition || null,
         energy_class: f.energy_class || null,
+        energy_performance_index_status: f.epi_status || null,
+        energy_performance_index_value:
+          f.epi_status === "precise_value" ? toNum(f.epi_value.replace(",", ".")) : null,
         furnished: furnishedBool,
         ...amenityBools,
         short_notes: f.short_notes.trim() || null,
