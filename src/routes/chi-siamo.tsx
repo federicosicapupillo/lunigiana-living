@@ -19,25 +19,23 @@ function ChiSiamoPage() {
     <>
       <section className="container-editorial grid items-center gap-12 pb-20 pt-32 md:grid-cols-12 md:gap-16 md:pt-40">
         <div className="md:col-span-6 lg:col-span-7">
-          <span className="eyebrow">Chi siamo</span>
+          <span className="eyebrow">CHI SIAMO</span>
           <h1 className="mt-4 font-serif text-4xl leading-[1.05] text-ink md:text-6xl lg:text-7xl">
-            Una casa non si sceglie<br />
-            <em className="font-normal italic">solo con gli occhi.</em>
+            Elena, Cometa<br />
+            e le case che sanno di casa.
           </h1>
           <div className="mt-8 space-y-5 text-base leading-relaxed text-foreground/85">
             <p>
-              Furia Immobiliare nasce da un legame profondo con la Lunigiana:
-              i suoi borghi, i suoi silenzi, le sue colline e quel modo di
-              vivere più lento, autentico e umano.
+              Furia Immobiliare nasce da Elena, dal suo legame profondo con la Lunigiana e da un modo molto personale di intendere la casa: non solo metri quadri, stanze e indirizzi, ma luoghi pieni di storia, silenzi, luce e possibilità.
             </p>
             <p>
-              Accompagniamo chi cerca una casa non solo a trovare un immobile,
-              ma a riconoscere un luogo in cui sentirsi davvero a casa.
+              Accanto a lei c'è Cometa, compagna fedele, mascotte ufficiale e presenza silenziosa — più o meno — nei momenti più belli di questo percorso. Perché a volte una casa si sceglie con gli occhi, altre volte con il cuore… e ogni tanto anche con il fiuto.
             </p>
             <p>
-              Ogni proprietà racconta una storia. Il nostro compito è
-              ascoltarla, valorizzarla e farla incontrare con le persone
-              giuste.
+              Elena accompagna chi cerca casa con uno sguardo attento, umano e concreto. Ascolta desideri, dubbi e sogni, cercando di capire non solo quale immobile possa funzionare, ma quale luogo possa davvero somigliare alla vita che una persona immagina.
+            </p>
+            <p>
+              Ogni proprietà racconta una storia. Il compito di Furia Immobiliare è ascoltarla, valorizzarla e farla incontrare con le persone giuste. Con professionalità, sensibilità e quel pizzico di istinto che, da queste parti, non guasta mai.
             </p>
           </div>
           <div className="mt-10 flex flex-wrap gap-3">
@@ -55,13 +53,13 @@ function ChiSiamoPage() {
           <div className="relative overflow-hidden rounded-sm shadow-xl shadow-ink/10">
             <img
               src={elenaAsset.url}
-              alt="Elena di Furia Immobiliare con il suo cane in giardino, Lunigiana"
+              alt="Elena e Cometa di Furia Immobiliare, Lunigiana"
               loading="eager"
               className="aspect-[3/4] w-full object-cover object-top"
             />
           </div>
           <figcaption className="mt-4 eyebrow text-center md:text-left">
-            Elena · Furia Immobiliare
+            ELENA E COMETA · FURIA IMMOBILIARE
           </figcaption>
         </figure>
       </section>
