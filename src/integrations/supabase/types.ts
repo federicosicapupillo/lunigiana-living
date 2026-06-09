@@ -34,11 +34,13 @@ export type Database = {
           energy_performance_index_status: string | null
           energy_performance_index_value: number | null
           featured: boolean
+          featured_at: string | null
           floors: number | null
           furnished: boolean
           garage: boolean
           garden: boolean
           historic_property: boolean
+          homepage_order: number | null
           id: string
           internal_notes: string | null
           latitude: number | null
@@ -85,11 +87,13 @@ export type Database = {
           energy_performance_index_status?: string | null
           energy_performance_index_value?: number | null
           featured?: boolean
+          featured_at?: string | null
           floors?: number | null
           furnished?: boolean
           garage?: boolean
           garden?: boolean
           historic_property?: boolean
+          homepage_order?: number | null
           id?: string
           internal_notes?: string | null
           latitude?: number | null
@@ -136,11 +140,13 @@ export type Database = {
           energy_performance_index_status?: string | null
           energy_performance_index_value?: number | null
           featured?: boolean
+          featured_at?: string | null
           floors?: number | null
           furnished?: boolean
           garage?: boolean
           garden?: boolean
           historic_property?: boolean
+          homepage_order?: number | null
           id?: string
           internal_notes?: string | null
           latitude?: number | null

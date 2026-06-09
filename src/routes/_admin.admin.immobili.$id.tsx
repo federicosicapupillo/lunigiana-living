@@ -101,6 +101,8 @@ type Property = {
   short_notes: string | null;
   internal_notes: string | null;
   status: PropertyStatus;
+  featured: boolean;
+  homepage_order: number | null;
 };
 
 type Description = {
@@ -700,6 +702,32 @@ function MainTab({
           placeholder="Appunti interni non visibili al pubblico."
           className={inputCls}
         />
+      </Field>
+      <Field label="Visibilità e promozione" full>
+        <div className="space-y-2 rounded-sm border border-border bg-muted/20 p-4">
+          <Toggle
+            label="Mostra in home page (immobile in evidenza)"
+            value={prop.featured}
+            onChange={(v) => update({ featured: v, homepage_order: v ? prop.homepage_order : null })}
+          />
+          {prop.featured && (
+            <div>
+              <label className="mb-1 block text-xs uppercase tracking-wider text-muted-foreground">
+                Ordine in home page (1 = primo)
+              </label>
+              <NumberInput
+                value={prop.homepage_order}
+                onChange={(v) => update({ homepage_order: v })}
+                step={1}
+                placeholder="Lascia vuoto per ordinare automaticamente"
+              />
+            </div>
+          )}
+          <p className="text-xs text-muted-foreground">
+            Compare in home solo se l'immobile è pubblicato. Massimo 6 immobili visibili.
+            Se l'ordine è vuoto, vengono mostrati prima i più recenti.
+          </p>
+        </div>
       </Field>
     </Section>
   );

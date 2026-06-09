@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, Search, Loader2, ImageOff, MoreHorizontal } from "lucide-react";
+import { Plus, Search, Loader2, ImageOff, MoreHorizontal, Star } from "lucide-react";
 import { toast } from "sonner";
 import { STATUS_LABELS, STATUS_BADGE_CLASSES, type PropertyStatus } from "@/lib/admin/property-constants";
 import {
@@ -23,6 +23,8 @@ type Row = {
   status: PropertyStatus;
   updated_at: string;
   cover_url: string | null;
+  featured: boolean;
+  homepage_order: number | null;
 };
 
 type Filter =
@@ -33,10 +35,12 @@ type Filter =
   | "sold"
   | "rented"
   | "archived"
-  | "deleted";
+  | "deleted"
+  | "homepage";
 
 const FILTERS: Array<{ key: Filter; label: string }> = [
   { key: "all", label: "Tutti" },
+  { key: "homepage", label: "In home" },
   { key: "published", label: "Pubblicati" },
   { key: "draft", label: "Bozze" },
   { key: "suspended", label: "Sospesi" },
@@ -70,7 +74,7 @@ function AdminPropertiesPage() {
     const { data, error } = await supabase
       .from("properties")
       .select(
-        `id, title, municipality, property_type, price, price_on_request, status, updated_at,
+        `id, title, municipality, property_type, price, price_on_request, status, updated_at, featured, homepage_order,
          property_images!left ( image_url, is_cover, sort_order )`,
       )
       .order("updated_at", { ascending: false });
@@ -99,6 +103,8 @@ function AdminPropertiesPage() {
         status: p.status as Row["status"],
         updated_at: p.updated_at as string,
         cover_url: cover,
+        featured: !!(p.featured as boolean),
+        homepage_order: (p.homepage_order as number | null) ?? null,
       };
     });
     setRows(mapped);
@@ -110,10 +116,12 @@ function AdminPropertiesPage() {
   }, []);
 
   const filtered = useMemo(() => {
-    return rows.filter((r) => {
+    const list = rows.filter((r) => {
       if (statusFilter === "all") {
         // Default view hides the trash
         if (r.status === "deleted") return false;
+      } else if (statusFilter === "homepage") {
+        if (!r.featured || r.status !== "published") return false;
       } else if (r.status !== statusFilter) {
         return false;
       }
@@ -125,11 +133,21 @@ function AdminPropertiesPage() {
         (r.property_type ?? "").toLowerCase().includes(needle)
       );
     });
+    if (statusFilter === "homepage") {
+      list.sort((a, b) => {
+        const ao = a.homepage_order ?? Number.POSITIVE_INFINITY;
+        const bo = b.homepage_order ?? Number.POSITIVE_INFINITY;
+        if (ao !== bo) return ao - bo;
+        return b.updated_at.localeCompare(a.updated_at);
+      });
+    }
+    return list;
   }, [rows, q, statusFilter]);
 
   const counts = useMemo(() => {
     const c: Record<Filter, number> = {
       all: rows.filter((r) => r.status !== "deleted").length,
+      homepage: rows.filter((r) => r.featured && r.status === "published").length,
       published: 0,
       draft: 0,
       suspended: 0,
@@ -244,6 +262,11 @@ function AdminPropertiesPage() {
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                     <h3 className="min-w-0 flex-1 truncate font-serif text-base text-ink sm:text-lg">{r.title}</h3>
+                    {r.featured && (
+                      <span className="inline-flex items-center gap-1 rounded-sm border border-amber-300 bg-amber-50 px-2 py-0.5 text-[10px] uppercase tracking-wider text-amber-800">
+                        <Star size={10} className="fill-amber-500 text-amber-500" /> In home{r.homepage_order ? ` · ${r.homepage_order}` : ""}
+                      </span>
+                    )}
                     <StatusBadge status={r.status} />
                   </div>
                   <p className="mt-1 truncate text-xs text-muted-foreground">
@@ -271,6 +294,33 @@ function AdminPropertiesPage() {
                 </div>
               </Link>
               <div className="relative shrink-0">
+                <button
+                  type="button"
+                  onClick={async (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const next = !r.featured;
+                    const { error } = await supabase
+                      .from("properties")
+                      .update({ featured: next })
+                      .eq("id", r.id);
+                    if (error) {
+                      toast.error(error.message);
+                      return;
+                    }
+                    toast.success(next ? "Aggiunto alla home" : "Rimosso dalla home");
+                    await load();
+                  }}
+                  aria-label={r.featured ? "Rimuovi dalla home" : "Aggiungi alla home"}
+                  title={r.featured ? "Rimuovi dalla home" : "Aggiungi alla home"}
+                  className={`mr-1 inline-flex h-9 w-9 items-center justify-center rounded-sm border transition ${
+                    r.featured
+                      ? "border-amber-300 bg-amber-50 text-amber-700 hover:border-amber-400"
+                      : "border-border text-muted-foreground hover:border-primary/50 hover:text-ink"
+                  }`}
+                >
+                  <Star size={15} className={r.featured ? "fill-amber-500 text-amber-500" : ""} />
+                </button>
                 <button
                   type="button"
                   onClick={(e) => {
