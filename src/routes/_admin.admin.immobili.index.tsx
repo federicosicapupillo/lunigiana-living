@@ -74,7 +74,7 @@ function AdminPropertiesPage() {
     const { data, error } = await supabase
       .from("properties")
       .select(
-        `id, title, municipality, property_type, price, price_on_request, status, updated_at,
+        `id, title, municipality, property_type, price, price_on_request, status, updated_at, featured, homepage_order,
          property_images!left ( image_url, is_cover, sort_order )`,
       )
       .order("updated_at", { ascending: false });
@@ -103,6 +103,8 @@ function AdminPropertiesPage() {
         status: p.status as Row["status"],
         updated_at: p.updated_at as string,
         cover_url: cover,
+        featured: !!(p.featured as boolean),
+        homepage_order: (p.homepage_order as number | null) ?? null,
       };
     });
     setRows(mapped);
@@ -118,6 +120,8 @@ function AdminPropertiesPage() {
       if (statusFilter === "all") {
         // Default view hides the trash
         if (r.status === "deleted") return false;
+      } else if (statusFilter === "homepage") {
+        if (!r.featured || r.status !== "published") return false;
       } else if (r.status !== statusFilter) {
         return false;
       }
@@ -134,6 +138,7 @@ function AdminPropertiesPage() {
   const counts = useMemo(() => {
     const c: Record<Filter, number> = {
       all: rows.filter((r) => r.status !== "deleted").length,
+      homepage: rows.filter((r) => r.featured && r.status === "published").length,
       published: 0,
       draft: 0,
       suspended: 0,
