@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { ChevronDown } from "lucide-react";
 import {
   REGIONI_IT,
   provinceByRegion,
@@ -31,7 +32,7 @@ export const EMPTY_LOCATION: LocationValue = {
 };
 
 const inputCls =
-  "w-full rounded-sm border border-border bg-background px-3 py-2 text-sm focus:border-primary focus:outline-none disabled:opacity-50";
+  "w-full rounded-sm border border-border bg-background px-3 py-2 text-sm transition hover:border-primary/60 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:opacity-50 disabled:cursor-not-allowed";
 
 function Field({
   label,
@@ -69,19 +70,25 @@ function Select({
   disabled?: boolean;
 }) {
   return (
-    <select
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      disabled={disabled}
-      className={inputCls}
-    >
-      <option value="">{placeholder ?? "—"}</option>
-      {options.map((o) => (
-        <option key={o.value} value={o.value}>
-          {o.label}
-        </option>
-      ))}
-    </select>
+    <div className="relative">
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        disabled={disabled}
+        className={`${inputCls} appearance-none pr-9 ${disabled ? "cursor-not-allowed" : "cursor-pointer"}`}
+      >
+        <option value="">{placeholder ?? "—"}</option>
+        {options.map((o) => (
+          <option key={o.value} value={o.value}>
+            {o.label}
+          </option>
+        ))}
+      </select>
+      <ChevronDown
+        aria-hidden
+        className={`pointer-events-none absolute right-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground ${disabled ? "opacity-40" : ""}`}
+      />
+    </div>
   );
 }
 
@@ -107,6 +114,7 @@ function Combobox({
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState("");
   const ref = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (!open) setQ("");
@@ -131,6 +139,7 @@ function Combobox({
   return (
     <div ref={ref} className="relative">
       <input
+        ref={inputRef}
         type="text"
         value={open ? q : value}
         onChange={(e) => {
@@ -139,12 +148,29 @@ function Combobox({
           if (allowFree) onChange(e.target.value);
         }}
         onFocus={() => setOpen(true)}
+        onClick={() => setOpen(true)}
         placeholder={placeholder}
         disabled={disabled}
-        className={inputCls}
+        className={`${inputCls} pr-9 ${disabled ? "cursor-not-allowed" : "cursor-pointer"}`}
+        role="combobox"
         aria-autocomplete="list"
         aria-expanded={open}
       />
+      <button
+        type="button"
+        tabIndex={-1}
+        disabled={disabled}
+        onMouseDown={(e) => {
+          e.preventDefault();
+          if (disabled) return;
+          setOpen((o) => !o);
+          inputRef.current?.focus();
+        }}
+        aria-label="Apri elenco"
+        className={`absolute right-1 top-1/2 -translate-y-1/2 flex h-7 w-7 items-center justify-center text-muted-foreground ${disabled ? "opacity-40 cursor-not-allowed" : "cursor-pointer hover:text-foreground"}`}
+      >
+        <ChevronDown className={`h-4 w-4 transition-transform ${open ? "rotate-180" : ""}`} />
+      </button>
       {open && filtered.length > 0 && (
         <ul
           role="listbox"
@@ -168,6 +194,16 @@ function Combobox({
             </li>
           ))}
         </ul>
+      )}
+      {open && filtered.length === 0 && (
+        <div
+          role="status"
+          className="absolute z-30 mt-1 w-full rounded-sm border border-border bg-card px-3 py-2 text-xs text-muted-foreground shadow-md"
+        >
+          {allowFree
+            ? "Nessuna opzione disponibile, puoi scrivere manualmente"
+            : "Nessun risultato"}
+        </div>
       )}
     </div>
   );
@@ -254,7 +290,7 @@ export function LocationFields({
           value={value.region}
           onChange={onRegionChange}
           options={REGIONI_IT.map((r) => ({ value: r, label: r }))}
-          placeholder="Seleziona regione"
+          placeholder="Seleziona una regione"
         />
       </Field>
       <Field
@@ -268,7 +304,7 @@ export function LocationFields({
             value: p.code,
             label: `${p.name} (${p.code})`,
           }))}
-          placeholder="Seleziona provincia"
+          placeholder="Seleziona una provincia"
           disabled={!value.region}
         />
       </Field>
@@ -280,7 +316,7 @@ export function LocationFields({
           value={value.municipality}
           onChange={(v) => onComuneChange(v)}
           options={comuni.map((c) => c.n)}
-          placeholder="Cerca o seleziona comune"
+          placeholder="Seleziona un comune"
           disabled={!value.province}
           allowFree={false}
         />
@@ -309,33 +345,33 @@ export function LocationFields({
             type="text"
             value={value.postal_code}
             onChange={(e) => onChange({ postal_code: e.target.value })}
-            placeholder="CAP"
+            placeholder={caps.length === 1 ? "CAP suggerito automaticamente" : "CAP"}
             className={inputCls}
           />
         )}
       </Field>
       <Field
         label="Località / frazione"
-        hint={!value.municipality ? "Seleziona prima il comune" : "Opzionale — inserimento libero"}
+        hint={!value.municipality ? "Seleziona prima il comune" : "Scegli dal menu se disponibile oppure scrivi liberamente"}
       >
         <Combobox
           value={value.locality}
           onChange={(v) => onChange({ locality: v })}
           options={[]}
-          placeholder="Es. Strettoia, Marina di Pietrasanta"
+          placeholder="Seleziona o scrivi una località/frazione"
           disabled={!value.municipality}
           allowFree
         />
       </Field>
       <Field
         label="Zona / quartiere"
-        hint={!value.municipality ? "Seleziona prima il comune" : "Scegli un preset o scrivi liberamente"}
+        hint={!value.municipality ? "Seleziona prima il comune" : "Scegli un preset oppure scrivi liberamente"}
       >
         <Combobox
           value={value.area_zone}
           onChange={(v) => onChange({ area_zone: v })}
           options={ZONE_PRESETS}
-          placeholder="Es. centro storico, collina, lungomare"
+          placeholder="Seleziona o scrivi una zona/quartiere"
           disabled={!value.municipality}
           allowFree
         />
