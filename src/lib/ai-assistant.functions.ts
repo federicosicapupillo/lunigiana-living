@@ -312,3 +312,64 @@ export const aiAssistantApplyDraft = createServerFn({ method: "POST" })
 
     return { propertyId };
   });
+
+const TranscribeInput = z.object({
+  audioBase64: z.string().min(100).max(20_000_000),
+  format: z.enum(["webm", "mp3", "wav", "ogg", "m4a", "mp4"]).default("webm"),
+});
+
+export const aiAssistantTranscribeAudio = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => TranscribeInput.parse(input))
+  .handler(async ({ data, context }): Promise<{ transcript: string }> => {
+    const { supabase } = context;
+    const { data: roleRow } = await supabase.from("user_roles").select("role").eq("role", "admin").maybeSingle();
+    if (!roleRow) throw new Error("Accesso negato: ruolo admin richiesto.");
+    const fmt = data.format === "mp4" ? "mp4" : data.format;
+    const messages: GwMsg[] = [
+      {
+        role: "system",
+        content:
+          "Sei un trascrittore professionale di italiano. Trascrivi fedelmente l'audio in italiano, senza riassumere, senza aggiungere note. Restituisci SOLO il testo trascritto.",
+      },
+      {
+        role: "user",
+        content: [
+          { type: "text", text: "Trascrivi questo audio in italiano." },
+          { type: "input_audio", input_audio: { data: data.audioBase64, format: fmt } },
+        ],
+      },
+    ];
+    const transcript = await callGateway(messages);
+    return { transcript };
+  });
+
+const DraftFromTextInput = z.object({
+  text: z.string().min(20).max(20000),
+});
+
+export const aiAssistantDraftFromText = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => DraftFromTextInput.parse(input))
+  .handler(async ({ data, context }): Promise<{ draft: AiDraft }> => {
+    const { supabase } = context;
+    const { data: roleRow } = await supabase.from("user_roles").select("role").eq("role", "admin").maybeSingle();
+    if (!roleRow) throw new Error("Accesso negato: ruolo admin richiesto.");
+    const reply = await callGateway(
+      [
+        { role: "system", content: DraftSchemaPrompt },
+        {
+          role: "user",
+          content: `Trascrizione vocale dettata da Elena (agente). Estrai SOLO i dati realmente menzionati, non inventare nulla.\n\n"""\n${data.text}\n"""\n\nRestituisci ora il JSON della bozza.`,
+        },
+      ],
+      true,
+    );
+    let parsed: AiDraft;
+    try {
+      parsed = JSON.parse(reply) as AiDraft;
+    } catch {
+      throw new Error("Risposta IA non in formato JSON valido. Riprova.");
+    }
+    return { draft: parsed };
+  });
