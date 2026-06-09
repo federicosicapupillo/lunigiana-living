@@ -4,7 +4,6 @@ import { toast } from "sonner";
 import { ImagePlus, Star, StarOff, Trash2, ArrowUp, ArrowDown, Loader2, Sparkles, Check, CloudDownload, Wand2 } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import {
-  checkImageRenderAvailability,
   renderPropertyImage,
   setPropertyImagePublished,
   syncImportedImage,
@@ -62,6 +61,49 @@ type Image = {
 
 const SIGNED_URL_TTL_SECONDS = 60 * 60 * 24 * 365 * 5; // ~5 anni
 
+const IMPORTED_NOT_SYNCED_MESSAGE =
+  "Questa foto è stata importata da una fonte esterna. Prima di generare il rendering, sincronizzala nello storage.";
+
+function computeAvailability(row: {
+  id: string;
+  storage_path: string;
+  is_imported: boolean;
+  import_status: string | null;
+  imported_source_url: string | null;
+}): NonNullable<Image["render_availability"]> {
+  const externalStorage = !!row.storage_path && /^https?:\/\//i.test(row.storage_path);
+  const isExternalOnly =
+    !row.storage_path ||
+    externalStorage ||
+    row.import_status === "external_only" ||
+    row.import_status === "imported_external_only";
+
+  if (isExternalOnly) {
+    return {
+      canRender: false,
+      state: "imported_external",
+      statusLabel: "Foto importata non sincronizzata",
+      message: IMPORTED_NOT_SYNCED_MESSAGE,
+    };
+  }
+  if (row.import_status === "sync_error") {
+    return {
+      canRender: false,
+      state: "sync_error",
+      statusLabel: "Errore sincronizzazione",
+      message: "Impossibile recuperare questa foto dalla fonte originale. Ricarica manualmente l’immagine.",
+    };
+  }
+  return {
+    canRender: true,
+    state: row.is_imported ? "ready_synced" : "ready_manual",
+    statusLabel: row.is_imported
+      ? "Foto sincronizzata nello storage"
+      : "Foto caricata correttamente",
+    message: null,
+  };
+}
+
 function extractSettings(img: Image): RenderSettings {
   return {
     photo_type: img.photo_type,
@@ -88,7 +130,6 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
   const runRender = useServerFn(renderPropertyImage);
   const runSetPublished = useServerFn(setPropertyImagePublished);
   const runSync = useServerFn(syncImportedImage);
-  const runCheckAvailability = useServerFn(checkImageRenderAvailability);
   const runEnhance = useServerFn(enhancePropertyImage);
   const runSetEnhancedPublished = useServerFn(setPropertyImageEnhancedPublished);
 
@@ -116,20 +157,7 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
         }
       }
     }
-    const availability = await Promise.all(
-      rows.map(async (r) => {
-        try {
-          return await runCheckAvailability({ data: { imageId: r.id } });
-        } catch {
-          return {
-            canRender: false,
-            state: "sync_error" as const,
-            statusLabel: "Errore sincronizzazione",
-            message: "Impossibile verificare la disponibilità della foto nello storage.",
-          };
-        }
-      }),
-    );
+    const availability = rows.map((r) => computeAvailability(r));
     setImages(
       rows.map((r, idx) => ({
         ...r,
