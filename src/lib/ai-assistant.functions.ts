@@ -3,6 +3,10 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 
 type ChatMsg = { role: "system" | "user" | "assistant"; content: string };
+type GwContent =
+  | { type: "text"; text: string }
+  | { type: "input_audio"; input_audio: { data: string; format: string } };
+type GwMsg = { role: "system" | "user" | "assistant"; content: string | GwContent[] };
 
 const SYSTEM_PROMPT = `Sei l'assistente IA interno dell'agenzia Furia Immobiliare (Lunigiana, Toscana).
 Aiuti Elena a creare la bozza di un nuovo annuncio immobiliare facendo domande SEMPLICI, una alla volta o in piccoli blocchi tematici.
@@ -27,7 +31,7 @@ Regole tassative:
   [PRONTO_PER_RIEPILOGO]
 - Non scrivere mai JSON o codice nella chat. La generazione strutturata avviene in un secondo passaggio.`;
 
-async function callGateway(messages: ChatMsg[], jsonMode = false): Promise<string> {
+async function callGateway(messages: GwMsg[] | ChatMsg[], jsonMode = false): Promise<string> {
   const apiKey = process.env.LOVABLE_API_KEY;
   if (!apiKey) throw new Error("Configurazione AI mancante.");
   const body: Record<string, unknown> = {
