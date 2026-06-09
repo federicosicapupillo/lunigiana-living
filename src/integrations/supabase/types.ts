@@ -14,6 +14,54 @@ export type Database = {
   }
   public: {
     Tables: {
+      leads: {
+        Row: {
+          budget_range: string | null
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          message: string | null
+          phone: string
+          preferred_area: string | null
+          privacy_accepted: boolean
+          property_type: string | null
+          source_page: string | null
+          status: Database["public"]["Enums"]["lead_status"]
+          updated_at: string
+        }
+        Insert: {
+          budget_range?: string | null
+          created_at?: string
+          email: string
+          full_name: string
+          id?: string
+          message?: string | null
+          phone: string
+          preferred_area?: string | null
+          privacy_accepted?: boolean
+          property_type?: string | null
+          source_page?: string | null
+          status?: Database["public"]["Enums"]["lead_status"]
+          updated_at?: string
+        }
+        Update: {
+          budget_range?: string | null
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          message?: string | null
+          phone?: string
+          preferred_area?: string | null
+          privacy_accepted?: boolean
+          property_type?: string | null
+          source_page?: string | null
+          status?: Database["public"]["Enums"]["lead_status"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
       properties: {
         Row: {
           address: string | null
@@ -449,6 +497,7 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "editor"
+      lead_status: "new" | "contacted" | "in_progress" | "closed"
       property_status:
         | "draft"
         | "ready"
@@ -586,6 +635,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "editor"],
+      lead_status: ["new", "contacted", "in_progress", "closed"],
       property_status: [
         "draft",
         "ready",
