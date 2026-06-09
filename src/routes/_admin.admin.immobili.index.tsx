@@ -358,7 +358,10 @@ function AdminPropertiesPage() {
                         : "—"}
                   </div>
                   <div className="text-xs text-muted-foreground">
-                    agg. {new Date(r.updated_at).toLocaleDateString("it-IT")}
+                    Caricato: {new Date(r.created_at).toLocaleDateString("it-IT")}
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    Aggiornato: {new Date(r.updated_at).toLocaleDateString("it-IT")}
                   </div>
                 </div>
               </Link>
