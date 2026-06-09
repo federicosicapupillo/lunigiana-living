@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, Search, Loader2, ImageOff, MoreHorizontal, Star } from "lucide-react";
+import { Plus, Search, Loader2, ImageOff, MoreHorizontal, Star, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { STATUS_LABELS, STATUS_BADGE_CLASSES, type PropertyStatus } from "@/lib/admin/property-constants";
 import {
@@ -193,12 +193,20 @@ function AdminPropertiesPage() {
             {counts.all} totali · {counts.published} pubblicati · {counts.draft} bozze · {counts.suspended} sospesi · {counts.deleted} nel cestino
           </p>
         </div>
-        <Link
-          to="/admin/immobili/nuovo"
-          className="inline-flex w-full items-center justify-center gap-2 rounded-sm bg-primary px-4 py-3 text-xs uppercase tracking-[0.18em] text-primary-foreground hover:bg-primary/90 sm:w-auto sm:px-5 sm:py-2.5"
-        >
-          <Plus size={15} /> Nuovo immobile
-        </Link>
+        <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
+          <Link
+            to="/admin/immobili/assistente"
+            className="inline-flex items-center justify-center gap-2 rounded-sm border border-primary bg-primary/10 px-4 py-3 text-xs uppercase tracking-[0.18em] text-primary hover:bg-primary/20 sm:px-5 sm:py-2.5"
+          >
+            <Sparkles size={15} /> Crea annuncio con IA
+          </Link>
+          <Link
+            to="/admin/immobili/nuovo"
+            className="inline-flex items-center justify-center gap-2 rounded-sm bg-primary px-4 py-3 text-xs uppercase tracking-[0.18em] text-primary-foreground hover:bg-primary/90 sm:px-5 sm:py-2.5"
+          >
+            <Plus size={15} /> Nuovo immobile
+          </Link>
+        </div>
       </div>
 
       <div className="mt-6 flex flex-col gap-3 border-b border-border pb-4 sm:mt-8 sm:flex-row sm:flex-wrap sm:items-center">
