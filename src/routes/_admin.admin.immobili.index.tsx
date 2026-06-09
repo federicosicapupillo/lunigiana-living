@@ -83,6 +83,7 @@ function AdminPropertiesPage() {
   const [loading, setLoading] = useState(true);
   const [q, setQ] = useState("");
   const [statusFilter, setStatusFilter] = useState<Filter>("all");
+  const [sortBy, setSortBy] = useState<SortBy>("newest");
   const [openMenu, setOpenMenu] = useState<string | null>(null);
   const [pending, setPending] = useState<{ id: string; action: StatusAction } | null>(null);
   const [busy, setBusy] = useState(false);
