@@ -55,13 +55,6 @@ async function callGateway(messages: ChatMsg[], jsonMode = false): Promise<strin
   return text;
 }
 
-async function assertAdmin(supabase: ReturnType<typeof getCtxSupabase>) {
-  const { data: roleRow } = await supabase.from("user_roles").select("role").eq("role", "admin").maybeSingle();
-  if (!roleRow) throw new Error("Accesso negato: ruolo admin richiesto.");
-}
-type Supa = Awaited<ReturnType<typeof import("@/integrations/supabase/auth-middleware").requireSupabaseAuth>> ;
-function getCtxSupabase(): never { throw new Error("type helper"); }
-
 const ChatInput = z.object({
   messages: z.array(
     z.object({
@@ -311,6 +304,3 @@ export const aiAssistantApplyDraft = createServerFn({ method: "POST" })
 
     return { propertyId };
   });
-
-// remove unused helper type
-export type _SupaPlaceholder = Supa;
