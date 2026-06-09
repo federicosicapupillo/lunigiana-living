@@ -222,6 +222,25 @@ function slugify(s: string) {
     .slice(0, 80);
 }
 
+function extractJson<T>(raw: string): T {
+  let s = raw.trim();
+  s = s.replace(/^```(?:json)?\s*/i, "").replace(/```\s*$/i, "").trim();
+  if (!s.startsWith("{") && !s.startsWith("[")) {
+    const i = s.indexOf("{");
+    const j = s.lastIndexOf("}");
+    if (i !== -1 && j > i) s = s.slice(i, j + 1);
+  }
+  return JSON.parse(s) as T;
+}
+  return s
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "")
+    .slice(0, 80);
+}
+
 export const aiAssistantApplyDraft = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => ApplyInput.parse(input))
