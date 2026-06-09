@@ -200,6 +200,12 @@ function AdminPropertiesPage() {
           >
             <Sparkles size={15} /> Crea annuncio con IA
           </Link>
+          <a
+            href="/admin/immobili/assistente?audio=1"
+            className="inline-flex items-center justify-center gap-2 rounded-sm border border-primary bg-primary/10 px-4 py-3 text-xs uppercase tracking-[0.18em] text-primary hover:bg-primary/20 sm:px-5 sm:py-2.5"
+          >
+            <Sparkles size={15} /> Detta con audio
+          </a>
           <Link
             to="/admin/immobili/nuovo"
             className="inline-flex items-center justify-center gap-2 rounded-sm bg-primary px-4 py-3 text-xs uppercase tracking-[0.18em] text-primary-foreground hover:bg-primary/90 sm:px-5 sm:py-2.5"

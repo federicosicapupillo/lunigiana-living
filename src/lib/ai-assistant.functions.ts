@@ -3,6 +3,10 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 
 type ChatMsg = { role: "system" | "user" | "assistant"; content: string };
+type GwContent =
+  | { type: "text"; text: string }
+  | { type: "input_audio"; input_audio: { data: string; format: string } };
+type GwMsg = { role: "system" | "user" | "assistant"; content: string | GwContent[] };
 
 const SYSTEM_PROMPT = `Sei l'assistente IA interno dell'agenzia Furia Immobiliare (Lunigiana, Toscana).
 Aiuti Elena a creare la bozza di un nuovo annuncio immobiliare facendo domande SEMPLICI, una alla volta o in piccoli blocchi tematici.
@@ -27,7 +31,7 @@ Regole tassative:
   [PRONTO_PER_RIEPILOGO]
 - Non scrivere mai JSON o codice nella chat. La generazione strutturata avviene in un secondo passaggio.`;
 
-async function callGateway(messages: ChatMsg[], jsonMode = false): Promise<string> {
+async function callGateway(messages: GwMsg[] | ChatMsg[], jsonMode = false): Promise<string> {
   const apiKey = process.env.LOVABLE_API_KEY;
   if (!apiKey) throw new Error("Configurazione AI mancante.");
   const body: Record<string, unknown> = {
@@ -204,6 +208,8 @@ export const aiAssistantFinalize = createServerFn({ method: "POST" })
 const ApplyInput = z.object({
   draft: z.record(z.any()),
   messages: z.array(z.object({ role: z.string(), content: z.string() })).max(60),
+  aiInputType: z.enum(["text", "audio"]).optional(),
+  audioTranscript: z.string().max(20000).optional(),
 });
 
 function slugify(s: string) {
@@ -234,6 +240,8 @@ export const aiAssistantApplyDraft = createServerFn({ method: "POST" })
       created_with_ai: true,
       ai_generated_at: new Date().toISOString(),
       ai_generation_notes: { messages: data.messages, draft: d },
+      ai_input_type: data.aiInputType ?? "text",
+      ai_audio_transcript: data.audioTranscript ?? null,
       property_type: d.property_type ?? null,
       contract_type: d.contract_type ?? null,
       price: typeof d.price === "number" ? d.price : null,
@@ -303,4 +311,65 @@ export const aiAssistantApplyDraft = createServerFn({ method: "POST" })
     if (feats.length) await supabase.from("property_features").insert(feats);
 
     return { propertyId };
+  });
+
+const TranscribeInput = z.object({
+  audioBase64: z.string().min(100).max(20_000_000),
+  format: z.enum(["webm", "mp3", "wav", "ogg", "m4a", "mp4"]).default("webm"),
+});
+
+export const aiAssistantTranscribeAudio = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => TranscribeInput.parse(input))
+  .handler(async ({ data, context }): Promise<{ transcript: string }> => {
+    const { supabase } = context;
+    const { data: roleRow } = await supabase.from("user_roles").select("role").eq("role", "admin").maybeSingle();
+    if (!roleRow) throw new Error("Accesso negato: ruolo admin richiesto.");
+    const fmt = data.format === "mp4" ? "mp4" : data.format;
+    const messages: GwMsg[] = [
+      {
+        role: "system",
+        content:
+          "Sei un trascrittore professionale di italiano. Trascrivi fedelmente l'audio in italiano, senza riassumere, senza aggiungere note. Restituisci SOLO il testo trascritto.",
+      },
+      {
+        role: "user",
+        content: [
+          { type: "text", text: "Trascrivi questo audio in italiano." },
+          { type: "input_audio", input_audio: { data: data.audioBase64, format: fmt } },
+        ],
+      },
+    ];
+    const transcript = await callGateway(messages);
+    return { transcript };
+  });
+
+const DraftFromTextInput = z.object({
+  text: z.string().min(20).max(20000),
+});
+
+export const aiAssistantDraftFromText = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => DraftFromTextInput.parse(input))
+  .handler(async ({ data, context }): Promise<{ draft: AiDraft }> => {
+    const { supabase } = context;
+    const { data: roleRow } = await supabase.from("user_roles").select("role").eq("role", "admin").maybeSingle();
+    if (!roleRow) throw new Error("Accesso negato: ruolo admin richiesto.");
+    const reply = await callGateway(
+      [
+        { role: "system", content: DraftSchemaPrompt },
+        {
+          role: "user",
+          content: `Trascrizione vocale dettata da Elena (agente). Estrai SOLO i dati realmente menzionati, non inventare nulla.\n\n"""\n${data.text}\n"""\n\nRestituisci ora il JSON della bozza.`,
+        },
+      ],
+      true,
+    );
+    let parsed: AiDraft;
+    try {
+      parsed = JSON.parse(reply) as AiDraft;
+    } catch {
+      throw new Error("Risposta IA non in formato JSON valido. Riprova.");
+    }
+    return { draft: parsed };
   });

@@ -1,12 +1,14 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { ArrowLeft, Sparkles, Send, Loader2, Wand2, CheckCircle2, RefreshCw, X } from "lucide-react";
+import { ArrowLeft, Sparkles, Send, Loader2, Wand2, CheckCircle2, RefreshCw, X, Mic, Square, Play, Pause } from "lucide-react";
 import { toast } from "sonner";
 import {
   aiAssistantReply,
   aiAssistantFinalize,
   aiAssistantApplyDraft,
+  aiAssistantTranscribeAudio,
+  aiAssistantDraftFromText,
   type AiDraft,
 } from "@/lib/ai-assistant.functions";
 
@@ -16,6 +18,9 @@ export const Route = createFileRoute("/_admin/admin/immobili/assistente")({
       { title: "Assistente IA annuncio — Admin Furia" },
       { name: "robots", content: "noindex,nofollow" },
     ],
+  }),
+  validateSearch: (s: Record<string, unknown>) => ({
+    audio: s.audio === 1 || s.audio === "1" ? 1 : undefined,
   }),
   component: AssistentePage,
 });
@@ -45,18 +50,27 @@ function estimateProgress(messages: Msg[]): number {
 
 function AssistentePage() {
   const navigate = useNavigate();
+  const search = Route.useSearch();
   const [messages, setMessages] = useState<Msg[]>([FIRST_TURN]);
   const [input, setInput] = useState("");
   const [thinking, setThinking] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [applying, setApplying] = useState(false);
   const [draft, setDraft] = useState<AiDraft | null>(null);
+  const [audioOpen, setAudioOpen] = useState(false);
+  const [audioTranscript, setAudioTranscript] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   const replyFn = useServerFn(aiAssistantReply);
   const finalizeFn = useServerFn(aiAssistantFinalize);
   const applyFn = useServerFn(aiAssistantApplyDraft);
+  const transcribeFn = useServerFn(aiAssistantTranscribeAudio);
+  const draftFromTextFn = useServerFn(aiAssistantDraftFromText);
+
+  useEffect(() => {
+    if (search.audio === 1) setAudioOpen(true);
+  }, [search.audio]);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
@@ -109,7 +123,14 @@ function AssistentePage() {
     setApplying(true);
     try {
       const { propertyId } = await applyFn({
-        data: { draft: draft as unknown as Record<string, unknown>, messages },
+        data: {
+          draft: draft as unknown as Record<string, unknown>,
+          messages: audioTranscript
+            ? [{ role: "user" as const, content: audioTranscript.slice(0, 8000) }]
+            : messages,
+          aiInputType: audioTranscript ? "audio" : "text",
+          audioTranscript: audioTranscript ?? undefined,
+        },
       });
       toast.success("Bozza creata! Ora carica le foto e rivedi i dettagli.");
       navigate({ to: "/admin/immobili/$id", params: { id: propertyId } });
@@ -117,6 +138,25 @@ function AssistentePage() {
       toast.error(e instanceof Error ? e.message : "Errore salvataggio");
     } finally {
       setApplying(false);
+    }
+  };
+
+  const handleAudioDraft = async (transcript: string) => {
+    const text = transcript.trim();
+    if (text.length < 20) {
+      toast.error("Trascrizione troppo breve.");
+      return;
+    }
+    setGenerating(true);
+    try {
+      const { draft: d } = await draftFromTextFn({ data: { text } });
+      setAudioTranscript(text);
+      setDraft(d);
+      setAudioOpen(false);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Errore generazione bozza");
+    } finally {
+      setGenerating(false);
     }
   };
 
@@ -138,13 +178,22 @@ function AssistentePage() {
           </h1>
         </div>
         {!draft && (
-          <button
-            onClick={generate}
-            disabled={generating || thinking}
-            className="inline-flex items-center gap-2 rounded-sm bg-primary px-4 py-2 text-xs uppercase tracking-[0.18em] text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
-          >
-            {generating ? <Loader2 size={14} className="animate-spin" /> : <Wand2 size={14} />} Genera bozza
-          </button>
+          <div className="flex flex-wrap gap-2">
+            <button
+              onClick={() => setAudioOpen(true)}
+              disabled={generating || thinking}
+              className="inline-flex items-center gap-2 rounded-sm border border-primary bg-primary/10 px-4 py-2 text-xs uppercase tracking-[0.18em] text-primary hover:bg-primary/20 disabled:opacity-50"
+            >
+              <Mic size={14} /> Detta annuncio con audio
+            </button>
+            <button
+              onClick={generate}
+              disabled={generating || thinking}
+              className="inline-flex items-center gap-2 rounded-sm bg-primary px-4 py-2 text-xs uppercase tracking-[0.18em] text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
+            >
+              {generating ? <Loader2 size={14} className="animate-spin" /> : <Wand2 size={14} />} Genera bozza
+            </button>
+          </div>
         )}
       </div>
 
@@ -225,6 +274,18 @@ function AssistentePage() {
             </p>
           </div>
         </>
+      )}
+
+      {audioOpen && (
+        <AudioDictationModal
+          onClose={() => setAudioOpen(false)}
+          onTranscribe={async (b64, format) => {
+            const { transcript } = await transcribeFn({ data: { audioBase64: b64, format } });
+            return transcript;
+          }}
+          onAnalyze={handleAudioDraft}
+          analyzing={generating}
+        />
       )}
     </div>
   );
@@ -397,4 +458,262 @@ function Section({ title, children }: { title: string; children: React.ReactNode
       <div>{children}</div>
     </div>
   );
+}
+
+type AudioFmt = "webm" | "mp3" | "wav" | "ogg" | "m4a" | "mp4";
+
+function AudioDictationModal({
+  onClose,
+  onTranscribe,
+  onAnalyze,
+  analyzing,
+}: {
+  onClose: () => void;
+  onTranscribe: (audioBase64: string, format: AudioFmt) => Promise<string>;
+  onAnalyze: (transcript: string) => Promise<void>;
+  analyzing: boolean;
+}) {
+  const [recording, setRecording] = useState(false);
+  const [transcribing, setTranscribing] = useState(false);
+  const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
+  const [audioFmt, setAudioFmt] = useState<AudioFmt>("webm");
+  const [transcript, setTranscript] = useState<string>("");
+  const [elapsed, setElapsed] = useState(0);
+  const [playing, setPlaying] = useState(false);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const chunksRef = useRef<Blob[]>([]);
+  const timerRef = useRef<number | null>(null);
+  const audioElRef = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) window.clearInterval(timerRef.current);
+      if (audioUrl) URL.revokeObjectURL(audioUrl);
+      const mr = mediaRecorderRef.current;
+      if (mr && mr.state !== "inactive") mr.stop();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const startRec = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mimeCandidates = ["audio/webm;codecs=opus", "audio/webm", "audio/mp4", "audio/ogg"];
+      const mime = mimeCandidates.find((m) => typeof MediaRecorder !== "undefined" && MediaRecorder.isTypeSupported(m)) ?? "";
+      const mr = mime ? new MediaRecorder(stream, { mimeType: mime }) : new MediaRecorder(stream);
+      chunksRef.current = [];
+      mr.ondataavailable = (e) => {
+        if (e.data.size > 0) chunksRef.current.push(e.data);
+      };
+      mr.onstop = () => {
+        stream.getTracks().forEach((t) => t.stop());
+        const blob = new Blob(chunksRef.current, { type: mr.mimeType || "audio/webm" });
+        setAudioBlob(blob);
+        setAudioUrl((prev) => {
+          if (prev) URL.revokeObjectURL(prev);
+          return URL.createObjectURL(blob);
+        });
+        const fmt: AudioFmt = mr.mimeType.includes("mp4") ? "mp4" : mr.mimeType.includes("ogg") ? "ogg" : "webm";
+        setAudioFmt(fmt);
+      };
+      mediaRecorderRef.current = mr;
+      mr.start();
+      setRecording(true);
+      setElapsed(0);
+      timerRef.current = window.setInterval(() => setElapsed((s) => s + 1), 1000);
+    } catch (e) {
+      toast.error("Impossibile accedere al microfono. Verifica i permessi del browser.");
+      console.error(e);
+    }
+  };
+
+  const stopRec = () => {
+    const mr = mediaRecorderRef.current;
+    if (mr && mr.state !== "inactive") mr.stop();
+    if (timerRef.current) {
+      window.clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+    setRecording(false);
+  };
+
+  const togglePlay = () => {
+    const el = audioElRef.current;
+    if (!el) return;
+    if (playing) {
+      el.pause();
+      setPlaying(false);
+    } else {
+      void el.play();
+      setPlaying(true);
+    }
+  };
+
+  const doTranscribe = async () => {
+    if (!audioBlob) return;
+    setTranscribing(true);
+    try {
+      const b64 = await blobToBase64(audioBlob);
+      const t = await onTranscribe(b64, audioFmt);
+      setTranscript(t);
+      toast.success("Trascrizione completata. Controllala prima di analizzare.");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Errore trascrizione");
+    } finally {
+      setTranscribing(false);
+    }
+  };
+
+  const resetAudio = () => {
+    if (audioUrl) URL.revokeObjectURL(audioUrl);
+    setAudioUrl(null);
+    setAudioBlob(null);
+    setTranscript("");
+    setElapsed(0);
+  };
+
+  const mm = String(Math.floor(elapsed / 60)).padStart(2, "0");
+  const ss = String(elapsed % 60).padStart(2, "0");
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+      <div className="relative max-h-[92vh] w-full max-w-2xl overflow-y-auto rounded-sm border border-border bg-card shadow-2xl">
+        <div className="flex items-start justify-between gap-3 border-b border-border p-4">
+          <div>
+            <h2 className="flex items-center gap-2 font-serif text-xl text-ink">
+              <Mic size={18} className="text-primary" /> Detta il tuo annuncio
+            </h2>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Racconta l'immobile a voce. L'AI trascriverà il testo, riconoscerà i dati principali e compilerà automaticamente la bozza dell'annuncio.
+            </p>
+          </div>
+          <button
+            onClick={onClose}
+            className="rounded-sm border border-border p-1.5 text-muted-foreground hover:text-ink"
+            aria-label="Chiudi"
+          >
+            <X size={16} />
+          </button>
+        </div>
+
+        <div className="space-y-4 p-4">
+          <div className="rounded-sm border border-primary/20 bg-primary/5 p-3 text-xs leading-relaxed text-ink">
+            <p className="font-medium">Suggerimento</p>
+            <p className="mt-1 text-muted-foreground">
+              Per ottenere una bozza migliore, racconta: <strong>dove si trova l'immobile, prezzo, metratura, camere, bagni, stato, punti forti e a chi può essere adatto</strong>.
+            </p>
+            <p className="mt-2 italic text-muted-foreground">
+              Es.: «È una villetta a schiera a Pontremoli, 135 mq, due bagni, giardino, prezzo 180.000 euro, ideale per una famiglia…»
+            </p>
+          </div>
+
+          {/* Recording controls */}
+          <div className="rounded-sm border border-border bg-background p-4">
+            <div className="flex flex-wrap items-center gap-3">
+              {!recording && !audioUrl && (
+                <button
+                  onClick={startRec}
+                  className="inline-flex items-center gap-2 rounded-sm bg-primary px-4 py-2.5 text-xs uppercase tracking-[0.18em] text-primary-foreground hover:bg-primary/90"
+                >
+                  <Mic size={14} /> Inizia registrazione
+                </button>
+              )}
+              {recording && (
+                <button
+                  onClick={stopRec}
+                  className="inline-flex items-center gap-2 rounded-sm bg-destructive px-4 py-2.5 text-xs uppercase tracking-[0.18em] text-destructive-foreground hover:bg-destructive/90"
+                >
+                  <Square size={14} /> Termina registrazione
+                </button>
+              )}
+              {audioUrl && !recording && (
+                <>
+                  <button
+                    onClick={togglePlay}
+                    className="inline-flex items-center gap-2 rounded-sm border border-border px-4 py-2.5 text-xs uppercase tracking-wider hover:border-primary/50"
+                  >
+                    {playing ? <Pause size={14} /> : <Play size={14} />} Riascolta audio
+                  </button>
+                  <button
+                    onClick={resetAudio}
+                    className="inline-flex items-center gap-2 rounded-sm border border-border px-4 py-2.5 text-xs uppercase tracking-wider hover:border-destructive/50 hover:text-destructive"
+                  >
+                    <RefreshCw size={14} /> Rifai
+                  </button>
+                  <button
+                    onClick={doTranscribe}
+                    disabled={transcribing}
+                    className="ml-auto inline-flex items-center gap-2 rounded-sm bg-primary px-4 py-2.5 text-xs uppercase tracking-[0.18em] text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
+                  >
+                    {transcribing ? <Loader2 size={14} className="animate-spin" /> : <Wand2 size={14} />} Trascrivi audio
+                  </button>
+                </>
+              )}
+              <div className="ml-auto text-xs tabular-nums text-muted-foreground">
+                {recording && <span className="text-destructive">● REC </span>}
+                {mm}:{ss}
+              </div>
+            </div>
+            {audioUrl && (
+              <audio
+                ref={audioElRef}
+                src={audioUrl}
+                onEnded={() => setPlaying(false)}
+                className="mt-3 w-full"
+                controls
+              />
+            )}
+          </div>
+
+          {/* Transcript editor */}
+          {transcript !== "" || transcribing ? (
+            <div className="rounded-sm border border-border bg-background p-4">
+              <label className="text-xs uppercase tracking-wider text-muted-foreground">Trascrizione audio</label>
+              <p className="mt-1 text-[11px] text-muted-foreground">
+                Controlla la trascrizione prima di far compilare l'annuncio all'AI. Puoi modificarla liberamente.
+              </p>
+              <textarea
+                value={transcript}
+                onChange={(e) => setTranscript(e.target.value)}
+                rows={8}
+                className="mt-2 w-full resize-y rounded-sm border border-border bg-card p-3 text-sm leading-relaxed focus:border-primary focus:outline-none"
+                placeholder={transcribing ? "Trascrizione in corso…" : ""}
+                disabled={transcribing}
+              />
+              <div className="mt-3 flex flex-wrap justify-end gap-2">
+                <button
+                  onClick={onClose}
+                  disabled={analyzing}
+                  className="inline-flex items-center gap-2 rounded-sm border border-border px-4 py-2.5 text-xs uppercase tracking-wider hover:border-destructive/50 hover:text-destructive disabled:opacity-50"
+                >
+                  <X size={14} /> Annulla
+                </button>
+                <button
+                  onClick={() => void onAnalyze(transcript)}
+                  disabled={analyzing || transcribing || transcript.trim().length < 20}
+                  className="inline-flex items-center gap-2 rounded-sm bg-primary px-4 py-2.5 text-xs uppercase tracking-[0.18em] text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
+                >
+                  {analyzing ? <Loader2 size={14} className="animate-spin" /> : <Sparkles size={14} />} Analizza e compila annuncio
+                </button>
+              </div>
+            </div>
+          ) : null}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function blobToBase64(blob: Blob): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const result = reader.result as string;
+      const idx = result.indexOf(",");
+      resolve(idx >= 0 ? result.slice(idx + 1) : result);
+    };
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(blob);
+  });
 }
