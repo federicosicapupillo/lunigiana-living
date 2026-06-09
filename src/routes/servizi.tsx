@@ -77,11 +77,11 @@ function ServiziPage() {
           </div>
 
           {/* Grid */}
-          <div className="mt-24 grid grid-cols-1 gap-x-8 gap-y-20 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-16 grid grid-cols-1 gap-x-8 gap-y-14 sm:grid-cols-2 lg:grid-cols-3">
             {services.map((s) => (
               <article
                 key={s.title}
-                className="group relative rounded-2xl border border-[var(--terracotta)]/10 bg-[var(--warm-ivory)]/70 px-7 pb-10 pt-16 text-center shadow-[0_18px_40px_-28px_rgba(36,23,17,0.35)] backdrop-blur-[1px] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_28px_50px_-28px_rgba(36,23,17,0.45)]"
+                className="group relative rounded-2xl border border-[var(--terracotta)]/10 bg-[var(--warm-ivory)]/70 px-7 pb-10 pt-14 text-center shadow-[0_12px_28px_-20px_rgba(36,23,17,0.30)] backdrop-blur-[1px] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_40px_-20px_rgba(36,23,17,0.40)]"
               >
                 {/* Floating icon badge */}
                 <div className="absolute -top-8 left-1/2 -translate-x-1/2">
@@ -105,7 +105,7 @@ function ServiziPage() {
           </div>
 
           {/* Editorial footer mark */}
-          <div className="mt-24 flex flex-col items-center gap-3 text-center">
+          <div className="mt-16 flex flex-col items-center gap-3 text-center">
             <svg
               aria-hidden="true"
               viewBox="0 0 60 20"
@@ -128,7 +128,7 @@ function ServiziPage() {
         </div>
       </section>
 
-      <section className="container-editorial pb-32">
+      <section className="container-editorial pt-20 pb-32">
         <div className="rounded-sm bg-ink px-8 py-20 text-center text-cream md:px-16">
           <h2 className="mx-auto max-w-2xl font-serif text-4xl md:text-5xl">
             Parliamone, senza fretta.
