@@ -268,7 +268,7 @@ export const aiAssistantApplyDraft = createServerFn({ method: "POST" })
 
     const { data: inserted, error } = await supabase
       .from("properties")
-      .insert(payload)
+      .insert(payload as never)
       .select("id")
       .single();
     if (error || !inserted) throw new Error(`Salvataggio bozza fallito: ${error?.message ?? ""}`);
