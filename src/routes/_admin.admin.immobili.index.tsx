@@ -116,7 +116,7 @@ function AdminPropertiesPage() {
   }, []);
 
   const filtered = useMemo(() => {
-    return rows.filter((r) => {
+    const list = rows.filter((r) => {
       if (statusFilter === "all") {
         // Default view hides the trash
         if (r.status === "deleted") return false;
@@ -133,6 +133,15 @@ function AdminPropertiesPage() {
         (r.property_type ?? "").toLowerCase().includes(needle)
       );
     });
+    if (statusFilter === "homepage") {
+      list.sort((a, b) => {
+        const ao = a.homepage_order ?? Number.POSITIVE_INFINITY;
+        const bo = b.homepage_order ?? Number.POSITIVE_INFINITY;
+        if (ao !== bo) return ao - bo;
+        return b.updated_at.localeCompare(a.updated_at);
+      });
+    }
+    return list;
   }, [rows, q, statusFilter]);
 
   const counts = useMemo(() => {
