@@ -11,19 +11,16 @@ export function WhatsAppFloat() {
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Scrivi a Elena su WhatsApp"
-      className="fixed bottom-5 right-5 z-50 inline-flex items-center gap-2 rounded-full bg-ink px-4 py-3 text-cream shadow-lg shadow-ink/30 transition hover:bg-primary sm:bottom-6 sm:right-6 sm:px-5"
+      className="fixed bottom-4 right-4 z-40 inline-flex items-center gap-2 rounded-full bg-ink p-2.5 text-cream shadow-lg shadow-ink/30 transition hover:bg-primary sm:bottom-5 sm:right-5 sm:p-2 sm:pr-4"
       style={{
-        paddingBottom: "calc(0.75rem + env(safe-area-inset-bottom, 0px))",
+        paddingBottom: "calc(0.625rem + env(safe-area-inset-bottom, 0px))",
       }}
     >
-      <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#25D366] text-white">
-        <MessageCircle size={16} fill="currentColor" strokeWidth={0} />
+      <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[#25D366] text-white sm:h-8 sm:w-8">
+        <MessageCircle size={18} fill="currentColor" strokeWidth={0} />
       </span>
       <span className="hidden text-[0.7rem] uppercase tracking-[0.18em] sm:inline">
         Scrivi a Elena
-      </span>
-      <span className="text-[0.7rem] uppercase tracking-[0.18em] sm:hidden">
-        WhatsApp
       </span>
     </a>
   );

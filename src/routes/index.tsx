@@ -212,7 +212,7 @@ function Index() {
 
       {/* TRUST STRIP */}
       <section className="border-b border-warm-border/60 section-ivory">
-        <div className="container-editorial grid grid-cols-2 gap-6 py-8 sm:grid-cols-4 sm:py-10">
+        <div className="container-editorial grid grid-cols-2 gap-6 py-6 sm:grid-cols-4 sm:py-7">
           {[
             { icon: HomeIcon, value: "18 anni", label: "a Pontremoli" },
             { icon: MapPin, value: "500+", label: "immobili trattati" },
@@ -232,7 +232,7 @@ function Index() {
 
       {/* BRAND STATEMENT */}
       <section className="section-cream">
-      <div className="container-editorial grid gap-10 py-16 sm:py-20 md:grid-cols-12 md:gap-12 md:py-32">
+      <div className="container-editorial grid gap-10 py-12 sm:py-16 md:grid-cols-12 md:gap-12 md:py-24">
         <div className="md:col-span-5">
           <span className="eyebrow">Chi siamo</span>
           <h2 className="mt-4 font-serif text-3xl leading-tight text-ink sm:text-4xl md:text-5xl">
@@ -252,7 +252,7 @@ function Index() {
           </p>
           <Link
             to="/chi-siamo"
-            className="group inline-flex items-center gap-2 pt-4 text-sm uppercase tracking-[0.2em] text-primary"
+            className="group inline-flex items-center gap-2 pt-4 text-sm uppercase tracking-[0.2em] text-primary underline decoration-primary/40 decoration-1 underline-offset-[6px] transition-colors hover:text-[color:var(--terracotta-hover)] hover:decoration-[color:var(--terracotta-hover)]"
           >
             La nostra storia
             <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
@@ -273,7 +273,7 @@ function Index() {
             </div>
             <Link
               to="/immobili"
-              className="group inline-flex items-center gap-2 text-sm uppercase tracking-[0.2em] text-primary"
+              className="group inline-flex items-center gap-2 text-sm uppercase tracking-[0.2em] text-primary underline decoration-primary/40 decoration-1 underline-offset-[6px] transition-colors hover:text-[color:var(--terracotta-hover)] hover:decoration-[color:var(--terracotta-hover)]"
             >
               Tutti gli immobili
               <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
@@ -311,7 +311,7 @@ function Index() {
             </div>
           </div>
           <div className="md:col-span-7">
-            <div className="rounded-md border border-warm-border/70 bg-warm-cream p-6 shadow-[0_1px_0_rgba(36,23,17,.04),0_18px_38px_-24px_rgba(36,23,17,.25)] sm:p-8">
+            <div className="rounded-md border border-warm-border/70 bg-warm-cream p-5 shadow-[0_1px_0_rgba(36,23,17,.04),0_18px_38px_-24px_rgba(36,23,17,.25)] sm:p-6">
               <LeadForm />
             </div>
           </div>

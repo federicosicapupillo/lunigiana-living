@@ -10,7 +10,7 @@ export function SiteFooter() {
             <img
               src={logoAsset.url}
               alt="Furia Immobiliare"
-              className="h-auto w-[130px] object-contain md:w-[150px]"
+              className="h-auto w-[100px] object-contain md:w-[115px]"
             />
           </div>
           <p className="mt-4 max-w-md text-sm leading-relaxed text-cream/70">

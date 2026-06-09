@@ -291,7 +291,7 @@ export function PropertySearchBar({
         {ROOM_OPTS.map((p) => <option key={p.label} value={p.value}>{p.label}</option>)}
       </SelectField>
 
-      <div className="flex min-w-0 flex-col gap-1 bg-card px-4 py-3 text-left">
+      <div className="flex min-w-0 flex-col gap-0.5 bg-card px-3 py-2 text-left">
         <span className="eyebrow text-[0.6rem]">Caratteristiche</span>
         <button
           ref={featTriggerRef}
@@ -414,7 +414,7 @@ export function PropertySearchBar({
           {Fields}
           {Chips}
           {ErrorMsg}
-          <div className="flex flex-wrap items-center justify-between gap-3 border-t border-warm-border bg-warm-sand/60 px-4 py-3">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-t border-warm-border bg-warm-sand/60 px-3 py-2.5">
             <button
               type="button"
               onClick={reset}
@@ -490,7 +490,7 @@ function SelectField({
   children: React.ReactNode;
 }) {
   return (
-    <label className="flex min-w-0 flex-col gap-1 bg-card px-4 py-3 text-left">
+    <label className="flex min-w-0 flex-col gap-0.5 bg-card px-3 py-2 text-left">
       <span className="eyebrow text-[0.6rem]">{label}</span>
       <select
         value={value}
@@ -509,7 +509,7 @@ function InputField({
   label: string; value: string; onChange: (v: string) => void; placeholder?: string;
 }) {
   return (
-    <label className="flex min-w-0 flex-col gap-1 bg-card px-4 py-3 text-left">
+    <label className="flex min-w-0 flex-col gap-0.5 bg-card px-3 py-2 text-left">
       <span className="eyebrow text-[0.6rem]">{label}</span>
       <input
         type="text"

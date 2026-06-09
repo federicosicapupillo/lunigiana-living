@@ -99,7 +99,7 @@ export function LeadForm() {
   }
 
   return (
-    <form onSubmit={onSubmit} className="grid gap-4 sm:gap-5" noValidate>
+    <form onSubmit={onSubmit} className="grid gap-3 sm:gap-3.5" noValidate>
       {/* Honeypot */}
       <input
         type="text"
@@ -110,7 +110,7 @@ export function LeadForm() {
         className="absolute left-[-9999px] h-0 w-0 opacity-0"
       />
 
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid gap-3 sm:grid-cols-2 sm:gap-3.5">
         <Field label="Nome e cognome *" name="full_name" required maxLength={200} autoComplete="name" />
         <Field label="Email *" name="email" type="email" required maxLength={320} autoComplete="email" />
         <Field label="Telefono / WhatsApp *" name="phone" type="tel" required maxLength={50} autoComplete="tel" />
@@ -119,14 +119,14 @@ export function LeadForm() {
         <SelectField label="Tipologia desiderata" name="property_type" options={PROPERTY_TYPES} />
       </div>
 
-      <label className="grid gap-2 text-[0.7rem] uppercase tracking-[0.18em] text-foreground/70">
+      <label className="grid gap-1.5 text-[0.7rem] uppercase tracking-[0.18em] text-foreground/70">
         Messaggio
         <textarea
           name="message"
-          rows={4}
+          rows={3}
           maxLength={3000}
           placeholder="Es. cerco una casa con giardino vicino a Pontremoli, possibilmente abitabile e con vista…"
-          className="rounded-sm border border-border bg-background px-3 py-2.5 text-sm normal-case tracking-normal text-ink placeholder:text-foreground/40 focus:border-primary focus:outline-none"
+          className="rounded-sm border border-border bg-background px-3 py-2 text-sm normal-case tracking-normal text-ink placeholder:text-foreground/40 focus:border-primary focus:outline-none"
         />
       </label>
 
@@ -146,11 +146,11 @@ export function LeadForm() {
         <p className="text-sm text-destructive">{errorMsg}</p>
       )}
 
-      <div className="flex flex-col items-start gap-4 pt-2 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col items-start gap-3 pt-1 sm:flex-row sm:items-center sm:justify-between">
         <button
           type="submit"
           disabled={status === "submitting"}
-          className="inline-flex w-full items-center justify-center gap-2 rounded-sm bg-ink px-6 py-3.5 text-[0.7rem] uppercase tracking-[0.2em] text-cream transition hover:bg-ink/90 disabled:opacity-60 sm:w-auto sm:px-8 sm:py-4 sm:text-xs sm:tracking-[0.22em]"
+          className="inline-flex w-full items-center justify-center gap-2 rounded-sm bg-ink px-6 py-3 text-[0.7rem] uppercase tracking-[0.2em] text-cream transition hover:bg-ink/90 disabled:opacity-60 sm:w-auto sm:px-7 sm:py-3.5 sm:text-xs sm:tracking-[0.22em]"
         >
           {status === "submitting" ? (
             <>
@@ -187,11 +187,11 @@ function Field({
   ...input
 }: { label: string } & React.InputHTMLAttributes<HTMLInputElement>) {
   return (
-    <label className="grid gap-2 text-[0.7rem] uppercase tracking-[0.18em] text-foreground/70">
+      <label className="grid gap-1.5 text-[0.7rem] uppercase tracking-[0.18em] text-foreground/70">
       {label}
       <input
         {...input}
-        className="rounded-sm border border-border bg-background px-3 py-2.5 text-sm normal-case tracking-normal text-ink placeholder:text-foreground/40 focus:border-primary focus:outline-none"
+        className="rounded-sm border border-border bg-background px-3 py-2 text-sm normal-case tracking-normal text-ink placeholder:text-foreground/40 focus:border-primary focus:outline-none"
       />
     </label>
   );
@@ -207,12 +207,12 @@ function SelectField({
   options: string[];
 }) {
   return (
-    <label className="grid gap-2 text-[0.7rem] uppercase tracking-[0.18em] text-foreground/70">
+    <label className="grid gap-1.5 text-[0.7rem] uppercase tracking-[0.18em] text-foreground/70">
       {label}
       <select
         name={name}
         defaultValue=""
-        className="rounded-sm border border-border bg-background px-3 py-2.5 text-sm normal-case tracking-normal text-ink focus:border-primary focus:outline-none"
+        className="rounded-sm border border-border bg-background px-3 py-2 text-sm normal-case tracking-normal text-ink focus:border-primary focus:outline-none"
       >
         <option value="">— Seleziona —</option>
         {options.map((o) => (
