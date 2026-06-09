@@ -350,9 +350,9 @@ function Index() {
           </div>
           <div className="grid gap-6">
             {[
-              { icon: Compass, title: "Ricerca su misura", body: "Ascoltiamo il tuo progetto di vita prima di mostrarti una casa." },
-              { icon: KeyRound, title: "Acquisto e vendita", body: "Ti seguiamo passo dopo passo, dalla visita al rogito notarile." },
-              { icon: Sparkles, title: "Valutazioni oneste", body: "Stime fondate sulla reale conoscenza del mercato locale." },
+              { icon: Compass, title: "Ricerca su misura per te", body: "Ci racconti che casa cerchi: noi filtriamo l'inventario e ti portiamo solo gli immobili che hanno davvero senso." },
+              { icon: KeyRound, title: "Visite guidate sul posto", body: "Ti accompagniamo immobile per immobile, anche se vivi lontano. Ti raccontiamo il borgo, non solo le mura." },
+              { icon: Sparkles, title: "Trattativa e rogito chiari", body: "Ti seguiamo dalla prima visita al notaio, con stime oneste e nessuna pressione di vendita." },
             ].map((s) => (
               <div key={s.title} className="flex gap-5 border-t border-border pt-6">
                 <s.icon size={22} className="mt-1 shrink-0 text-primary" />
@@ -366,20 +366,63 @@ function Index() {
         </div>
       </section>
 
+      {/* REVIEWS */}
+      <section className="bg-muted/40 py-16 sm:py-20 md:py-24">
+        <div className="container-editorial">
+          <div className="mx-auto max-w-3xl text-center">
+            <span className="eyebrow">Cosa dicono di noi</span>
+            <div className="mt-4 flex items-center justify-center gap-1 text-primary" aria-hidden="true">
+              {[0, 1, 2, 3, 4].map((i) => (
+                <Star key={i} size={22} fill="currentColor" strokeWidth={0} />
+              ))}
+            </div>
+            <h2 className="mt-5 font-serif text-3xl leading-tight text-ink sm:text-4xl md:text-5xl">
+              Le recensioni delle persone<br />che ci hanno scelto.
+            </h2>
+            <p className="mt-5 text-base leading-relaxed text-foreground/80">
+              Leggi cosa raccontano i clienti che hanno comprato casa con
+              Furia Immobiliare sul nostro profilo Google verificato.
+            </p>
+            <a
+              href={AGENCY_FACTS.googleReviewsUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-8 inline-flex items-center gap-2 rounded-sm bg-ink px-6 py-3.5 text-xs uppercase tracking-[0.2em] text-cream transition hover:bg-ink/90 sm:px-8 sm:py-4 sm:tracking-[0.22em]"
+            >
+              Leggi le recensioni su Google <ArrowRight size={14} />
+            </a>
+          </div>
+        </div>
+      </section>
+
       {/* CTA */}
       <section className="container-editorial pb-20 sm:pb-32">
-        <div className="relative overflow-hidden rounded-sm bg-secondary px-6 py-14 text-center text-cream sm:px-8 sm:py-20 md:px-16 md:py-28">
+        <div className="relative overflow-hidden rounded-sm bg-secondary px-6 py-14 text-center text-cream sm:px-8 sm:py-20 md:px-16 md:py-28 mt-16 sm:mt-20">
           <span className="eyebrow text-cream/80">Iniziamo</span>
           <h2 className="mx-auto mt-4 max-w-3xl font-serif text-3xl leading-tight sm:text-4xl md:text-6xl">
-            Raccontaci che casa stai cercando.<br />
-            <em className="font-normal italic">Noi conosciamo dove trovarla.</em>
+            Dimmi che casa cerchi.<br />
+            <em className="font-normal italic">Te la trovo io.</em>
           </h2>
-          <Link
-            to="/contatti"
-            className="mt-10 inline-flex items-center gap-2 rounded-sm bg-cream px-8 py-4 text-xs uppercase tracking-[0.22em] text-ink transition hover:bg-cream/90"
-          >
-            Prenota una consulenza <ArrowRight size={14} />
-          </Link>
+          <p className="mx-auto mt-5 max-w-xl text-sm leading-relaxed text-cream/85 sm:text-base">
+            Scrivimi su WhatsApp o lasciami i tuoi contatti. Ti rispondo io, Elena,
+            entro 24 ore lavorative. Senza form complicati, senza spam.
+          </p>
+          <div className="mt-10 flex flex-wrap items-center justify-center gap-3 sm:gap-4">
+            <a
+              href={`https://wa.me/393207019985?text=${encodeURIComponent("Ciao Elena, sto cercando casa in Lunigiana e vorrei ricevere informazioni.")}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 rounded-sm bg-cream px-7 py-4 text-xs uppercase tracking-[0.22em] text-ink transition hover:bg-cream/90"
+            >
+              Scrivimi su WhatsApp <ArrowRight size={14} />
+            </a>
+            <Link
+              to="/contatti"
+              className="inline-flex items-center gap-2 rounded-sm border border-cream/70 px-7 py-4 text-xs uppercase tracking-[0.22em] text-cream transition hover:bg-cream hover:text-ink"
+            >
+              Modulo di contatto
+            </Link>
+          </div>
         </div>
       </section>
     </>
