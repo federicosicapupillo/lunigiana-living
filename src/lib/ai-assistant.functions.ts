@@ -198,7 +198,7 @@ export const aiAssistantFinalize = createServerFn({ method: "POST" })
     );
     let parsed: AiDraft;
     try {
-      parsed = JSON.parse(reply) as AiDraft;
+      parsed = extractJson<AiDraft>(reply);
     } catch {
       throw new Error("Risposta IA non in formato JSON valido. Riprova.");
     }
@@ -378,7 +378,7 @@ export const aiAssistantDraftFromText = createServerFn({ method: "POST" })
     );
     let parsed: AiDraft;
     try {
-      parsed = JSON.parse(reply) as AiDraft;
+      parsed = extractJson<AiDraft>(reply);
     } catch {
       throw new Error("Risposta IA non in formato JSON valido. Riprova.");
     }
