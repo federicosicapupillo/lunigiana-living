@@ -3,6 +3,7 @@ import { getPublishedProperty, type PublicProperty } from "@/lib/public-properti
 import { ArrowLeft, MapPin, Maximize2, BedDouble, Bath, Building2 } from "lucide-react";
 import { useState } from "react";
 import { WatermarkedImage } from "@/components/watermarked-image";
+import { whatsappUrl } from "@/components/whatsapp-float";
 
 export const Route = createFileRoute("/immobili/$id")({
   loader: async ({ params }) => {
@@ -56,6 +57,11 @@ function PropertyDetail() {
   const { property: p } = Route.useLoaderData() as { property: PublicProperty };
   const [active, setActive] = useState(0);
   const main = p.gallery[active] || p.image;
+  const waMessage =
+    `Ciao Elena, vorrei ricevere informazioni su questo immobile: ` +
+    `${p.reference} — ${p.title} (${p.location}).` +
+    (typeof window !== "undefined" ? `\n${window.location.href}` : "");
+  const waHref = whatsappUrl(waMessage);
 
   return (
     <article className="pb-24">
@@ -241,6 +247,18 @@ function PropertyDetail() {
               <a href="tel:+390187830229" className="mt-1 block font-serif text-xl text-ink">0187 830229</a>
               <a href="tel:+393207019985" className="block font-serif text-xl text-ink">320 7019985</a>
             </div>
+
+            <a
+              href={waHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-6 flex w-full items-center justify-center gap-2 rounded-sm border border-ink bg-ink px-6 py-4 text-xs uppercase tracking-[0.22em] text-cream transition hover:bg-primary hover:border-primary"
+            >
+              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#25D366]" aria-hidden>
+                <span className="block h-2 w-2 rounded-full bg-white" />
+              </span>
+              Chiedi informazioni a Elena su WhatsApp
+            </a>
           </div>
         </aside>
       </section>

@@ -89,12 +89,14 @@ function Index() {
                 >
                   Cerca la tua casa <ArrowRight size={14} />
                 </Link>
-                <Link
-                  to="/contatti"
+                <a
+                  href={`https://wa.me/393207019985?text=${encodeURIComponent("Ciao Elena, sto cercando casa in Lunigiana e vorrei ricevere maggiori informazioni.")}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 rounded-sm border border-ink px-6 py-3.5 text-[0.7rem] uppercase tracking-[0.2em] text-ink transition hover:bg-ink hover:text-cream sm:px-8 sm:py-4 sm:text-xs sm:tracking-[0.22em]"
                 >
                   Parla con Elena
-                </Link>
+                </a>
               </div>
             </div>
             <div className="md:col-span-6 lg:col-span-6">
