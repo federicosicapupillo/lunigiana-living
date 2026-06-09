@@ -17,14 +17,14 @@ export const Route = createFileRoute("/chi-siamo")({
 function ChiSiamoPage() {
   return (
     <>
-      <section className="container-editorial grid items-center gap-12 pb-20 pt-32 md:grid-cols-12 md:gap-16 md:pt-40">
+      <section className="container-editorial grid items-center gap-12 pb-16 pt-28 md:grid-cols-12 md:gap-16 md:pt-36">
         <div className="md:col-span-6 lg:col-span-7">
           <span className="eyebrow">CHI SIAMO</span>
           <h1 className="mt-4 font-serif text-4xl leading-[1.05] text-ink md:text-6xl lg:text-7xl">
             Elena, Cometa<br />
             e le case che sanno di casa.
           </h1>
-          <div className="mt-8 space-y-5 text-base leading-relaxed text-foreground/85">
+          <div className="mt-8 space-y-4 text-base leading-relaxed text-foreground/85">
             <p>
               Furia Immobiliare nasce da Elena, dal suo legame profondo con la Lunigiana e da un modo molto personale di intendere la casa: non solo metri quadri, stanze e indirizzi, ma luoghi pieni di storia, silenzi, luce e possibilità.
             </p>
@@ -55,7 +55,7 @@ function ChiSiamoPage() {
               src={elenaAsset.url}
               alt="Elena e Cometa di Furia Immobiliare, Lunigiana"
               loading="eager"
-              className="aspect-[3/4] w-full object-cover object-top"
+              className="aspect-[4/5] w-full object-cover object-top"
             />
           </div>
           <figcaption className="mt-4 eyebrow text-center md:text-left">
@@ -65,15 +65,15 @@ function ChiSiamoPage() {
       </section>
 
       <section className="bg-warm-sand">
-        <div className="container-editorial py-20 md:py-28">
+        <div className="container-editorial py-16 md:py-24">
           <div className="mx-auto max-w-3xl space-y-4 text-center">
             <span className="eyebrow">Il nostro modo di lavorare</span>
-            <h2 className="font-serif text-3xl text-ink md:text-5xl">
+            <h2 className="font-serif text-3xl text-ink md:text-4xl">
               Persone, prima degli immobili.
             </h2>
           </div>
 
-          <div className="mt-14 grid gap-6 md:grid-cols-3">
+          <div className="mt-12 grid gap-6 md:grid-cols-3">
             {[
               { t: "Ascolto", b: "Prima di proporre una casa, ascoltiamo il modo in cui vuoi vivere." },
               { t: "Territorio", b: "Conosciamo la Lunigiana non solo come mercato, ma come luogo da abitare." },
@@ -90,7 +90,7 @@ function ChiSiamoPage() {
             ))}
           </div>
 
-          <div className="mt-12 grid gap-6 md:mt-16 md:grid-cols-3">
+          <div className="mt-10 grid gap-6 md:mt-14 md:grid-cols-3">
             {[
               { n: "18+", l: "Anni sul territorio", b: "Una presenza continua a Pontremoli e in tutta la Lunigiana." },
               { n: "500+", l: "Famiglie accompagnate", b: "Compratori italiani e internazionali che hanno scelto questa terra." },
@@ -109,7 +109,7 @@ function ChiSiamoPage() {
         </div>
       </section>
 
-      <section className="container-editorial py-24 md:py-32">
+      <section className="container-editorial py-20 md:py-28">
         <blockquote className="mx-auto max-w-3xl text-center">
           <p className="font-serif text-3xl italic leading-relaxed text-ink md:text-4xl">
             "Hanno trovato non una casa, ma il nostro posto.
@@ -118,7 +118,7 @@ function ChiSiamoPage() {
           <footer className="mt-6 eyebrow">Anna e Marco · acquirenti a Bagnone</footer>
         </blockquote>
 
-        <div className="mt-20 border-t border-border pt-16 text-center">
+        <div className="mt-16 border-t border-border pt-12 text-center">
           <h2 className="font-serif text-3xl text-ink md:text-5xl">
             Cerchi una casa in Lunigiana?
           </h2>
