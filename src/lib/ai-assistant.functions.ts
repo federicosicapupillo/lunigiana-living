@@ -198,7 +198,7 @@ export const aiAssistantFinalize = createServerFn({ method: "POST" })
     );
     let parsed: AiDraft;
     try {
-      parsed = JSON.parse(reply) as AiDraft;
+      parsed = extractJson<AiDraft>(reply);
     } catch {
       throw new Error("Risposta IA non in formato JSON valido. Riprova.");
     }
@@ -220,6 +220,17 @@ function slugify(s: string) {
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/(^-|-$)/g, "")
     .slice(0, 80);
+}
+
+function extractJson<T>(raw: string): T {
+  let s = raw.trim();
+  s = s.replace(/^```(?:json)?\s*/i, "").replace(/```\s*$/i, "").trim();
+  if (!s.startsWith("{") && !s.startsWith("[")) {
+    const i = s.indexOf("{");
+    const j = s.lastIndexOf("}");
+    if (i !== -1 && j > i) s = s.slice(i, j + 1);
+  }
+  return JSON.parse(s) as T;
 }
 
 export const aiAssistantApplyDraft = createServerFn({ method: "POST" })
@@ -367,7 +378,7 @@ export const aiAssistantDraftFromText = createServerFn({ method: "POST" })
     );
     let parsed: AiDraft;
     try {
-      parsed = JSON.parse(reply) as AiDraft;
+      parsed = extractJson<AiDraft>(reply);
     } catch {
       throw new Error("Risposta IA non in formato JSON valido. Riprova.");
     }
