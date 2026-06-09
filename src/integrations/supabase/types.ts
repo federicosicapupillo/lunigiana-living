@@ -17,8 +17,10 @@ export type Database = {
       properties: {
         Row: {
           address: string | null
+          ai_audio_transcript: string | null
           ai_generated_at: string | null
           ai_generation_notes: Json | null
+          ai_input_type: string | null
           archived_at: string | null
           area_zone: string | null
           balcony: boolean
@@ -73,8 +75,10 @@ export type Database = {
         }
         Insert: {
           address?: string | null
+          ai_audio_transcript?: string | null
           ai_generated_at?: string | null
           ai_generation_notes?: Json | null
+          ai_input_type?: string | null
           archived_at?: string | null
           area_zone?: string | null
           balcony?: boolean
@@ -129,8 +133,10 @@ export type Database = {
         }
         Update: {
           address?: string | null
+          ai_audio_transcript?: string | null
           ai_generated_at?: string | null
           ai_generation_notes?: Json | null
+          ai_input_type?: string | null
           archived_at?: string | null
           area_zone?: string | null
           balcony?: boolean
