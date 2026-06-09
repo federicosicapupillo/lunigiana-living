@@ -101,6 +101,8 @@ type Property = {
   short_notes: string | null;
   internal_notes: string | null;
   status: PropertyStatus;
+  featured: boolean;
+  homepage_order: number | null;
 };
 
 type Description = {
