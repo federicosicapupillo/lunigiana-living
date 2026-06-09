@@ -84,7 +84,7 @@ function Index() {
     heroVariant: HomeHeroVariant;
   };
   const featuredProperties = properties
-    .filter((p) => p.featured && p.category === "vendita" && p.images && p.images.length > 0)
+    .filter((p) => p.featured && p.category === "vendita" && p.gallery && p.gallery.length > 0)
     .slice(0, 6);
   const isPontremoli = heroVariant === "pontremoli_historic_center";
   const isElena = heroVariant === "elena_cometa";
