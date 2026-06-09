@@ -17,6 +17,8 @@ export type Database = {
       properties: {
         Row: {
           address: string | null
+          ai_generated_at: string | null
+          ai_generation_notes: Json | null
           archived_at: string | null
           area_zone: string | null
           balcony: boolean
@@ -28,6 +30,7 @@ export type Database = {
           country: string | null
           created_at: string
           created_by: string | null
+          created_with_ai: boolean
           deleted_at: string | null
           elevator: boolean
           energy_class: string | null
@@ -70,6 +73,8 @@ export type Database = {
         }
         Insert: {
           address?: string | null
+          ai_generated_at?: string | null
+          ai_generation_notes?: Json | null
           archived_at?: string | null
           area_zone?: string | null
           balcony?: boolean
@@ -81,6 +86,7 @@ export type Database = {
           country?: string | null
           created_at?: string
           created_by?: string | null
+          created_with_ai?: boolean
           deleted_at?: string | null
           elevator?: boolean
           energy_class?: string | null
@@ -123,6 +129,8 @@ export type Database = {
         }
         Update: {
           address?: string | null
+          ai_generated_at?: string | null
+          ai_generation_notes?: Json | null
           archived_at?: string | null
           area_zone?: string | null
           balcony?: boolean
@@ -134,6 +142,7 @@ export type Database = {
           country?: string | null
           created_at?: string
           created_by?: string | null
+          created_with_ai?: boolean
           deleted_at?: string | null
           elevator?: boolean
           energy_class?: string | null
