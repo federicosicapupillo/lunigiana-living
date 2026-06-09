@@ -269,46 +269,14 @@ function Index() {
               passaggi. La Lunigiana è una scelta di vita, prima ancora che una
               destinazione.
             </p>
-            <button
-              type="button"
-              onClick={() => setOpen(true)}
+            <Link
+              to="/territori"
               className="mt-8 inline-flex items-center gap-2 rounded-sm bg-ink px-6 py-3.5 text-xs uppercase tracking-[0.2em] text-cream transition hover:bg-ink/90"
             >
               Esplora il territorio <ArrowRight size={14} />
-            </button>
+            </Link>
           </div>
         </div>
-
-        <Dialog open={open} onOpenChange={setOpen}>
-          <DialogContent className="border-none bg-cream text-ink sm:max-w-md">
-            <DialogHeader>
-              <DialogTitle className="font-serif text-2xl">Stai lasciando Furia Immobiliare</DialogTitle>
-              <DialogDescription className="mt-2 text-foreground/80">
-                Stai per visitare un sito esterno dedicato al territorio e agli itinerari della Lunigiana. Vuoi continuare?
-              </DialogDescription>
-            </DialogHeader>
-            <DialogFooter className="mt-6 flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-              <DialogClose asChild>
-                <button
-                  type="button"
-                  className="inline-flex items-center justify-center gap-2 rounded-sm border border-ink px-6 py-3 text-xs uppercase tracking-[0.2em] text-ink transition hover:bg-ink hover:text-cream"
-                >
-                  Annulla
-                </button>
-              </DialogClose>
-              <button
-                type="button"
-                onClick={() => {
-                  window.open("https://www.sigeric.it/", "_blank", "noopener,noreferrer");
-                  setOpen(false);
-                }}
-                className="inline-flex items-center justify-center gap-2 rounded-sm bg-ink px-6 py-3 text-xs uppercase tracking-[0.2em] text-cream transition hover:bg-ink/90"
-              >
-                Continua
-              </button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
       </section>
 
       {/* TERRITORIES STRIP */}
