@@ -1,7 +1,7 @@
 import { createFileRoute, Outlet, Link, useNavigate } from "@tanstack/react-router";
 import { useAdmin } from "@/hooks/use-admin";
 import { supabase } from "@/integrations/supabase/client";
-import { LogOut, LayoutDashboard, Home, Settings } from "lucide-react";
+import { LogOut, LayoutDashboard, Home, Settings, Inbox } from "lucide-react";
 import { Loader2 } from "lucide-react";
 import { useEffect } from "react";
 
@@ -48,6 +48,13 @@ function AdminLayout() {
                 activeOptions={{ exact: true }}
               >
                 <LayoutDashboard size={15} /> Immobili
+              </Link>
+              <Link
+                to="/admin/richieste"
+                className="flex items-center gap-2 text-muted-foreground transition hover:text-ink"
+                activeProps={{ className: "text-ink" }}
+              >
+                <Inbox size={15} /> Richieste
               </Link>
               <Link
                 to="/admin/impostazioni"
