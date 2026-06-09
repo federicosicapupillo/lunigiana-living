@@ -10,17 +10,47 @@ import { PropertyCard } from "@/components/property-card";
 import { PropertySearchBar } from "@/components/property-search-bar";
 import { listPublishedProperties, type PublicProperty } from "@/lib/public-properties.functions";
 import { getHomeHeroVariant, type HomeHeroVariant } from "@/lib/site-settings.functions";
-import { ArrowRight, Compass, KeyRound, Sparkles } from "lucide-react";
-import { useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-  DialogClose,
-} from "@/components/ui/dialog";
+import { ArrowRight, Compass, KeyRound, Sparkles, Star, ShieldCheck, MapPin, Home as HomeIcon } from "lucide-react";
+
+const AGENCY_FACTS = {
+  yearsActive: 18,
+  propertiesManaged: 500,
+  comuniCovered: 6,
+  association: "FIAIP",
+  phone: "0187 830229",
+  mobile: "320 7019985",
+  address: "Via Pirandello 7, 54027 Pontremoli (MS)",
+  email: "furiaimmobiliare@libero.it",
+  googleReviewsUrl: "https://share.google/XuLvMM0CG6tmjlwpO",
+};
+
+const ORGANIZATION_JSONLD = {
+  "@context": "https://schema.org",
+  "@type": "RealEstateAgent",
+  name: "Furia Immobiliare",
+  description:
+    "Agenzia immobiliare a Pontremoli. Vendita e affitto di case, ville e dimore di carattere in Lunigiana.",
+  url: "https://furiaimmobiliare.it/",
+  telephone: "+39 0187 830229",
+  email: AGENCY_FACTS.email,
+  address: {
+    "@type": "PostalAddress",
+    streetAddress: "Via Pirandello 7",
+    addressLocality: "Pontremoli",
+    postalCode: "54027",
+    addressRegion: "MS",
+    addressCountry: "IT",
+  },
+  areaServed: [
+    "Pontremoli",
+    "Villafranca in Lunigiana",
+    "Filattiera",
+    "Mulazzo",
+    "Bagnone",
+    "Zeri",
+  ],
+  memberOf: { "@type": "Organization", name: "FIAIP" },
+};
 
 export const Route = createFileRoute("/")({
   loader: async () => {
@@ -38,18 +68,29 @@ export const Route = createFileRoute("/")({
       { rel: "canonical", href: "/" },
       { rel: "preload", as: "image", href: heroTramontoVignetiAsset.url, fetchpriority: "high" },
     ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify(ORGANIZATION_JSONLD),
+      },
+    ],
   }),
   component: Index,
 });
 
 function Index() {
-  const [open, setOpen] = useState(false);
   const { properties, heroVariant } = Route.useLoaderData() as {
     properties: PublicProperty[];
     heroVariant: HomeHeroVariant;
   };
   const featuredProperties = properties
-    .filter((p) => p.featured && p.category === "vendita")
+    .filter(
+      (p) =>
+        p.featured &&
+        p.category === "vendita" &&
+        p.image &&
+        !p.image.startsWith("data:"),
+    )
     .slice(0, 6);
   const isPontremoli = heroVariant === "pontremoli_historic_center";
   const isElena = heroVariant === "elena_cometa";
@@ -72,15 +113,15 @@ function Index() {
           <div className="absolute inset-0 -z-10 bg-gradient-to-br from-cream via-cream to-[hsl(var(--muted))]" />
           <div className="container-editorial grid min-h-[88svh] grid-cols-1 items-center gap-10 pb-12 pt-32 sm:min-h-[92svh] sm:pb-16 sm:pt-40 md:min-h-[100svh] md:grid-cols-12 md:gap-12 md:pb-24">
             <div className="md:col-span-6 lg:col-span-6">
-              <span className="eyebrow text-primary">Furia Immobiliare · Lunigiana</span>
+              <span className="eyebrow text-primary">Agenzia immobiliare · Pontremoli · Lunigiana</span>
               <h1 className="mt-4 font-serif text-[2.4rem] leading-[1.05] text-ink sm:text-5xl sm:leading-[1.02] md:text-6xl lg:text-7xl">
-                La casa giusta si riconosce<br />
-                <em className="font-normal italic">anche dal cuore.</em>
+                Case in vendita in Lunigiana,<br />
+                <em className="font-normal italic">scelte una per una.</em>
               </h1>
               <p className="mt-5 max-w-xl text-sm leading-relaxed text-foreground/80 sm:text-base md:text-lg">
-                Con Elena e Cometa, Furia Immobiliare accompagna chi cerca una casa
-                autentica in Lunigiana: non solo un immobile, ma un luogo in cui
-                sentirsi davvero a casa.
+                Da 18 anni a Pontremoli. Elena e Cometa ti accompagnano a trovare
+                la casa giusta in Lunigiana: visite sul posto, conoscenza reale
+                dei borghi, nessuna pressione di vendita.
               </p>
               <div className="mt-8 flex flex-wrap items-center gap-3 sm:mt-10 sm:gap-4">
                 <Link
@@ -136,29 +177,57 @@ function Index() {
 
         <div className="container-editorial w-full pb-12 pt-32 sm:pb-16 sm:pt-40 md:pb-24">
           <div className="max-w-3xl">
-            <span className="eyebrow text-cream/90">Furia Immobiliare · Pontremoli</span>
+            <span className="eyebrow text-cream/90">Agenzia immobiliare · Pontremoli · Lunigiana</span>
             <h1 className="mt-4 font-serif text-[2.4rem] leading-[1.05] text-cream sm:text-5xl sm:leading-[1.02] md:text-7xl">
-              La casa giusta in una terra<br />
-              <em className="font-normal italic text-cream/95">che lascia spazio al tempo.</em>
+              Case in vendita in Lunigiana,<br />
+              <em className="font-normal italic text-cream/95">scelte una per una.</em>
             </h1>
             <p className="mt-5 max-w-xl text-sm leading-relaxed text-cream/85 sm:text-base md:text-lg">
-              Selezioniamo case di pietra, ville panoramiche e dimore di carattere
-              in tutta la Lunigiana. Per chi non cerca solo un immobile, ma un modo
-              diverso di vivere.
+              Da 18 anni a Pontremoli. Case di pietra, ville panoramiche e
+              dimore di carattere in tutta la Lunigiana — selezionate da chi
+              questa terra la abita davvero.
             </p>
           </div>
 
-          <div className="mt-8 sm:mt-10">
+          <div className="mt-8 flex flex-wrap items-center gap-3 sm:mt-10 sm:gap-4">
             <Link
               to="/immobili"
               className="inline-flex items-center gap-2 rounded-sm bg-cream px-6 py-3.5 text-[0.7rem] uppercase tracking-[0.2em] text-ink transition hover:bg-cream/90 sm:px-8 sm:py-4 sm:text-xs sm:tracking-[0.22em]"
             >
-              Cerca la tua casa in Lunigiana <ArrowRight size={14} />
+              Vedi gli immobili <ArrowRight size={14} />
             </Link>
+            <a
+              href={`https://wa.me/393207019985?text=${encodeURIComponent("Ciao Elena, sto cercando casa in Lunigiana e vorrei ricevere maggiori informazioni.")}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 rounded-sm border border-cream/70 px-6 py-3.5 text-[0.7rem] uppercase tracking-[0.2em] text-cream transition hover:bg-cream hover:text-ink sm:px-8 sm:py-4 sm:text-xs sm:tracking-[0.22em]"
+            >
+              Parla con Elena su WhatsApp
+            </a>
           </div>
         </div>
       </section>
       )}
+
+      {/* TRUST STRIP */}
+      <section className="border-b border-border bg-cream">
+        <div className="container-editorial grid grid-cols-2 gap-6 py-8 sm:grid-cols-4 sm:py-10">
+          {[
+            { icon: HomeIcon, value: "18 anni", label: "a Pontremoli" },
+            { icon: MapPin, value: "500+", label: "immobili trattati" },
+            { icon: Compass, value: "6 comuni", label: "della Lunigiana" },
+            { icon: ShieldCheck, value: "FIAIP", label: "agenzia iscritta" },
+          ].map((s) => (
+            <div key={s.label} className="flex items-center gap-3 sm:gap-4">
+              <s.icon size={22} className="shrink-0 text-primary" />
+              <div>
+                <div className="font-serif text-xl leading-tight text-ink sm:text-2xl">{s.value}</div>
+                <div className="text-[0.7rem] uppercase tracking-[0.15em] text-foreground/70">{s.label}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
 
       {/* BRAND STATEMENT */}
       <section className="container-editorial grid gap-10 py-16 sm:py-20 md:grid-cols-12 md:gap-12 md:py-32">
@@ -234,46 +303,14 @@ function Index() {
               passaggi. La Lunigiana è una scelta di vita, prima ancora che una
               destinazione.
             </p>
-            <button
-              type="button"
-              onClick={() => setOpen(true)}
+            <Link
+              to="/territori"
               className="mt-8 inline-flex items-center gap-2 rounded-sm bg-ink px-6 py-3.5 text-xs uppercase tracking-[0.2em] text-cream transition hover:bg-ink/90"
             >
               Esplora il territorio <ArrowRight size={14} />
-            </button>
+            </Link>
           </div>
         </div>
-
-        <Dialog open={open} onOpenChange={setOpen}>
-          <DialogContent className="border-none bg-cream text-ink sm:max-w-md">
-            <DialogHeader>
-              <DialogTitle className="font-serif text-2xl">Stai lasciando Furia Immobiliare</DialogTitle>
-              <DialogDescription className="mt-2 text-foreground/80">
-                Stai per visitare un sito esterno dedicato al territorio e agli itinerari della Lunigiana. Vuoi continuare?
-              </DialogDescription>
-            </DialogHeader>
-            <DialogFooter className="mt-6 flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-              <DialogClose asChild>
-                <button
-                  type="button"
-                  className="inline-flex items-center justify-center gap-2 rounded-sm border border-ink px-6 py-3 text-xs uppercase tracking-[0.2em] text-ink transition hover:bg-ink hover:text-cream"
-                >
-                  Annulla
-                </button>
-              </DialogClose>
-              <button
-                type="button"
-                onClick={() => {
-                  window.open("https://www.sigeric.it/", "_blank", "noopener,noreferrer");
-                  setOpen(false);
-                }}
-                className="inline-flex items-center justify-center gap-2 rounded-sm bg-ink px-6 py-3 text-xs uppercase tracking-[0.2em] text-cream transition hover:bg-ink/90"
-              >
-                Continua
-              </button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
       </section>
 
       {/* TERRITORIES STRIP */}
@@ -319,9 +356,9 @@ function Index() {
           </div>
           <div className="grid gap-6">
             {[
-              { icon: Compass, title: "Ricerca su misura", body: "Ascoltiamo il tuo progetto di vita prima di mostrarti una casa." },
-              { icon: KeyRound, title: "Acquisto e vendita", body: "Ti seguiamo passo dopo passo, dalla visita al rogito notarile." },
-              { icon: Sparkles, title: "Valutazioni oneste", body: "Stime fondate sulla reale conoscenza del mercato locale." },
+              { icon: Compass, title: "Ricerca su misura per te", body: "Ci racconti che casa cerchi: noi filtriamo l'inventario e ti portiamo solo gli immobili che hanno davvero senso." },
+              { icon: KeyRound, title: "Visite guidate sul posto", body: "Ti accompagniamo immobile per immobile, anche se vivi lontano. Ti raccontiamo il borgo, non solo le mura." },
+              { icon: Sparkles, title: "Trattativa e rogito chiari", body: "Ti seguiamo dalla prima visita al notaio, con stime oneste e nessuna pressione di vendita." },
             ].map((s) => (
               <div key={s.title} className="flex gap-5 border-t border-border pt-6">
                 <s.icon size={22} className="mt-1 shrink-0 text-primary" />
@@ -335,20 +372,63 @@ function Index() {
         </div>
       </section>
 
+      {/* REVIEWS */}
+      <section className="bg-muted/40 py-16 sm:py-20 md:py-24">
+        <div className="container-editorial">
+          <div className="mx-auto max-w-3xl text-center">
+            <span className="eyebrow">Cosa dicono di noi</span>
+            <div className="mt-4 flex items-center justify-center gap-1 text-primary" aria-hidden="true">
+              {[0, 1, 2, 3, 4].map((i) => (
+                <Star key={i} size={22} fill="currentColor" strokeWidth={0} />
+              ))}
+            </div>
+            <h2 className="mt-5 font-serif text-3xl leading-tight text-ink sm:text-4xl md:text-5xl">
+              Le recensioni delle persone<br />che ci hanno scelto.
+            </h2>
+            <p className="mt-5 text-base leading-relaxed text-foreground/80">
+              Leggi cosa raccontano i clienti che hanno comprato casa con
+              Furia Immobiliare sul nostro profilo Google verificato.
+            </p>
+            <a
+              href={AGENCY_FACTS.googleReviewsUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-8 inline-flex items-center gap-2 rounded-sm bg-ink px-6 py-3.5 text-xs uppercase tracking-[0.2em] text-cream transition hover:bg-ink/90 sm:px-8 sm:py-4 sm:tracking-[0.22em]"
+            >
+              Leggi le recensioni su Google <ArrowRight size={14} />
+            </a>
+          </div>
+        </div>
+      </section>
+
       {/* CTA */}
       <section className="container-editorial pb-20 sm:pb-32">
-        <div className="relative overflow-hidden rounded-sm bg-secondary px-6 py-14 text-center text-cream sm:px-8 sm:py-20 md:px-16 md:py-28">
+        <div className="relative overflow-hidden rounded-sm bg-secondary px-6 py-14 text-center text-cream sm:px-8 sm:py-20 md:px-16 md:py-28 mt-16 sm:mt-20">
           <span className="eyebrow text-cream/80">Iniziamo</span>
           <h2 className="mx-auto mt-4 max-w-3xl font-serif text-3xl leading-tight sm:text-4xl md:text-6xl">
-            Raccontaci che casa stai cercando.<br />
-            <em className="font-normal italic">Noi conosciamo dove trovarla.</em>
+            Dimmi che casa cerchi.<br />
+            <em className="font-normal italic">Te la trovo io.</em>
           </h2>
-          <Link
-            to="/contatti"
-            className="mt-10 inline-flex items-center gap-2 rounded-sm bg-cream px-8 py-4 text-xs uppercase tracking-[0.22em] text-ink transition hover:bg-cream/90"
-          >
-            Prenota una consulenza <ArrowRight size={14} />
-          </Link>
+          <p className="mx-auto mt-5 max-w-xl text-sm leading-relaxed text-cream/85 sm:text-base">
+            Scrivimi su WhatsApp o lasciami i tuoi contatti. Ti rispondo io, Elena,
+            entro 24 ore lavorative. Senza form complicati, senza spam.
+          </p>
+          <div className="mt-10 flex flex-wrap items-center justify-center gap-3 sm:gap-4">
+            <a
+              href={`https://wa.me/393207019985?text=${encodeURIComponent("Ciao Elena, sto cercando casa in Lunigiana e vorrei ricevere informazioni.")}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 rounded-sm bg-cream px-7 py-4 text-xs uppercase tracking-[0.22em] text-ink transition hover:bg-cream/90"
+            >
+              Scrivimi su WhatsApp <ArrowRight size={14} />
+            </a>
+            <Link
+              to="/contatti"
+              className="inline-flex items-center gap-2 rounded-sm border border-cream/70 px-7 py-4 text-xs uppercase tracking-[0.22em] text-cream transition hover:bg-cream hover:text-ink"
+            >
+              Modulo di contatto
+            </Link>
+          </div>
         </div>
       </section>
     </>
