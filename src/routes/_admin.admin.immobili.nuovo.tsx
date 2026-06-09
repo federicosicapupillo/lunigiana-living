@@ -444,17 +444,29 @@ function NewPropertyPage() {
               options={CONTRACT_TYPES.map((o) => ({ value: o, label: o }))}
             />
           </Field>
-          <Field label="Prezzo (€)">
-            <NumberInput
-              value={f.price}
-              onChange={(v) => upd("price", v)}
-              disabled={f.price_on_request}
-              step={1000}
-              placeholder={f.price_on_request ? "Prezzo su richiesta" : "Es. 450000"}
-            />
-          </Field>
-          <Field label="Modalità prezzo">
-            <Toggle label="Prezzo su richiesta" value={f.price_on_request} onChange={(v) => upd("price_on_request", v)} />
+          <Field label="Prezzo (€)" full>
+            <div className="space-y-2">
+              <NumberInput
+                value={f.price_on_request ? "" : f.price}
+                onChange={(v) => upd("price", v)}
+                disabled={f.price_on_request}
+                step={1000}
+                placeholder={f.price_on_request ? "Prezzo su richiesta" : "Inserisci prezzo"}
+              />
+              <Toggle
+                label="Prezzo su richiesta"
+                value={f.price_on_request}
+                onChange={(v) => {
+                  upd("price_on_request", v);
+                  if (v) upd("price", "");
+                }}
+              />
+              <p className="text-xs text-muted-foreground">
+                {f.price_on_request
+                  ? "Il prezzo non sarà mostrato. Sul sito apparirà: Prezzo su richiesta."
+                  : "Attiva questa opzione se non vuoi mostrare il prezzo pubblicamente."}
+              </p>
+            </div>
           </Field>
         </Section>
 
@@ -930,14 +942,26 @@ function Toggle({
     <button
       type="button"
       onClick={() => onChange(!value)}
-      className={`flex items-center justify-between rounded-sm border px-4 py-2.5 text-sm transition ${
+      role="switch"
+      aria-checked={value}
+      className={`group flex w-full items-center gap-3 rounded-sm border px-4 py-2.5 text-sm transition cursor-pointer ${
         value
           ? "border-primary bg-primary/5 text-ink"
           : "border-border bg-card text-muted-foreground hover:border-primary/40"
       }`}
     >
-      <span>{label}</span>
-      <span className={`ml-3 h-2.5 w-2.5 rounded-full ${value ? "bg-primary" : "bg-muted-foreground/30"}`} />
+      <span
+        className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors ${
+          value ? "bg-primary" : "bg-muted-foreground/30"
+        }`}
+      >
+        <span
+          className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform ${
+            value ? "translate-x-[22px]" : "translate-x-0.5"
+          }`}
+        />
+      </span>
+      <span className="font-medium">{label}</span>
     </button>
   );
 }
