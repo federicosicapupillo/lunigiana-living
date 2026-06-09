@@ -254,6 +254,11 @@ export type Database = {
           alt_text: string | null
           created_at: string
           desired_lighting: string | null
+          enhanced_image_url: string | null
+          enhanced_storage_path: string | null
+          enhancement_created_at: string | null
+          enhancement_error: string | null
+          enhancement_status: string
           id: string
           image_url: string
           import_status: string | null
@@ -278,6 +283,7 @@ export type Database = {
           room_condition: string | null
           sort_order: number
           storage_path: string
+          use_enhanced: boolean
           use_rendered: boolean
           visual_target: string | null
         }
@@ -285,6 +291,11 @@ export type Database = {
           alt_text?: string | null
           created_at?: string
           desired_lighting?: string | null
+          enhanced_image_url?: string | null
+          enhanced_storage_path?: string | null
+          enhancement_created_at?: string | null
+          enhancement_error?: string | null
+          enhancement_status?: string
           id?: string
           image_url: string
           import_status?: string | null
@@ -309,6 +320,7 @@ export type Database = {
           room_condition?: string | null
           sort_order?: number
           storage_path: string
+          use_enhanced?: boolean
           use_rendered?: boolean
           visual_target?: string | null
         }
@@ -316,6 +328,11 @@ export type Database = {
           alt_text?: string | null
           created_at?: string
           desired_lighting?: string | null
+          enhanced_image_url?: string | null
+          enhanced_storage_path?: string | null
+          enhancement_created_at?: string | null
+          enhancement_error?: string | null
+          enhancement_status?: string
           id?: string
           image_url?: string
           import_status?: string | null
@@ -340,6 +357,7 @@ export type Database = {
           room_condition?: string | null
           sort_order?: number
           storage_path?: string
+          use_enhanced?: boolean
           use_rendered?: boolean
           visual_target?: string | null
         }
