@@ -906,29 +906,11 @@ function FeaturesTab({
           ))}
         </select>
         {prop.energy_performance_index_status === "precise_value" && (
-          <div className="mt-2 flex items-center gap-2">
-            <input
-              type="text"
-              inputMode="decimal"
-              value={prop.energy_performance_index_value ?? ""}
-              onChange={(e) => {
-                const raw = e.target.value.replace(",", ".");
-                if (raw === "") {
-                  update({ energy_performance_index_value: null });
-                  return;
-                }
-                const n = Number(raw);
-                update({
-                  energy_performance_index_value: Number.isFinite(n) ? n : null,
-                });
-              }}
-              placeholder="Es. 135"
-              className={inputCls}
-            />
-            <span className="shrink-0 text-xs uppercase tracking-wider text-muted-foreground">
-              kWh/m² anno
-            </span>
-          </div>
+          <EpiValueInput
+            value={prop.energy_performance_index_value}
+            onChange={(v) => update({ energy_performance_index_value: v })}
+            className={inputCls}
+          />
         )}
       </Field>
 
@@ -977,6 +959,70 @@ function SelectStringInput({
         </option>
       ))}
     </select>
+  );
+}
+
+function EpiValueInput({
+  value,
+  onChange,
+  className,
+}: {
+  value: number | null;
+  onChange: (v: number | null) => void;
+  className: string;
+}) {
+  const [text, setText] = useState<string>(
+    value == null ? "" : String(value).replace(".", ","),
+  );
+  // Sync when external value changes (e.g. initial load) but not while user types
+  useEffect(() => {
+    const parsed = text.trim() === "" ? null : Number(text.replace(",", "."));
+    if (parsed !== value && !(Number.isNaN(parsed as number) && value == null)) {
+      // Only resync if the parsed local value differs meaningfully from prop
+      if (value == null) {
+        setText("");
+      } else if (Number.isFinite(parsed as number) && parsed !== value) {
+        setText(String(value).replace(".", ","));
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value]);
+  return (
+    <div className="mt-2 flex items-center gap-2">
+      <input
+        type="text"
+        inputMode="decimal"
+        value={text}
+        onChange={(e) => {
+          const raw = e.target.value;
+          // Allow digits, one comma or dot, up to 2 decimals
+          if (raw !== "" && !/^\d*(?:[.,]\d{0,2})?$/.test(raw)) return;
+          setText(raw);
+          if (raw.trim() === "") {
+            onChange(null);
+            return;
+          }
+          const normalized = raw.replace(",", ".");
+          // Don't commit partial values like "135." — wait for next char
+          if (normalized.endsWith(".")) return;
+          const n = Number(normalized);
+          onChange(Number.isFinite(n) ? n : null);
+        }}
+        onBlur={() => {
+          if (text.trim() === "") return;
+          const n = Number(text.replace(",", "."));
+          if (Number.isFinite(n)) {
+            onChange(n);
+            setText(String(n).replace(".", ","));
+          }
+        }}
+        placeholder="Es. 135,42"
+        className={className}
+      />
+      <span className="shrink-0 text-xs uppercase tracking-wider text-muted-foreground">
+        kWh/m² anno
+      </span>
+    </div>
   );
 }
 

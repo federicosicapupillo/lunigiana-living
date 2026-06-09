@@ -615,7 +615,7 @@ function NewPropertyPage() {
                   inputMode="decimal"
                   value={f.epi_value}
                   onChange={(e) => upd("epi_value", e.target.value)}
-                  placeholder="Es. 135"
+                  placeholder="Es. 135,42"
                   className="w-full rounded-sm border border-border bg-background px-3 py-2.5 text-base focus:border-primary focus:outline-none sm:py-2 sm:text-sm"
                 />
                 <span className="shrink-0 text-xs uppercase tracking-wider text-muted-foreground">
