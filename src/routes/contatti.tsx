@@ -20,8 +20,8 @@ function ContattiPage() {
     "Ciao Elena, vorrei parlare con te per una ricerca immobiliare.",
   );
   return (
-    <section className="container-editorial pb-32 pt-32 md:pt-40">
-      <div className="grid gap-16 md:grid-cols-12">
+    <section className="container-editorial pb-24 pt-28 md:pt-36">
+      <div className="grid gap-10 md:grid-cols-12">
         <div className="md:col-span-5">
           <span className="eyebrow">Contatti</span>
           <h1 className="mt-3 font-serif text-5xl leading-tight text-ink md:text-6xl">
@@ -79,19 +79,19 @@ function ContattiPage() {
         </div>
 
         <form onSubmit={(e) => e.preventDefault()}
-          className="space-y-5 rounded-sm bg-card p-8 md:col-span-6 md:col-start-7 md:p-12">
-          <div className="grid gap-5 md:grid-cols-2">
+          className="space-y-4 rounded-sm bg-card p-8 md:col-span-7 md:col-start-6 md:p-10">
+          <div className="grid gap-4 md:grid-cols-2">
             <Field label="Nome" />
             <Field label="Cognome" />
           </div>
-          <div className="grid gap-5 md:grid-cols-2">
+          <div className="grid gap-4 md:grid-cols-2">
             <Field label="Email" type="email" />
             <Field label="Telefono" type="tel" />
           </div>
           <Field label="Comune di interesse" placeholder="Pontremoli, Bagnone, Zeri…" />
           <label className="block">
             <span className="eyebrow text-[0.65rem]">Raccontaci</span>
-            <textarea rows={5} placeholder="Che casa stai cercando? Per chi? In che zona?"
+            <textarea rows={4} placeholder="Che casa stai cercando? Per chi? In che zona?"
               className="mt-2 w-full border-0 border-b border-border bg-transparent pb-2 text-sm text-ink placeholder:text-muted-foreground/70 focus:border-primary focus:outline-none focus:ring-0" />
           </label>
           <button type="submit"
