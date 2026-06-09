@@ -240,6 +240,8 @@ export const aiAssistantApplyDraft = createServerFn({ method: "POST" })
       created_with_ai: true,
       ai_generated_at: new Date().toISOString(),
       ai_generation_notes: { messages: data.messages, draft: d },
+      ai_input_type: data.aiInputType ?? "text",
+      ai_audio_transcript: data.audioTranscript ?? null,
       property_type: d.property_type ?? null,
       contract_type: d.contract_type ?? null,
       price: typeof d.price === "number" ? d.price : null,
