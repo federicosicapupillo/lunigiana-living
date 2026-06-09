@@ -108,19 +108,20 @@ async function enhanceOne(imageId: string): Promise<{ ok: true; enhancedPath: st
       .from(BUCKET)
       .createSignedUrl(enhancedPath, SIGNED_URL_TTL_SECONDS);
 
-    const updates: Record<string, unknown> = {
+    const baseUpdate = {
       enhanced_storage_path: enhancedPath,
       enhanced_image_url: signed?.signedUrl ?? null,
       enhancement_status: "enhanced",
       enhancement_error: null,
       enhancement_created_at: new Date().toISOString(),
-    };
-    if (img.use_enhanced && signed?.signedUrl) {
-      updates.published_image_url = signed.signedUrl;
-    }
+    } as const;
     const { error: updErr } = await supabaseAdmin
       .from("property_images")
-      .update(updates)
+      .update(
+        img.use_enhanced && signed?.signedUrl
+          ? { ...baseUpdate, published_image_url: signed.signedUrl }
+          : baseUpdate,
+      )
       .eq("id", imageId);
     if (updErr) throw new Error(updErr.message);
 
