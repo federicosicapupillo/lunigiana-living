@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Mail, MapPin, Phone } from "lucide-react";
+import { whatsappUrl } from "@/components/whatsapp-float";
 
 export const Route = createFileRoute("/contatti")({
   head: () => ({
@@ -15,6 +16,9 @@ export const Route = createFileRoute("/contatti")({
 });
 
 function ContattiPage() {
+  const waHref = whatsappUrl(
+    "Ciao Elena, vorrei parlare con te per una ricerca immobiliare.",
+  );
   return (
     <section className="container-editorial pb-32 pt-32 md:pt-40">
       <div className="grid gap-16 md:grid-cols-12">
@@ -51,6 +55,27 @@ function ContattiPage() {
               </div>
             </li>
           </ul>
+
+          <div className="mt-10 rounded-sm border border-warm-border/70 bg-warm-ivory p-6">
+            <div className="eyebrow text-[0.65rem]">WhatsApp</div>
+            <h2 className="mt-2 font-serif text-2xl text-ink">Parla direttamente con Elena</h2>
+            <p className="mt-3 text-sm leading-relaxed text-foreground/80">
+              Hai visto una casa che ti interessa o vuoi raccontarci cosa stai
+              cercando? Scrivi a Elena su WhatsApp: ti risponderà appena
+              possibile.
+            </p>
+            <a
+              href={waHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-5 inline-flex items-center gap-2 rounded-sm bg-ink px-6 py-3.5 text-xs uppercase tracking-[0.22em] text-cream transition hover:bg-primary"
+            >
+              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#25D366]" aria-hidden>
+                <span className="block h-2 w-2 rounded-full bg-white" />
+              </span>
+              Scrivi su WhatsApp
+            </a>
+          </div>
         </div>
 
         <form onSubmit={(e) => e.preventDefault()}

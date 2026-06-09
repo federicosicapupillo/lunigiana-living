@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { MapPin, Maximize2, BedDouble, ArrowRight } from "lucide-react";
 import { WatermarkedImage } from "@/components/watermarked-image";
+import { whatsappUrl } from "@/components/whatsapp-float";
 
 type PropertyCardData = {
   id: number | string;
@@ -17,6 +18,9 @@ type PropertyCardData = {
 };
 
 export function PropertyCard({ p }: { p: PropertyCardData }) {
+  const waHref = whatsappUrl(
+    `Ciao Elena, vorrei ricevere informazioni su questo immobile: ${p.reference} — ${p.title} (${p.location}).`,
+  );
   return (
     <Link
       to="/immobili/$id"
@@ -69,6 +73,26 @@ export function PropertyCard({ p }: { p: PropertyCardData }) {
         <span className="mt-5 flex items-center justify-between rounded-sm bg-ink px-5 py-3 text-[0.7rem] uppercase tracking-[0.2em] text-cream transition group-hover:bg-primary">
           Vedi immobile
           <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
+        </span>
+        <span
+          role="link"
+          tabIndex={0}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            window.open(waHref, "_blank", "noopener,noreferrer");
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              e.stopPropagation();
+              window.open(waHref, "_blank", "noopener,noreferrer");
+            }
+          }}
+          className="mt-2 inline-flex cursor-pointer items-center gap-1.5 text-[0.7rem] uppercase tracking-[0.18em] text-muted-foreground transition hover:text-primary"
+        >
+          <span className="inline-block h-1.5 w-1.5 rounded-full bg-[#25D366]" />
+          Info su WhatsApp
         </span>
       </div>
     </Link>
