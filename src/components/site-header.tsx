@@ -16,8 +16,8 @@ export function SiteHeader() {
   const [open, setOpen] = useState(false);
   return (
     <header className="sticky top-0 z-40 border-b border-warm-border/60 bg-warm-cream/90 backdrop-blur-md">
-      <div className="container-editorial flex h-20 items-center justify-between sm:h-[84px] md:h-[92px] lg:h-[108px]">
-        <Link to="/" className="group flex items-center" aria-label="Furia Immobiliare — Home">
+      <div className="container-editorial flex h-20 items-center sm:h-[84px] md:h-[92px] lg:h-[108px]">
+        <Link to="/" className="group flex shrink-0 items-center" aria-label="Furia Immobiliare — Home">
           <img
             src={logoAsset.url}
             alt="Furia Immobiliare"
@@ -25,17 +25,17 @@ export function SiteHeader() {
           />
         </Link>
 
-        <nav className="hidden items-center gap-1 lg:flex">
+        <nav className="hidden flex-1 items-center justify-center gap-1.5 lg:flex">
           {nav.map((n) => (
             <Link
               key={n.to}
               to={n.to}
-              className="group relative rounded-sm px-3 py-1.5 text-[0.78rem] font-medium tracking-wide text-ink-soft/80 transition-all duration-200 hover:bg-warm-ivory/70 hover:text-terracotta"
+              className="group relative rounded-lg px-5 py-2.5 text-[0.95rem] font-medium tracking-wide text-ink-soft/80 transition-all duration-200 hover:bg-warm-ivory/70 hover:text-terracotta lg:text-[1.06rem]"
               activeProps={{ className: "text-terracotta bg-warm-ivory/50 [&>span:last-child]:scale-x-100" }}
               activeOptions={{ exact: n.to === "/" }}
             >
               <span>{n.label}</span>
-              <span className="pointer-events-none absolute bottom-0 left-1/2 h-[2px] w-5 -translate-x-1/2 scale-x-0 rounded-full bg-terracotta/70 transition-transform duration-200 group-hover:scale-x-100" />
+              <span className="pointer-events-none absolute bottom-1 left-1/2 h-[2px] w-6 -translate-x-1/2 scale-x-0 rounded-full bg-terracotta/70 transition-transform duration-200 group-hover:scale-x-100" />
             </Link>
           ))}
         </nav>
@@ -43,7 +43,7 @@ export function SiteHeader() {
         <button
           aria-label="Apri menu"
           onClick={() => setOpen((v) => !v)}
-          className="rounded-sm p-2 text-foreground transition-colors hover:text-terracotta lg:hidden"
+          className="ml-auto rounded-sm p-2 text-foreground transition-colors hover:text-terracotta lg:hidden"
         >
           {open ? <X size={22} /> : <Menu size={22} />}
         </button>
