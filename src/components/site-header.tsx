@@ -21,7 +21,7 @@ export function SiteHeader() {
           <img
             src={logoAsset.url}
             alt="Furia Immobiliare"
-            className="h-14 w-auto object-contain sm:h-[68px] md:h-[76px] lg:h-[88px]"
+            className="h-16 w-auto object-contain sm:h-[72px] md:h-20 lg:h-[88px]"
           />
         </Link>
 
