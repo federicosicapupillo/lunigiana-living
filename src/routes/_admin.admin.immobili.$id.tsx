@@ -677,23 +677,18 @@ function MainTab({
       <Field label="Prezzo (€)" full>
         <div className="space-y-2">
           <NumberInput
-            value={prop.price_on_request ? null : prop.price}
+            value={prop.price}
             onChange={(v) => update({ price: v })}
             step={1000}
-            disabled={prop.price_on_request}
-            placeholder={prop.price_on_request ? "Prezzo su richiesta" : "Inserisci prezzo"}
+            placeholder="Inserisci prezzo interno"
           />
           <Toggle
-            label="Prezzo su richiesta"
+            label="Mostra come prezzo su richiesta"
             value={prop.price_on_request}
-            onChange={(v) =>
-              update(v ? { price_on_request: true, price: null } : { price_on_request: false })
-            }
+            onChange={(v) => update({ price_on_request: v })}
           />
           <p className="text-xs text-muted-foreground">
-            {prop.price_on_request
-              ? "Il prezzo non sarà mostrato. Sul sito apparirà: Prezzo su richiesta."
-              : "Attiva questa opzione se non vuoi mostrare il prezzo pubblicamente."}
+            Il prezzo resta salvato nel backend, ma sul sito verrà mostrato come “Prezzo su richiesta”.
           </p>
         </div>
       </Field>
