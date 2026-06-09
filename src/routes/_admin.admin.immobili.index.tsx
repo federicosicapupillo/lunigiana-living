@@ -39,6 +39,14 @@ type Filter =
   | "deleted"
   | "homepage";
 
+type SortBy =
+  | "newest"
+  | "oldest"
+  | "updated"
+  | "price_asc"
+  | "price_desc"
+  | "home_first";
+
 const FILTERS: Array<{ key: Filter; label: string }> = [
   { key: "all", label: "Tutti" },
   { key: "homepage", label: "In home" },
