@@ -171,29 +171,57 @@ function Index() {
 
         <div className="container-editorial w-full pb-12 pt-32 sm:pb-16 sm:pt-40 md:pb-24">
           <div className="max-w-3xl">
-            <span className="eyebrow text-cream/90">Furia Immobiliare · Pontremoli</span>
+            <span className="eyebrow text-cream/90">Agenzia immobiliare · Pontremoli · Lunigiana</span>
             <h1 className="mt-4 font-serif text-[2.4rem] leading-[1.05] text-cream sm:text-5xl sm:leading-[1.02] md:text-7xl">
-              La casa giusta in una terra<br />
-              <em className="font-normal italic text-cream/95">che lascia spazio al tempo.</em>
+              Case in vendita in Lunigiana,<br />
+              <em className="font-normal italic text-cream/95">scelte una per una.</em>
             </h1>
             <p className="mt-5 max-w-xl text-sm leading-relaxed text-cream/85 sm:text-base md:text-lg">
-              Selezioniamo case di pietra, ville panoramiche e dimore di carattere
-              in tutta la Lunigiana. Per chi non cerca solo un immobile, ma un modo
-              diverso di vivere.
+              Da 18 anni a Pontremoli. Case di pietra, ville panoramiche e
+              dimore di carattere in tutta la Lunigiana — selezionate da chi
+              questa terra la abita davvero.
             </p>
           </div>
 
-          <div className="mt-8 sm:mt-10">
+          <div className="mt-8 flex flex-wrap items-center gap-3 sm:mt-10 sm:gap-4">
             <Link
               to="/immobili"
               className="inline-flex items-center gap-2 rounded-sm bg-cream px-6 py-3.5 text-[0.7rem] uppercase tracking-[0.2em] text-ink transition hover:bg-cream/90 sm:px-8 sm:py-4 sm:text-xs sm:tracking-[0.22em]"
             >
-              Cerca la tua casa in Lunigiana <ArrowRight size={14} />
+              Vedi gli immobili <ArrowRight size={14} />
             </Link>
+            <a
+              href={`https://wa.me/393207019985?text=${encodeURIComponent("Ciao Elena, sto cercando casa in Lunigiana e vorrei ricevere maggiori informazioni.")}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 rounded-sm border border-cream/70 px-6 py-3.5 text-[0.7rem] uppercase tracking-[0.2em] text-cream transition hover:bg-cream hover:text-ink sm:px-8 sm:py-4 sm:text-xs sm:tracking-[0.22em]"
+            >
+              Parla con Elena su WhatsApp
+            </a>
           </div>
         </div>
       </section>
       )}
+
+      {/* TRUST STRIP */}
+      <section className="border-b border-border bg-cream">
+        <div className="container-editorial grid grid-cols-2 gap-6 py-8 sm:grid-cols-4 sm:py-10">
+          {[
+            { icon: HomeIcon, value: "18 anni", label: "a Pontremoli" },
+            { icon: MapPin, value: "500+", label: "immobili trattati" },
+            { icon: Compass, value: "6 comuni", label: "della Lunigiana" },
+            { icon: ShieldCheck, value: "FIAIP", label: "agenzia iscritta" },
+          ].map((s) => (
+            <div key={s.label} className="flex items-center gap-3 sm:gap-4">
+              <s.icon size={22} className="shrink-0 text-primary" />
+              <div>
+                <div className="font-serif text-xl leading-tight text-ink sm:text-2xl">{s.value}</div>
+                <div className="text-[0.7rem] uppercase tracking-[0.15em] text-foreground/70">{s.label}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
 
       {/* BRAND STATEMENT */}
       <section className="container-editorial grid gap-10 py-16 sm:py-20 md:grid-cols-12 md:gap-12 md:py-32">
