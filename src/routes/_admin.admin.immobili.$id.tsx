@@ -623,9 +623,6 @@ function MainTab({
 }) {
   return (
     <Section title="Dati principali">
-      <Field label="Slug URL">
-        <TextInput value={prop.slug} onChange={(v) => update({ slug: v })} placeholder="auto da titolo se vuoto" />
-      </Field>
       <Field label="Codice riferimento">
         <input
           type="text"
