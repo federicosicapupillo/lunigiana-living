@@ -962,7 +962,6 @@ function SelectStringInput({
   );
 }
 
-function AmenitiesTab({
 function EpiValueInput({
   value,
   onChange,
