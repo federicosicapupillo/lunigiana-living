@@ -409,32 +409,6 @@ function Index() {
       </section>
 
       {/* OLD SERVICES PLACEHOLDER REMOVED */}
-      <section className="hidden">
-        <div className="grid gap-12 md:grid-cols-2">
-          <div>
-            <span className="eyebrow">Cosa facciamo</span>
-            <h2 className="mt-3 font-serif text-3xl leading-tight text-ink sm:text-4xl md:text-5xl">
-              Un servizio sartoriale,<br />una conoscenza locale.
-            </h2>
-          </div>
-          <div className="grid gap-6">
-            {[
-              { icon: Compass, title: "Ricerca su misura per te", body: "Ci racconti che casa cerchi: noi filtriamo l'inventario e ti portiamo solo gli immobili che hanno davvero senso." },
-              { icon: KeyRound, title: "Visite guidate sul posto", body: "Ti accompagniamo immobile per immobile, anche se vivi lontano. Ti raccontiamo il borgo, non solo le mura." },
-              { icon: Sparkles, title: "Trattativa e rogito chiari", body: "Ti seguiamo dalla prima visita al notaio, con stime oneste e nessuna pressione di vendita." },
-            ].map((s) => (
-              <div key={s.title} className="flex gap-5 border-t border-border pt-6">
-                <s.icon size={22} className="mt-1 shrink-0 text-primary" />
-                <div>
-                  <h3 className="font-serif text-2xl text-ink">{s.title}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-foreground/75">{s.body}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* REVIEWS */}
       <section className="section-sand py-16 sm:py-20 md:py-24">
         <div className="container-editorial">
