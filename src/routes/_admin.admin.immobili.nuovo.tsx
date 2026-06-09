@@ -234,7 +234,10 @@ function NewPropertyPage() {
 
       const payload = {
         title: f.title.trim(),
-        slug: slugify(f.title),
+        slug: slugify(
+          [f.title, f.municipality].filter((v) => v && v.trim()).join(" ") ||
+            "immobile",
+        ),
         property_type: f.property_type || null,
         contract_type: f.contract_type || null,
         price: f.price_on_request ? null : toNum(f.price),
