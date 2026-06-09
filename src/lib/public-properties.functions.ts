@@ -223,9 +223,11 @@ export const listPublishedProperties = createServerFn({ method: "GET" }).handler
   const { data: props, error } = await supabaseAdmin
     .from("properties")
     .select(
-      "id, slug, reference_code, title, municipality, area_zone, price, price_on_request, property_type, contract_type, size_sqm, bedrooms, bathrooms, floors, short_notes, panoramic_view, historic_property, featured, energy_class, energy_performance_index_status, energy_performance_index_value",
+      "id, slug, reference_code, title, municipality, area_zone, price, price_on_request, property_type, contract_type, size_sqm, bedrooms, bathrooms, floors, short_notes, panoramic_view, historic_property, featured, homepage_order, featured_at, energy_class, energy_performance_index_status, energy_performance_index_value",
     )
     .eq("status", "published")
+    .order("homepage_order", { ascending: true, nullsFirst: false })
+    .order("featured_at", { ascending: false, nullsFirst: false })
     .order("updated_at", { ascending: false });
   if (error) throw new Error(error.message);
   const propRows = (props ?? []) as PropertyRow[];
