@@ -10,6 +10,7 @@ import {
   ImagePlus,
   CheckCircle2,
   Info,
+  Sparkles,
 } from "lucide-react";
 import {
   PROPERTY_TYPES,
@@ -349,12 +350,20 @@ function NewPropertyPage() {
     <div className="mx-auto max-w-6xl px-4 py-5 pb-32 sm:px-6 sm:py-8 sm:pb-8">
       {/* Sticky header */}
       <div className="sticky top-0 z-10 -mx-4 mb-6 border-b border-border bg-background/95 px-4 pb-4 pt-3 backdrop-blur sm:-mx-6 sm:mb-8 sm:px-6 sm:pb-5 sm:pt-4">
-        <Link
-          to="/admin/immobili"
-          className="inline-flex items-center gap-1 text-xs uppercase tracking-wider text-muted-foreground hover:text-ink"
-        >
-          <ArrowLeft size={12} /> Torna all'elenco
-        </Link>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <Link
+            to="/admin/immobili"
+            className="inline-flex items-center gap-1 text-xs uppercase tracking-wider text-muted-foreground hover:text-ink"
+          >
+            <ArrowLeft size={12} /> Torna all'elenco
+          </Link>
+          <Link
+            to="/admin/immobili/assistente"
+            className="inline-flex items-center gap-2 rounded-sm border border-primary bg-primary/10 px-3 py-1.5 text-[11px] uppercase tracking-wider text-primary hover:bg-primary/20"
+          >
+            <Sparkles size={13} /> Crea con IA
+          </Link>
+        </div>
         <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end sm:justify-between sm:gap-4">
           <div className="min-w-0 flex-1">
             <h1 className="font-serif text-2xl text-ink sm:text-3xl">
