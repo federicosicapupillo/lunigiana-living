@@ -208,6 +208,8 @@ export const aiAssistantFinalize = createServerFn({ method: "POST" })
 const ApplyInput = z.object({
   draft: z.record(z.any()),
   messages: z.array(z.object({ role: z.string(), content: z.string() })).max(60),
+  aiInputType: z.enum(["text", "audio"]).optional(),
+  audioTranscript: z.string().max(20000).optional(),
 });
 
 function slugify(s: string) {
