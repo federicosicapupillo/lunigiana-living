@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import logoAsset from "@/assets/furia-logo-footer.png.asset.json";
+import logoAsset from "@/assets/furia-logo.png.asset.json";
 
 export function SiteFooter() {
   return (
@@ -10,7 +10,7 @@ export function SiteFooter() {
             <img
               src={logoAsset.url}
               alt="Furia Immobiliare"
-              className="h-auto w-[100px] object-contain md:w-[115px]"
+              className="h-auto w-[130px] object-contain md:w-[160px]"
             />
           </div>
           <p className="mt-4 max-w-md text-sm leading-relaxed text-cream/70">
