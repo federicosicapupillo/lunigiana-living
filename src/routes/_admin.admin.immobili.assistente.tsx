@@ -1,12 +1,14 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { ArrowLeft, Sparkles, Send, Loader2, Wand2, CheckCircle2, RefreshCw, X } from "lucide-react";
+import { ArrowLeft, Sparkles, Send, Loader2, Wand2, CheckCircle2, RefreshCw, X, Mic, Square, Play, Pause } from "lucide-react";
 import { toast } from "sonner";
 import {
   aiAssistantReply,
   aiAssistantFinalize,
   aiAssistantApplyDraft,
+  aiAssistantTranscribeAudio,
+  aiAssistantDraftFromText,
   type AiDraft,
 } from "@/lib/ai-assistant.functions";
 
@@ -16,6 +18,9 @@ export const Route = createFileRoute("/_admin/admin/immobili/assistente")({
       { title: "Assistente IA annuncio — Admin Furia" },
       { name: "robots", content: "noindex,nofollow" },
     ],
+  }),
+  validateSearch: (s: Record<string, unknown>) => ({
+    audio: s.audio === 1 || s.audio === "1" ? 1 : undefined,
   }),
   component: AssistentePage,
 });
@@ -45,18 +50,27 @@ function estimateProgress(messages: Msg[]): number {
 
 function AssistentePage() {
   const navigate = useNavigate();
+  const search = Route.useSearch();
   const [messages, setMessages] = useState<Msg[]>([FIRST_TURN]);
   const [input, setInput] = useState("");
   const [thinking, setThinking] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [applying, setApplying] = useState(false);
   const [draft, setDraft] = useState<AiDraft | null>(null);
+  const [audioOpen, setAudioOpen] = useState(false);
+  const [audioTranscript, setAudioTranscript] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   const replyFn = useServerFn(aiAssistantReply);
   const finalizeFn = useServerFn(aiAssistantFinalize);
   const applyFn = useServerFn(aiAssistantApplyDraft);
+  const transcribeFn = useServerFn(aiAssistantTranscribeAudio);
+  const draftFromTextFn = useServerFn(aiAssistantDraftFromText);
+
+  useEffect(() => {
+    if (search.audio === 1) setAudioOpen(true);
+  }, [search.audio]);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
@@ -109,7 +123,14 @@ function AssistentePage() {
     setApplying(true);
     try {
       const { propertyId } = await applyFn({
-        data: { draft: draft as unknown as Record<string, unknown>, messages },
+        data: {
+          draft: draft as unknown as Record<string, unknown>,
+          messages: audioTranscript
+            ? [{ role: "user" as const, content: audioTranscript.slice(0, 8000) }]
+            : messages,
+          aiInputType: audioTranscript ? "audio" : "text",
+          audioTranscript: audioTranscript ?? undefined,
+        },
       });
       toast.success("Bozza creata! Ora carica le foto e rivedi i dettagli.");
       navigate({ to: "/admin/immobili/$id", params: { id: propertyId } });
@@ -117,6 +138,25 @@ function AssistentePage() {
       toast.error(e instanceof Error ? e.message : "Errore salvataggio");
     } finally {
       setApplying(false);
+    }
+  };
+
+  const handleAudioDraft = async (transcript: string) => {
+    const text = transcript.trim();
+    if (text.length < 20) {
+      toast.error("Trascrizione troppo breve.");
+      return;
+    }
+    setGenerating(true);
+    try {
+      const { draft: d } = await draftFromTextFn({ data: { text } });
+      setAudioTranscript(text);
+      setDraft(d);
+      setAudioOpen(false);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Errore generazione bozza");
+    } finally {
+      setGenerating(false);
     }
   };
 
@@ -138,13 +178,22 @@ function AssistentePage() {
           </h1>
         </div>
         {!draft && (
-          <button
-            onClick={generate}
-            disabled={generating || thinking}
-            className="inline-flex items-center gap-2 rounded-sm bg-primary px-4 py-2 text-xs uppercase tracking-[0.18em] text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
-          >
-            {generating ? <Loader2 size={14} className="animate-spin" /> : <Wand2 size={14} />} Genera bozza
-          </button>
+          <div className="flex flex-wrap gap-2">
+            <button
+              onClick={() => setAudioOpen(true)}
+              disabled={generating || thinking}
+              className="inline-flex items-center gap-2 rounded-sm border border-primary bg-primary/10 px-4 py-2 text-xs uppercase tracking-[0.18em] text-primary hover:bg-primary/20 disabled:opacity-50"
+            >
+              <Mic size={14} /> Detta annuncio con audio
+            </button>
+            <button
+              onClick={generate}
+              disabled={generating || thinking}
+              className="inline-flex items-center gap-2 rounded-sm bg-primary px-4 py-2 text-xs uppercase tracking-[0.18em] text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
+            >
+              {generating ? <Loader2 size={14} className="animate-spin" /> : <Wand2 size={14} />} Genera bozza
+            </button>
+          </div>
         )}
       </div>
 
@@ -225,6 +274,18 @@ function AssistentePage() {
             </p>
           </div>
         </>
+      )}
+
+      {audioOpen && (
+        <AudioDictationModal
+          onClose={() => setAudioOpen(false)}
+          onTranscribe={async (b64, format) => {
+            const { transcript } = await transcribeFn({ data: { audioBase64: b64, format } });
+            return transcript;
+          }}
+          onAnalyze={handleAudioDraft}
+          analyzing={generating}
+        />
       )}
     </div>
   );
