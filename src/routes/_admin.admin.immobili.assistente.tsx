@@ -74,7 +74,7 @@ function AssistentePage() {
     setInput("");
     setThinking(true);
     try {
-      const { reply } = await replyFn({ data: { messages: next.filter((m) => m.role !== "assistant" || messages.indexOf(m) > 0 || m !== FIRST_TURN ? true : true) } });
+      const { reply } = await replyFn({ data: { messages: next } });
       setMessages((prev) => [...prev, { role: "assistant", content: reply.replace(/\[PRONTO_PER_RIEPILOGO\]/g, "").trim() }]);
       if (/\[PRONTO_PER_RIEPILOGO\]/.test(reply)) {
         // Auto-trigger generation hint

@@ -25,6 +25,7 @@ import { Route as AdminAdminIndexRouteImport } from './routes/_admin.admin.index
 import { Route as AdminAdminImpostazioniRouteImport } from './routes/_admin.admin.impostazioni'
 import { Route as AdminAdminImmobiliIndexRouteImport } from './routes/_admin.admin.immobili.index'
 import { Route as AdminAdminImmobiliNuovoRouteImport } from './routes/_admin.admin.immobili.nuovo'
+import { Route as AdminAdminImmobiliAssistenteRouteImport } from './routes/_admin.admin.immobili.assistente'
 import { Route as AdminAdminImmobiliIdRouteImport } from './routes/_admin.admin.immobili.$id'
 
 const TerritoriRoute = TerritoriRouteImport.update({
@@ -106,6 +107,12 @@ const AdminAdminImmobiliNuovoRoute = AdminAdminImmobiliNuovoRouteImport.update({
   path: '/immobili/nuovo',
   getParentRoute: () => AdminAdminRoute,
 } as any)
+const AdminAdminImmobiliAssistenteRoute =
+  AdminAdminImmobiliAssistenteRouteImport.update({
+    id: '/immobili/assistente',
+    path: '/immobili/assistente',
+    getParentRoute: () => AdminAdminRoute,
+  } as any)
 const AdminAdminImmobiliIdRoute = AdminAdminImmobiliIdRouteImport.update({
   id: '/immobili/$id',
   path: '/immobili/$id',
@@ -127,6 +134,7 @@ export interface FileRoutesByFullPath {
   '/admin/impostazioni': typeof AdminAdminImpostazioniRoute
   '/admin/': typeof AdminAdminIndexRoute
   '/admin/immobili/$id': typeof AdminAdminImmobiliIdRoute
+  '/admin/immobili/assistente': typeof AdminAdminImmobiliAssistenteRoute
   '/admin/immobili/nuovo': typeof AdminAdminImmobiliNuovoRoute
   '/admin/immobili/': typeof AdminAdminImmobiliIndexRoute
 }
@@ -143,6 +151,7 @@ export interface FileRoutesByTo {
   '/admin/impostazioni': typeof AdminAdminImpostazioniRoute
   '/admin': typeof AdminAdminIndexRoute
   '/admin/immobili/$id': typeof AdminAdminImmobiliIdRoute
+  '/admin/immobili/assistente': typeof AdminAdminImmobiliAssistenteRoute
   '/admin/immobili/nuovo': typeof AdminAdminImmobiliNuovoRoute
   '/admin/immobili': typeof AdminAdminImmobiliIndexRoute
 }
@@ -163,6 +172,7 @@ export interface FileRoutesById {
   '/_admin/admin/impostazioni': typeof AdminAdminImpostazioniRoute
   '/_admin/admin/': typeof AdminAdminIndexRoute
   '/_admin/admin/immobili/$id': typeof AdminAdminImmobiliIdRoute
+  '/_admin/admin/immobili/assistente': typeof AdminAdminImmobiliAssistenteRoute
   '/_admin/admin/immobili/nuovo': typeof AdminAdminImmobiliNuovoRoute
   '/_admin/admin/immobili/': typeof AdminAdminImmobiliIndexRoute
 }
@@ -183,6 +193,7 @@ export interface FileRouteTypes {
     | '/admin/impostazioni'
     | '/admin/'
     | '/admin/immobili/$id'
+    | '/admin/immobili/assistente'
     | '/admin/immobili/nuovo'
     | '/admin/immobili/'
   fileRoutesByTo: FileRoutesByTo
@@ -199,6 +210,7 @@ export interface FileRouteTypes {
     | '/admin/impostazioni'
     | '/admin'
     | '/admin/immobili/$id'
+    | '/admin/immobili/assistente'
     | '/admin/immobili/nuovo'
     | '/admin/immobili'
   id:
@@ -218,6 +230,7 @@ export interface FileRouteTypes {
     | '/_admin/admin/impostazioni'
     | '/_admin/admin/'
     | '/_admin/admin/immobili/$id'
+    | '/_admin/admin/immobili/assistente'
     | '/_admin/admin/immobili/nuovo'
     | '/_admin/admin/immobili/'
   fileRoutesById: FileRoutesById
@@ -348,6 +361,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAdminImmobiliNuovoRouteImport
       parentRoute: typeof AdminAdminRoute
     }
+    '/_admin/admin/immobili/assistente': {
+      id: '/_admin/admin/immobili/assistente'
+      path: '/immobili/assistente'
+      fullPath: '/admin/immobili/assistente'
+      preLoaderRoute: typeof AdminAdminImmobiliAssistenteRouteImport
+      parentRoute: typeof AdminAdminRoute
+    }
     '/_admin/admin/immobili/$id': {
       id: '/_admin/admin/immobili/$id'
       path: '/immobili/$id'
@@ -362,6 +382,7 @@ interface AdminAdminRouteChildren {
   AdminAdminImpostazioniRoute: typeof AdminAdminImpostazioniRoute
   AdminAdminIndexRoute: typeof AdminAdminIndexRoute
   AdminAdminImmobiliIdRoute: typeof AdminAdminImmobiliIdRoute
+  AdminAdminImmobiliAssistenteRoute: typeof AdminAdminImmobiliAssistenteRoute
   AdminAdminImmobiliNuovoRoute: typeof AdminAdminImmobiliNuovoRoute
   AdminAdminImmobiliIndexRoute: typeof AdminAdminImmobiliIndexRoute
 }
@@ -370,6 +391,7 @@ const AdminAdminRouteChildren: AdminAdminRouteChildren = {
   AdminAdminImpostazioniRoute: AdminAdminImpostazioniRoute,
   AdminAdminIndexRoute: AdminAdminIndexRoute,
   AdminAdminImmobiliIdRoute: AdminAdminImmobiliIdRoute,
+  AdminAdminImmobiliAssistenteRoute: AdminAdminImmobiliAssistenteRoute,
   AdminAdminImmobiliNuovoRoute: AdminAdminImmobiliNuovoRoute,
   AdminAdminImmobiliIndexRoute: AdminAdminImmobiliIndexRoute,
 }
