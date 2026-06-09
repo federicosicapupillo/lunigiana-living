@@ -10,6 +10,7 @@ import { PropertyCard } from "@/components/property-card";
 import { PropertySearchBar } from "@/components/property-search-bar";
 import { listPublishedProperties, type PublicProperty } from "@/lib/public-properties.functions";
 import { getHomeHeroVariant, type HomeHeroVariant } from "@/lib/site-settings.functions";
+import { LeadForm } from "@/components/lead-form";
 import { ArrowRight, Compass, KeyRound, Sparkles, Star, ShieldCheck, MapPin, Home as HomeIcon } from "lucide-react";
 
 const AGENCY_FACTS = {
