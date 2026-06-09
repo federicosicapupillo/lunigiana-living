@@ -278,6 +278,20 @@ function AdminPropertiesPage() {
             </button>
           ))}
         </div>
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-muted-foreground uppercase tracking-wider">Ordina</span>
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value as SortBy)}
+            className="rounded-sm border border-border bg-background px-3 py-1.5 text-xs uppercase tracking-wider text-ink focus:border-primary focus:outline-none"
+          >
+            {SORT_OPTIONS.map((s) => (
+              <option key={s.key} value={s.key}>
+                {s.label}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
       {loading ? (
