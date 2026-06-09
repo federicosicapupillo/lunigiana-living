@@ -93,10 +93,10 @@ function AdminPropertiesPage() {
     const { data, error } = await supabase
       .from("properties")
       .select(
-        `id, title, municipality, property_type, price, price_on_request, status, updated_at, featured, homepage_order,
+        `id, title, municipality, property_type, price, price_on_request, status, created_at, updated_at, featured, homepage_order,
          property_images!left ( image_url, is_cover, sort_order )`,
       )
-      .order("updated_at", { ascending: false });
+      .order("created_at", { ascending: false });
     if (error) {
       toast.error(`Errore caricamento: ${error.message}`);
       setLoading(false);
