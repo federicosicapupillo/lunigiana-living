@@ -211,7 +211,7 @@ function Index() {
       )}
 
       {/* TRUST STRIP */}
-      <section className="border-b border-border bg-cream">
+      <section className="border-b border-warm-border/60 section-ivory">
         <div className="container-editorial grid grid-cols-2 gap-6 py-8 sm:grid-cols-4 sm:py-10">
           {[
             { icon: HomeIcon, value: "18 anni", label: "a Pontremoli" },
@@ -231,7 +231,8 @@ function Index() {
       </section>
 
       {/* BRAND STATEMENT */}
-      <section className="container-editorial grid gap-10 py-16 sm:py-20 md:grid-cols-12 md:gap-12 md:py-32">
+      <section className="section-cream">
+      <div className="container-editorial grid gap-10 py-16 sm:py-20 md:grid-cols-12 md:gap-12 md:py-32">
         <div className="md:col-span-5">
           <span className="eyebrow">Chi siamo</span>
           <h2 className="mt-4 font-serif text-3xl leading-tight text-ink sm:text-4xl md:text-5xl">
@@ -257,10 +258,11 @@ function Index() {
             <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
           </Link>
         </div>
+      </div>
       </section>
 
       {/* FEATURED PROPERTIES */}
-      <section className="bg-muted/40 py-16 sm:py-20 md:py-32">
+      <section className="section-sand py-16 sm:py-20 md:py-32">
         <div className="container-editorial">
           <div className="flex flex-wrap items-end justify-between gap-6">
             <div>
@@ -291,7 +293,7 @@ function Index() {
       </section>
 
       {/* LEAD FORM */}
-      <section className="bg-cream py-16 sm:py-20 md:py-24">
+      <section className="section-ivory py-16 sm:py-20 md:py-24">
         <div className="container-editorial grid gap-10 md:grid-cols-12 md:gap-12">
           <div className="md:col-span-5">
             <span className="eyebrow">Cerchi casa</span>
@@ -309,7 +311,7 @@ function Index() {
             </div>
           </div>
           <div className="md:col-span-7">
-            <div className="rounded-sm border border-border bg-background p-6 shadow-sm sm:p-8">
+            <div className="rounded-md border border-warm-border/70 bg-warm-cream p-6 shadow-[0_1px_0_rgba(36,23,17,.04),0_18px_38px_-24px_rgba(36,23,17,.25)] sm:p-8">
               <LeadForm />
             </div>
           </div>
@@ -317,7 +319,8 @@ function Index() {
       </section>
 
       {/* WHY LUNIGIANA */}
-      <section className="container-editorial py-16 sm:py-20 md:py-32">
+      <section className="section-cream">
+      <div className="container-editorial py-16 sm:py-20 md:py-32">
         <div className="grid gap-12 md:grid-cols-12 md:items-center">
           <div className="md:col-span-8 lg:col-span-7">
             <span className="eyebrow">Vivere in Lunigiana</span>
@@ -332,12 +335,13 @@ function Index() {
             </p>
             <Link
               to="/territori"
-              className="mt-8 inline-flex items-center gap-2 rounded-sm bg-ink px-6 py-3.5 text-xs uppercase tracking-[0.2em] text-cream transition hover:bg-ink/90"
+              className="mt-8 inline-flex items-center gap-2 rounded-md bg-terracotta px-6 py-3.5 text-xs uppercase tracking-[0.2em] text-cream transition hover:bg-[color:var(--terracotta-hover)]"
             >
               Esplora il territorio <ArrowRight size={14} />
             </Link>
           </div>
         </div>
+      </div>
       </section>
 
       {/* TERRITORIES STRIP */}
@@ -373,7 +377,39 @@ function Index() {
       </section>
 
       {/* SERVICES */}
-      <section className="container-editorial py-16 sm:py-20 md:py-32">
+      <section className="section-ivory">
+      <div className="container-editorial py-16 sm:py-20 md:py-32">
+        <div className="grid gap-12 md:grid-cols-12">
+          <div className="md:col-span-5">
+            <span className="eyebrow">Cosa facciamo</span>
+            <h2 className="mt-3 font-serif text-3xl leading-tight text-ink sm:text-4xl md:text-5xl">
+              Un servizio sartoriale,<br />una conoscenza locale.
+            </h2>
+            <p className="mt-5 max-w-md text-base leading-relaxed text-foreground/75">
+              Ogni richiesta ha la sua storia. Ti accompagniamo passo per passo,
+              con attenzione vera per la casa e per chi ci abiterà.
+            </p>
+          </div>
+          <div className="grid gap-6 md:col-span-7">
+            {[
+              { icon: Compass, title: "Ricerca su misura per te", body: "Ci racconti che casa cerchi: noi filtriamo l'inventario e ti portiamo solo gli immobili che hanno davvero senso." },
+              { icon: KeyRound, title: "Visite guidate sul posto", body: "Ti accompagniamo immobile per immobile, anche se vivi lontano. Ti raccontiamo il borgo, non solo le mura." },
+              { icon: Sparkles, title: "Trattativa e rogito chiari", body: "Ti seguiamo dalla prima visita al notaio, con stime oneste e nessuna pressione di vendita." },
+            ].map((s) => (
+              <div key={s.title} className="card-service">
+                <span className="icon-badge"><s.icon size={20} /></span>
+                <h3 className="font-serif text-2xl text-ink">{s.title}</h3>
+                <span className="title-rule" />
+                <p className="mt-3 text-sm leading-relaxed text-foreground/80">{s.body}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+      </section>
+
+      {/* OLD SERVICES PLACEHOLDER REMOVED */}
+      <section className="hidden">
         <div className="grid gap-12 md:grid-cols-2">
           <div>
             <span className="eyebrow">Cosa facciamo</span>
@@ -400,7 +436,7 @@ function Index() {
       </section>
 
       {/* REVIEWS */}
-      <section className="bg-muted/40 py-16 sm:py-20 md:py-24">
+      <section className="section-sand py-16 sm:py-20 md:py-24">
         <div className="container-editorial">
           <div className="mx-auto max-w-3xl text-center">
             <span className="eyebrow">Cosa dicono di noi</span>
@@ -420,7 +456,7 @@ function Index() {
               href={AGENCY_FACTS.googleReviewsUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-8 inline-flex items-center gap-2 rounded-sm bg-ink px-6 py-3.5 text-xs uppercase tracking-[0.2em] text-cream transition hover:bg-ink/90 sm:px-8 sm:py-4 sm:tracking-[0.22em]"
+              className="mt-8 inline-flex items-center gap-2 rounded-md bg-terracotta px-6 py-3.5 text-xs uppercase tracking-[0.2em] text-cream transition hover:bg-[color:var(--terracotta-hover)] sm:px-8 sm:py-4 sm:tracking-[0.22em]"
             >
               Leggi le recensioni su Google <ArrowRight size={14} />
             </a>
