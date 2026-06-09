@@ -180,7 +180,7 @@ function AdminPropertiesPage() {
       }
     }
     return list;
-  }, [rows, q, statusFilter]);
+  }, [rows, q, statusFilter, sortBy]);
 
   const counts = useMemo(() => {
     const c: Record<Filter, number> = {
