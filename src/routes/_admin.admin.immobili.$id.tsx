@@ -906,29 +906,11 @@ function FeaturesTab({
           ))}
         </select>
         {prop.energy_performance_index_status === "precise_value" && (
-          <div className="mt-2 flex items-center gap-2">
-            <input
-              type="text"
-              inputMode="decimal"
-              value={prop.energy_performance_index_value ?? ""}
-              onChange={(e) => {
-                const raw = e.target.value.replace(",", ".");
-                if (raw === "") {
-                  update({ energy_performance_index_value: null });
-                  return;
-                }
-                const n = Number(raw);
-                update({
-                  energy_performance_index_value: Number.isFinite(n) ? n : null,
-                });
-              }}
-              placeholder="Es. 135"
-              className={inputCls}
-            />
-            <span className="shrink-0 text-xs uppercase tracking-wider text-muted-foreground">
-              kWh/m² anno
-            </span>
-          </div>
+          <EpiValueInput
+            value={prop.energy_performance_index_value}
+            onChange={(v) => update({ energy_performance_index_value: v })}
+            className={inputCls}
+          />
         )}
       </Field>
 
