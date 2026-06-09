@@ -262,6 +262,11 @@ function AdminPropertiesPage() {
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                     <h3 className="min-w-0 flex-1 truncate font-serif text-base text-ink sm:text-lg">{r.title}</h3>
+                    {r.featured && (
+                      <span className="inline-flex items-center gap-1 rounded-sm border border-amber-300 bg-amber-50 px-2 py-0.5 text-[10px] uppercase tracking-wider text-amber-800">
+                        <Star size={10} className="fill-amber-500 text-amber-500" /> In home{r.homepage_order ? ` · ${r.homepage_order}` : ""}
+                      </span>
+                    )}
                     <StatusBadge status={r.status} />
                   </div>
                   <p className="mt-1 truncate text-xs text-muted-foreground">
@@ -289,6 +294,33 @@ function AdminPropertiesPage() {
                 </div>
               </Link>
               <div className="relative shrink-0">
+                <button
+                  type="button"
+                  onClick={async (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const next = !r.featured;
+                    const { error } = await supabase
+                      .from("properties")
+                      .update({ featured: next })
+                      .eq("id", r.id);
+                    if (error) {
+                      toast.error(error.message);
+                      return;
+                    }
+                    toast.success(next ? "Aggiunto alla home" : "Rimosso dalla home");
+                    await load();
+                  }}
+                  aria-label={r.featured ? "Rimuovi dalla home" : "Aggiungi alla home"}
+                  title={r.featured ? "Rimuovi dalla home" : "Aggiungi alla home"}
+                  className={`mr-1 inline-flex h-9 w-9 items-center justify-center rounded-sm border transition ${
+                    r.featured
+                      ? "border-amber-300 bg-amber-50 text-amber-700 hover:border-amber-400"
+                      : "border-border text-muted-foreground hover:border-primary/50 hover:text-ink"
+                  }`}
+                >
+                  <Star size={15} className={r.featured ? "fill-amber-500 text-amber-500" : ""} />
+                </button>
                 <button
                   type="button"
                   onClick={(e) => {
