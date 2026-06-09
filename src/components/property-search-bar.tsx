@@ -49,6 +49,19 @@ const PRICE_MAX_OPTS = [
   { label: "Oltre 1.000.000 €", value: "1000001" },
 ];
 
+const RENT_MIN_STEPS = [300, 500, 700, 900, 1200, 1500, 2000];
+const RENT_MAX_STEPS = [500, 700, 900, 1200, 1500, 2000, 3000];
+const RENT_MIN_OPTS = [
+  { label: "Nessun minimo", value: "" },
+  ...RENT_MIN_STEPS.map((n) => ({ label: fmtPrice(n), value: String(n) })),
+  { label: "Oltre 2.000 €", value: "2001" },
+];
+const RENT_MAX_OPTS = [
+  { label: "Nessun massimo", value: "" },
+  ...RENT_MAX_STEPS.map((n) => ({ label: fmtPrice(n), value: String(n) })),
+  { label: "Oltre 3.000 €", value: "3001" },
+];
+
 const FEATURE_GROUPS: { label: string; items: string[] }[] = [
   {
     label: "Esterni",
