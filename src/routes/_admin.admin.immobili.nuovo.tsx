@@ -97,7 +97,6 @@ type FormState = {
   amenities: Record<string, boolean>;
   altre_dotazioni: string;
   // Sezione 4
-  short_notes: string;
   long_description: string;
   internal_notes: string;
   multi: Record<MultiSelectKey, MultiSelectValue>;
@@ -137,7 +136,6 @@ const empty: FormState = {
   furnished: "",
   amenities: {},
   altre_dotazioni: "",
-  short_notes: "",
   long_description: "",
   internal_notes: "",
   multi: {
@@ -263,7 +261,6 @@ function NewPropertyPage() {
           f.epi_status === "precise_value" ? toNum(f.epi_value.replace(",", ".")) : null,
         furnished: furnishedBool,
         ...amenityBools,
-        short_notes: f.short_notes.trim() || null,
         internal_notes: f.internal_notes.trim() || null,
         created_by: userId,
       };
@@ -669,14 +666,6 @@ function NewPropertyPage() {
 
         {/* SEZIONE 4 */}
         <Section title="4. Descrizione e contenuti" subtitle="Testi pubblici e note interne">
-          <Field label="Descrizione breve" full>
-            <TextArea
-              value={f.short_notes}
-              onChange={(v) => upd("short_notes", v)}
-              rows={3}
-              placeholder="Sintesi di 1-2 righe per le card e i risultati di ricerca"
-            />
-          </Field>
           <Field label="Descrizione completa" full>
             <TextArea
               value={f.long_description}
@@ -698,12 +687,12 @@ function NewPropertyPage() {
               />
             </Field>
           ))}
-          <Field label="Note interne (non pubbliche)" full>
+          <Field label="Note private agenzia" full>
             <TextArea
               value={f.internal_notes}
               onChange={(v) => upd("internal_notes", v)}
               rows={3}
-              placeholder="Visibili solo allo staff: prezzo trattabile, contatti proprietario, ecc."
+              placeholder="Appunti interni non visibili al pubblico."
             />
           </Field>
         </Section>
