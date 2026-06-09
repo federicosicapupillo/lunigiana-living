@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Loader2, Save, CloudDownload, RefreshCw } from "lucide-react";
+import { Loader2, Save, CloudDownload, RefreshCw, Wand2, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { useServerFn } from "@tanstack/react-start";
 import {
@@ -9,6 +9,10 @@ import {
   type HomeHeroVariant,
 } from "@/lib/site-settings.functions";
 import { syncAllImportedImages } from "@/lib/property-render.functions";
+import {
+  enhanceAllImages,
+  publishAllEnhancedImages,
+} from "@/lib/property-enhance.functions";
 import heroLunigiana from "@/assets/real/hero-tramonto-ulivi.png.asset.json";
 import heroPontremoli from "@/assets/real/pontremoli-hero-centro-storico.png.asset.json";
 import heroElena from "@/assets/elena-furia.png.asset.json";
@@ -48,6 +52,8 @@ function SettingsPage() {
   const get = useServerFn(getHomeHeroVariant);
   const set = useServerFn(setHomeHeroVariant);
   const syncAll = useServerFn(syncAllImportedImages);
+  const enhanceAll = useServerFn(enhanceAllImages);
+  const publishAll = useServerFn(publishAllEnhancedImages);
   const [variant, setVariant] = useState<HomeHeroVariant>("lunigiana_emotional");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -56,6 +62,13 @@ function SettingsPage() {
     | { total: number; synced: number; alreadyOk: number; failed: number; errors: Array<{ imageId: string; message: string }> }
     | null
   >(null);
+  const [enhancing, setEnhancing] = useState(false);
+  const [enhanceResult, setEnhanceResult] = useState<
+    | { total: number; enhanced: number; failed: number; skipped: number; errors: Array<{ imageId: string; message: string }> }
+    | null
+  >(null);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [publishing, setPublishing] = useState(false);
 
   useEffect(() => {
     get()
@@ -87,6 +100,35 @@ function SettingsPage() {
       toast.error(e instanceof Error ? e.message : "Errore sincronizzazione");
     } finally {
       setSyncing(false);
+    }
+  };
+
+  const runEnhance = async (onlyErrors: boolean) => {
+    setEnhancing(true);
+    setEnhanceResult(null);
+    setConfirmOpen(false);
+    try {
+      const res = await enhanceAll({ data: { onlyErrors } });
+      setEnhanceResult(res);
+      if (res.failed === 0) toast.success(`Miglioramento completato · ${res.enhanced} foto`);
+      else toast.warning(`Completato con ${res.failed} errori · ${res.enhanced} ok`);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Errore miglioramento");
+    } finally {
+      setEnhancing(false);
+    }
+  };
+
+  const runPublishAll = async () => {
+    if (!confirm("Pubblicare tutte le versioni migliorate disponibili come foto pubbliche?")) return;
+    setPublishing(true);
+    try {
+      const res = await publishAll();
+      toast.success(`${res.published} foto migliorate pubblicate`);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Errore pubblicazione");
+    } finally {
+      setPublishing(false);
     }
   };
 
@@ -210,6 +252,110 @@ function SettingsPage() {
                 </ul>
               </details>
             )}
+          </div>
+        )}
+      </section>
+
+      <section className="mt-16 border-t border-border pt-10">
+        <h2 className="font-serif text-xl text-ink">Miglioramento fotografico</h2>
+        <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
+          Crea una versione ottimizzata di tutte le foto degli immobili (luminosità, contrasto,
+          bilanciamento del bianco, nitidezza). L'originale non viene mai modificato: scegli
+          immobile per immobile quale versione mostrare al pubblico.
+        </p>
+        <div className="mt-5 flex flex-wrap gap-3">
+          <button
+            type="button"
+            onClick={() => setConfirmOpen(true)}
+            disabled={enhancing}
+            className="inline-flex items-center gap-2 rounded-sm bg-primary px-5 py-2.5 text-xs uppercase tracking-[0.2em] text-primary-foreground transition hover:bg-primary/90 disabled:opacity-60"
+          >
+            {enhancing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wand2 size={14} />}
+            Migliora tutte le foto esistenti
+          </button>
+          {enhanceResult && enhanceResult.failed > 0 && (
+            <button
+              type="button"
+              onClick={() => runEnhance(true)}
+              disabled={enhancing}
+              className="inline-flex items-center gap-2 rounded-sm border border-border bg-background px-5 py-2.5 text-xs uppercase tracking-[0.2em] text-ink transition hover:border-primary/50 disabled:opacity-60"
+            >
+              <RefreshCw size={14} /> Riprova solo le foto fallite
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={runPublishAll}
+            disabled={publishing}
+            className="inline-flex items-center gap-2 rounded-sm border border-border bg-background px-5 py-2.5 text-xs uppercase tracking-[0.2em] text-ink transition hover:border-primary/50 disabled:opacity-60"
+          >
+            {publishing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload size={14} />}
+            Pubblica tutte le versioni migliorate
+          </button>
+        </div>
+        {enhancing && (
+          <p className="mt-4 text-sm text-muted-foreground">
+            Miglioramento in corso… (può richiedere alcuni minuti)
+          </p>
+        )}
+        {enhanceResult && (
+          <div className="mt-6 rounded-sm border border-border bg-muted/30 p-4 text-sm">
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+              <Stat label="Elaborate" value={enhanceResult.total} />
+              <Stat label="Migliorate" value={enhanceResult.enhanced} tone="ok" />
+              <Stat label="Saltate" value={enhanceResult.skipped} />
+              <Stat label="Errori" value={enhanceResult.failed} tone={enhanceResult.failed > 0 ? "error" : undefined} />
+            </div>
+            {enhanceResult.errors.length > 0 && (
+              <details className="mt-4">
+                <summary className="cursor-pointer text-xs uppercase tracking-wider text-muted-foreground">
+                  Dettagli errori ({enhanceResult.errors.length})
+                </summary>
+                <ul className="mt-2 max-h-60 space-y-1 overflow-auto text-xs text-destructive">
+                  {enhanceResult.errors.map((e) => (
+                    <li key={e.imageId} className="font-mono">
+                      {e.imageId.slice(0, 8)}… — {e.message}
+                    </li>
+                  ))}
+                </ul>
+              </details>
+            )}
+          </div>
+        )}
+
+        {confirmOpen && (
+          <div
+            role="dialog"
+            aria-modal="true"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-ink/60 px-4"
+            onClick={() => setConfirmOpen(false)}
+          >
+            <div
+              className="w-full max-w-md rounded-sm border border-border bg-background p-6 shadow-xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <h3 className="font-serif text-xl text-ink">Migliora tutte le foto?</h3>
+              <p className="mt-3 text-sm text-muted-foreground">
+                Vuoi migliorare tutte le foto esistenti? Il sistema creerà una versione ottimizzata
+                delle immagini senza cancellare gli originali.
+              </p>
+              <div className="mt-6 flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setConfirmOpen(false)}
+                  className="rounded-sm border border-border bg-background px-4 py-2 text-xs uppercase tracking-[0.18em] text-ink hover:border-primary/50"
+                >
+                  Annulla
+                </button>
+                <button
+                  type="button"
+                  onClick={() => runEnhance(false)}
+                  className="inline-flex items-center gap-2 rounded-sm bg-primary px-4 py-2 text-xs uppercase tracking-[0.18em] text-primary-foreground hover:bg-primary/90"
+                >
+                  <Wand2 size={13} /> Avvia miglioramento
+                </button>
+              </div>
+            </div>
           </div>
         )}
       </section>

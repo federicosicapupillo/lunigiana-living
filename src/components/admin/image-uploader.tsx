@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { ImagePlus, Star, StarOff, Trash2, ArrowUp, ArrowDown, Loader2, Sparkles, Check, CloudDownload } from "lucide-react";
+import { ImagePlus, Star, StarOff, Trash2, ArrowUp, ArrowDown, Loader2, Sparkles, Check, CloudDownload, Wand2 } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import {
   checkImageRenderAvailability,
@@ -9,6 +9,10 @@ import {
   setPropertyImagePublished,
   syncImportedImage,
 } from "@/lib/property-render.functions";
+import {
+  enhancePropertyImage,
+  setPropertyImageEnhancedPublished,
+} from "@/lib/property-enhance.functions";
 import { RenderSettingsPanel } from "@/components/admin/render-settings-panel";
 import type { RenderSettings } from "@/lib/render-options";
 
@@ -26,6 +30,12 @@ type Image = {
   render_status: string;
   render_error: string | null;
   use_rendered: boolean;
+  enhanced_storage_path: string | null;
+  enhanced_image_url: string | null;
+  enhancement_status: string;
+  enhancement_error: string | null;
+  enhancement_created_at: string | null;
+  use_enhanced: boolean;
   // import status
   is_imported: boolean;
   import_status: string | null;
@@ -73,18 +83,21 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
   const [uploading, setUploading] = useState(false);
   const [renderingId, setRenderingId] = useState<string | null>(null);
   const [syncingId, setSyncingId] = useState<string | null>(null);
+  const [enhancingId, setEnhancingId] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const runRender = useServerFn(renderPropertyImage);
   const runSetPublished = useServerFn(setPropertyImagePublished);
   const runSync = useServerFn(syncImportedImage);
   const runCheckAvailability = useServerFn(checkImageRenderAvailability);
+  const runEnhance = useServerFn(enhancePropertyImage);
+  const runSetEnhancedPublished = useServerFn(setPropertyImageEnhancedPublished);
 
   const load = async () => {
     setLoading(true);
     const { data, error } = await supabase
       .from("property_images")
       .select(
-        "id, image_url, original_image_url, rendered_image_url, published_image_url, storage_path, alt_text, sort_order, is_cover, rendered_storage_path, render_status, render_error, use_rendered, is_imported, import_status, imported_source_url, photo_type, photo_category, render_style, render_goal, room_condition, intervention_level, preserve_structure, desired_lighting, visual_target, render_notes",
+        "id, image_url, original_image_url, rendered_image_url, published_image_url, storage_path, alt_text, sort_order, is_cover, rendered_storage_path, render_status, render_error, use_rendered, enhanced_storage_path, enhanced_image_url, enhancement_status, enhancement_error, enhancement_created_at, use_enhanced, is_imported, import_status, imported_source_url, photo_type, photo_category, render_style, render_goal, room_condition, intervention_level, preserve_structure, desired_lighting, visual_target, render_notes",
       )
       .eq("property_id", propertyId)
       .order("sort_order", { ascending: true });
@@ -244,6 +257,34 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
     }
   };
 
+  const enhance = async (img: Image) => {
+    if (!img.render_availability?.canRender) {
+      toast.error("Sincronizza prima la foto nello storage interno");
+      return;
+    }
+    setEnhancingId(img.id);
+    try {
+      await runEnhance({ data: { imageId: img.id } });
+      toast.success("Foto migliorata");
+      await load();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Errore miglioramento");
+      await load();
+    } finally {
+      setEnhancingId(null);
+    }
+  };
+
+  const toggleEnhancedPublished = async (img: Image, useEnhanced: boolean) => {
+    try {
+      await runSetEnhancedPublished({ data: { imageId: img.id, useEnhanced } });
+      toast.success(useEnhanced ? "Versione migliorata pubblicata" : "Originale pubblicato");
+      await load();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Errore");
+    }
+  };
+
   const syncImage = async (img: Image) => {
     setSyncingId(img.id);
     try {
@@ -327,6 +368,84 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
                       Rendering {img.use_rendered && "· in uso"}
                     </span>
                   )}
+                </div>
+              </div>
+              {/* Enhancement preview & controls */}
+              <div className="border-t border-border bg-muted/20 p-3">
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="relative aspect-[4/3] overflow-hidden rounded-sm bg-muted">
+                    {img.enhanced_image_url ? (
+                      <img src={img.enhanced_image_url} alt="Migliorata" className="h-full w-full object-cover" />
+                    ) : (
+                      <div className="flex h-full items-center justify-center text-[10px] uppercase tracking-wider text-muted-foreground">
+                        Nessuna versione migliorata
+                      </div>
+                    )}
+                    {img.enhanced_image_url && (
+                      <span className="absolute left-1 top-1 rounded-sm bg-background/80 px-1.5 py-0.5 text-[9px] uppercase tracking-wider text-muted-foreground">
+                        Migliorata {img.use_enhanced && "· in uso"}
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex flex-col justify-between gap-2 text-[10px]">
+                    <div>
+                      <div className="uppercase tracking-wider text-muted-foreground">Miglioramento</div>
+                      <div
+                        className={
+                          img.enhancement_status === "error"
+                            ? "text-destructive"
+                            : img.enhancement_status === "enhanced"
+                            ? "text-primary"
+                            : ""
+                        }
+                      >
+                        {img.enhancement_status === "not_enhanced" && "Non migliorata"}
+                        {img.enhancement_status === "processing" && "In elaborazione"}
+                        {img.enhancement_status === "enhanced" && "Migliorata"}
+                        {img.enhancement_status === "error" && "Errore"}
+                      </div>
+                      {img.enhancement_error && (
+                        <div className="mt-1 text-destructive">{img.enhancement_error}</div>
+                      )}
+                    </div>
+                    <div className="flex flex-col gap-1">
+                      <button
+                        type="button"
+                        onClick={() => enhance(img)}
+                        disabled={enhancingId === img.id || !img.render_availability?.canRender}
+                        className="inline-flex items-center justify-center gap-1 rounded-sm bg-ink px-2 py-1.5 text-[10px] uppercase tracking-wider text-cream hover:bg-ink/90 disabled:opacity-50"
+                      >
+                        {enhancingId === img.id ? (
+                          <Loader2 size={11} className="animate-spin" />
+                        ) : (
+                          <Wand2 size={11} />
+                        )}
+                        {img.enhanced_storage_path ? "Rigenera miglioramento" : "Migliora foto"}
+                      </button>
+                      {img.enhanced_storage_path && (
+                        <div className="flex flex-wrap gap-1">
+                          <button
+                            type="button"
+                            onClick={() => toggleEnhancedPublished(img, true)}
+                            disabled={img.use_enhanced}
+                            className="inline-flex flex-1 items-center justify-center gap-1 rounded-sm border border-border bg-background px-2 py-1 text-[10px] uppercase tracking-wider hover:border-primary/50 disabled:opacity-40"
+                          >
+                            {img.use_enhanced && <Check size={11} className="text-primary" />}
+                            Usa migliorata
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => toggleEnhancedPublished(img, false)}
+                            disabled={!img.use_enhanced}
+                            className="inline-flex flex-1 items-center justify-center gap-1 rounded-sm border border-border bg-background px-2 py-1 text-[10px] uppercase tracking-wider hover:border-primary/50 disabled:opacity-40"
+                          >
+                            {!img.use_enhanced && <Check size={11} className="text-primary" />}
+                            Mantieni originale
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
               </div>
               {img.is_cover && (
