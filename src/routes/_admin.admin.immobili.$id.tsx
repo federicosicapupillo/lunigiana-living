@@ -542,10 +542,14 @@ function NumberInput({
   value,
   onChange,
   step = 1,
+  disabled,
+  placeholder,
 }: {
   value: number | null;
   onChange: (v: number | null) => void;
   step?: number;
+  disabled?: boolean;
+  placeholder?: string;
 }) {
   return (
     <input
@@ -553,7 +557,9 @@ function NumberInput({
       step={step}
       value={value ?? ""}
       onChange={(e) => onChange(e.target.value === "" ? null : Number(e.target.value))}
-      className={inputCls}
+      disabled={disabled}
+      placeholder={placeholder}
+      className={`${inputCls} ${disabled ? "cursor-not-allowed opacity-50" : ""}`}
     />
   );
 }
@@ -594,16 +600,26 @@ function Toggle({
     <button
       type="button"
       onClick={() => onChange(!value)}
-      className={`flex items-center justify-between rounded-sm border px-4 py-2.5 text-sm transition ${
+      role="switch"
+      aria-checked={value}
+      className={`group flex w-full items-center gap-3 rounded-sm border px-4 py-2.5 text-sm transition cursor-pointer ${
         value
           ? "border-primary bg-primary/5 text-ink"
           : "border-border bg-card text-muted-foreground hover:border-primary/40"
       }`}
     >
-      <span>{label}</span>
       <span
-        className={`ml-3 h-2.5 w-2.5 rounded-full ${value ? "bg-primary" : "bg-muted-foreground/30"}`}
-      />
+        className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors ${
+          value ? "bg-primary" : "bg-muted-foreground/30"
+        }`}
+      >
+        <span
+          className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform ${
+            value ? "translate-x-[22px]" : "translate-x-0.5"
+          }`}
+        />
+      </span>
+      <span className="font-medium">{label}</span>
     </button>
   );
 }
