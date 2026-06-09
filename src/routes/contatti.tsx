@@ -79,8 +79,10 @@ function ContattiPage() {
           </div>
         </div>
 
-        <div className="rounded-sm bg-card p-6 sm:p-8 md:col-span-7 md:col-start-6 md:p-10">
-          <LeadForm />
+        <div className="md:col-span-7 md:col-start-6">
+          <div className="rounded-md border border-warm-border/70 bg-warm-cream p-5 shadow-[0_1px_0_rgba(36,23,17,.04),0_18px_38px_-24px_rgba(36,23,17,.25)] sm:p-6">
+            <LeadForm />
+          </div>
         </div>
       </div>
     </section>
