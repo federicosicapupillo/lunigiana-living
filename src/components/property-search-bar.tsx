@@ -1,7 +1,7 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useNavigate } from "@tanstack/react-router";
-import { Search, X, ChevronDown, Star } from "lucide-react";
+import { Search, X, ChevronDown, Star, SlidersHorizontal } from "lucide-react";
 import { PROPERTY_TYPES } from "@/lib/admin/property-constants";
 
 const COMUNI_FALLBACK = [
@@ -134,6 +134,17 @@ export function PropertySearchBar({
   const [error, setError] = useState<string | null>(null);
   const featTriggerRef = useRef<HTMLButtonElement>(null);
   const [featCoords, setFeatCoords] = useState<{ top: number; left: number; width: number } | null>(null);
+  const hasAdvanced = useMemo(
+    () =>
+      Boolean(
+        (initial?.size && initial.size.length) ||
+          (initial?.rooms && initial.rooms.length) ||
+          (initial?.features && initial.features.length) ||
+          (initial?.sort && initial.sort && initial.sort !== "recent"),
+      ),
+    [initial?.size, initial?.rooms, initial?.sort, (initial?.features ?? []).join(",")],
+  );
+  const [advancedOpen, setAdvancedOpen] = useState<boolean>(hasAdvanced);
 
   // Sync when URL-controlled `initial` changes (e.g. user clicks reset on parent).
   useEffect(() => {
@@ -266,32 +277,34 @@ export function PropertySearchBar({
   );
 
   const Fields = (
-    <div className="grid grid-cols-1 gap-px bg-border sm:grid-cols-2 lg:grid-cols-4">
-      <SelectField label="Tipologia" value={state.type} onChange={(v) => setState({ ...state, type: v })}>
+    <>
+      <div className="grid grid-cols-1 gap-px bg-border sm:grid-cols-2 lg:grid-cols-4">
+        <SelectField label="Tipologia" value={state.type} onChange={(v) => setState({ ...state, type: v })}>
         <option value="">Tutte</option>
         {PROPERTY_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
-      </SelectField>
-      <SelectField label="Comune" value={state.comune} onChange={(v) => setState({ ...state, comune: v })}>
+        </SelectField>
+        <SelectField label="Comune" value={state.comune} onChange={(v) => setState({ ...state, comune: v })}>
         <option value="">Tutti i comuni</option>
         {comuniList.map((c) => <option key={c} value={c}>{c}</option>)}
-      </SelectField>
-      <SelectField label="Prezzo da" value={state.price_min}
-        onChange={(v) => setState({ ...state, price_min: v })}>
+        </SelectField>
+        <SelectField label="Prezzo da" value={state.price_min}
+          onChange={(v) => setState({ ...state, price_min: v })}>
         {PRICE_MIN_OPTS.map((p) => <option key={p.label} value={p.value}>{p.label}</option>)}
-      </SelectField>
-      <SelectField label="Prezzo a" value={state.price_max}
-        onChange={(v) => setState({ ...state, price_max: v })}>
+        </SelectField>
+        <SelectField label="Prezzo a" value={state.price_max}
+          onChange={(v) => setState({ ...state, price_max: v })}>
         {PRICE_MAX_OPTS.map((p) => <option key={p.label} value={p.value}>{p.label}</option>)}
-      </SelectField>
-
-      <SelectField label="Superficie" value={state.size} onChange={(v) => setState({ ...state, size: v })}>
+        </SelectField>
+      </div>
+      {advancedOpen && (
+        <div className="grid grid-cols-1 gap-px border-t border-border bg-border sm:grid-cols-2 lg:grid-cols-4">
+          <SelectField label="Superficie" value={state.size} onChange={(v) => setState({ ...state, size: v })}>
         {SIZE_RANGES.map((p) => <option key={p.label} value={p.value}>{p.label}</option>)}
-      </SelectField>
-      <SelectField label="Camere" value={state.rooms} onChange={(v) => setState({ ...state, rooms: v })}>
+          </SelectField>
+          <SelectField label="Camere" value={state.rooms} onChange={(v) => setState({ ...state, rooms: v })}>
         {ROOM_OPTS.map((p) => <option key={p.label} value={p.value}>{p.label}</option>)}
-      </SelectField>
-
-      <div className="flex min-w-0 flex-col gap-0.5 bg-card px-3 py-2 text-left">
+          </SelectField>
+          <div className="flex min-w-0 flex-col gap-0.5 bg-card px-3 py-2 text-left">
         <span className="eyebrow text-[0.6rem]">Caratteristiche</span>
         <button
           ref={featTriggerRef}
@@ -304,12 +317,13 @@ export function PropertySearchBar({
           </span>
           <ChevronDown size={14} className={`shrink-0 transition ${featOpen ? "rotate-180" : ""}`} />
         </button>
-      </div>
-
-      <SelectField label="Ordina per" value={state.sort} onChange={(v) => setState({ ...state, sort: v })}>
+          </div>
+          <SelectField label="Ordina per" value={state.sort} onChange={(v) => setState({ ...state, sort: v })}>
         {SORT_OPTS.map((p) => <option key={p.value} value={p.value}>{p.label}</option>)}
-      </SelectField>
-    </div>
+          </SelectField>
+        </div>
+      )}
+    </>
   );
 
   const visibleChips = state.features.slice(0, 3);
@@ -405,7 +419,18 @@ export function PropertySearchBar({
       <div className="hidden md:block">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
           {ContractTabs}
-          {FeaturedToggle}
+          <div className="flex flex-wrap items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setAdvancedOpen((o) => !o)}
+              className="inline-flex items-center gap-2 rounded-md border border-warm-border bg-warm-ivory px-4 py-2 text-[0.7rem] font-medium uppercase tracking-[0.2em] text-muted-foreground transition hover:border-primary/50 hover:text-ink"
+              aria-expanded={advancedOpen}
+            >
+              <SlidersHorizontal size={13} />
+              {advancedOpen ? "Meno filtri" : "Filtri avanzati"}
+            </button>
+            {FeaturedToggle}
+          </div>
         </div>
         <form
           onSubmit={(e) => { e.preventDefault(); submit(); }}
