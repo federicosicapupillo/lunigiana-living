@@ -21,6 +21,7 @@ type Row = {
   price: number | null;
   price_on_request: boolean;
   status: PropertyStatus;
+  created_at: string;
   updated_at: string;
   cover_url: string | null;
   featured: boolean;
