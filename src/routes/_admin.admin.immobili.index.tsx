@@ -153,13 +153,31 @@ function AdminPropertiesPage() {
         (r.property_type ?? "").toLowerCase().includes(needle)
       );
     });
-    if (statusFilter === "homepage") {
+    if (sortBy === "home_first") {
       list.sort((a, b) => {
         const ao = a.homepage_order ?? Number.POSITIVE_INFINITY;
         const bo = b.homepage_order ?? Number.POSITIVE_INFINITY;
         if (ao !== bo) return ao - bo;
-        return b.updated_at.localeCompare(a.updated_at);
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
       });
+    } else {
+      switch (sortBy) {
+        case "newest":
+          list.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+          break;
+        case "oldest":
+          list.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+          break;
+        case "updated":
+          list.sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime());
+          break;
+        case "price_asc":
+          list.sort((a, b) => (a.price ?? 0) - (b.price ?? 0));
+          break;
+        case "price_desc":
+          list.sort((a, b) => (b.price ?? 0) - (a.price ?? 0));
+          break;
+      }
     }
     return list;
   }, [rows, q, statusFilter]);
