@@ -674,15 +674,28 @@ function MainTab({
           className={inputCls}
         />
       </Field>
-      <Field label="Prezzo (€)">
-        <NumberInput value={prop.price} onChange={(v) => update({ price: v })} step={1000} />
-      </Field>
-      <Field label="Prezzo">
-        <Toggle
-          label="Prezzo su richiesta"
-          value={prop.price_on_request}
-          onChange={(v) => update({ price_on_request: v })}
-        />
+      <Field label="Prezzo (€)" full>
+        <div className="space-y-2">
+          <NumberInput
+            value={prop.price_on_request ? null : prop.price}
+            onChange={(v) => update({ price: v })}
+            step={1000}
+            disabled={prop.price_on_request}
+            placeholder={prop.price_on_request ? "Prezzo su richiesta" : "Inserisci prezzo"}
+          />
+          <Toggle
+            label="Prezzo su richiesta"
+            value={prop.price_on_request}
+            onChange={(v) =>
+              update(v ? { price_on_request: true, price: null } : { price_on_request: false })
+            }
+          />
+          <p className="text-xs text-muted-foreground">
+            {prop.price_on_request
+              ? "Il prezzo non sarà mostrato. Sul sito apparirà: Prezzo su richiesta."
+              : "Attiva questa opzione se non vuoi mostrare il prezzo pubblicamente."}
+          </p>
+        </div>
       </Field>
       <Field label="Note private agenzia" full>
         <textarea
