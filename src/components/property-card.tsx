@@ -82,7 +82,7 @@ export function PropertyCard({ p }: { p: PropertyCardData }) {
           href={waHref}
           target="_blank"
           rel="noopener noreferrer"
-          className="mt-2 inline-flex items-center gap-1.5 text-[0.7rem] uppercase tracking-[0.18em] text-muted-foreground transition hover:text-terracotta"
+          className="mt-2 inline-flex items-center gap-2 rounded-full border border-[#25D366]/30 bg-[#25D366]/10 px-3.5 py-1.5 text-[0.7rem] uppercase tracking-[0.18em] text-[#1f8a4c] transition hover:border-[#25D366]/60 hover:bg-[#25D366]/15"
         >
           <span className="inline-block h-1.5 w-1.5 rounded-full bg-[#25D366]" />
           Info su WhatsApp
