@@ -107,15 +107,15 @@ function Index() {
           <div className="absolute inset-0 -z-10 bg-gradient-to-br from-cream via-cream to-[hsl(var(--muted))]" />
           <div className="container-editorial grid min-h-[88svh] grid-cols-1 items-center gap-10 pb-12 pt-32 sm:min-h-[92svh] sm:pb-16 sm:pt-40 md:min-h-[100svh] md:grid-cols-12 md:gap-12 md:pb-24">
             <div className="md:col-span-6 lg:col-span-6">
-              <span className="eyebrow text-primary">Furia Immobiliare · Lunigiana</span>
+              <span className="eyebrow text-primary">Agenzia immobiliare · Pontremoli · Lunigiana</span>
               <h1 className="mt-4 font-serif text-[2.4rem] leading-[1.05] text-ink sm:text-5xl sm:leading-[1.02] md:text-6xl lg:text-7xl">
-                La casa giusta si riconosce<br />
-                <em className="font-normal italic">anche dal cuore.</em>
+                Case in vendita in Lunigiana,<br />
+                <em className="font-normal italic">scelte una per una.</em>
               </h1>
               <p className="mt-5 max-w-xl text-sm leading-relaxed text-foreground/80 sm:text-base md:text-lg">
-                Con Elena e Cometa, Furia Immobiliare accompagna chi cerca una casa
-                autentica in Lunigiana: non solo un immobile, ma un luogo in cui
-                sentirsi davvero a casa.
+                Da 18 anni a Pontremoli. Elena e Cometa ti accompagnano a trovare
+                la casa giusta in Lunigiana: visite sul posto, conoscenza reale
+                dei borghi, nessuna pressione di vendita.
               </p>
               <div className="mt-8 flex flex-wrap items-center gap-3 sm:mt-10 sm:gap-4">
                 <Link
