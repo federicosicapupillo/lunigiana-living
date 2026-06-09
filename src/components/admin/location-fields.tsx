@@ -173,6 +173,21 @@ function Combobox({
   );
 }
 
+const ZONE_PRESETS = [
+  "Centro storico",
+  "Collina",
+  "Prima periferia",
+  "Campagna",
+  "Zona residenziale",
+  "Lungofiume",
+  "Lungomare",
+  "Borgo",
+  "Frazione",
+  "Zona panoramica",
+  "Zona industriale",
+  "Zona commerciale",
+];
+
 export function LocationFields({
   value,
   onChange,
@@ -270,31 +285,16 @@ export function LocationFields({
           allowFree={false}
         />
       </Field>
-      <Field label="Località / frazione">
-        <Combobox
-          value={value.locality}
-          onChange={(v) => onChange({ locality: v })}
-          options={[]}
-          placeholder="Es. Strettoia, Marina di Pietrasanta"
-          disabled={!value.municipality}
-          allowFree
-        />
-      </Field>
-      <Field label="Zona / quartiere">
-        <input
-          type="text"
-          value={value.area_zone}
-          onChange={(e) => onChange({ area_zone: e.target.value })}
-          placeholder="Es. centro storico, collina, lungomare"
-          className={inputCls}
-        />
-      </Field>
       <Field
         label="CAP"
         hint={
-          caps.length > 1
-            ? `Il comune ha ${caps.length} CAP: seleziona quello corretto`
-            : undefined
+          !value.municipality
+            ? "Seleziona prima il comune"
+            : caps.length > 1
+              ? `Il comune ha ${caps.length} CAP: seleziona quello corretto`
+              : caps.length === 1
+                ? "CAP suggerito automaticamente"
+                : undefined
         }
       >
         {caps.length > 1 ? (
@@ -313,6 +313,32 @@ export function LocationFields({
             className={inputCls}
           />
         )}
+      </Field>
+      <Field
+        label="Località / frazione"
+        hint={!value.municipality ? "Seleziona prima il comune" : "Opzionale — inserimento libero"}
+      >
+        <Combobox
+          value={value.locality}
+          onChange={(v) => onChange({ locality: v })}
+          options={[]}
+          placeholder="Es. Strettoia, Marina di Pietrasanta"
+          disabled={!value.municipality}
+          allowFree
+        />
+      </Field>
+      <Field
+        label="Zona / quartiere"
+        hint={!value.municipality ? "Seleziona prima il comune" : "Scegli un preset o scrivi liberamente"}
+      >
+        <Combobox
+          value={value.area_zone}
+          onChange={(v) => onChange({ area_zone: v })}
+          options={ZONE_PRESETS}
+          placeholder="Es. centro storico, collina, lungomare"
+          disabled={!value.municipality}
+          allowFree
+        />
       </Field>
       <Field label="Indirizzo / Via" full>
         <input
