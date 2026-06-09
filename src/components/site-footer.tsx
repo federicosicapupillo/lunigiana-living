@@ -6,11 +6,13 @@ export function SiteFooter() {
     <footer className="mt-24 border-t border-border bg-ink text-cream">
       <div className="container-editorial grid gap-12 py-16 md:grid-cols-4">
         <div className="md:col-span-2">
-          <img
-            src={logoAsset.url}
-            alt="Furia Immobiliare"
-            className="h-auto w-[140px] object-contain md:w-[170px]"
-          />
+          <div className="footer-logo-badge">
+            <img
+              src={logoAsset.url}
+              alt="Furia Immobiliare"
+              className="h-auto w-[130px] object-contain md:w-[150px]"
+            />
+          </div>
           <p className="mt-4 max-w-md text-sm leading-relaxed text-cream/70">
             Da Pontremoli, accompagniamo chi cerca una casa di carattere in Lunigiana.
             Conosciamo i borghi, le pietre, le valli — e il loro modo di vivere.
