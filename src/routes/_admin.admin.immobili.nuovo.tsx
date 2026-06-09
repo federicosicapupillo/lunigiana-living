@@ -238,7 +238,7 @@ function NewPropertyPage() {
         ),
         property_type: f.property_type || null,
         contract_type: f.contract_type || null,
-        price: f.price_on_request ? null : toNum(f.price),
+        price: toNum(f.price),
         price_on_request: f.price_on_request,
         status,
         municipality: f.municipality.trim() || null,
@@ -447,24 +447,18 @@ function NewPropertyPage() {
           <Field label="Prezzo (€)" full>
             <div className="space-y-2">
               <NumberInput
-                value={f.price_on_request ? "" : f.price}
+                value={f.price}
                 onChange={(v) => upd("price", v)}
-                disabled={f.price_on_request}
                 step={1000}
-                placeholder={f.price_on_request ? "Prezzo su richiesta" : "Inserisci prezzo"}
+                placeholder="Inserisci prezzo interno"
               />
               <Toggle
-                label="Prezzo su richiesta"
+                label="Mostra come prezzo su richiesta"
                 value={f.price_on_request}
-                onChange={(v) => {
-                  upd("price_on_request", v);
-                  if (v) upd("price", "");
-                }}
+                onChange={(v) => upd("price_on_request", v)}
               />
               <p className="text-xs text-muted-foreground">
-                {f.price_on_request
-                  ? "Il prezzo non sarà mostrato. Sul sito apparirà: Prezzo su richiesta."
-                  : "Attiva questa opzione se non vuoi mostrare il prezzo pubblicamente."}
+                Il prezzo resta salvato nel backend, ma sul sito verrà mostrato come “Prezzo su richiesta”.
               </p>
             </div>
           </Field>
