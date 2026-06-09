@@ -16,7 +16,7 @@ export function SiteHeader() {
   const [open, setOpen] = useState(false);
   return (
     <header className="sticky top-0 z-40 border-b border-warm-border/60 bg-warm-cream/90 backdrop-blur-md">
-      <div className="container-editorial flex h-[72px] items-center justify-between md:h-[88px] lg:h-[108px]">
+      <div className="container-editorial flex h-20 items-center justify-between sm:h-[84px] md:h-[92px] lg:h-[108px]">
         <Link to="/" className="group flex items-center" aria-label="Furia Immobiliare — Home">
           <img
             src={logoAsset.url}
@@ -30,12 +30,12 @@ export function SiteHeader() {
             <Link
               key={n.to}
               to={n.to}
-              className="relative rounded-sm px-3 py-1.5 text-[0.78rem] font-medium tracking-wide text-ink-soft/80 transition-all duration-200 hover:bg-warm-ivory/70 hover:text-terracotta"
-              activeProps={{ className: "text-terracotta bg-warm-ivory/50" }}
+              className="group relative rounded-sm px-3 py-1.5 text-[0.78rem] font-medium tracking-wide text-ink-soft/80 transition-all duration-200 hover:bg-warm-ivory/70 hover:text-terracotta"
+              activeProps={{ className: "text-terracotta bg-warm-ivory/50 [&>span:last-child]:scale-x-100" }}
               activeOptions={{ exact: n.to === "/" }}
             >
               <span>{n.label}</span>
-              <span className="pointer-events-none absolute bottom-0 left-1/2 h-[2px] w-5 -translate-x-1/2 scale-x-0 rounded-full bg-terracotta/70 transition-transform duration-200 [&:nth-child(2)]:aria-[current=page]:scale-x-100" />
+              <span className="pointer-events-none absolute bottom-0 left-1/2 h-[2px] w-5 -translate-x-1/2 scale-x-0 rounded-full bg-terracotta/70 transition-transform duration-200 group-hover:scale-x-100" />
             </Link>
           ))}
         </nav>
