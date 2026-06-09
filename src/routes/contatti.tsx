@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Mail, MapPin, Phone } from "lucide-react";
 import { whatsappUrl } from "@/components/whatsapp-float";
+import { LeadForm } from "@/components/lead-form";
 
 export const Route = createFileRoute("/contatti")({
   head: () => ({
@@ -25,11 +26,11 @@ function ContattiPage() {
         <div className="md:col-span-5">
           <span className="eyebrow">Contatti</span>
           <h1 className="mt-3 font-serif text-5xl leading-tight text-ink md:text-6xl">
-            Raccontaci la casa<br />che hai in mente.
+            Raccontaci che casa<br />stai cercando.
           </h1>
           <p className="mt-6 text-base leading-relaxed text-foreground/80">
-            Rispondiamo a tutti, di persona. Scrivici una mail, una telefonata,
-            o vienici a trovare in agenzia a Pontremoli.
+            Scrivi a Elena: ti aiuterà a capire quali immobili possono fare al
+            caso tuo. Rispondiamo a tutti, di persona.
           </p>
 
           <ul className="mt-10 space-y-5 text-sm">
@@ -78,38 +79,10 @@ function ContattiPage() {
           </div>
         </div>
 
-        <form onSubmit={(e) => e.preventDefault()}
-          className="space-y-4 rounded-sm bg-card p-8 md:col-span-7 md:col-start-6 md:p-10">
-          <div className="grid gap-4 md:grid-cols-2">
-            <Field label="Nome" />
-            <Field label="Cognome" />
-          </div>
-          <div className="grid gap-4 md:grid-cols-2">
-            <Field label="Email" type="email" />
-            <Field label="Telefono" type="tel" />
-          </div>
-          <Field label="Comune di interesse" placeholder="Pontremoli, Bagnone, Zeri…" />
-          <label className="block">
-            <span className="eyebrow text-[0.65rem]">Raccontaci</span>
-            <textarea rows={4} placeholder="Che casa stai cercando? Per chi? In che zona?"
-              className="mt-2 w-full border-0 border-b border-border bg-transparent pb-2 text-sm text-ink placeholder:text-muted-foreground/70 focus:border-primary focus:outline-none focus:ring-0" />
-          </label>
-          <button type="submit"
-            className="mt-4 w-full rounded-sm bg-primary py-4 text-xs uppercase tracking-[0.22em] text-primary-foreground transition hover:bg-primary/90">
-            Invia messaggio
-          </button>
-        </form>
+        <div className="rounded-sm bg-card p-6 sm:p-8 md:col-span-7 md:col-start-6 md:p-10">
+          <LeadForm />
+        </div>
       </div>
     </section>
-  );
-}
-
-function Field({ label, type = "text", placeholder }: { label: string; type?: string; placeholder?: string }) {
-  return (
-    <label className="block">
-      <span className="eyebrow text-[0.65rem]">{label}</span>
-      <input type={type} placeholder={placeholder}
-        className="mt-2 w-full border-0 border-b border-border bg-transparent pb-2 text-sm text-ink placeholder:text-muted-foreground/70 focus:border-primary focus:outline-none focus:ring-0" />
-    </label>
   );
 }
