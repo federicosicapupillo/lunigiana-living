@@ -4,7 +4,6 @@ import { toast } from "sonner";
 import { ImagePlus, Star, StarOff, Trash2, ArrowUp, ArrowDown, Loader2, Sparkles, Check, CloudDownload, Wand2 } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import {
-  checkImageRenderAvailability,
   renderPropertyImage,
   setPropertyImagePublished,
   syncImportedImage,
@@ -131,7 +130,6 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
   const runRender = useServerFn(renderPropertyImage);
   const runSetPublished = useServerFn(setPropertyImagePublished);
   const runSync = useServerFn(syncImportedImage);
-  const runCheckAvailability = useServerFn(checkImageRenderAvailability);
   const runEnhance = useServerFn(enhancePropertyImage);
   const runSetEnhancedPublished = useServerFn(setPropertyImageEnhancedPublished);
 
