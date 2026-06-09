@@ -345,6 +345,9 @@ function AdminPropertiesPage() {
                         ? `€ ${r.price.toLocaleString("it-IT")}`
                         : "—"}
                   </div>
+                  <div className="mt-1 text-[10px] text-muted-foreground sm:hidden">
+                    Caricato: {new Date(r.created_at).toLocaleDateString("it-IT")} · Aggiornato: {new Date(r.updated_at).toLocaleDateString("it-IT")}
+                  </div>
                 </div>
                 <div className="hidden text-right text-sm sm:block">
                   <div className="text-ink">
