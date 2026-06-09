@@ -159,20 +159,7 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
         }
       }
     }
-    const availability = await Promise.all(
-      rows.map(async (r) => {
-        try {
-          return await runCheckAvailability({ data: { imageId: r.id } });
-        } catch {
-          return {
-            canRender: false,
-            state: "sync_error" as const,
-            statusLabel: "Errore sincronizzazione",
-            message: "Impossibile verificare la disponibilità della foto nello storage.",
-          };
-        }
-      }),
-    );
+    const availability = rows.map((r) => computeAvailability(r));
     setImages(
       rows.map((r, idx) => ({
         ...r,
