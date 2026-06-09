@@ -120,6 +120,7 @@ function AdminPropertiesPage() {
         price: p.price as number | null,
         price_on_request: p.price_on_request as boolean,
         status: p.status as Row["status"],
+        created_at: p.created_at as string,
         updated_at: p.updated_at as string,
         cover_url: cover,
         featured: !!(p.featured as boolean),
