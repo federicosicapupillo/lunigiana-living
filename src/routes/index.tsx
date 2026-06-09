@@ -290,6 +290,32 @@ function Index() {
         </div>
       </section>
 
+      {/* LEAD FORM */}
+      <section className="bg-cream py-16 sm:py-20 md:py-24">
+        <div className="container-editorial grid gap-10 md:grid-cols-12 md:gap-12">
+          <div className="md:col-span-5">
+            <span className="eyebrow">Cerchi casa</span>
+            <h2 className="mt-3 font-serif text-3xl leading-tight text-ink sm:text-4xl md:text-5xl">
+              Cerchi una casa<br />in Lunigiana?
+            </h2>
+            <p className="mt-5 max-w-md text-base leading-relaxed text-foreground/80">
+              Racconta a Elena cosa stai cercando. Ti aiuterà a capire quali
+              immobili possono davvero fare al caso tuo.
+            </p>
+            <div className="mt-6 hidden text-sm text-foreground/70 md:block">
+              <div className="font-medium text-ink">Furia Immobiliare</div>
+              <div className="mt-1">{AGENCY_FACTS.address}</div>
+              <div className="mt-1">Tel. {AGENCY_FACTS.phone} · Cell. {AGENCY_FACTS.mobile}</div>
+            </div>
+          </div>
+          <div className="md:col-span-7">
+            <div className="rounded-sm border border-border bg-background p-6 shadow-sm sm:p-8">
+              <LeadForm />
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* WHY LUNIGIANA */}
       <section className="container-editorial py-16 sm:py-20 md:py-32">
         <div className="grid gap-12 md:grid-cols-12 md:items-center">
