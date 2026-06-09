@@ -9,7 +9,7 @@ export function SiteFooter() {
           <img
             src={logoAsset.url}
             alt="Furia Immobiliare"
-            className="h-16 w-auto bg-cream/95 rounded-sm p-2"
+            className="h-16 w-auto object-contain bg-cream/95 rounded-sm p-2"
           />
           <p className="mt-4 max-w-md text-sm leading-relaxed text-cream/70">
             Da Pontremoli, accompagniamo chi cerca una casa di carattere in Lunigiana.
