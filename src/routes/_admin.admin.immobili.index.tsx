@@ -21,6 +21,7 @@ type Row = {
   price: number | null;
   price_on_request: boolean;
   status: PropertyStatus;
+  created_at: string;
   updated_at: string;
   cover_url: string | null;
   featured: boolean;
@@ -38,6 +39,14 @@ type Filter =
   | "deleted"
   | "homepage";
 
+type SortBy =
+  | "newest"
+  | "oldest"
+  | "updated"
+  | "price_asc"
+  | "price_desc"
+  | "home_first";
+
 const FILTERS: Array<{ key: Filter; label: string }> = [
   { key: "all", label: "Tutti" },
   { key: "homepage", label: "In home" },
@@ -48,6 +57,15 @@ const FILTERS: Array<{ key: Filter; label: string }> = [
   { key: "rented", label: "Affittati" },
   { key: "archived", label: "Archiviati" },
   { key: "deleted", label: "Cestino" },
+];
+
+const SORT_OPTIONS: Array<{ key: SortBy; label: string }> = [
+  { key: "newest", label: "Ultimi caricati" },
+  { key: "oldest", label: "Più vecchi" },
+  { key: "updated", label: "Ultimi aggiornati" },
+  { key: "price_asc", label: "Prezzo crescente" },
+  { key: "price_desc", label: "Prezzo decrescente" },
+  { key: "home_first", label: "In home prima" },
 ];
 
 export const Route = createFileRoute("/_admin/admin/immobili/")({
@@ -65,6 +83,7 @@ function AdminPropertiesPage() {
   const [loading, setLoading] = useState(true);
   const [q, setQ] = useState("");
   const [statusFilter, setStatusFilter] = useState<Filter>("all");
+  const [sortBy, setSortBy] = useState<SortBy>("newest");
   const [openMenu, setOpenMenu] = useState<string | null>(null);
   const [pending, setPending] = useState<{ id: string; action: StatusAction } | null>(null);
   const [busy, setBusy] = useState(false);
@@ -74,10 +93,10 @@ function AdminPropertiesPage() {
     const { data, error } = await supabase
       .from("properties")
       .select(
-        `id, title, municipality, property_type, price, price_on_request, status, updated_at, featured, homepage_order,
+        `id, title, municipality, property_type, price, price_on_request, status, created_at, updated_at, featured, homepage_order,
          property_images!left ( image_url, is_cover, sort_order )`,
       )
-      .order("updated_at", { ascending: false });
+      .order("created_at", { ascending: false });
     if (error) {
       toast.error(`Errore caricamento: ${error.message}`);
       setLoading(false);
@@ -101,6 +120,7 @@ function AdminPropertiesPage() {
         price: p.price as number | null,
         price_on_request: p.price_on_request as boolean,
         status: p.status as Row["status"],
+        created_at: p.created_at as string,
         updated_at: p.updated_at as string,
         cover_url: cover,
         featured: !!(p.featured as boolean),
@@ -133,16 +153,34 @@ function AdminPropertiesPage() {
         (r.property_type ?? "").toLowerCase().includes(needle)
       );
     });
-    if (statusFilter === "homepage") {
+    if (sortBy === "home_first") {
       list.sort((a, b) => {
         const ao = a.homepage_order ?? Number.POSITIVE_INFINITY;
         const bo = b.homepage_order ?? Number.POSITIVE_INFINITY;
         if (ao !== bo) return ao - bo;
-        return b.updated_at.localeCompare(a.updated_at);
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
       });
+    } else {
+      switch (sortBy) {
+        case "newest":
+          list.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+          break;
+        case "oldest":
+          list.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+          break;
+        case "updated":
+          list.sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime());
+          break;
+        case "price_asc":
+          list.sort((a, b) => (a.price ?? 0) - (b.price ?? 0));
+          break;
+        case "price_desc":
+          list.sort((a, b) => (b.price ?? 0) - (a.price ?? 0));
+          break;
+      }
     }
     return list;
-  }, [rows, q, statusFilter]);
+  }, [rows, q, statusFilter, sortBy]);
 
   const counts = useMemo(() => {
     const c: Record<Filter, number> = {
@@ -240,6 +278,20 @@ function AdminPropertiesPage() {
             </button>
           ))}
         </div>
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-muted-foreground uppercase tracking-wider">Ordina</span>
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value as SortBy)}
+            className="rounded-sm border border-border bg-background px-3 py-1.5 text-xs uppercase tracking-wider text-ink focus:border-primary focus:outline-none"
+          >
+            {SORT_OPTIONS.map((s) => (
+              <option key={s.key} value={s.key}>
+                {s.label}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
       {loading ? (
@@ -293,6 +345,9 @@ function AdminPropertiesPage() {
                         ? `€ ${r.price.toLocaleString("it-IT")}`
                         : "—"}
                   </div>
+                  <div className="mt-1 text-[10px] text-muted-foreground sm:hidden">
+                    Caricato: {new Date(r.created_at).toLocaleDateString("it-IT")} · Aggiornato: {new Date(r.updated_at).toLocaleDateString("it-IT")}
+                  </div>
                 </div>
                 <div className="hidden text-right text-sm sm:block">
                   <div className="text-ink">
@@ -303,7 +358,10 @@ function AdminPropertiesPage() {
                         : "—"}
                   </div>
                   <div className="text-xs text-muted-foreground">
-                    agg. {new Date(r.updated_at).toLocaleDateString("it-IT")}
+                    Caricato: {new Date(r.created_at).toLocaleDateString("it-IT")}
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    Aggiornato: {new Date(r.updated_at).toLocaleDateString("it-IT")}
                   </div>
                 </div>
               </Link>
