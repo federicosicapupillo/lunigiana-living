@@ -16,12 +16,12 @@ export function SiteHeader() {
   const [open, setOpen] = useState(false);
   return (
     <header className="sticky top-0 z-40 border-b border-warm-border/70 bg-warm-cream/90 backdrop-blur-md">
-      <div className="container-editorial flex h-20 items-center justify-between">
+      <div className="container-editorial flex h-24 items-center justify-between md:h-28">
         <Link to="/" className="group flex items-center" aria-label="Furia Immobiliare — Home">
           <img
             src={logoAsset.url}
             alt="Furia Immobiliare"
-            className="h-12 w-auto md:h-14"
+            className="h-16 w-auto object-contain sm:h-[72px] md:h-20 lg:h-[88px]"
           />
         </Link>
 

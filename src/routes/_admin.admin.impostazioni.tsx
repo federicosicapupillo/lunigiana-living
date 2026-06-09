@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Loader2, Save } from "lucide-react";
+import { Loader2, Save, CloudDownload, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { useServerFn } from "@tanstack/react-start";
 import {
@@ -8,6 +8,7 @@ import {
   setHomeHeroVariant,
   type HomeHeroVariant,
 } from "@/lib/site-settings.functions";
+import { syncAllImportedImages } from "@/lib/property-render.functions";
 import heroLunigiana from "@/assets/real/hero-tramonto-ulivi.png.asset.json";
 import heroPontremoli from "@/assets/real/pontremoli-hero-centro-storico.png.asset.json";
 import heroElena from "@/assets/elena-furia.png.asset.json";
@@ -46,9 +47,15 @@ const OPTIONS: Array<{ id: HomeHeroVariant; label: string; desc: string; img: st
 function SettingsPage() {
   const get = useServerFn(getHomeHeroVariant);
   const set = useServerFn(setHomeHeroVariant);
+  const syncAll = useServerFn(syncAllImportedImages);
   const [variant, setVariant] = useState<HomeHeroVariant>("lunigiana_emotional");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [syncing, setSyncing] = useState(false);
+  const [syncResult, setSyncResult] = useState<
+    | { total: number; synced: number; alreadyOk: number; failed: number; errors: Array<{ imageId: string; message: string }> }
+    | null
+  >(null);
 
   useEffect(() => {
     get()
@@ -65,6 +72,21 @@ function SettingsPage() {
       toast.error(e instanceof Error ? e.message : "Errore salvataggio");
     } finally {
       setSaving(false);
+    }
+  };
+
+  const runSync = async (onlyErrors: boolean) => {
+    setSyncing(true);
+    setSyncResult(null);
+    try {
+      const res = await syncAll({ data: { onlyErrors } });
+      setSyncResult(res);
+      if (res.failed === 0) toast.success(`Sincronizzazione completata · ${res.synced} foto`);
+      else toast.warning(`Completata con ${res.failed} errori · ${res.synced} ok`);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Errore sincronizzazione");
+    } finally {
+      setSyncing(false);
     }
   };
 
@@ -134,6 +156,77 @@ function SettingsPage() {
         >
           {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save size={14} />} Salva
         </button>
+      </div>
+
+      <section className="mt-16 border-t border-border pt-10">
+        <h2 className="font-serif text-xl text-ink">Sincronizzazione foto importate</h2>
+        <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
+          Scarica nello storage interno tutte le foto immobili importate dal vecchio sito.
+          Le foto già sincronizzate non vengono duplicate. Necessario per generare i rendering.
+        </p>
+        <div className="mt-5 flex flex-wrap gap-3">
+          <button
+            type="button"
+            onClick={() => runSync(false)}
+            disabled={syncing}
+            className="inline-flex items-center gap-2 rounded-sm bg-primary px-5 py-2.5 text-xs uppercase tracking-[0.2em] text-primary-foreground transition hover:bg-primary/90 disabled:opacity-60"
+          >
+            {syncing ? <Loader2 className="h-4 w-4 animate-spin" /> : <CloudDownload size={14} />}
+            Sincronizza tutte le foto importate
+          </button>
+          {syncResult && syncResult.failed > 0 && (
+            <button
+              type="button"
+              onClick={() => runSync(true)}
+              disabled={syncing}
+              className="inline-flex items-center gap-2 rounded-sm border border-border bg-background px-5 py-2.5 text-xs uppercase tracking-[0.2em] text-ink transition hover:border-primary/50 disabled:opacity-60"
+            >
+              <RefreshCw size={14} /> Riprova solo le foto fallite
+            </button>
+          )}
+        </div>
+        {syncing && (
+          <p className="mt-4 text-sm text-muted-foreground">Sincronizzazione in corso…</p>
+        )}
+        {syncResult && (
+          <div className="mt-6 rounded-sm border border-border bg-muted/30 p-4 text-sm">
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+              <Stat label="Totali" value={syncResult.total} />
+              <Stat label="Sincronizzate" value={syncResult.synced} tone="ok" />
+              <Stat label="Già nello storage" value={syncResult.alreadyOk} />
+              <Stat label="Errori" value={syncResult.failed} tone={syncResult.failed > 0 ? "error" : undefined} />
+            </div>
+            {syncResult.errors.length > 0 && (
+              <details className="mt-4">
+                <summary className="cursor-pointer text-xs uppercase tracking-wider text-muted-foreground">
+                  Dettagli errori ({syncResult.errors.length})
+                </summary>
+                <ul className="mt-2 max-h-60 space-y-1 overflow-auto text-xs text-destructive">
+                  {syncResult.errors.map((e) => (
+                    <li key={e.imageId} className="font-mono">
+                      {e.imageId.slice(0, 8)}… — {e.message}
+                    </li>
+                  ))}
+                </ul>
+              </details>
+            )}
+          </div>
+        )}
+      </section>
+    </div>
+  );
+}
+
+function Stat({ label, value, tone }: { label: string; value: number; tone?: "ok" | "error" }) {
+  return (
+    <div>
+      <div className="text-xs uppercase tracking-wider text-muted-foreground">{label}</div>
+      <div
+        className={`mt-1 font-serif text-2xl ${
+          tone === "ok" ? "text-primary" : tone === "error" ? "text-destructive" : "text-ink"
+        }`}
+      >
+        {value}
       </div>
     </div>
   );
