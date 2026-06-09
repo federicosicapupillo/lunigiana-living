@@ -87,6 +87,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:site_name", content: "Furia Immobiliare" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
+      { property: "og:title", content: "Furia Immobiliare — Case e immobili in Lunigiana" },
+      { name: "twitter:title", content: "Furia Immobiliare — Case e immobili in Lunigiana" },
+      { property: "og:description", content: "Agenzia immobiliare a Pontremoli. Case, ville e immobili di carattere in Lunigiana: Pontremoli, Villafranca, Filattiera, Mulazzo, Bagnone, Zeri." },
+      { name: "twitter:description", content: "Agenzia immobiliare a Pontremoli. Case, ville e immobili di carattere in Lunigiana: Pontremoli, Villafranca, Filattiera, Mulazzo, Bagnone, Zeri." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/bf226b38-5d96-49e7-874e-d424fe5f9557/id-preview-ecef9743--c4e1d01b-1e1d-4552-90f5-6a8dbe4cbb6d.lovable.app-1781012892011.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/bf226b38-5d96-49e7-874e-d424fe5f9557/id-preview-ecef9743--c4e1d01b-1e1d-4552-90f5-6a8dbe4cbb6d.lovable.app-1781012892011.png" },
     ],
     links: [
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
