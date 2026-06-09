@@ -668,21 +668,12 @@ function MainTab({
           onChange={(v) => update({ price_on_request: v })}
         />
       </Field>
-      <Field label="Note brevi (catenaccio)" full>
-        <textarea
-          value={prop.short_notes ?? ""}
-          onChange={(e) => update({ short_notes: e.target.value })}
-          rows={2}
-          placeholder="Frase di lancio breve, visibile nell'elenco"
-          className={inputCls}
-        />
-      </Field>
-      <Field label="Note interne (non pubblicate)" full>
+      <Field label="Note private agenzia" full>
         <textarea
           value={prop.internal_notes ?? ""}
           onChange={(e) => update({ internal_notes: e.target.value })}
           rows={3}
-          placeholder="Promemoria per lo staff, condizioni, contatti..."
+          placeholder="Appunti interni non visibili al pubblico."
           className={inputCls}
         />
       </Field>
