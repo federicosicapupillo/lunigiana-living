@@ -49,6 +49,19 @@ const PRICE_MAX_OPTS = [
   { label: "Oltre 1.000.000 €", value: "1000001" },
 ];
 
+const RENT_MIN_STEPS = [300, 500, 700, 900, 1200, 1500, 2000];
+const RENT_MAX_STEPS = [500, 700, 900, 1200, 1500, 2000, 3000];
+const RENT_MIN_OPTS = [
+  { label: "Nessun minimo", value: "" },
+  ...RENT_MIN_STEPS.map((n) => ({ label: fmtPrice(n), value: String(n) })),
+  { label: "Oltre 2.000 €", value: "2001" },
+];
+const RENT_MAX_OPTS = [
+  { label: "Nessun massimo", value: "" },
+  ...RENT_MAX_STEPS.map((n) => ({ label: fmtPrice(n), value: String(n) })),
+  { label: "Oltre 3.000 €", value: "3001" },
+];
+
 const FEATURE_GROUPS: { label: string; items: string[] }[] = [
   {
     label: "Esterni",
@@ -180,6 +193,26 @@ export function PropertySearchBar({
 
   const comuniList = comuni && comuni.length ? comuni : COMUNI_FALLBACK;
 
+  const isRent = state.contract === "affitto";
+  const priceMinOpts = isRent ? RENT_MIN_OPTS : PRICE_MIN_OPTS;
+  const priceMaxOpts = isRent ? RENT_MAX_OPTS : PRICE_MAX_OPTS;
+  const priceMinLabel = isRent ? "Canone mensile da" : "Prezzo da";
+  const priceMaxLabel = isRent ? "Canone mensile a" : "Prezzo a";
+
+  const setContract = (id: SearchValues["contract"]) => {
+    setState((s) => {
+      const switchingToRent = id === "affitto" && s.contract !== "affitto";
+      const switchingFromRent = id !== "affitto" && s.contract === "affitto";
+      const resetPrice = switchingToRent || switchingFromRent;
+      return {
+        ...s,
+        contract: id,
+        price_min: resetPrice ? "" : s.price_min,
+        price_max: resetPrice ? "" : s.price_max,
+      };
+    });
+  };
+
   const toggleFeature = (f: string) =>
     setState((s) => ({
       ...s,
@@ -246,7 +279,7 @@ export function PropertySearchBar({
           <button
             key={t.id || "all"}
             type="button"
-            onClick={() => setState({ ...state, contract: t.id })}
+            onClick={() => setContract(t.id)}
             className={`rounded-[3px] px-5 py-2 text-[0.7rem] font-medium uppercase tracking-[0.2em] transition-all ${
               active
                 ? "bg-primary text-primary-foreground shadow-[0_4px_12px_-6px_rgba(184,106,75,0.6)]"
@@ -287,13 +320,13 @@ export function PropertySearchBar({
         <option value="">Tutti i comuni</option>
         {comuniList.map((c) => <option key={c} value={c}>{c}</option>)}
         </SelectField>
-        <SelectField label="Prezzo da" value={state.price_min}
+        <SelectField label={priceMinLabel} value={state.price_min}
           onChange={(v) => setState({ ...state, price_min: v })}>
-        {PRICE_MIN_OPTS.map((p) => <option key={p.label} value={p.value}>{p.label}</option>)}
+        {priceMinOpts.map((p) => <option key={p.label} value={p.value}>{p.label}</option>)}
         </SelectField>
-        <SelectField label="Prezzo a" value={state.price_max}
+        <SelectField label={priceMaxLabel} value={state.price_max}
           onChange={(v) => setState({ ...state, price_max: v })}>
-        {PRICE_MAX_OPTS.map((p) => <option key={p.label} value={p.value}>{p.label}</option>)}
+        {priceMaxOpts.map((p) => <option key={p.label} value={p.value}>{p.label}</option>)}
         </SelectField>
       </div>
       {advancedOpen && (
