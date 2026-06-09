@@ -444,17 +444,29 @@ function NewPropertyPage() {
               options={CONTRACT_TYPES.map((o) => ({ value: o, label: o }))}
             />
           </Field>
-          <Field label="Prezzo (€)">
-            <NumberInput
-              value={f.price}
-              onChange={(v) => upd("price", v)}
-              disabled={f.price_on_request}
-              step={1000}
-              placeholder={f.price_on_request ? "Prezzo su richiesta" : "Es. 450000"}
-            />
-          </Field>
-          <Field label="Modalità prezzo">
-            <Toggle label="Prezzo su richiesta" value={f.price_on_request} onChange={(v) => upd("price_on_request", v)} />
+          <Field label="Prezzo (€)" full>
+            <div className="space-y-2">
+              <NumberInput
+                value={f.price_on_request ? "" : f.price}
+                onChange={(v) => upd("price", v)}
+                disabled={f.price_on_request}
+                step={1000}
+                placeholder={f.price_on_request ? "Prezzo su richiesta" : "Inserisci prezzo"}
+              />
+              <Toggle
+                label="Prezzo su richiesta"
+                value={f.price_on_request}
+                onChange={(v) => {
+                  upd("price_on_request", v);
+                  if (v) upd("price", "");
+                }}
+              />
+              <p className="text-xs text-muted-foreground">
+                {f.price_on_request
+                  ? "Il prezzo non sarà mostrato. Sul sito apparirà: Prezzo su richiesta."
+                  : "Attiva questa opzione se non vuoi mostrare il prezzo pubblicamente."}
+              </p>
+            </div>
           </Field>
         </Section>
 
