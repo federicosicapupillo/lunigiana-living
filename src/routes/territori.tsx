@@ -37,6 +37,8 @@ function TerritoriPage() {
       <section className="relative isolate -mt-20 flex min-h-[80svh] items-end overflow-hidden">
         <img src={heroAsset.url} alt="Paesaggio della Lunigiana al tramonto" className="absolute inset-0 -z-10 h-full w-full object-cover" />
         <div className="hero-gradient absolute inset-0 -z-10" />
+        <div className="absolute inset-0 -z-10 bg-gradient-to-r from-ink/75 via-ink/45 to-ink/15" />
+        <div className="absolute inset-x-0 bottom-0 -z-10 h-1/2 bg-gradient-to-t from-ink/70 to-transparent" />
         <div className="container-editorial pb-20 pt-32">
           <span className="eyebrow text-cream/85">Vivere in Lunigiana</span>
           <h1 className="mt-4 max-w-3xl font-serif text-5xl leading-[1.05] text-cream md:text-7xl">
@@ -52,7 +54,7 @@ function TerritoriPage() {
       </section>
 
       <section className="bg-warm-cream">
-        <div className="container-editorial grid gap-12 py-24 md:grid-cols-12 md:py-32">
+        <div className="container-editorial grid gap-12 py-20 md:grid-cols-12 md:py-24">
           <div className="md:col-span-5">
             <span className="eyebrow">Il luogo</span>
             <h2 className="mt-3 font-serif text-4xl text-ink md:text-5xl">
@@ -85,7 +87,7 @@ function TerritoriPage() {
       </section>
 
       <section className="bg-warm-sand">
-        <div className="container-editorial py-20 md:py-28">
+        <div className="container-editorial py-16 md:py-20">
           <div className="max-w-2xl">
             <span className="eyebrow">Perché qui</span>
             <h2 className="mt-3 font-serif text-3xl text-ink md:text-4xl">
@@ -125,8 +127,8 @@ function TerritoriPage() {
         </div>
       </section>
 
-      <section className="bg-warm-ivory pb-0 pt-24 md:pt-32">
-        <div className="container-editorial pb-20 md:pb-28">
+      <section className="bg-warm-ivory pb-0 pt-20 md:pt-24">
+        <div className="container-editorial pb-16 md:pb-20">
           <span className="eyebrow">I borghi</span>
           <h2 className="mt-3 max-w-3xl font-serif text-4xl text-ink md:text-5xl">
             Sei luoghi,<br /><em className="italic">sei atmosfere diverse.</em>
@@ -145,7 +147,7 @@ function TerritoriPage() {
           const bg = bands[i % bands.length];
           return (
             <div key={t.slug} className={`${bg} border-t border-warm-border/60`}>
-              <div className="container-editorial py-20 md:py-28">
+              <div className="container-editorial py-14 md:py-20">
                 <article
                   className={`grid gap-10 md:grid-cols-12 md:items-center ${i % 2 ? "md:[&>figure]:order-2" : ""}`}
                 >
@@ -154,7 +156,7 @@ function TerritoriPage() {
                       src={imageBySlug[t.slug]}
                       alt={t.name}
                       loading="lazy"
-                      className="aspect-[4/3] w-full object-cover"
+                      className="aspect-[5/4] w-full object-cover md:aspect-[4/3]"
                     />
                   </figure>
                   <div className="md:col-span-5">
@@ -166,7 +168,7 @@ function TerritoriPage() {
                     <p className="mt-5 text-base leading-relaxed text-foreground/80">{t.body}</p>
                     <Link
                       to="/immobili"
-                      className="group mt-6 inline-flex items-center gap-2 text-sm uppercase tracking-[0.2em] text-primary"
+                      className="group mt-7 inline-flex items-center gap-2 rounded-sm border border-primary/60 px-5 py-2.5 text-[0.7rem] uppercase tracking-[0.22em] text-primary transition hover:bg-primary hover:text-primary-foreground"
                     >
                       Immobili a {t.name}
                       <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
@@ -180,7 +182,7 @@ function TerritoriPage() {
       </section>
 
       <section className="bg-warm-cream">
-        <div className="container-editorial grid gap-12 py-24 md:grid-cols-12 md:py-32">
+        <div className="container-editorial grid gap-12 py-20 md:grid-cols-12 md:py-24">
           <div className="md:col-span-5">
             <span className="eyebrow">Comprare in Lunigiana</span>
             <h2 className="mt-3 font-serif text-4xl text-ink md:text-5xl">
@@ -208,7 +210,7 @@ function TerritoriPage() {
         </div>
       </section>
 
-      <section className="bg-ink py-24 text-cream md:py-32">
+      <section className="bg-ink py-20 text-cream md:py-24">
         <div className="container-editorial max-w-3xl text-center">
           <span className="eyebrow text-cream/70">Trova la tua Lunigiana</span>
           <h2 className="mt-4 font-serif text-4xl leading-tight md:text-5xl">
