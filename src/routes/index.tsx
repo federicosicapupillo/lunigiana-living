@@ -10,17 +10,47 @@ import { PropertyCard } from "@/components/property-card";
 import { PropertySearchBar } from "@/components/property-search-bar";
 import { listPublishedProperties, type PublicProperty } from "@/lib/public-properties.functions";
 import { getHomeHeroVariant, type HomeHeroVariant } from "@/lib/site-settings.functions";
-import { ArrowRight, Compass, KeyRound, Sparkles } from "lucide-react";
-import { useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-  DialogClose,
-} from "@/components/ui/dialog";
+import { ArrowRight, Compass, KeyRound, Sparkles, Star, ShieldCheck, MapPin, Home as HomeIcon } from "lucide-react";
+
+const AGENCY_FACTS = {
+  yearsActive: 18,
+  propertiesManaged: 500,
+  comuniCovered: 6,
+  association: "FIAIP",
+  phone: "0187 830229",
+  mobile: "320 7019985",
+  address: "Via Pirandello 7, 54027 Pontremoli (MS)",
+  email: "furiaimmobiliare@libero.it",
+  googleReviewsUrl: "https://share.google/XuLvMM0CG6tmjlwpO",
+};
+
+const ORGANIZATION_JSONLD = {
+  "@context": "https://schema.org",
+  "@type": "RealEstateAgent",
+  name: "Furia Immobiliare",
+  description:
+    "Agenzia immobiliare a Pontremoli. Vendita e affitto di case, ville e dimore di carattere in Lunigiana.",
+  url: "https://furiaimmobiliare.it/",
+  telephone: "+39 0187 830229",
+  email: AGENCY_FACTS.email,
+  address: {
+    "@type": "PostalAddress",
+    streetAddress: "Via Pirandello 7",
+    addressLocality: "Pontremoli",
+    postalCode: "54027",
+    addressRegion: "MS",
+    addressCountry: "IT",
+  },
+  areaServed: [
+    "Pontremoli",
+    "Villafranca in Lunigiana",
+    "Filattiera",
+    "Mulazzo",
+    "Bagnone",
+    "Zeri",
+  ],
+  memberOf: { "@type": "Organization", name: "FIAIP" },
+};
 
 export const Route = createFileRoute("/")({
   loader: async () => {
@@ -38,18 +68,23 @@ export const Route = createFileRoute("/")({
       { rel: "canonical", href: "/" },
       { rel: "preload", as: "image", href: heroTramontoVignetiAsset.url, fetchpriority: "high" },
     ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify(ORGANIZATION_JSONLD),
+      },
+    ],
   }),
   component: Index,
 });
 
 function Index() {
-  const [open, setOpen] = useState(false);
   const { properties, heroVariant } = Route.useLoaderData() as {
     properties: PublicProperty[];
     heroVariant: HomeHeroVariant;
   };
   const featuredProperties = properties
-    .filter((p) => p.featured && p.category === "vendita")
+    .filter((p) => p.featured && p.category === "vendita" && p.images && p.images.length > 0)
     .slice(0, 6);
   const isPontremoli = heroVariant === "pontremoli_historic_center";
   const isElena = heroVariant === "elena_cometa";
