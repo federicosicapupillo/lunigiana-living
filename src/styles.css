@@ -386,10 +386,10 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 0.9rem 1.1rem;
-    border-radius: 0.5rem;
-    background: color-mix(in srgb, var(--warm-cream) 92%, transparent);
-    border: 1px solid color-mix(in srgb, var(--warm-border) 60%, transparent);
-    box-shadow: 0 1px 0 rgba(0,0,0,.08), 0 10px 24px -18px rgba(0,0,0,.4);
+    padding: 0.6rem 0.85rem;
+    border-radius: 0.4rem;
+    background: color-mix(in srgb, var(--warm-cream) 96%, transparent);
+    border: 1px solid color-mix(in srgb, var(--warm-border) 45%, transparent);
+    box-shadow: 0 1px 0 rgba(0,0,0,.06);
   }
 }
