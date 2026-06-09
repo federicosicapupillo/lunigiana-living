@@ -197,7 +197,17 @@ function PropertyEditor() {
   const save = async (silent = false) => {
     if (!prop) return;
     setSaving(true);
-    const slug = prop.slug?.trim() || slugify(prop.title || "immobile");
+    // Lo slug è un dato tecnico interno: si genera solo se manca,
+    // non viene mai rigenerato dal titolo dopo la creazione (stabilità SEO/link).
+    const existingSlug = prop.slug?.trim();
+    const slug =
+      existingSlug && existingSlug.length > 0
+        ? existingSlug
+        : slugify(
+            [prop.title, prop.municipality, prop.reference_code]
+              .filter(Boolean)
+              .join(" ") || "immobile",
+          );
     const { error } = await supabase
       .from("properties")
       .update({ ...prop, slug })
@@ -613,9 +623,6 @@ function MainTab({
 }) {
   return (
     <Section title="Dati principali">
-      <Field label="Slug URL">
-        <TextInput value={prop.slug} onChange={(v) => update({ slug: v })} placeholder="auto da titolo se vuoto" />
-      </Field>
       <Field label="Codice riferimento">
         <input
           type="text"
