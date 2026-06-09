@@ -59,6 +59,15 @@ const FILTERS: Array<{ key: Filter; label: string }> = [
   { key: "deleted", label: "Cestino" },
 ];
 
+const SORT_OPTIONS: Array<{ key: SortBy; label: string }> = [
+  { key: "newest", label: "Ultimi caricati" },
+  { key: "oldest", label: "Più vecchi" },
+  { key: "updated", label: "Ultimi aggiornati" },
+  { key: "price_asc", label: "Prezzo crescente" },
+  { key: "price_desc", label: "Prezzo decrescente" },
+  { key: "home_first", label: "In home prima" },
+];
+
 export const Route = createFileRoute("/_admin/admin/immobili/")({
   head: () => ({
     meta: [
