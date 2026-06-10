@@ -678,3 +678,63 @@ function IconBtn({
     </button>
   );
 }
+
+function VersionCard({
+  label,
+  inUse,
+  src,
+  alt,
+  downloadUrl,
+  downloadName,
+}: {
+  label: string;
+  inUse: boolean;
+  src: string;
+  alt: string;
+  downloadUrl: string;
+  downloadName: string;
+}) {
+  return (
+    <div
+      className={`group relative overflow-hidden rounded-sm border bg-muted transition ${
+        inUse ? "border-primary ring-1 ring-primary/40" : "border-border"
+      }`}
+    >
+      <div className="relative aspect-[4/3]">
+        <img src={src} alt={alt} className="h-full w-full object-cover" loading="lazy" />
+        <span className="absolute left-1.5 top-1.5 rounded-sm bg-background/85 px-1.5 py-0.5 text-[9px] uppercase tracking-wider text-foreground">
+          {label}
+          {inUse && <span className="ml-1 text-primary">· in uso</span>}
+        </span>
+        <a
+          href={downloadUrl}
+          download={downloadName}
+          target="_blank"
+          rel="noopener noreferrer"
+          title="Scarica"
+          className="absolute right-1.5 top-1.5 inline-flex items-center gap-1 rounded-sm bg-background/85 px-1.5 py-0.5 text-[9px] uppercase tracking-wider text-foreground opacity-0 transition group-hover:opacity-100 hover:bg-background"
+        >
+          <Download size={10} />
+        </a>
+      </div>
+    </div>
+  );
+}
+
+function EmptyVersion({
+  icon,
+  title,
+  hint,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  hint?: string;
+}) {
+  return (
+    <div className="flex aspect-[4/3] flex-col items-center justify-center gap-1.5 rounded-sm border border-dashed border-border bg-muted/30 p-2 text-center">
+      <span className="text-muted-foreground">{icon}</span>
+      <span className="text-[10px] leading-tight text-muted-foreground">{title}</span>
+      {hint && <span className="text-[9px] uppercase tracking-wider text-primary">{hint}</span>}
+    </div>
+  );
+}
