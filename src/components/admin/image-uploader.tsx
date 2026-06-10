@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { ImagePlus, Star, StarOff, Trash2, ArrowUp, ArrowDown, Loader2, Sparkles, Check, CloudDownload, Wand2 } from "lucide-react";
+import { ImagePlus, Star, StarOff, Trash2, ArrowUp, ArrowDown, Loader2, Sparkles, Check, CloudDownload, Wand2, Download } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import {
   renderPropertyImage,
@@ -376,111 +376,142 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
                 img.is_cover ? "border-primary" : "border-border"
               }`}
             >
-              <div className="grid grid-cols-2 gap-px bg-border">
-                <div className="relative aspect-[4/3] bg-muted">
-                  <img src={img.image_url} alt={img.alt_text ?? ""} className="h-full w-full object-cover" />
-                  <span className="absolute left-1 top-1 rounded-sm bg-background/80 px-1.5 py-0.5 text-[9px] uppercase tracking-wider text-muted-foreground">
-                    Originale {!img.use_rendered && "· in uso"}
+              {/* Versions gallery */}
+              <div className="bg-card p-3">
+                <div className="mb-2 flex items-center justify-between">
+                  <span className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+                    Versioni
                   </span>
-                </div>
-                <div className="relative aspect-[4/3] bg-muted">
-                  {img.rendered_signed_url ? (
-                    <img src={img.rendered_signed_url} alt="Rendering" className="h-full w-full object-cover" />
-                  ) : (
-                    <div className="flex h-full items-center justify-center text-[10px] uppercase tracking-wider text-muted-foreground">
-                      Nessun rendering
-                    </div>
-                  )}
-                  {img.rendered_signed_url && (
-                    <span className="absolute left-1 top-1 rounded-sm bg-background/80 px-1.5 py-0.5 text-[9px] uppercase tracking-wider text-muted-foreground">
-                      Rendering {img.use_rendered && "· in uso"}
+                  {img.is_cover && (
+                    <span className="inline-flex items-center gap-1 rounded-sm bg-primary px-2 py-0.5 text-[10px] uppercase tracking-wider text-primary-foreground">
+                      <Star size={10} className="fill-current" /> Cover in uso
                     </span>
                   )}
                 </div>
-              </div>
-              {/* Enhancement preview & controls */}
-              <div className="border-t border-border bg-muted/20 p-3">
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="relative aspect-[4/3] overflow-hidden rounded-sm bg-muted">
-                    {img.enhanced_image_url ? (
-                      <img src={img.enhanced_image_url} alt="Migliorata" className="h-full w-full object-cover" />
+                <div className="grid gap-2 sm:grid-cols-3">
+                  {/* Originale — always shown */}
+                  <VersionCard
+                    label="Originale"
+                    inUse={!img.use_rendered && !img.use_enhanced}
+                    src={img.image_url}
+                    alt={img.alt_text ?? "Originale"}
+                    downloadUrl={img.image_url}
+                    downloadName={`originale-${img.id}.jpg`}
+                  />
+                  {/* Migliorata */}
+                  {img.enhanced_image_url ? (
+                    <VersionCard
+                      label="Migliorata"
+                      inUse={img.use_enhanced}
+                      src={img.enhanced_image_url}
+                      alt="Migliorata"
+                      downloadUrl={img.enhanced_image_url}
+                      downloadName={`migliorata-${img.id}.jpg`}
+                    />
+                  ) : (
+                    <EmptyVersion
+                      icon={<Wand2 size={14} />}
+                      title="Foto non ancora migliorata"
+                      hint={
+                        img.enhancement_status === "processing"
+                          ? "In elaborazione…"
+                          : img.enhancement_status === "error"
+                          ? "Errore: riprova"
+                          : undefined
+                      }
+                    />
+                  )}
+                  {/* Rendering */}
+                  {img.rendered_signed_url ? (
+                    <VersionCard
+                      label="Rendering"
+                      inUse={img.use_rendered}
+                      src={img.rendered_signed_url}
+                      alt="Rendering"
+                      downloadUrl={img.rendered_signed_url}
+                      downloadName={`rendering-${img.id}.jpg`}
+                    />
+                  ) : (
+                    <EmptyVersion
+                      icon={<Sparkles size={14} />}
+                      title="Rendering non ancora generato"
+                      hint={
+                        img.render_status === "processing"
+                          ? "In elaborazione…"
+                          : img.render_status === "error"
+                          ? "Errore: riprova"
+                          : undefined
+                      }
+                    />
+                  )}
+                </div>
+
+                {/* Enhancement actions */}
+                <div className="mt-3 flex flex-wrap items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => enhance(img)}
+                    disabled={enhancingId === img.id || !img.render_availability?.canRender}
+                    className="inline-flex items-center gap-1.5 rounded-sm bg-ink px-3 py-1.5 text-[10px] uppercase tracking-[0.18em] text-cream transition-colors hover:bg-ink/90 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    {enhancingId === img.id ? (
+                      <>
+                        <Loader2 size={12} className="animate-spin" />
+                        Miglioramento in corso…
+                      </>
                     ) : (
-                      <div className="flex h-full items-center justify-center text-[10px] uppercase tracking-wider text-muted-foreground">
-                        Nessuna versione migliorata
-                      </div>
+                      <>
+                        <Wand2 size={12} />
+                        {img.enhanced_storage_path ? "Rigenera miglioramento" : "Migliora foto"}
+                      </>
                     )}
-                    {img.enhanced_image_url && (
-                      <span className="absolute left-1 top-1 rounded-sm bg-background/80 px-1.5 py-0.5 text-[9px] uppercase tracking-wider text-muted-foreground">
-                        Migliorata {img.use_enhanced && "· in uso"}
-                      </span>
-                    )}
-                  </div>
-                  <div className="flex flex-col justify-between gap-2 text-[10px]">
-                    <div>
-                      <div className="uppercase tracking-wider text-muted-foreground">Miglioramento</div>
-                      <div
-                        className={
-                          img.enhancement_status === "error"
-                            ? "text-destructive"
-                            : img.enhancement_status === "enhanced"
-                            ? "text-primary"
-                            : ""
-                        }
-                      >
-                        {img.enhancement_status === "not_enhanced" && "Non migliorata"}
-                        {img.enhancement_status === "processing" && "In elaborazione"}
-                        {img.enhancement_status === "enhanced" && "Migliorata"}
-                        {img.enhancement_status === "error" && "Errore"}
-                      </div>
-                      {img.enhancement_error && (
-                        <div className="mt-1 text-destructive">{img.enhancement_error}</div>
-                      )}
-                    </div>
-                    <div className="flex flex-col gap-1">
+                  </button>
+                  {img.enhanced_storage_path && (
+                    <div className="flex flex-wrap gap-1">
                       <button
                         type="button"
-                        onClick={() => enhance(img)}
-                        disabled={enhancingId === img.id || !img.render_availability?.canRender}
-                        className="inline-flex items-center justify-center gap-1 rounded-sm bg-ink px-2 py-1.5 text-[10px] uppercase tracking-wider text-cream hover:bg-ink/90 disabled:opacity-50"
+                        onClick={() => toggleEnhancedPublished(img, true)}
+                        disabled={img.use_enhanced}
+                        className="inline-flex items-center gap-1 rounded-sm border border-border bg-background px-2 py-1 text-[10px] uppercase tracking-wider hover:border-primary/50 disabled:opacity-40"
                       >
-                        {enhancingId === img.id ? (
-                          <Loader2 size={11} className="animate-spin" />
-                        ) : (
-                          <Wand2 size={11} />
-                        )}
-                        {img.enhanced_storage_path ? "Rigenera miglioramento" : "Migliora foto"}
+                        {img.use_enhanced && <Check size={11} className="text-primary" />}
+                        Usa migliorata
                       </button>
-                      {img.enhanced_storage_path && (
-                        <div className="flex flex-wrap gap-1">
-                          <button
-                            type="button"
-                            onClick={() => toggleEnhancedPublished(img, true)}
-                            disabled={img.use_enhanced}
-                            className="inline-flex flex-1 items-center justify-center gap-1 rounded-sm border border-border bg-background px-2 py-1 text-[10px] uppercase tracking-wider hover:border-primary/50 disabled:opacity-40"
-                          >
-                            {img.use_enhanced && <Check size={11} className="text-primary" />}
-                            Usa migliorata
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => toggleEnhancedPublished(img, false)}
-                            disabled={!img.use_enhanced}
-                            className="inline-flex flex-1 items-center justify-center gap-1 rounded-sm border border-border bg-background px-2 py-1 text-[10px] uppercase tracking-wider hover:border-primary/50 disabled:opacity-40"
-                          >
-                            {!img.use_enhanced && <Check size={11} className="text-primary" />}
-                            Mantieni originale
-                          </button>
-                        </div>
-                      )}
+                      <button
+                        type="button"
+                        onClick={() => toggleEnhancedPublished(img, false)}
+                        disabled={!img.use_enhanced}
+                        className="inline-flex items-center gap-1 rounded-sm border border-border bg-background px-2 py-1 text-[10px] uppercase tracking-wider hover:border-primary/50 disabled:opacity-40"
+                      >
+                        {!img.use_enhanced && <Check size={11} className="text-primary" />}
+                        Mantieni originale
+                      </button>
                     </div>
-                  </div>
+                  )}
                 </div>
+                {!img.enhanced_image_url && (
+                  <div className="mt-2 text-[10px] uppercase tracking-wider text-muted-foreground">
+                    Stato miglioramento:{" "}
+                    <span
+                      className={
+                        img.enhancement_status === "error"
+                          ? "text-destructive"
+                          : img.enhancement_status === "processing"
+                          ? "text-primary"
+                          : ""
+                      }
+                    >
+                      {img.enhancement_status === "not_enhanced" && "non ancora eseguito"}
+                      {img.enhancement_status === "processing" && "in elaborazione"}
+                      {img.enhancement_status === "enhanced" && "completato"}
+                      {img.enhancement_status === "error" && "errore"}
+                    </span>
+                  </div>
+                )}
+                {img.enhancement_error && (
+                  <div className="mt-1 text-[10px] text-destructive">{img.enhancement_error}</div>
+                )}
               </div>
-              {img.is_cover && (
-                <span className="absolute left-2 top-2 rounded-sm bg-primary px-2 py-0.5 text-[10px] uppercase tracking-wider text-primary-foreground">
-                  Cover
-                </span>
-              )}
               <div className="space-y-2 p-3">
                 <input
                   defaultValue={img.alt_text ?? ""}
@@ -551,7 +582,7 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
                           : ""
                       }
                     >
-                      {(img.render_status === "not_generated" || img.render_status === "idle") && "Non generato"}
+                      {(img.render_status === "not_generated" || img.render_status === "idle") && "Rendering non ancora generato"}
                       {img.render_status === "processing" && "In elaborazione"}
                       {(img.render_status === "completed" || img.render_status === "done") && "Rendering generato"}
                       {img.render_status === "error" && "Errore"}
@@ -645,5 +676,65 @@ function IconBtn({
     >
       {children}
     </button>
+  );
+}
+
+function VersionCard({
+  label,
+  inUse,
+  src,
+  alt,
+  downloadUrl,
+  downloadName,
+}: {
+  label: string;
+  inUse: boolean;
+  src: string;
+  alt: string;
+  downloadUrl: string;
+  downloadName: string;
+}) {
+  return (
+    <div
+      className={`group relative overflow-hidden rounded-sm border bg-muted transition ${
+        inUse ? "border-primary ring-1 ring-primary/40" : "border-border"
+      }`}
+    >
+      <div className="relative aspect-[4/3]">
+        <img src={src} alt={alt} className="h-full w-full object-cover" loading="lazy" />
+        <span className="absolute left-1.5 top-1.5 rounded-sm bg-background/85 px-1.5 py-0.5 text-[9px] uppercase tracking-wider text-foreground">
+          {label}
+          {inUse && <span className="ml-1 text-primary">· in uso</span>}
+        </span>
+        <a
+          href={downloadUrl}
+          download={downloadName}
+          target="_blank"
+          rel="noopener noreferrer"
+          title="Scarica"
+          className="absolute right-1.5 top-1.5 inline-flex items-center gap-1 rounded-sm bg-background/85 px-1.5 py-0.5 text-[9px] uppercase tracking-wider text-foreground opacity-0 transition group-hover:opacity-100 hover:bg-background"
+        >
+          <Download size={10} />
+        </a>
+      </div>
+    </div>
+  );
+}
+
+function EmptyVersion({
+  icon,
+  title,
+  hint,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  hint?: string;
+}) {
+  return (
+    <div className="flex aspect-[4/3] flex-col items-center justify-center gap-1.5 rounded-sm border border-dashed border-border bg-muted/30 p-2 text-center">
+      <span className="text-muted-foreground">{icon}</span>
+      <span className="text-[10px] leading-tight text-muted-foreground">{title}</span>
+      {hint && <span className="text-[9px] uppercase tracking-wider text-primary">{hint}</span>}
+    </div>
   );
 }
