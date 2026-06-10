@@ -582,7 +582,7 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
                           : ""
                       }
                     >
-                      {(img.render_status === "not_generated" || img.render_status === "idle") && "Non generato"}
+                      {(img.render_status === "not_generated" || img.render_status === "idle") && "Rendering non ancora generato"}
                       {img.render_status === "processing" && "In elaborazione"}
                       {(img.render_status === "completed" || img.render_status === "done") && "Rendering generato"}
                       {img.render_status === "error" && "Errore"}
