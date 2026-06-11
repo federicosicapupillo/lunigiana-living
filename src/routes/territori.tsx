@@ -155,61 +155,45 @@ function TerritoriPage() {
       <section className="bg-warm-cream">
         <div className="container-editorial grid gap-12 py-20 md:grid-cols-12 md:py-24">
           <div className="md:col-span-5">
-            <span className="eyebrow">Comprare in Lunigiana</span>
+            <span className="eyebrow">{t("terr.market.eyebrow")}</span>
             <h2 className="mt-3 font-serif text-4xl text-ink md:text-5xl">
-              Cosa si trova,<br /><em className="italic">e a che condizioni.</em>
+              {t("terr.market.title1")}<br /><em className="italic">{t("terr.market.title2")}</em>
             </h2>
             <div className="mt-8 h-px w-16 bg-warm-border" />
           </div>
           <div className="space-y-5 text-[1.0625rem] leading-[1.75] text-foreground/85 md:col-span-6 md:col-start-7">
-          <p>
-            Il mercato lunigianese non assomiglia a quello di Lucca o della
-            Versilia. Qui si trovano ancora case di paese in pietra a vista,
-            rustici da recuperare con porzioni di terreno, casali isolati con
-            vista sull'Appennino, appartamenti nei centri storici e ville
-            indipendenti in collina. I valori al metro quadro sono fra i più
-            accessibili della Toscana, soprattutto fuori dai centri principali.
-          </p>
-          <p>
-            È un mercato che premia chi sa leggere le sfumature: l'esposizione
-            del versante, lo stato delle strutture portanti, la viabilità
-            invernale, i vincoli paesaggistici, le pratiche edilizie pregresse.
-            Sono proprio gli aspetti su cui ti accompagniamo, perché una bella
-            foto da sola non basta a dire se quella casa è davvero per te.
-          </p>
+          <p>{t("terr.market.p1")}</p>
+          <p>{t("terr.market.p2")}</p>
           </div>
         </div>
       </section>
 
       <section className="bg-ink py-20 text-cream md:py-24">
         <div className="container-editorial max-w-3xl text-center">
-          <span className="eyebrow text-cream/70">Trova la tua Lunigiana</span>
+          <span className="eyebrow text-cream/70">{t("terr.cta.eyebrow")}</span>
           <h2 className="mt-4 font-serif text-4xl leading-tight md:text-5xl">
-            Non sei sicuro<br />
-            <em className="italic">da dove cominciare?</em>
+            {t("terr.cta.title1")}<br />
+            <em className="italic">{t("terr.cta.title2")}</em>
           </h2>
           <p className="mx-auto mt-6 max-w-xl text-base leading-relaxed text-cream/80">
-            Raccontaci come immagini la tua casa, il tempo che vorresti
-            dedicarle e cosa cerchi intorno: borgo vivo, campagna silenziosa,
-            vicinanza al mare o alla montagna. Ti proponiamo i territori e gli
-            immobili più coerenti con la tua idea, senza farti perdere tempo.
+            {t("terr.cta.body")}
           </p>
           <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Link
               to="/contatti"
               className="inline-flex items-center justify-center gap-2 rounded-sm bg-cream px-8 py-4 text-xs uppercase tracking-[0.22em] text-ink transition hover:bg-cream/90"
             >
-              Parla con Elena <ArrowRight size={14} />
+              {t("cta.talkToElena")} <ArrowRight size={14} />
             </Link>
             <Link
               to="/immobili"
               className="inline-flex items-center justify-center gap-2 text-xs uppercase tracking-[0.22em] text-cream/85 hover:text-cream"
             >
-              Vedi gli immobili disponibili
+              {t("cta.viewProperties")}
             </Link>
           </div>
           <p className="mt-6 text-[0.7rem] uppercase tracking-[0.2em] text-cream/55">
-            Consulenza iniziale gratuita · risposta entro 24 ore
+            {t("terr.cta.note")}
           </p>
         </div>
       </section>
