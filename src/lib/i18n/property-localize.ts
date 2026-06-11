@@ -386,7 +386,7 @@ type LocalizableProperty = {
 /** One public-site entry point: apply EN translations to all dynamic property fields. */
 export function localizePropertyDynamic<T extends LocalizableProperty>(property: T, lang: Language): T {
   if (lang === "it") return property;
-  return {
+  const localized: LocalizableProperty = {
     ...property,
     title: localizeFreeText(property.titleEn || property.title, lang),
     description: localizeFreeText(property.descriptionEn || property.description, lang),
@@ -409,4 +409,5 @@ export function localizePropertyDynamic<T extends LocalizableProperty>(property:
       note: group.note ? localizeFreeText(group.note, lang) : group.note,
     })),
   };
+  return localized as T;
 }
