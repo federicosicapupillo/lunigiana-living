@@ -118,30 +118,28 @@ function Index() {
           <div className="absolute inset-0 -z-10 bg-gradient-to-br from-cream via-cream to-[hsl(var(--muted))]" />
           <div className="container-editorial grid min-h-[88svh] grid-cols-1 items-center gap-10 pb-12 pt-32 sm:min-h-[92svh] sm:pb-16 sm:pt-40 md:min-h-[100svh] md:grid-cols-12 md:gap-12 md:pb-24">
             <div className="md:col-span-6 lg:col-span-6">
-              <span className="eyebrow text-primary">Agenzia immobiliare · Pontremoli · Lunigiana</span>
+              <span className="eyebrow text-primary">{t("home.eyebrow")}</span>
               <h1 className="mt-4 font-serif text-[2.4rem] leading-[1.05] text-ink sm:text-5xl sm:leading-[1.02] md:text-6xl lg:text-7xl">
-                Case in vendita in Lunigiana,<br />
-                <em className="font-normal italic">scelte una per una.</em>
+                {t("home.hero.title1")}<br />
+                <em className="font-normal italic">{t("home.hero.title2")}</em>
               </h1>
               <p className="mt-5 max-w-xl text-sm leading-relaxed text-foreground/80 sm:text-base md:text-lg">
-                Da 18 anni a Pontremoli. Elena e Cometa ti accompagnano a trovare
-                la casa giusta in Lunigiana: visite sul posto, conoscenza reale
-                dei borghi, nessuna pressione di vendita.
+                {t("home.hero.lead")}
               </p>
               <div className="mt-8 flex flex-wrap items-center gap-3 sm:mt-10 sm:gap-4">
                 <Link
                   to="/immobili"
                   className="inline-flex items-center gap-2 rounded-sm bg-ink px-6 py-3.5 text-[0.7rem] uppercase tracking-[0.2em] text-cream transition hover:bg-ink/90 sm:px-8 sm:py-4 sm:text-xs sm:tracking-[0.22em]"
                 >
-                  Cerca la tua casa <ArrowRight size={14} />
+                  {t("cta.searchYourHome")} <ArrowRight size={14} />
                 </Link>
                 <a
-                  href={`https://wa.me/393207019985?text=${encodeURIComponent("Ciao Elena, sto cercando casa in Lunigiana e vorrei ricevere maggiori informazioni.")}`}
+                  href={`https://wa.me/393207019985?text=${encodeURIComponent(t("wa.defaultMsg"))}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 rounded-sm border border-ink px-6 py-3.5 text-[0.7rem] uppercase tracking-[0.2em] text-ink transition hover:bg-ink hover:text-cream sm:px-8 sm:py-4 sm:text-xs sm:tracking-[0.22em]"
                 >
-                  Parla con Elena
+                  {t("cta.talkToElena")}
                 </a>
               </div>
             </div>
@@ -158,7 +156,7 @@ function Index() {
                 />
                 <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-ink/40 to-transparent p-5">
                   <div className="text-[0.65rem] uppercase tracking-[0.22em] text-cream/90">
-                    Elena e Cometa · Furia Immobiliare
+                    {t("home.hero.elenaCaption")}
                   </div>
                 </div>
               </div>
@@ -182,15 +180,13 @@ function Index() {
 
         <div className="container-editorial w-full pb-12 pt-32 sm:pb-16 sm:pt-40 md:pb-24">
           <div className="max-w-3xl">
-            <span className="eyebrow text-cream/90">Agenzia immobiliare · Pontremoli · Lunigiana</span>
+            <span className="eyebrow text-cream/90">{t("home.eyebrow")}</span>
             <h1 className="mt-4 font-serif text-[2.4rem] leading-[1.05] text-cream sm:text-5xl sm:leading-[1.02] md:text-7xl">
-              Case in vendita in Lunigiana,<br />
-              <em className="font-normal italic text-cream/95">scelte una per una.</em>
+              {t("home.hero.title1")}<br />
+              <em className="font-normal italic text-cream/95">{t("home.hero.title2")}</em>
             </h1>
             <p className="mt-5 max-w-xl text-sm leading-relaxed text-cream/85 sm:text-base md:text-lg">
-              Da 18 anni a Pontremoli. Case di pietra, ville panoramiche e
-              dimore di carattere in tutta la Lunigiana — selezionate da chi
-              questa terra la abita davvero.
+              {t("home.hero.leadAlt")}
             </p>
           </div>
 
@@ -199,15 +195,15 @@ function Index() {
               to="/immobili"
               className="inline-flex items-center gap-2 rounded-sm bg-cream px-6 py-3.5 text-[0.7rem] uppercase tracking-[0.2em] text-ink transition hover:bg-cream/90 sm:px-8 sm:py-4 sm:text-xs sm:tracking-[0.22em]"
             >
-              Vedi gli immobili <ArrowRight size={14} />
+              {t("cta.viewProperties")} <ArrowRight size={14} />
             </Link>
             <a
-              href={`https://wa.me/393207019985?text=${encodeURIComponent("Ciao Elena, sto cercando casa in Lunigiana e vorrei ricevere maggiori informazioni.")}`}
+              href={`https://wa.me/393207019985?text=${encodeURIComponent(t("wa.defaultMsg"))}`}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 rounded-sm border border-cream/70 px-6 py-3.5 text-[0.7rem] uppercase tracking-[0.2em] text-cream transition hover:bg-cream hover:text-ink sm:px-8 sm:py-4 sm:text-xs sm:tracking-[0.22em]"
             >
-              Parla con Elena su WhatsApp
+              {t("cta.talkToElenaWA")}
             </a>
           </div>
         </div>
