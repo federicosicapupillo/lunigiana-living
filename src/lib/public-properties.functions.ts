@@ -10,8 +10,13 @@ export type PublicProperty = {
   slug: string | null;
   reference: string;
   title: string;
+  titleEn: string | null;
+  subtitleEn: string | null;
+  summaryEn: string | null;
+  locationDescriptionEn: string | null;
   location: string;
   price: string;
+  priceRent: string;
   priceValue: number | null;
   type: string;
   sqm: number | null;
@@ -26,6 +31,7 @@ export type PublicProperty = {
   image: string;
   gallery: string[];
   description: string;
+  descriptionEn: string | null;
   attributes: Record<string, string>;
   amenities: string[];
   altreDotazioni: string | null;
@@ -33,6 +39,7 @@ export type PublicProperty = {
   category: "vendita" | "affitto" | "scelti-per-voi";
   featured: boolean;
   tag?: string;
+  isRent: boolean;
 };
 
 const PLACEHOLDER =
@@ -85,6 +92,10 @@ type PropertyRow = {
   slug: string | null;
   reference_code: string | null;
   title: string;
+  title_en: string | null;
+  subtitle_en: string | null;
+  summary_en: string | null;
+  location_description_en: string | null;
   municipality: string | null;
   area_zone: string | null;
   price: number | null;
@@ -119,7 +130,7 @@ type ImageRow = {
 };
 
 type FeatureRow = { property_id: string; feature_name: string; feature_value: string | null };
-type DescriptionRow = { property_id: string; edited_description: string | null; generated_description: string | null };
+type DescriptionRow = { property_id: string; edited_description: string | null; generated_description: string | null; description_en: string | null };
 
 function buildTag(p: PropertyRow): string | undefined {
   if (p.historic_property) return "Storico";
@@ -193,8 +204,13 @@ function adapt(
     slug: p.slug,
     reference: p.reference_code || p.id.slice(0, 8).toUpperCase(),
     title: p.title,
+    titleEn: p.title_en,
+    subtitleEn: p.subtitle_en,
+    summaryEn: p.summary_en,
+    locationDescriptionEn: p.location_description_en,
     location,
     price: formatPrice(p.price, p.price_on_request, p.contract_type),
+    priceRent: p.contract_type === "affitto" ? formatPrice(p.price, p.price_on_request, p.contract_type) : "",
     priceValue: p.price_on_request ? null : p.price,
     type: p.property_type || "Immobile",
     sqm: p.size_sqm,
@@ -209,6 +225,7 @@ function adapt(
     image: cover,
     gallery: gallery.length ? gallery : [PLACEHOLDER],
     description: description?.edited_description || description?.generated_description || p.short_notes || "",
+    descriptionEn: description?.description_en || null,
     attributes: attrs,
     amenities,
     altreDotazioni: altre,
@@ -216,6 +233,7 @@ function adapt(
     category: deriveCategory(p.contract_type),
     featured: !!p.featured,
     tag: buildTag(p),
+    isRent: p.contract_type === "affitto",
   };
 }
 
@@ -223,7 +241,7 @@ export const listPublishedProperties = createServerFn({ method: "GET" }).handler
   const { data: props, error } = await supabaseAdmin
     .from("properties")
     .select(
-      "id, slug, reference_code, title, municipality, area_zone, price, price_on_request, property_type, contract_type, size_sqm, bedrooms, bathrooms, floors, short_notes, panoramic_view, historic_property, featured, homepage_order, featured_at, energy_class, energy_performance_index_status, energy_performance_index_value",
+      "id, slug, reference_code, title, title_en, subtitle_en, summary_en, location_description_en, municipality, area_zone, price, price_on_request, property_type, contract_type, size_sqm, bedrooms, bathrooms, floors, short_notes, panoramic_view, historic_property, featured, homepage_order, featured_at, energy_class, energy_performance_index_status, energy_performance_index_value",
     )
     .eq("status", "published")
     .order("homepage_order", { ascending: true, nullsFirst: false })
@@ -246,7 +264,7 @@ export const listPublishedProperties = createServerFn({ method: "GET" }).handler
       .in("property_id", ids),
     supabaseAdmin
       .from("property_descriptions")
-      .select("property_id, edited_description, generated_description")
+      .select("property_id, edited_description, generated_description, description_en")
       .in("property_id", ids),
   ]);
 
@@ -287,7 +305,7 @@ export const getPublishedProperty = createServerFn({ method: "GET" })
     const { data: p, error } = await supabaseAdmin
       .from("properties")
       .select(
-      "id, slug, reference_code, title, municipality, area_zone, price, price_on_request, property_type, contract_type, size_sqm, bedrooms, bathrooms, floors, short_notes, panoramic_view, historic_property, featured, energy_class, energy_performance_index_status, energy_performance_index_value",
+      "id, slug, reference_code, title, title_en, subtitle_en, summary_en, location_description_en, municipality, area_zone, price, price_on_request, property_type, contract_type, size_sqm, bedrooms, bathrooms, floors, short_notes, panoramic_view, historic_property, featured, energy_class, energy_performance_index_status, energy_performance_index_value",
       )
       .eq("status", "published")
       .or(`id.eq.${data.id},slug.eq.${data.id}`)
@@ -307,7 +325,7 @@ export const getPublishedProperty = createServerFn({ method: "GET" })
         .eq("property_id", propRow.id),
       supabaseAdmin
         .from("property_descriptions")
-        .select("property_id, edited_description, generated_description")
+        .select("property_id, edited_description, generated_description, description_en")
         .eq("property_id", propRow.id)
         .maybeSingle(),
     ]);

@@ -3,11 +3,14 @@ import { MapPin, Maximize2, BedDouble, ArrowRight } from "lucide-react";
 import { WatermarkedImage } from "@/components/watermarked-image";
 import { whatsappUrl } from "@/components/whatsapp-float";
 import { useT } from "@/lib/i18n/LanguageContext";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
+import { pickLocalized } from "@/lib/i18n/translations";
 
 type PropertyCardData = {
   id: number | string;
   reference: string;
   title: string;
+  titleEn?: string | null;
   location: string;
   type: string;
   image: string;
@@ -16,25 +19,31 @@ type PropertyCardData = {
   rooms?: number | null;
   epi?: string;
   tag?: string;
+  isRent?: boolean;
 };
 
 export function PropertyCard({ p }: { p: PropertyCardData }) {
   const t = useT();
+  const { language } = useLanguage();
+  const displayTitle = pickLocalized<string | null | undefined>(p.title, p.titleEn ?? null, language) ?? p.title;
+  const displayPrice = p.isRent && language === "en"
+    ? p.price.replace("/ mese", "/ month")
+    : p.price;
   const waHref = whatsappUrl(
-    `${t("wa.propertyMsgPrefix")} ${p.reference} — ${p.title} (${p.location}).`,
+    `${t("wa.propertyMsgPrefix")} ${p.reference} — ${displayTitle} (${p.location}).`,
   );
   return (
     <div className="card-property group block overflow-hidden">
       <Link
         to="/immobili/$id"
         params={{ id: String(p.id) }}
-        aria-label={`Apri scheda immobile ${p.reference} — ${p.title} a ${p.location}`}
+        aria-label={`${t("cta.openListing")} ${p.reference} — ${displayTitle} (${p.location})`}
         className="block focus-visible:outline-none"
       >
         <div className="relative aspect-[4/3] overflow-hidden bg-muted">
           <WatermarkedImage
             src={p.image}
-            alt={p.title}
+            alt={displayTitle}
             loading="lazy"
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
             watermarkSize="md"
@@ -52,7 +61,7 @@ export function PropertyCard({ p }: { p: PropertyCardData }) {
         <div className="px-5 pt-5 pb-3">
           <div className="eyebrow">{p.reference} · {p.type}</div>
           <h3 className="mt-2 font-serif text-2xl leading-tight text-ink transition-colors group-hover:text-primary">
-            {p.title}
+            {displayTitle}
           </h3>
           <div className="mt-2 flex items-center gap-1.5 text-sm text-muted-foreground">
             <MapPin size={14} /> {p.location}
@@ -66,7 +75,7 @@ export function PropertyCard({ p }: { p: PropertyCardData }) {
                 <span className="flex items-center gap-1"><BedDouble size={13} /> {p.rooms} {t("card.rooms")}</span>
               )}
             </div>
-            <div className="font-serif text-xl font-medium text-terracotta">{p.price}</div>
+            <div className="font-serif text-xl font-medium text-terracotta">{displayPrice}</div>
           </div>
           {p.epi && (
             <div className="mt-2 text-[0.7rem] uppercase tracking-wider text-muted-foreground">
