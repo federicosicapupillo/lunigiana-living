@@ -1397,3 +1397,108 @@ function RadioRow({
     </button>
   );
 }
+function EnglishTab({
+  prop,
+  update,
+  desc,
+  setDesc,
+  translating,
+  onTranslate,
+  onSaveDescEn,
+}: {
+  prop: Property;
+  update: (p: Partial<Property>) => void;
+  desc: Description | null;
+  setDesc: React.Dispatch<React.SetStateAction<Description | null>>;
+  translating: boolean;
+  onTranslate: () => void | Promise<void>;
+  onSaveDescEn: () => void | Promise<void>;
+}) {
+  return (
+    <Section title="Versione inglese (opzionale)">
+      <Field label="Traduzione automatica" full>
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-sm border border-primary/30 bg-primary/5 p-3">
+          <p className="text-xs text-muted-foreground">
+            Compila a mano oppure traduci automaticamente dall'italiano con l'AI.
+            Se i campi EN restano vuoti, il sito mostra la versione italiana.
+          </p>
+          <button
+            type="button"
+            onClick={onTranslate}
+            disabled={translating}
+            className="inline-flex items-center gap-2 rounded-sm bg-primary px-4 py-2 text-xs uppercase tracking-wider text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
+          >
+            {translating ? <Loader2 size={13} className="animate-spin" /> : <Languages size={13} />}
+            Traduci con AI
+          </button>
+        </div>
+      </Field>
+      <Field label="Titolo (EN)" full>
+        <input
+          type="text"
+          value={prop.title_en ?? ""}
+          onChange={(e) => update({ title_en: e.target.value })}
+          className={inputCls}
+          placeholder="Stone farmhouse with views of the Apuan Alps"
+        />
+      </Field>
+      <Field label="Sottotitolo (EN)" full>
+        <input
+          type="text"
+          value={prop.subtitle_en ?? ""}
+          onChange={(e) => update({ subtitle_en: e.target.value })}
+          className={inputCls}
+          placeholder="Short tagline shown on the listing"
+        />
+      </Field>
+      <Field label="Riassunto (EN)" full>
+        <textarea
+          value={prop.summary_en ?? ""}
+          onChange={(e) => update({ summary_en: e.target.value })}
+          rows={3}
+          className={inputCls}
+          placeholder="Short summary in English."
+        />
+      </Field>
+      <Field label="Descrizione zona (EN)" full>
+        <textarea
+          value={prop.location_description_en ?? ""}
+          onChange={(e) => update({ location_description_en: e.target.value })}
+          rows={3}
+          className={inputCls}
+          placeholder="English description of the area."
+        />
+      </Field>
+      <Field label="Descrizione completa (EN)" full>
+        <textarea
+          value={desc?.description_en ?? ""}
+          onChange={(e) =>
+            setDesc((d) => ({
+              ...(d ?? {
+                generated_description: null,
+                edited_description: null,
+                tone_of_voice: null,
+                length_preference: null,
+                seo_focus: null,
+                generated_at: null,
+              }),
+              description_en: e.target.value,
+            }))
+          }
+          rows={8}
+          className={inputCls}
+          placeholder="Full English description shown on the property page."
+        />
+        <div className="mt-2 flex justify-end">
+          <button
+            type="button"
+            onClick={onSaveDescEn}
+            className="inline-flex items-center gap-2 rounded-sm border border-primary/40 bg-primary/5 px-4 py-2 text-xs uppercase tracking-wider text-primary hover:bg-primary/10"
+          >
+            <Save size={13} /> Salva descrizione EN
+          </button>
+        </div>
+      </Field>
+    </Section>
+  );
+}
