@@ -775,6 +775,62 @@ function NewPropertyPage() {
           </Field>
         </Section>
 
+        {/* SEZIONE 4-bis — Versione inglese */}
+        <Section title="5. Versione inglese (opzionale)" subtitle="Mostrata agli utenti che selezionano EN. Se vuota, si usa la versione italiana.">
+          <div className="md:col-span-2 flex flex-wrap items-center justify-between gap-3 rounded-sm border border-primary/30 bg-primary/5 p-3">
+            <p className="text-xs text-muted-foreground">
+              Compila a mano oppure traduci automaticamente dall'italiano con l'AI.
+            </p>
+            <button
+              type="button"
+              onClick={onTranslateAi}
+              disabled={translating}
+              className="inline-flex items-center gap-2 rounded-sm bg-primary px-4 py-2 text-xs uppercase tracking-wider text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
+            >
+              {translating ? <Loader2 size={13} className="animate-spin" /> : <Languages size={13} />}
+              Traduci con AI
+            </button>
+          </div>
+          <Field label="Titolo (EN)" full>
+            <TextInput
+              value={f.title_en}
+              onChange={(v) => upd("title_en", v)}
+              placeholder="e.g. Stone farmhouse with views of the Apuan Alps"
+            />
+          </Field>
+          <Field label="Sottotitolo (EN)" full>
+            <TextInput
+              value={f.subtitle_en}
+              onChange={(v) => upd("subtitle_en", v)}
+              placeholder="Short tagline shown on the listing"
+            />
+          </Field>
+          <Field label="Riassunto (EN)" full>
+            <TextArea
+              value={f.summary_en}
+              onChange={(v) => upd("summary_en", v)}
+              rows={3}
+              placeholder="Short summary of the property in English."
+            />
+          </Field>
+          <Field label="Descrizione zona (EN)" full>
+            <TextArea
+              value={f.location_description_en}
+              onChange={(v) => upd("location_description_en", v)}
+              rows={3}
+              placeholder="English description of the area / neighbourhood."
+            />
+          </Field>
+          <Field label="Descrizione completa (EN)" full>
+            <TextArea
+              value={f.description_en}
+              onChange={(v) => upd("description_en", v)}
+              rows={6}
+              placeholder="Full English description shown on the property page."
+            />
+          </Field>
+        </Section>
+
         {/* SEZIONI 5 + 6 — handoff al full editor */}
         <div className="rounded-sm border border-dashed border-border bg-muted/30 p-6">
           <div className="flex items-start gap-3">
