@@ -378,7 +378,7 @@ export function PropertySearchBar({
           onClick={() => toggleFeature(f)}
           className="inline-flex items-center gap-1.5 rounded-full border border-border bg-muted/40 px-3 py-1 text-xs text-ink hover:border-primary/50"
         >
-          {f}
+          {localizeAmenity(f, language)}
           <X size={12} />
         </button>
       ))}
