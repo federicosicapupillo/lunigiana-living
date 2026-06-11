@@ -4,6 +4,8 @@ import { ArrowLeft, MapPin, Maximize2, BedDouble, Bath, Building2 } from "lucide
 import { useState } from "react";
 import { WatermarkedImage } from "@/components/watermarked-image";
 import { whatsappUrl } from "@/components/whatsapp-float";
+import { useLanguage, useT } from "@/lib/i18n/LanguageContext";
+import { pickLocalized } from "@/lib/i18n/translations";
 
 export const Route = createFileRoute("/immobili/$id")({
   loader: async ({ params }) => {
@@ -55,11 +57,16 @@ const DETAIL_KEYS = [
 
 function PropertyDetail() {
   const { property: p } = Route.useLoaderData() as { property: PublicProperty };
+  const t = useT();
+  const { language } = useLanguage();
+  const title = pickLocalized<string | null | undefined>(p.title, p.titleEn, language) ?? p.title;
+  const desc = pickLocalized<string | null | undefined>(p.description, p.descriptionEn, language) ?? p.description;
+  const priceLabel = p.isRent && language === "en" ? p.price.replace("/ mese", "/ month") : p.price;
   const [active, setActive] = useState(0);
   const main = p.gallery[active] || p.image;
   const waMessage =
     `Ciao Elena, vorrei ricevere informazioni su questo immobile: ` +
-    `${p.reference} — ${p.title} (${p.location}).` +
+    `${p.reference} — ${title} (${p.location}).` +
     (typeof window !== "undefined" ? `\n${window.location.href}` : "");
   const waHref = whatsappUrl(waMessage);
 
@@ -69,19 +76,19 @@ function PropertyDetail() {
       <header className="border-b border-border bg-muted/40 pb-8 pt-24 sm:pb-10 sm:pt-28 md:pt-36">
         <div className="container-editorial">
           <Link to="/immobili" className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-muted-foreground hover:text-ink">
-            <ArrowLeft size={14} /> Torna agli immobili
+            <ArrowLeft size={14} /> {t("detail.back")}
           </Link>
           <div className="mt-6 flex flex-wrap items-end justify-between gap-4 sm:gap-6">
             <div className="min-w-0 flex-1">
               <span className="eyebrow">{p.reference} · {p.type}</span>
-              <h1 className="mt-3 font-serif text-3xl leading-tight text-ink sm:text-4xl md:text-5xl">{p.title}</h1>
+              <h1 className="mt-3 font-serif text-3xl leading-tight text-ink sm:text-4xl md:text-5xl">{title}</h1>
               <div className="mt-3 flex items-center gap-2 text-sm text-muted-foreground">
                 <MapPin size={15} /> {p.location}
               </div>
             </div>
             <div className="text-right">
-              <div className="eyebrow text-muted-foreground">{p.category === "affitto" ? "Affitto" : "Prezzo"}</div>
-              <div className="mt-2 font-serif text-2xl text-primary sm:text-3xl md:text-4xl">{p.price}</div>
+              <div className="eyebrow text-muted-foreground">{p.category === "affitto" ? t("detail.rent") : t("detail.price")}</div>
+              <div className="mt-2 font-serif text-2xl text-primary sm:text-3xl md:text-4xl">{priceLabel}</div>
             </div>
           </div>
         </div>
@@ -92,7 +99,7 @@ function PropertyDetail() {
         <div className="overflow-hidden rounded-sm bg-muted">
           <WatermarkedImage
             src={main}
-            alt={p.title}
+            alt={title}
             fetchPriority="high"
             sizes="(max-width: 1024px) 100vw, 70vw"
             watermarkSize="lg"
@@ -119,10 +126,10 @@ function PropertyDetail() {
       {/* Body */}
       <section className="container-editorial mt-12 grid gap-12 sm:mt-16 sm:gap-16 md:grid-cols-12">
         <div className="md:col-span-7">
-          <span className="eyebrow">Descrizione</span>
-          <h2 className="mt-3 font-serif text-2xl text-ink sm:text-3xl">L'immobile</h2>
+          <span className="eyebrow">{t("detail.descEyebrow")}</span>
+          <h2 className="mt-3 font-serif text-2xl text-ink sm:text-3xl">{t("detail.descTitle")}</h2>
           <p className="mt-6 whitespace-pre-line text-base leading-relaxed text-foreground/85">
-            {p.description || "Descrizione disponibile in agenzia."}
+            {desc || t("detail.descFallback")}
           </p>
 
           {/* Quick facts */}

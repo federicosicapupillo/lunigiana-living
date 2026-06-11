@@ -2,6 +2,8 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useServerFn } from "@tanstack/react-start";
+import { translatePropertyToEnglish } from "@/lib/property-translate.functions";
 import {
   ArrowLeft,
   Save,
@@ -11,6 +13,7 @@ import {
   CheckCircle2,
   Info,
   Sparkles,
+  Languages,
 } from "lucide-react";
 import {
   PROPERTY_TYPES,
@@ -63,6 +66,11 @@ type Status = "draft" | "ready" | "published";
 type FormState = {
   // Sezione 1
   title: string;
+  title_en: string;
+  subtitle_en: string;
+  summary_en: string;
+  location_description_en: string;
+  description_en: string;
   property_type: string;
   descrizione_libera: string;
   contract_type: string;
@@ -105,6 +113,11 @@ type FormState = {
 
 const empty: FormState = {
   title: "",
+  title_en: "",
+  subtitle_en: "",
+  summary_en: "",
+  location_description_en: "",
+  description_en: "",
   property_type: "",
   descrizione_libera: "",
   contract_type: "",
@@ -167,9 +180,44 @@ function NewPropertyPage() {
   const navigate = useNavigate();
   const [f, setF] = useState<FormState>(empty);
   const [saving, setSaving] = useState(false);
+  const [translating, setTranslating] = useState(false);
+  const translateFn = useServerFn(translatePropertyToEnglish);
 
   const upd = <K extends keyof FormState>(k: K, v: FormState[K]) =>
     setF((s) => ({ ...s, [k]: v }));
+
+  const onTranslateAi = async () => {
+    if (!f.title.trim() && !f.descrizione_libera.trim() && !f.long_description.trim()) {
+      toast.error("Compila almeno il titolo o una descrizione in italiano prima di tradurre.");
+      return;
+    }
+    setTranslating(true);
+    const tid = toast.loading("Traduzione in corso…");
+    try {
+      const res = await translateFn({
+        data: {
+          title: f.title,
+          subtitle: f.descrizione_libera,
+          summary: f.descrizione_libera,
+          locationDescription: "",
+          description: f.long_description,
+        },
+      });
+      setF((s) => ({
+        ...s,
+        title_en: res.title_en || s.title_en,
+        subtitle_en: res.subtitle_en || s.subtitle_en,
+        summary_en: res.summary_en || s.summary_en,
+        location_description_en: res.location_description_en || s.location_description_en,
+        description_en: res.description_en || s.description_en,
+      }));
+      toast.success("Traduzione completata", { id: tid });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Errore traduzione", { id: tid });
+    } finally {
+      setTranslating(false);
+    }
+  };
 
   /**
    * Crea l'immobile + features narrative.
@@ -233,6 +281,10 @@ function NewPropertyPage() {
 
       const payload = {
         title: f.title.trim(),
+        title_en: f.title_en.trim() || null,
+        subtitle_en: f.subtitle_en.trim() || null,
+        summary_en: f.summary_en.trim() || null,
+        location_description_en: f.location_description_en.trim() || null,
         slug: slugify(
           [f.title, f.municipality].filter((v) => v && v.trim()).join(" ") ||
             "immobile",
@@ -317,6 +369,17 @@ function NewPropertyPage() {
       if (extraFeatures.length) {
         const { error: fErr } = await supabase.from("property_features").insert(extraFeatures);
         if (fErr) console.warn("[nuovo] features insert warn:", fErr.message);
+      }
+
+      // Save EN description if provided
+      if (f.description_en.trim()) {
+        const { error: dErr } = await supabase
+          .from("property_descriptions")
+          .upsert(
+            { property_id: data.id, description_en: f.description_en.trim() },
+            { onConflict: "property_id" },
+          );
+        if (dErr) console.warn("[nuovo] description_en upsert warn:", dErr.message);
       }
 
       toast.success("Immobile salvato", { id: t });
