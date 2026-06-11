@@ -1,11 +1,13 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { getPublishedProperty, type PublicProperty } from "@/lib/public-properties.functions";
+import { getLocalizedProperty } from "@/lib/property-i18n.functions";
 import { ArrowLeft, MapPin, Maximize2, BedDouble, Bath, Building2 } from "lucide-react";
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { WatermarkedImage } from "@/components/watermarked-image";
 import { whatsappUrl } from "@/components/whatsapp-float";
 import { useLanguage, useT } from "@/lib/i18n/LanguageContext";
-import { pickLocalized } from "@/lib/i18n/translations";
 
 export const Route = createFileRoute("/immobili/$id")({
   loader: async ({ params }) => {
@@ -56,12 +58,21 @@ const DETAIL_KEYS = [
 ];
 
 function PropertyDetail() {
-  const { property: p } = Route.useLoaderData() as { property: PublicProperty };
+  const { property: base } = Route.useLoaderData() as { property: PublicProperty };
   const t = useT();
   const { language } = useLanguage();
-  const title = pickLocalized<string | null | undefined>(p.title, p.titleEn, language) ?? p.title;
-  const desc = pickLocalized<string | null | undefined>(p.description, p.descriptionEn, language) ?? p.description;
-  const priceLabel = p.isRent && language === "en" ? p.price.replace("/ mese", "/ month") : p.price;
+  const localize = useServerFn(getLocalizedProperty);
+  const { data: localized } = useQuery({
+    queryKey: ["property-localized", base.id, language],
+    queryFn: () => localize({ data: { id: base.id, lang: language } }),
+    enabled: language === "en",
+    staleTime: 1000 * 60 * 60, // 1h
+    placeholderData: { property: base },
+  });
+  const p: PublicProperty = (localized?.property as PublicProperty | null) ?? base;
+  const title = p.title;
+  const desc = p.description;
+  const priceLabel = p.price;
   const [active, setActive] = useState(0);
   const main = p.gallery[active] || p.image;
   const waMessage =
