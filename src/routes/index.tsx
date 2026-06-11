@@ -214,10 +214,10 @@ function Index() {
       <section className="border-b border-warm-border/60 section-ivory">
         <div className="container-editorial grid grid-cols-2 gap-6 py-6 sm:grid-cols-4 sm:py-7">
           {[
-            { icon: HomeIcon, value: "18 anni", label: "a Pontremoli" },
-            { icon: MapPin, value: "500+", label: "immobili trattati" },
-            { icon: Compass, value: "6 comuni", label: "della Lunigiana" },
-            { icon: ShieldCheck, value: "FIAIP", label: "agenzia iscritta" },
+            { icon: HomeIcon, value: "18 " + t("home.trust.yearsUnit") || "18 anni", label: t("home.trust.years") },
+            { icon: MapPin, value: "500+", label: t("home.trust.properties") },
+            { icon: Compass, value: "6", label: t("home.trust.comuni") },
+            { icon: ShieldCheck, value: "FIAIP", label: t("home.trust.fiaip") },
           ].map((s) => (
             <div key={s.label} className="flex items-center gap-3 sm:gap-4">
               <s.icon size={22} className="shrink-0 text-primary" />
