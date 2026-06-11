@@ -5,6 +5,13 @@ import { whatsappUrl } from "@/components/whatsapp-float";
 import { useT } from "@/lib/i18n/LanguageContext";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { pickLocalized } from "@/lib/i18n/translations";
+import {
+  localizeType,
+  localizePrice,
+  localizeTag,
+  localizeRoomsLabel,
+  localizeAttrValue,
+} from "@/lib/i18n/property-localize";
 
 type PropertyCardData = {
   id: number | string;
@@ -26,9 +33,11 @@ export function PropertyCard({ p }: { p: PropertyCardData }) {
   const t = useT();
   const { language } = useLanguage();
   const displayTitle = pickLocalized<string | null | undefined>(p.title, p.titleEn ?? null, language) ?? p.title;
-  const displayPrice = p.isRent && language === "en"
-    ? p.price.replace("/ mese", "/ month")
-    : p.price;
+  const displayPrice = localizePrice(p.price, language);
+  const displayType = localizeType(p.type, language);
+  const displayTag = localizeTag(p.tag, language);
+  const displayEpi = p.epi ? localizeAttrValue(p.epi, language) : p.epi;
+  const roomsText = p.rooms != null ? localizeRoomsLabel(`${p.rooms} ${t("card.rooms")}`, language) : null;
   const waHref = whatsappUrl(
     `${t("wa.propertyMsgPrefix")} ${p.reference} — ${displayTitle} (${p.location}).`,
   );
@@ -49,9 +58,9 @@ export function PropertyCard({ p }: { p: PropertyCardData }) {
             watermarkSize="md"
             className="h-full w-full object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-105"
           />
-          {p.tag && (
+          {displayTag && (
             <span className="absolute left-4 top-4 rounded-md bg-terracotta px-3 py-1 text-[0.65rem] uppercase tracking-[0.18em] text-cream shadow-sm">
-              {p.tag}
+              {displayTag}
             </span>
           )}
           <span className="pointer-events-none absolute inset-x-0 bottom-0 flex items-center justify-end gap-2 bg-gradient-to-t from-ink/75 via-ink/25 to-transparent p-4 text-[0.65rem] uppercase tracking-[0.2em] text-cream opacity-0 transition-opacity duration-500 group-hover:opacity-100">
@@ -59,7 +68,7 @@ export function PropertyCard({ p }: { p: PropertyCardData }) {
           </span>
         </div>
         <div className="px-5 pt-5 pb-3">
-          <div className="eyebrow">{p.reference} · {p.type}</div>
+          <div className="eyebrow">{p.reference} · {displayType}</div>
           <h3 className="mt-2 font-serif text-2xl leading-tight text-ink transition-colors group-hover:text-primary">
             {displayTitle}
           </h3>
@@ -72,14 +81,14 @@ export function PropertyCard({ p }: { p: PropertyCardData }) {
                 <span className="flex items-center gap-1"><Maximize2 size={13} /> {p.sqm} m²</span>
               )}
               {p.rooms != null && (
-                <span className="flex items-center gap-1"><BedDouble size={13} /> {p.rooms} {t("card.rooms")}</span>
+                <span className="flex items-center gap-1"><BedDouble size={13} /> {roomsText}</span>
               )}
             </div>
             <div className="font-serif text-xl font-medium text-terracotta">{displayPrice}</div>
           </div>
-          {p.epi && (
+          {displayEpi && (
             <div className="mt-2 text-[0.7rem] uppercase tracking-wider text-muted-foreground">
-              {t("card.epi")}: {p.epi}
+              {t("card.epi")}: {displayEpi}
             </div>
           )}
           <span className="mt-5 flex items-center justify-between rounded-md bg-ink px-5 py-3 text-[0.7rem] uppercase tracking-[0.2em] text-cream transition-colors group-hover:bg-terracotta">
