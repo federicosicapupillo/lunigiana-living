@@ -1,7 +1,9 @@
 import { Link } from "@tanstack/react-router";
 import logoAsset from "@/assets/furia-logo.png.asset.json";
+import { useT } from "@/lib/i18n/LanguageContext";
 
 export function SiteFooter() {
+  const t = useT();
   return (
     <footer className="mt-24 border-t border-border bg-ink text-cream">
       <div className="container-editorial grid gap-12 py-16 md:grid-cols-4">
@@ -14,13 +16,12 @@ export function SiteFooter() {
             />
           </div>
           <p className="mt-4 max-w-md text-sm leading-relaxed text-cream/70">
-            Da Pontremoli, accompagniamo chi cerca una casa di carattere in Lunigiana.
-            Conosciamo i borghi, le pietre, le valli — e il loro modo di vivere.
+            {t("footer.intro")}
           </p>
         </div>
 
         <div>
-          <div className="eyebrow text-cream/60">Contatti</div>
+          <div className="eyebrow text-cream/60">{t("footer.contacts")}</div>
           <ul className="mt-4 space-y-2 text-sm text-cream/85">
             <li>Via Pirandello 7</li>
             <li>54027 Pontremoli (MS)</li>
@@ -31,22 +32,22 @@ export function SiteFooter() {
         </div>
 
         <div>
-          <div className="eyebrow text-cream/60">Naviga</div>
+          <div className="eyebrow text-cream/60">{t("footer.navigate")}</div>
           <ul className="mt-4 space-y-2 text-sm text-cream/85">
-            <li><Link to="/" className="hover:text-cream">Home</Link></li>
-            <li><Link to="/immobili" className="hover:text-cream">Immobili</Link></li>
-            <li><Link to="/territori" className="hover:text-cream">Vivere in Lunigiana</Link></li>
-            <li><Link to="/servizi" className="hover:text-cream">Servizi</Link></li>
-            <li><Link to="/chi-siamo" className="hover:text-cream">Chi siamo</Link></li>
-            <li><Link to="/contatti" className="hover:text-cream">Contatti</Link></li>
-            <li><Link to="/admin/login" className="hover:text-cream">Area riservata</Link></li>
+            <li><Link to="/" className="hover:text-cream">{t("nav.home")}</Link></li>
+            <li><Link to="/immobili" className="hover:text-cream">{t("nav.immobili")}</Link></li>
+            <li><Link to="/territori" className="hover:text-cream">{t("nav.territori")}</Link></li>
+            <li><Link to="/servizi" className="hover:text-cream">{t("nav.servizi")}</Link></li>
+            <li><Link to="/chi-siamo" className="hover:text-cream">{t("nav.chiSiamo")}</Link></li>
+            <li><Link to="/contatti" className="hover:text-cream">{t("nav.contatti")}</Link></li>
+            <li><Link to="/admin/login" className="hover:text-cream">{t("footer.adminArea")}</Link></li>
           </ul>
         </div>
       </div>
 
       <div className="border-t border-cream/10">
         <div className="container-editorial flex flex-col gap-2 py-6 text-xs text-cream/55 md:flex-row md:items-center md:justify-between">
-          <span>© {new Date().getFullYear()} Furia Immobiliare di Furia Elena. Tutti i diritti riservati.</span>
+          <span>© {new Date().getFullYear()} Furia Immobiliare di Furia Elena. {t("footer.rights")}</span>
           <span>Pontremoli · Lunigiana</span>
         </div>
       </div>

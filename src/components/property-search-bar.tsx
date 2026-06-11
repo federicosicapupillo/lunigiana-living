@@ -3,6 +3,7 @@ import { createPortal } from "react-dom";
 import { useNavigate } from "@tanstack/react-router";
 import { Search, X, ChevronDown, Star, SlidersHorizontal } from "lucide-react";
 import { PROPERTY_TYPES } from "@/lib/admin/property-constants";
+import { useT } from "@/lib/i18n/LanguageContext";
 
 const COMUNI_FALLBACK = [
   "Pontremoli","Bagnone","Villafranca in Lunigiana","Mulazzo","Filattiera",
@@ -140,6 +141,7 @@ export function PropertySearchBar({
   onSubmit,
   onReset,
 }: PropertySearchBarProps) {
+  const t = useT();
   const navigate = useNavigate();
   const [state, setState] = useState<SearchValues>({ ...EMPTY, ...initial });
   const [featOpen, setFeatOpen] = useState(false);
@@ -196,8 +198,8 @@ export function PropertySearchBar({
   const isRent = state.contract === "affitto";
   const priceMinOpts = isRent ? RENT_MIN_OPTS : PRICE_MIN_OPTS;
   const priceMaxOpts = isRent ? RENT_MAX_OPTS : PRICE_MAX_OPTS;
-  const priceMinLabel = isRent ? "Canone mensile da" : "Prezzo da";
-  const priceMaxLabel = isRent ? "Canone mensile a" : "Prezzo a";
+  const priceMinLabel = isRent ? t("search.label.rentMin") : t("search.label.priceMin");
+  const priceMaxLabel = isRent ? t("search.label.rentMax") : t("search.label.priceMax");
 
   const setContract = (id: SearchValues["contract"]) => {
     setState((s) => {
@@ -226,7 +228,7 @@ export function PropertySearchBar({
       const a = Number(s.price_min);
       const b = Number(s.price_max);
       if (Number.isFinite(a) && Number.isFinite(b) && a > b) {
-        return "Controlla il range prezzo inserito.";
+        return t("search.errRange");
       }
     }
     return null;
@@ -265,14 +267,14 @@ export function PropertySearchBar({
   };
 
   const featCount = state.features.length;
-  const featLabel = featCount ? `${featCount} selezionate` : "Tutte";
+  const featLabel = featCount ? `${featCount} ${t("search.featSelected")}` : t("search.featAll");
 
   const ContractTabs = (
     <div className="inline-flex flex-wrap gap-1 rounded-md border border-warm-border bg-warm-ivory p-1 shadow-[0_1px_0_rgba(36,23,17,0.04)]">
       {([
-        { id: "", label: "Tutti" },
-        { id: "vendita", label: "Vendita" },
-        { id: "affitto", label: "Affitto" },
+        { id: "", label: t("search.tab.all") },
+        { id: "vendita", label: t("search.tab.sale") },
+        { id: "affitto", label: t("search.tab.rent") },
       ] as const).map((t) => {
         const active = state.contract === t.id;
         return (
@@ -305,19 +307,19 @@ export function PropertySearchBar({
       aria-pressed={state.featured}
     >
       <Star size={13} className={state.featured ? "fill-current" : ""} />
-      Solo scelti per voi
+      {t("search.featured")}
     </button>
   );
 
   const Fields = (
     <>
       <div className="grid grid-cols-1 gap-px bg-border sm:grid-cols-2 lg:grid-cols-4">
-        <SelectField label="Tipologia" value={state.type} onChange={(v) => setState({ ...state, type: v })}>
-        <option value="">Tutte</option>
+        <SelectField label={t("search.label.type")} value={state.type} onChange={(v) => setState({ ...state, type: v })}>
+        <option value="">{t("search.label.allTypes")}</option>
         {PROPERTY_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
         </SelectField>
-        <SelectField label="Comune" value={state.comune} onChange={(v) => setState({ ...state, comune: v })}>
-        <option value="">Tutti i comuni</option>
+        <SelectField label={t("search.label.comune")} value={state.comune} onChange={(v) => setState({ ...state, comune: v })}>
+        <option value="">{t("search.label.allComuni")}</option>
         {comuniList.map((c) => <option key={c} value={c}>{c}</option>)}
         </SelectField>
         <SelectField label={priceMinLabel} value={state.price_min}
@@ -331,14 +333,14 @@ export function PropertySearchBar({
       </div>
       {advancedOpen && (
         <div className="grid grid-cols-1 gap-px border-t border-border bg-border sm:grid-cols-2 lg:grid-cols-4">
-          <SelectField label="Superficie" value={state.size} onChange={(v) => setState({ ...state, size: v })}>
+          <SelectField label={t("search.label.size")} value={state.size} onChange={(v) => setState({ ...state, size: v })}>
         {SIZE_RANGES.map((p) => <option key={p.label} value={p.value}>{p.label}</option>)}
           </SelectField>
-          <SelectField label="Camere" value={state.rooms} onChange={(v) => setState({ ...state, rooms: v })}>
+          <SelectField label={t("search.label.rooms")} value={state.rooms} onChange={(v) => setState({ ...state, rooms: v })}>
         {ROOM_OPTS.map((p) => <option key={p.label} value={p.value}>{p.label}</option>)}
           </SelectField>
           <div className="flex min-w-0 flex-col gap-0.5 bg-card px-3 py-2 text-left">
-        <span className="eyebrow text-[0.6rem]">Caratteristiche</span>
+        <span className="eyebrow text-[0.6rem]">{t("search.label.features")}</span>
         <button
           ref={featTriggerRef}
           type="button"
@@ -351,7 +353,7 @@ export function PropertySearchBar({
           <ChevronDown size={14} className={`shrink-0 transition ${featOpen ? "rotate-180" : ""}`} />
         </button>
           </div>
-          <SelectField label="Ordina per" value={state.sort} onChange={(v) => setState({ ...state, sort: v })}>
+          <SelectField label={t("search.label.sort")} value={state.sort} onChange={(v) => setState({ ...state, sort: v })}>
         {SORT_OPTS.map((p) => <option key={p.value} value={p.value}>{p.label}</option>)}
           </SelectField>
         </div>
@@ -380,7 +382,7 @@ export function PropertySearchBar({
           onClick={() => setFeatOpen(true)}
           className="rounded-full border border-border bg-muted/40 px-3 py-1 text-xs text-muted-foreground hover:text-ink"
         >
-          + altre {remainingChips}
+          + {remainingChips}
         </button>
       )}
     </div>
@@ -430,14 +432,14 @@ export function PropertySearchBar({
                 onClick={() => setState({ ...state, features: [] })}
                 className="text-xs uppercase tracking-[0.18em] text-muted-foreground hover:text-ink"
               >
-                Pulisci
+                {t("search.clean")}
               </button>
               <button
                 type="button"
                 onClick={() => setFeatOpen(false)}
                 className="rounded-sm bg-ink px-5 py-2 text-xs uppercase tracking-[0.18em] text-cream"
               >
-                Conferma
+                {t("search.confirm")}
               </button>
             </div>
           </div>
@@ -460,7 +462,7 @@ export function PropertySearchBar({
               aria-expanded={advancedOpen}
             >
               <SlidersHorizontal size={13} />
-              {advancedOpen ? "Meno filtri" : "Filtri avanzati"}
+              {advancedOpen ? t("search.moreOptions") : t("search.moreOptions")}
             </button>
             {FeaturedToggle}
           </div>
@@ -478,10 +480,10 @@ export function PropertySearchBar({
               onClick={reset}
               className="text-[0.7rem] uppercase tracking-[0.2em] text-muted-foreground transition-colors hover:text-ink"
             >
-              Reset filtri
+              {t("search.reset")}
             </button>
             <button type="submit" className="btn-primary">
-              <Search size={14} /> Cerca
+              <Search size={14} /> {t("search.search")}
             </button>
           </div>
         </form>
@@ -496,15 +498,15 @@ export function PropertySearchBar({
         >
           <span className="flex items-center gap-2">
             <Search size={16} className="text-primary" />
-            Filtra immobili
+            {t("search.search")}
           </span>
           <ChevronDown size={14} />
         </button>
         {mobileOpen && (
           <div className="fixed inset-0 z-[70] flex flex-col bg-background">
             <div className="flex items-center justify-between border-b border-border px-5 py-4">
-              <span className="eyebrow text-[0.65rem]">Filtra immobili</span>
-              <button type="button" onClick={() => setMobileOpen(false)} aria-label="Chiudi">
+              <span className="eyebrow text-[0.65rem]">{t("search.search")}</span>
+              <button type="button" onClick={() => setMobileOpen(false)} aria-label="Close">
                 <X size={20} />
               </button>
             </div>
@@ -521,14 +523,14 @@ export function PropertySearchBar({
               {ErrorMsg}
               <div className="flex flex-col gap-3 p-5">
                 <button type="submit" className="btn-primary w-full">
-                  <Search size={14} /> Cerca
+                  <Search size={14} /> {t("search.search")}
                 </button>
                 <button
                   type="button"
                   onClick={reset}
                   className="text-[0.7rem] uppercase tracking-[0.2em] text-muted-foreground"
                 >
-                  Reset filtri
+                  {t("search.reset")}
                 </button>
               </div>
             </form>

@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Mail, MapPin, Phone } from "lucide-react";
 import { whatsappUrl } from "@/components/whatsapp-float";
 import { LeadForm } from "@/components/lead-form";
+import { useT } from "@/lib/i18n/LanguageContext";
 
 export const Route = createFileRoute("/contatti")({
   head: () => ({
@@ -17,53 +18,49 @@ export const Route = createFileRoute("/contatti")({
 });
 
 function ContattiPage() {
-  const waHref = whatsappUrl(
-    "Ciao Elena, vorrei parlare con te per una ricerca immobiliare.",
-  );
+  const t = useT();
+  const waHref = whatsappUrl(t("wa.defaultMsg"));
   return (
     <section className="container-editorial pb-24 pt-28 md:pt-36">
       <div className="grid gap-10 md:grid-cols-12">
         <div className="md:col-span-5">
-          <span className="eyebrow">Contatti</span>
+          <span className="eyebrow">{t("contatti.eyebrow")}</span>
           <h1 className="mt-3 font-serif text-5xl leading-tight text-ink md:text-6xl">
-            Raccontaci che casa<br />stai cercando.
+            {t("contatti.title1")}<br />{t("contatti.title2")}
           </h1>
           <p className="mt-6 text-base leading-relaxed text-foreground/80">
-            Scrivi a Elena: ti aiuterà a capire quali immobili possono fare al
-            caso tuo. Rispondiamo a tutti, di persona.
+            {t("contatti.lead")}
           </p>
 
           <ul className="mt-10 space-y-5 text-sm">
             <li className="flex items-start gap-4">
               <MapPin size={18} className="mt-0.5 text-primary" />
               <div>
-                <div className="eyebrow text-[0.65rem]">Agenzia</div>
+                <div className="eyebrow text-[0.65rem]">{t("contatti.agency")}</div>
                 <div className="mt-1 text-foreground/85">Furia Immobiliare di Furia Elena<br />Via Pirandello 7<br />54027 Pontremoli (MS)</div>
               </div>
             </li>
             <li className="flex items-start gap-4">
               <Phone size={18} className="mt-0.5 text-primary" />
               <div>
-                <div className="eyebrow text-[0.65rem]">Telefono · Cellulare</div>
+                <div className="eyebrow text-[0.65rem]">{t("contatti.phone")}</div>
                 <div className="mt-1 text-foreground/85">0187 830229<br />320 7019985</div>
               </div>
             </li>
             <li className="flex items-start gap-4">
               <Mail size={18} className="mt-0.5 text-primary" />
               <div>
-                <div className="eyebrow text-[0.65rem]">Email</div>
+                <div className="eyebrow text-[0.65rem]">{t("contatti.email")}</div>
                 <div className="mt-1 text-foreground/85">furiaimmobiliare@libero.it</div>
               </div>
             </li>
           </ul>
 
           <div className="mt-10 rounded-sm border border-warm-border/70 bg-warm-ivory p-6">
-            <div className="eyebrow text-[0.65rem]">WhatsApp</div>
-            <h2 className="mt-2 font-serif text-2xl text-ink">Parla direttamente con Elena</h2>
+            <div className="eyebrow text-[0.65rem]">{t("contatti.wa")}</div>
+            <h2 className="mt-2 font-serif text-2xl text-ink">{t("contatti.waTitle")}</h2>
             <p className="mt-3 text-sm leading-relaxed text-foreground/80">
-              Hai visto una casa che ti interessa o vuoi raccontarci cosa stai
-              cercando? Scrivi a Elena su WhatsApp: ti risponderà appena
-              possibile.
+              {t("contatti.waBody")}
             </p>
             <a
               href={waHref}
@@ -74,7 +71,7 @@ function ContattiPage() {
               <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#25D366]" aria-hidden>
                 <span className="block h-2 w-2 rounded-full bg-white" />
               </span>
-              Scrivi su WhatsApp
+              {t("cta.writeOnWhatsapp")}
             </a>
           </div>
         </div>
