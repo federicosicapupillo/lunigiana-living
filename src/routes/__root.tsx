@@ -15,6 +15,7 @@ import { SiteHeader } from "../components/site-header";
 import { SiteFooter } from "../components/site-footer";
 import { Toaster } from "../components/ui/sonner";
 import { WhatsAppFloat } from "../components/whatsapp-float";
+import { LanguageProvider } from "../lib/i18n/LanguageContext";
 
 function NotFoundComponent() {
   return (
@@ -134,15 +135,17 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <div className="flex min-h-screen flex-col bg-background text-foreground">
-        {!isAdminArea && <SiteHeader />}
-        <main className="flex-1">
-          <Outlet />
-        </main>
-        {!isAdminArea && <SiteFooter />}
-        {!isAdminArea && <WhatsAppFloat />}
-      </div>
-      <Toaster />
+      <LanguageProvider>
+        <div className="flex min-h-screen flex-col bg-background text-foreground">
+          {!isAdminArea && <SiteHeader />}
+          <main className="flex-1">
+            <Outlet />
+          </main>
+          {!isAdminArea && <SiteFooter />}
+          {!isAdminArea && <WhatsAppFloat />}
+        </div>
+        <Toaster />
+      </LanguageProvider>
     </QueryClientProvider>
   );
 }
