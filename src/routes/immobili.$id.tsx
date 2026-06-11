@@ -16,6 +16,7 @@ import {
   localizeAmenity,
   localizeKnown,
   localizeRoomsLabel,
+  localizePropertyDynamic,
 } from "@/lib/i18n/property-localize";
 
 export const Route = createFileRoute("/immobili/$id")({
@@ -79,7 +80,7 @@ function PropertyDetail() {
     staleTime: 1000 * 60 * 60, // 1h
     placeholderData: { property: base },
   });
-  const p: PublicProperty = (localized?.property as PublicProperty | null) ?? base;
+  const p: PublicProperty = (localized?.property as PublicProperty | null) ?? localizePropertyDynamic(base, language);
   const title = p.title;
   const desc = p.description;
   const priceLabel = localizePrice(p.price, language);
@@ -214,7 +215,7 @@ function PropertyDetail() {
             <div className="mt-12 space-y-8">
               {p.highlights.map((h) => (
                 <div key={h.key}>
-                  <span className="eyebrow">{h.label}</span>
+                  <span className="eyebrow">{localizeKnown(h.label, language)}</span>
                   {h.items.length > 0 && (
                     <ul className="mt-4 flex flex-wrap gap-2">
                       {h.items.map((it) => (

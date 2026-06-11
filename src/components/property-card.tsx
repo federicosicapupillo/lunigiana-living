@@ -4,13 +4,10 @@ import { WatermarkedImage } from "@/components/watermarked-image";
 import { whatsappUrl } from "@/components/whatsapp-float";
 import { useT } from "@/lib/i18n/LanguageContext";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
-import { pickLocalized } from "@/lib/i18n/translations";
 import {
-  localizeType,
-  localizePrice,
-  localizeTag,
   localizeRoomsLabel,
   localizeAttrValue,
+  localizePropertyDynamic,
 } from "@/lib/i18n/property-localize";
 
 type PropertyCardData = {
@@ -32,11 +29,12 @@ type PropertyCardData = {
 export function PropertyCard({ p }: { p: PropertyCardData }) {
   const t = useT();
   const { language } = useLanguage();
-  const displayTitle = pickLocalized<string | null | undefined>(p.title, p.titleEn ?? null, language) ?? p.title;
-  const displayPrice = localizePrice(p.price, language);
-  const displayType = localizeType(p.type, language);
-  const displayTag = localizeTag(p.tag, language);
-  const displayEpi = p.epi ? localizeAttrValue(p.epi, language) : p.epi;
+  const localized = localizePropertyDynamic(p, language);
+  const displayTitle = localized.title || p.title;
+  const displayPrice = localized.price || p.price;
+  const displayType = localized.type || p.type;
+  const displayTag = localized.tag;
+  const displayEpi = localized.epi ? localizeAttrValue(localized.epi, language) : localized.epi;
   const roomsText = p.rooms != null ? localizeRoomsLabel(`${p.rooms} ${t("card.rooms")}`, language) : null;
   const waHref = whatsappUrl(
     `${t("wa.propertyMsgPrefix")} ${p.reference} — ${displayTitle} (${p.location}).`,

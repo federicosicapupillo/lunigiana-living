@@ -9,11 +9,15 @@ import territoryZeri from "@/assets/real/zeri-lunigiana.png.asset.json";
 import { PropertyCard } from "@/components/property-card";
 import { PropertySearchBar } from "@/components/property-search-bar";
 import { listPublishedProperties, type PublicProperty } from "@/lib/public-properties.functions";
+import { getLocalizedProperties } from "@/lib/property-i18n.functions";
 import { getHomeHeroVariant, type HomeHeroVariant } from "@/lib/site-settings.functions";
 import { LeadForm } from "@/components/lead-form";
 import { ArrowRight, Compass, KeyRound, Sparkles, Star, ShieldCheck, MapPin, Home as HomeIcon } from "lucide-react";
-import { useT } from "@/lib/i18n/LanguageContext";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { useLanguage, useT } from "@/lib/i18n/LanguageContext";
 import { useLocalizedHead } from "@/hooks/use-localized-head";
+import { localizePropertyDynamic } from "@/lib/i18n/property-localize";
 
 const AGENCY_FACTS = {
   yearsActive: 18,
@@ -83,6 +87,7 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   const t = useT();
+  const { language } = useLanguage();
   useLocalizedHead("seo.home.title", "seo.home.desc");
   const { properties, heroVariant } = Route.useLoaderData() as {
     properties: PublicProperty[];
@@ -97,6 +102,14 @@ function Index() {
         !p.image.startsWith("data:"),
     )
     .slice(0, 6);
+  const localizeMany = useServerFn(getLocalizedProperties);
+  const localizedQuery = useQuery({
+    queryKey: ["home-properties-localized", language, featuredProperties.map((p) => p.id).join(",")],
+    queryFn: () => localizeMany({ data: { ids: featuredProperties.map((p) => p.id), lang: language } }),
+    enabled: language === "en" && featuredProperties.length > 0,
+    staleTime: 1000 * 60 * 60,
+  });
+  const localizedById = new Map((localizedQuery.data?.properties ?? []).map((p) => [p.id, p as PublicProperty]));
   const isPontremoli = heroVariant === "pontremoli_historic_center";
   const isElena = heroVariant === "elena_cometa";
   const heroSrc = isElena
@@ -278,7 +291,7 @@ function Index() {
 
           <div className="mt-10 grid gap-8 sm:mt-14 sm:gap-10 md:grid-cols-3">
             {featuredProperties.map((p) => (
-              <PropertyCard key={p.id} p={p} />
+              <PropertyCard key={p.id} p={localizedById.get(p.id) ?? localizePropertyDynamic(p, language)} />
             ))}
           </div>
         </div>

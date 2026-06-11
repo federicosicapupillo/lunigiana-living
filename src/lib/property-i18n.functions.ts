@@ -3,6 +3,7 @@ import { z } from "zod";
 import { createHash } from "crypto";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { getPublishedProperty, type PublicProperty } from "@/lib/public-properties.functions";
+import { localizePropertyDynamic } from "@/lib/i18n/property-localize";
 
 /**
  * Public, no-auth server function: returns a PublicProperty fully translated
@@ -171,17 +172,30 @@ async function translateShortStrings(texts: string[]): Promise<Record<string, st
 
 function applyEn(p: PublicProperty, longEn: Awaited<ReturnType<typeof ensurePropertyEnglish>>, shortMap: Record<string, string>): PublicProperty {
   const tr = (s: string) => shortMap[s.trim()] || s;
-  return {
+  return localizePropertyDynamic({
     ...p,
     title: longEn.title || p.titleEn || p.title,
     description: longEn.descriptionEn || p.descriptionEn || p.description,
-    price: p.isRent ? p.price.replace("/ mese", "/ month").replace("Prezzo su richiesta", "Price on request") : p.price.replace("Prezzo su richiesta", "Price on request"),
-    priceRent: p.priceRent ? p.priceRent.replace("/ mese", "/ month") : p.priceRent,
     amenities: p.amenities.map(tr),
     altreDotazioni: p.altreDotazioni ? tr(p.altreDotazioni) : p.altreDotazioni,
     tag: p.tag ? tr(p.tag) : p.tag,
-    highlights: p.highlights.map((h) => ({ ...h, items: h.items.map(tr) })),
-  };
+    highlights: p.highlights.map((h) => ({ ...h, items: h.items.map(tr), note: h.note ? tr(h.note) : h.note })),
+  }, "en");
+}
+
+async function localizeOneProperty(property: PublicProperty): Promise<PublicProperty> {
+  const longEn = await ensurePropertyEnglish(property);
+  const shortInputs: string[] = [
+    property.type,
+    property.epi,
+    ...Object.values(property.attributes ?? {}),
+    ...property.amenities,
+    ...property.highlights.flatMap((h) => [h.label, ...h.items, ...(h.note ? [h.note] : [])]),
+    ...(property.altreDotazioni ? [property.altreDotazioni] : []),
+    ...(property.tag ? [property.tag] : []),
+  ];
+  const shortMap = await translateShortStrings(shortInputs);
+  return applyEn(property, longEn, shortMap);
 }
 
 export const getLocalizedProperty = createServerFn({ method: "POST" })
@@ -192,17 +206,31 @@ export const getLocalizedProperty = createServerFn({ method: "POST" })
     if (data.lang === "it") return { property };
 
     try {
-      const longEn = await ensurePropertyEnglish(property);
-      const shortInputs: string[] = [
-        ...property.amenities,
-        ...property.highlights.flatMap((h) => h.items),
-        ...(property.altreDotazioni ? [property.altreDotazioni] : []),
-        ...(property.tag ? [property.tag] : []),
-      ];
-      const shortMap = await translateShortStrings(shortInputs);
-      return { property: applyEn(property, longEn, shortMap) };
+      return { property: await localizeOneProperty(property) };
     } catch {
       // Total failure → return IT property (fallback)
-      return { property };
+      return { property: localizePropertyDynamic(property, "en") };
     }
+  });
+
+export const getLocalizedProperties = createServerFn({ method: "POST" })
+  .inputValidator((data: unknown) => z.object({
+    ids: z.array(z.string().min(1).max(128)).min(1).max(80),
+    lang: z.enum(["it", "en"]).default("en"),
+  }).parse(data))
+  .handler(async ({ data }) => {
+    const uniqueIds = Array.from(new Set(data.ids));
+    const results = await Promise.all(
+      uniqueIds.map(async (id) => {
+        const { property } = await getPublishedProperty({ data: { id } });
+        if (!property) return null;
+        if (data.lang === "it") return property;
+        try {
+          return await localizeOneProperty(property);
+        } catch {
+          return localizePropertyDynamic(property, "en");
+        }
+      }),
+    );
+    return { properties: results.filter(Boolean) as PublicProperty[] };
   });

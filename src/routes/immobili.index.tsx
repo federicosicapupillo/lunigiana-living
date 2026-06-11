@@ -4,9 +4,13 @@ import { z } from "zod";
 import { PropertyCard } from "@/components/property-card";
 import { PropertySearchBar } from "@/components/property-search-bar";
 import { listPublishedProperties, type PublicProperty } from "@/lib/public-properties.functions";
+import { getLocalizedProperties } from "@/lib/property-i18n.functions";
 import { useMemo } from "react";
-import { useT } from "@/lib/i18n/LanguageContext";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { useLanguage, useT } from "@/lib/i18n/LanguageContext";
 import { useLocalizedHead } from "@/hooks/use-localized-head";
+import { localizePropertyDynamic } from "@/lib/i18n/property-localize";
 
 const searchSchema = z.object({
   contract: fallback(z.string(), "").default(""),
@@ -48,8 +52,20 @@ export const Route = createFileRoute("/immobili/")({
 
 function ImmobiliPage() {
   const t = useT();
+  const { language } = useLanguage();
   useLocalizedHead("seo.immobili.title", "seo.immobili.desc");
   const { properties: allProperties } = Route.useLoaderData() as { properties: PublicProperty[] };
+  const localizeMany = useServerFn(getLocalizedProperties);
+  const localizedQuery = useQuery({
+    queryKey: ["properties-localized", language, allProperties.map((p) => p.id).join(",")],
+    queryFn: () => localizeMany({ data: { ids: allProperties.map((p) => p.id), lang: language } }),
+    enabled: language === "en" && allProperties.length > 0,
+    staleTime: 1000 * 60 * 60,
+  });
+  const localizedById = useMemo(
+    () => new Map((localizedQuery.data?.properties ?? []).map((p) => [p.id, p as PublicProperty])),
+    [localizedQuery.data?.properties],
+  );
   const urlSearch = Route.useSearch();
   const uniqueLocations = useMemo(
     () => Array.from(new Set(allProperties.map((p) => p.location).filter(Boolean))).sort(),
@@ -182,7 +198,7 @@ function ImmobiliPage() {
         ) : (
           <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-3">
             {filtered.map((p) => (
-              <PropertyCard key={p.id} p={p} />
+              <PropertyCard key={p.id} p={localizedById.get(p.id) ?? localizePropertyDynamic(p, language)} />
             ))}
           </div>
         )}
