@@ -1,107 +1,65 @@
 ## Obiettivo
+Sito EN completamente automatico. L'admin lavora solo in italiano. Le traduzioni vengono generate on-demand la prima volta, salvate in cache e riusate sempre, con fallback IT se manca/fallisce.
 
-Estendere il sistema i18n già avviato a tutto il sito Furia Immobiliare. Stessi URL, lingua via selettore. Nessuna modifica a logica immobili, DB esistente (le colonne `_en` ci sono già), auth, immagini, filtri di ricerca.
+## Architettura
 
-## 1. Dizionario traduzioni completo
+### 1. Cache traduzioni (DB)
+- I campi `*_en` già esistenti su `properties` e `property_descriptions` diventano **cache tecnica** (non lavoro manuale).
+- Nuova tabella `translation_cache` per stringhe corte ripetute (accessori, dotazioni, caratteristiche, badge, highlights):
+  ```
+  translation_cache(
+    source_hash text,        -- sha256(lower(trim(source)))
+    target_lang text,        -- 'en'
+    source_text text,
+    translated_text text,
+    created_at timestamptz,
+    PRIMARY KEY (source_hash, target_lang)
+  )
+  ```
+  RLS: lettura pubblica (anon+authenticated), scrittura solo service_role (via server fn).
 
-Estendere `src/lib/i18n/translations.ts` con tutte le chiavi mancanti, raggruppate per area:
+### 2. Server functions pubbliche (no auth richiesta)
+- `ensurePropertyEnglish(propertyId)`: se mancano `title_en/subtitle_en/summary_en/location_description_en/description_en`, chiama Lovable AI (`google/gemini-3-flash-preview`) UNA volta, salva i risultati nei campi `_en` con `supabaseAdmin`, restituisce la property già localizzata. Idempotente: se i campi esistono, no-op.
+- `translateStrings({ texts: string[], lang: 'en' })`: lookup batch su `translation_cache` per hash; per i missing fa un'unica chiamata AI batch (JSON in/out), salva tutto in cache, restituisce mappa `{ source → translated }`.
+- Rate-limit soft: throttle interno + try/catch → fallback all'italiano (mai rompe la pagina).
 
-- `home.*` — hero, sezioni servizi, territori, CTA, testimonianze
-- `chiSiamo.*` — titoli, paragrafi, blockquote, statistiche
-- `servizi.*` — tutte le card servizi e descrizioni
-- `territori.*` — intro, schede comuni (Pontremoli, Villafranca, Filattiera, Mulazzo, Bagnone, Zeri)
-- `contatti.*` — già parziale, completare
-- `immobili.*` — pagina lista, filtri, badge, etichette (€/mese vs prezzo, locali, mq, ecc.)
-- `propertyDetail.*` — sezioni scheda immobile (descrizione, caratteristiche, classe energetica, contattaci)
-- `form.*` — placeholder, label, validazione, messaggi di successo/errore, toast
-- `common.*` — pulsanti generici (chiudi, indietro, salva, conferma, annulla, scopri di più, ecc.)
-- `seo.*` — title e description per ogni pagina
+### 3. Integrazione frontend
+- **Dettaglio immobile** (`immobili.$id.tsx`): nel loader, se `language==='en'` → `await ensurePropertyEnglish(id)`. Poi `translateStrings` per `amenities + features + highlights.items + tag`. Tutto con fallback IT.
+- **Lista immobili** (`immobili.index.tsx` + `PropertyCard`): il loader pubblico già porta i `*_en`. Per le card non chiamiamo AI per ogni card (costoso); usiamo solo quanto già in cache DB. Quando l'utente apre la scheda, la traduzione completa viene generata e salvata, così la prossima visita la card mostrerà tutto in EN.
+  - Per le card NON ancora visitate in EN: titolo IT come fallback (richiesta utente: "fallback senza rompere").
+  - Etichette UI (`/mese → /month`, rooms, m², badge "Nuovo/In evidenza") già gestite via dizionario `t()`.
+- **Pagine statiche, menu, footer, form, filtri, SEO**: già coperte dal dizionario `useT()` (verifico copertura e completo eventuali stringhe rimaste).
 
-Helper `t(key, lang)` con fallback automatico IT.
+### 4. Admin: rimozione del lavoro manuale
+- In `_admin.admin.immobili.nuovo.tsx` e `_admin.admin.immobili.$id.tsx`: la sezione "Versione inglese" viene **rimossa dal flusso normale**. Sostituita da un piccolo box info: *"Le traduzioni inglesi vengono generate automaticamente quando un utente visita la scheda in EN. Nessuna azione richiesta."*
+- I campi `_en` restano nel DB (cache), ma non più nel form. Eventuale pulsante avanzato "Rigenera traduzione EN" opzionale, fuori dal flusso principale (solo se serve).
 
-## 2. Pagine statiche da convertire
+### 5. Performance
+- Cache permanente su DB → la traduzione di un immobile costa AI una sola volta.
+- Stringhe ripetute (es. "Giardino", "Parcheggio") condivise via `translation_cache` tra tutti gli immobili: dopo i primi annunci il costo crolla a quasi zero.
+- Nessuna chiamata AI per utenti che restano in IT.
+- Nessuna chiamata AI in lista (solo dettaglio), così la home/lista resta velocissima.
 
-Sostituire stringhe hardcoded con `useT()` in:
+## File modificati / nuovi
 
-- `src/routes/index.tsx` (Home)
-- `src/routes/chi-siamo.tsx`
-- `src/routes/servizi.tsx`
-- `src/routes/territori.tsx`
-- `src/routes/contatti.tsx` (completare)
-- `src/routes/immobili.index.tsx`
-- `src/routes/immobili.$id.tsx`
-- `src/routes/immobili.tsx` (layout)
+**Nuovi**
+- `supabase/migrations/<ts>_translation_cache.sql` — tabella + RLS + GRANT
+- `src/lib/translation-cache.functions.ts` — `translateStrings`
+- `src/lib/property-i18n.functions.ts` — `ensurePropertyEnglish` (pubblica, usa supabaseAdmin internamente)
 
-## 3. Componenti UI
+**Modificati**
+- `src/routes/immobili.$id.tsx` — loader chiama `ensurePropertyEnglish` + `translateStrings` quando lang=EN; render con fallback
+- `src/components/property-card.tsx` — usa già `pickLocalized`, ok
+- `src/routes/_admin.admin.immobili.nuovo.tsx` + `$id.tsx` — rimuovo sezione EN, aggiungo info-box
+- `src/lib/i18n/translations.ts` — completo chiavi mancanti (badge, "Cover in uso", messaggi form, ecc.)
+- Verifiche minori su form/filtri/footer per stringhe rimaste
 
-- Completare componenti non ancora toccati: badge "In evidenza", "Nuovo", stati immobile (Disponibile, Venduto, Affittato), classe energetica, "Cover in uso", testi vuoti ("Nessun immobile trovato"), pulsanti "Vedi tutti", "Scopri di più".
-- Aggiornare toast/sonner messages e validazione `lead-form` con le chiavi `form.*`.
+## Fuori scope
+- Nessun cambio a URL, auth, routing, upload immagini, logica di ricerca, schema immobili oltre la cache.
+- Niente hreflang con URL separati (mantenuto come da decisione precedente).
+- Niente traduzione di campi numerici/strutturati (prezzo, m², EPI).
 
-## 4. SEO multilingua (client-side)
-
-Nuovo hook `useLocalizedHead({ titleKey, descriptionKey })` che:
-
-- aggiorna `document.title` quando cambia la lingua
-- aggiorna `<meta name="description">` via DOM
-- aggiorna `<html lang="...">` (già fatto)
-- aggiunge tag `<link rel="alternate" hreflang="it">` e `hreflang="en">` puntando allo stesso URL con query `?lang=en` (best-effort, dato che URL non cambia)
-
-Applicato in ogni route page tramite `useEffect`. I valori SSR restano in italiano (accettabile: il selettore lingua è client-side).
-
-## 5. Immobili: campi EN già in DB
-
-Colonne già presenti:
-- `properties.title_en, subtitle_en, summary_en, location_description_en`
-- `property_descriptions.description_en`
-
-Frontend (`property-card`, `immobili.$id`, `immobili.index`) usa helper `pickLocalized(it, en, lang)` che ritorna EN se presente, altrimenti IT. Già parzialmente fatto, da completare per tutti i campi sopra.
-
-## 6. Admin: input EN + traduzione AI
-
-In `src/routes/_admin.admin.immobili.nuovo.tsx` e `_admin.admin.immobili.$id.tsx`:
-
-- Nuova sezione "Versione inglese (opzionale)" con campi:
-  - Titolo EN
-  - Sottotitolo EN
-  - Riassunto EN (textarea)
-  - Descrizione zona EN (textarea)
-  - Descrizione lunga EN (textarea, su `property_descriptions.description_en`)
-- Pulsante "Traduci con AI" accanto a ciascun campo EN (o uno globale "Traduci tutto"): chiama nuova server function `translatePropertyToEnglish` che usa Lovable AI Gateway (modello `google/gemini-3-flash-preview`) per tradurre i campi IT corrispondenti e popola gli input EN. L'admin può poi rivedere e salvare.
-
-Nuovo file: `src/lib/property-translate.functions.ts` con `createServerFn` protetto da `requireSupabaseAuth` + check ruolo admin via `has_role`. Input: tutti i campi IT da tradurre. Output: oggetto con i corrispettivi EN.
-
-## 7. Fallback
-
-Helper `pickLocalized(it, en, lang)`:
-```
-if (lang === 'en' && en?.trim()) return en;
-return it;
-```
-Usato ovunque vengano mostrati campi immobile.
-
-## 8. Performance e safety
-
-- Nessuna modifica a route, URL, query Supabase, filtri.
-- Nessun cambiamento a immagini, auth, storage.
-- SSR non rallenta: il dizionario è un singolo file statico importato lazy nel context client.
-
-## Sezione tecnica
-
-### File nuovi
-- `src/hooks/use-localized-head.ts`
-- `src/lib/property-translate.functions.ts`
-- `src/lib/i18n/pick-localized.ts`
-
-### File modificati
-- `src/lib/i18n/translations.ts` (espansione massiccia dizionario)
-- 8 route pages elencate sopra
-- ~5 componenti residui (badge, toast, validazione form)
-- 2 file admin (input EN + pulsante AI)
-
-### Stima
-~20 file toccati, ~1 file di traduzioni esteso significativamente, 1 server function nuova per la traduzione AI.
-
-### Fuori scope (confermato)
-- URL `/en/...` (mantenuti gli stessi)
-- hreflang con URL distinti (impossibile senza route separate; aggiungiamo solo `<html lang>` e meta description tradotta)
-- Modifiche a logica immobili, filtri, DB, auth, immagini
+## Rischi & mitigazioni
+- **Costo AI** prima visita EN di un immobile → mitigato da cache permanente.
+- **AI down / 402 / 429** → try/catch nel server fn, ritorna IT, log lato server, UI non rotta.
+- **Stringhe lunghe** (description) → un'unica chiamata per immobile, salvata su `description_en`.

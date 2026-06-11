@@ -1,11 +1,13 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { getPublishedProperty, type PublicProperty } from "@/lib/public-properties.functions";
+import { getLocalizedProperty } from "@/lib/property-i18n.functions";
 import { ArrowLeft, MapPin, Maximize2, BedDouble, Bath, Building2 } from "lucide-react";
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { WatermarkedImage } from "@/components/watermarked-image";
 import { whatsappUrl } from "@/components/whatsapp-float";
 import { useLanguage, useT } from "@/lib/i18n/LanguageContext";
-import { pickLocalized } from "@/lib/i18n/translations";
 
 export const Route = createFileRoute("/immobili/$id")({
   loader: async ({ params }) => {
@@ -36,12 +38,13 @@ export const Route = createFileRoute("/immobili/$id")({
 });
 
 function NotFound() {
+  const t = useT();
   return (
     <div className="container-editorial py-32 text-center">
-      <h1 className="font-serif text-4xl text-ink">Immobile non trovato</h1>
-      <p className="mt-4 text-muted-foreground">L'annuncio che cerchi non è più disponibile.</p>
+      <h1 className="font-serif text-4xl text-ink">{t("detail.notFound")}</h1>
+      <p className="mt-4 text-muted-foreground">{t("detail.notFoundBody")}</p>
       <Link to="/immobili" className="mt-8 inline-block rounded-sm bg-primary px-6 py-3 text-xs uppercase tracking-[0.2em] text-primary-foreground">
-        Torna agli immobili
+        {t("detail.back")}
       </Link>
     </div>
   );
@@ -56,16 +59,25 @@ const DETAIL_KEYS = [
 ];
 
 function PropertyDetail() {
-  const { property: p } = Route.useLoaderData() as { property: PublicProperty };
+  const { property: base } = Route.useLoaderData() as { property: PublicProperty };
   const t = useT();
   const { language } = useLanguage();
-  const title = pickLocalized<string | null | undefined>(p.title, p.titleEn, language) ?? p.title;
-  const desc = pickLocalized<string | null | undefined>(p.description, p.descriptionEn, language) ?? p.description;
-  const priceLabel = p.isRent && language === "en" ? p.price.replace("/ mese", "/ month") : p.price;
+  const localize = useServerFn(getLocalizedProperty);
+  const { data: localized } = useQuery({
+    queryKey: ["property-localized", base.id, language],
+    queryFn: () => localize({ data: { id: base.id, lang: language } }),
+    enabled: language === "en",
+    staleTime: 1000 * 60 * 60, // 1h
+    placeholderData: { property: base },
+  });
+  const p: PublicProperty = (localized?.property as PublicProperty | null) ?? base;
+  const title = p.title;
+  const desc = p.description;
+  const priceLabel = p.price;
   const [active, setActive] = useState(0);
   const main = p.gallery[active] || p.image;
   const waMessage =
-    `Ciao Elena, vorrei ricevere informazioni su questo immobile: ` +
+    `${t("wa.propertyMsgPrefix")} ` +
     `${p.reference} — ${title} (${p.location}).` +
     (typeof window !== "undefined" ? `\n${window.location.href}` : "");
   const waHref = whatsappUrl(waMessage);
@@ -135,10 +147,10 @@ function PropertyDetail() {
           {/* Quick facts */}
           <div className="mt-12 grid grid-cols-2 gap-px overflow-hidden rounded-sm bg-border md:grid-cols-4">
             {[
-              { icon: Maximize2, label: "Superficie", value: p.sqmLabel ?? (p.sqm ? `${p.sqm} m²` : "—") },
-              { icon: BedDouble, label: "Camere", value: p.roomsLabel ?? "—" },
-              { icon: Bath, label: "Bagni", value: p.bathroomsLabel ?? "—" },
-              { icon: Building2, label: "Piano", value: p.floor || "—" },
+              { icon: Maximize2, label: t("detail.surface"), value: p.sqmLabel ?? (p.sqm ? `${p.sqm} m²` : "—") },
+              { icon: BedDouble, label: t("detail.rooms"), value: p.roomsLabel ?? "—" },
+              { icon: Bath, label: t("detail.bathrooms"), value: p.bathroomsLabel ?? "—" },
+              { icon: Building2, label: t("detail.floor"), value: p.floor || "—" },
             ].map((f) => (
               <div key={f.label} className="bg-card p-5">
                 <f.icon size={18} className="text-primary" />
@@ -150,8 +162,8 @@ function PropertyDetail() {
 
           {/* Full attributes */}
           <div className="mt-12">
-            <span className="eyebrow">Dettagli</span>
-            <h2 className="mt-3 font-serif text-3xl text-ink">Caratteristiche</h2>
+            <span className="eyebrow">{t("detail.detailsEyebrow")}</span>
+            <h2 className="mt-3 font-serif text-3xl text-ink">{t("detail.detailsTitle")}</h2>
             <dl className="mt-6 grid grid-cols-1 gap-x-8 md:grid-cols-2">
               {DETAIL_KEYS.filter((k) => p.attributes[k] && p.attributes[k].toLowerCase() !== "non indicato").map((k) => (
                 <div key={k} className="flex justify-between border-b border-border py-3 text-sm">
@@ -165,8 +177,8 @@ function PropertyDetail() {
           {/* Dotazioni */}
           {(p.amenities.length > 0 || p.altreDotazioni) && (
             <div className="mt-12">
-              <span className="eyebrow">Dotazioni</span>
-              <h2 className="mt-3 font-serif text-3xl text-ink">Cosa offre</h2>
+              <span className="eyebrow">{t("detail.amenitiesEyebrow")}</span>
+              <h2 className="mt-3 font-serif text-3xl text-ink">{t("detail.amenitiesTitle")}</h2>
               {p.amenities.length > 0 && (
                 <ul className="mt-6 flex flex-wrap gap-2">
                   {p.amenities.map((a) => (
@@ -219,12 +231,12 @@ function PropertyDetail() {
         {/* Contact card */}
         <aside className="md:col-span-5">
           <div className="sticky top-28 rounded-sm border border-border bg-card p-8">
-            <div className="eyebrow">Contattaci</div>
+            <div className="eyebrow">{t("detail.contactEyebrow")}</div>
             <h3 className="mt-3 font-serif text-2xl text-ink">
-              Richiedi informazioni o una visita per <em className="italic">{p.reference}</em>
+              {t("detail.contactTitle")} <em className="italic">{p.reference}</em>
             </h3>
             <p className="mt-3 text-sm text-muted-foreground">
-              Rispondiamo personalmente, di solito entro la giornata.
+              {t("detail.contactBody")}
             </p>
 
             <form
@@ -240,17 +252,17 @@ function PropertyDetail() {
               }}
               className="mt-6 space-y-3"
             >
-              <input name="nome" required placeholder="Nome e cognome" className="w-full rounded-sm border border-border bg-background px-4 py-3 text-sm focus:border-primary focus:outline-none" />
-              <input name="email" type="email" required placeholder="Email" className="w-full rounded-sm border border-border bg-background px-4 py-3 text-sm focus:border-primary focus:outline-none" />
-              <input name="telefono" placeholder="Telefono (facoltativo)" className="w-full rounded-sm border border-border bg-background px-4 py-3 text-sm focus:border-primary focus:outline-none" />
-              <textarea name="messaggio" rows={4} placeholder="Vorrei avere maggiori informazioni..." className="w-full rounded-sm border border-border bg-background px-4 py-3 text-sm focus:border-primary focus:outline-none" />
+              <input name="nome" required placeholder={t("detail.namePh")} className="w-full rounded-sm border border-border bg-background px-4 py-3 text-sm focus:border-primary focus:outline-none" />
+              <input name="email" type="email" required placeholder={t("detail.emailPh")} className="w-full rounded-sm border border-border bg-background px-4 py-3 text-sm focus:border-primary focus:outline-none" />
+              <input name="telefono" placeholder={t("detail.phonePh")} className="w-full rounded-sm border border-border bg-background px-4 py-3 text-sm focus:border-primary focus:outline-none" />
+              <textarea name="messaggio" rows={4} placeholder={t("detail.msgPh")} className="w-full rounded-sm border border-border bg-background px-4 py-3 text-sm focus:border-primary focus:outline-none" />
               <button type="submit" className="w-full rounded-sm bg-primary px-6 py-4 text-xs uppercase tracking-[0.22em] text-primary-foreground transition hover:bg-primary/90">
-                Richiedi informazioni o visita
+                {t("detail.submit")}
               </button>
             </form>
 
             <div className="mt-6 border-t border-border pt-6 text-sm text-muted-foreground">
-              <div>oppure chiamaci</div>
+              <div>{t("detail.orCall")}</div>
               <a href="tel:+390187830229" className="mt-1 block font-serif text-xl text-ink">0187 830229</a>
               <a href="tel:+393207019985" className="block font-serif text-xl text-ink">320 7019985</a>
             </div>
@@ -264,7 +276,7 @@ function PropertyDetail() {
               <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#25D366]" aria-hidden>
                 <span className="block h-2 w-2 rounded-full bg-white" />
               </span>
-              Chiedi informazioni a Elena su WhatsApp
+              {t("detail.waBtn")}
             </a>
           </div>
         </aside>

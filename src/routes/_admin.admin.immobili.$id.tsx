@@ -1415,12 +1415,11 @@ function EnglishTab({
   onSaveDescEn: () => void | Promise<void>;
 }) {
   return (
-    <Section title="Versione inglese (opzionale)">
-      <Field label="Traduzione automatica" full>
+    <Section title="Versione inglese (automatica)">
+      <Field label="Gestione traduzione" full>
         <div className="flex flex-wrap items-center justify-between gap-3 rounded-sm border border-primary/30 bg-primary/5 p-3">
           <p className="text-xs text-muted-foreground">
-            Compila a mano oppure traduci automaticamente dall'italiano con l'AI.
-            Se i campi EN restano vuoti, il sito mostra la versione italiana.
+            <strong className="text-ink">Nessuna azione richiesta.</strong> Quando un visitatore apre questa scheda in inglese, il sito traduce automaticamente titolo, descrizione, accessori e caratteristiche e salva il risultato in cache. I campi qui sotto sono opzionali: usali solo se vuoi forzare una traduzione manuale.
           </p>
           <button
             type="button"
