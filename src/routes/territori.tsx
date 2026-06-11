@@ -8,7 +8,7 @@ import filattieraAsset from "@/assets/real/filattiera-lunigiana.png.asset.json";
 import mulazzoAsset from "@/assets/real/mulazzo-lunigiana.png.asset.json";
 import { territories } from "@/lib/properties";
 import { ArrowRight, MapPin, Mountain, Sparkles } from "lucide-react";
-import { useT, useLanguage } from "@/lib/i18n/LanguageContext";
+import { useT } from "@/lib/i18n/LanguageContext";
 import { useLocalizedHead } from "@/hooks/use-localized-head";
 
 const imageBySlug: Record<string, string> = {
@@ -35,7 +35,6 @@ export const Route = createFileRoute("/territori")({
 
 function TerritoriPage() {
   const t = useT();
-  const { language } = useLanguage();
   useLocalizedHead("seo.territori.title", "seo.territori.desc");
   return (
     <>
