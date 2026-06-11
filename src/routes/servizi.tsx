@@ -1,5 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Compass, KeyRound, Sparkles, FileSearch, Home, Handshake } from "lucide-react";
+import { useT } from "@/lib/i18n/LanguageContext";
+import { useLocalizedHead } from "@/hooks/use-localized-head";
 
 export const Route = createFileRoute("/servizi")({
   head: () => ({
@@ -14,16 +16,17 @@ export const Route = createFileRoute("/servizi")({
   component: ServiziPage,
 });
 
-const services = [
-  { icon: Compass, title: "Ricerca su misura", body: "Comprendiamo il tuo progetto di vita: famiglia, lavoro, ritmi, panorami. Poi cerchiamo la casa che lo accoglie." },
-  { icon: Home, title: "Vendita di immobili", body: "Valorizziamo il tuo immobile con fotografia curata, racconto editoriale e una rete di acquirenti reali." },
-  { icon: KeyRound, title: "Accompagnamento all'acquisto", body: "Dalla prima visita al rogito notarile: ti guidiamo in ogni passaggio tecnico e burocratico." },
-  { icon: Sparkles, title: "Valutazioni immobiliari", body: "Stime trasparenti, basate sul mercato reale della Lunigiana, non su algoritmi generici." },
-  { icon: FileSearch, title: "Consulenza pre-acquisto", body: "Verifichiamo per te documenti, conformità urbanistiche e potenzialità di ristrutturazione." },
-  { icon: Handshake, title: "Affitti selezionati", body: "Una piccola selezione di immobili in locazione, per chi vuole conoscere la Lunigiana prima di comprare." },
-];
-
 function ServiziPage() {
+  const t = useT();
+  useLocalizedHead("seo.servizi.title", "seo.servizi.desc");
+  const services = [
+    { icon: Compass, title: t("servizi.card1.title"), body: t("servizi.card1.body") },
+    { icon: Home, title: t("servizi.card2.title"), body: t("servizi.card2.body") },
+    { icon: KeyRound, title: t("servizi.card3.title"), body: t("servizi.card3.body") },
+    { icon: Sparkles, title: t("servizi.card4.title"), body: t("servizi.card4.body") },
+    { icon: FileSearch, title: t("servizi.card5.title"), body: t("servizi.card5.body") },
+    { icon: Handshake, title: t("servizi.card6.title"), body: t("servizi.card6.body") },
+  ];
   return (
     <>
       <section className="relative overflow-hidden bg-[var(--cream)] pb-24 pt-32 md:pt-40">
@@ -62,7 +65,7 @@ function ServiziPage() {
               FI
             </div>
             <h1 className="font-serif text-5xl leading-tight text-ink md:text-6xl">
-              I nostri servizi
+              {t("servizi.title")}
             </h1>
             <div className="mx-auto mt-6 flex items-center justify-center gap-3">
               <span className="h-px w-16 bg-[var(--terracotta)]/50" />
@@ -70,9 +73,7 @@ function ServiziPage() {
               <span className="h-px w-16 bg-[var(--terracotta)]/50" />
             </div>
             <p className="mx-auto mt-8 max-w-2xl text-base leading-relaxed text-[var(--ink-soft)]">
-              Un metodo su misura, radicato nella Lunigiana. Ogni servizio è
-              pensato per offrirti chiarezza, cura e risultati concreti, in ogni
-              fase del tuo percorso immobiliare.
+              {t("servizi.subtitle")}
             </p>
           </div>
 
@@ -131,11 +132,11 @@ function ServiziPage() {
       <section className="container-editorial pt-20 pb-32">
         <div className="rounded-sm bg-ink px-8 py-20 text-center text-cream md:px-16">
           <h2 className="mx-auto max-w-2xl font-serif text-4xl md:text-5xl">
-            Parliamone, senza fretta.
+            {t("servizi.ctaTitle")}
           </h2>
           <Link to="/contatti"
             className="mt-8 inline-block rounded-sm bg-cream px-8 py-4 text-xs uppercase tracking-[0.22em] text-ink">
-            Prenota una consulenza
+            {t("cta.bookConsultation")}
           </Link>
         </div>
       </section>

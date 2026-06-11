@@ -8,6 +8,8 @@ import filattieraAsset from "@/assets/real/filattiera-lunigiana.png.asset.json";
 import mulazzoAsset from "@/assets/real/mulazzo-lunigiana.png.asset.json";
 import { territories } from "@/lib/properties";
 import { ArrowRight, MapPin, Mountain, Sparkles } from "lucide-react";
+import { useT } from "@/lib/i18n/LanguageContext";
+import { useLocalizedHead } from "@/hooks/use-localized-head";
 
 const imageBySlug: Record<string, string> = {
   pontremoli: pontremoliAsset.url,
@@ -32,6 +34,8 @@ export const Route = createFileRoute("/territori")({
 });
 
 function TerritoriPage() {
+  const t = useT();
+  useLocalizedHead("seo.territori.title", "seo.territori.desc");
   return (
     <>
       <section className="relative isolate -mt-20 flex min-h-[80svh] items-end overflow-hidden">
@@ -40,15 +44,12 @@ function TerritoriPage() {
         <div className="absolute inset-0 -z-10 bg-gradient-to-r from-ink/75 via-ink/45 to-ink/15" />
         <div className="absolute inset-x-0 bottom-0 -z-10 h-1/2 bg-gradient-to-t from-ink/70 to-transparent" />
         <div className="container-editorial pb-20 pt-32">
-          <span className="eyebrow text-cream/85">Vivere in Lunigiana</span>
+          <span className="eyebrow text-cream/85">{t("terr.hero.eyebrow")}</span>
           <h1 className="mt-4 max-w-3xl font-serif text-5xl leading-[1.05] text-cream md:text-7xl">
-            Una terra di confine,<br /><em className="font-normal italic">tre regioni, una luce sola.</em>
+            {t("terr.hero.title1")}<br /><em className="font-normal italic">{t("terr.hero.title2")}</em>
           </h1>
           <p className="mt-6 max-w-2xl text-lg leading-relaxed text-cream/85 md:text-xl">
-            La Lunigiana non è un'idea di Toscana, né di Liguria, né di Emilia.
-            È il punto in cui le tre si incontrano e diventano qualcos'altro:
-            castelli, fiumi, pievi e borghi vivi, dove la casa è ancora una scelta
-            di vita e non solo un investimento.
+            {t("terr.hero.lead")}
           </p>
         </div>
       </section>
@@ -56,32 +57,18 @@ function TerritoriPage() {
       <section className="bg-warm-cream">
         <div className="container-editorial grid gap-12 py-20 md:grid-cols-12 md:py-24">
           <div className="md:col-span-5">
-            <span className="eyebrow">Il luogo</span>
+            <span className="eyebrow">{t("terr.place.eyebrow")}</span>
             <h2 className="mt-3 font-serif text-4xl text-ink md:text-5xl">
-              Tra Toscana, Liguria<br /><em className="italic">ed Emilia.</em>
+              {t("terr.place.title1")}<br /><em className="italic">{t("terr.place.title2")}</em>
             </h2>
             <p className="mt-6 text-sm uppercase tracking-[0.2em] text-muted-foreground">
-              Massa-Carrara · alta valle del Magra
+              {t("terr.place.subtitle")}
             </p>
             <div className="mt-8 h-px w-16 bg-warm-border" />
           </div>
           <div className="space-y-5 text-[1.0625rem] leading-[1.75] text-foreground/85 md:col-span-6 md:col-start-7">
-            <p>
-              La Lunigiana è una valle stretta fra l'Appennino tosco-emiliano e
-              le Alpi Apuane, attraversata dal fiume Magra e dalla via Francigena.
-              Per secoli è stata terra di passaggio: pellegrini diretti a Roma,
-              mercanti, pastori, eserciti. Da quel transito sono nate pievi
-              romaniche, castelli Malaspina e una rete fittissima di borghi in
-              pietra arroccati sui crinali.
-            </p>
-            <p>
-              Oggi è uno dei pochi luoghi in Italia dove i centri storici
-              medievali sono ancora abitati davvero — non solo visitati — e dove
-              il prezzo di una casa di carattere non ha perso il senso delle
-              proporzioni. Un'ora dal mare delle Cinque Terre, un'ora dalle piste
-              dell'Abetone, mezz'ora dai marmi di Carrara: la Lunigiana è centrale
-              proprio perché sembra appartata.
-            </p>
+            <p>{t("terr.place.p1")}</p>
+            <p>{t("terr.place.p2")}</p>
           </div>
         </div>
       </section>
@@ -89,28 +76,16 @@ function TerritoriPage() {
       <section className="bg-warm-sand">
         <div className="container-editorial py-16 md:py-20">
           <div className="max-w-2xl">
-            <span className="eyebrow">Perché qui</span>
+            <span className="eyebrow">{t("terr.why.eyebrow")}</span>
             <h2 className="mt-3 font-serif text-3xl text-ink md:text-4xl">
-              Tre ragioni per <em className="italic">sceglierla.</em>
+              {t("terr.why.title1")} <em className="italic">{t("terr.why.title2")}</em>
             </h2>
           </div>
           <div className="mt-12 grid gap-6 md:mt-16 md:grid-cols-3">
             {[
-              {
-                icon: MapPin,
-                title: "Posizione strategica",
-                body: "Casello A15 della Cisa, stazione di Pontremoli sulla Parma-La Spezia, aeroporti di Pisa e Genova a circa un'ora. Milano in poco più di due ore di auto.",
-              },
-              {
-                icon: Mountain,
-                title: "Paesaggio intatto",
-                body: "Parco Nazionale dell'Appennino Tosco-Emiliano, Apuane, foreste di castagni e faggi, fiumi balneabili. Una densità abitativa fra le più basse del centro Italia.",
-              },
-              {
-                icon: Sparkles,
-                title: "Qualità della vita",
-                body: "Servizi essenziali in ogni capoluogo, scuole, sanità di prossimità, mercati settimanali, una scena gastronomica autentica (testaroli, panigacci, funghi di Borgotaro, agnello di Zeri).",
-              },
+              { icon: MapPin, title: t("terr.why.r1.t"), body: t("terr.why.r1.b") },
+              { icon: Mountain, title: t("terr.why.r2.t"), body: t("terr.why.r2.b") },
+              { icon: Sparkles, title: t("terr.why.r3.t"), body: t("terr.why.r3.b") },
             ].map(({ icon: Icon, title, body }) => (
               <div
                 key={title}
@@ -129,48 +104,44 @@ function TerritoriPage() {
 
       <section className="bg-warm-ivory pb-0 pt-20 md:pt-24">
         <div className="container-editorial pb-16 md:pb-20">
-          <span className="eyebrow">I borghi</span>
+          <span className="eyebrow">{t("terr.borghi.eyebrow")}</span>
           <h2 className="mt-3 max-w-3xl font-serif text-4xl text-ink md:text-5xl">
-            Sei luoghi,<br /><em className="italic">sei atmosfere diverse.</em>
+            {t("terr.borghi.title1")}<br /><em className="italic">{t("terr.borghi.title2")}</em>
           </h2>
           <p className="mt-6 max-w-2xl text-base leading-relaxed text-foreground/80">
-            La Lunigiana cambia carattere ogni dieci chilometri. Un borgo
-            commerciale e colto come Pontremoli non somiglia a un'aia di pietra
-            di Zeri, e una loggia rinascimentale di Filattiera non racconta la
-            stessa storia di un mulino sul torrente di Bagnone. Ti aiutiamo a
-            riconoscere queste differenze prima di scegliere dove cercare casa.
+            {t("terr.borghi.lead")}
           </p>
         </div>
 
-        {territories.map((t, i) => {
+        {territories.map((terr, i) => {
           const bands = ["bg-warm-soft", "bg-warm-sand", "bg-warm-cream"];
           const bg = bands[i % bands.length];
           return (
-            <div key={t.slug} className={`${bg} border-t border-warm-border/60`}>
+            <div key={terr.slug} className={`${bg} border-t border-warm-border/60`}>
               <div className="container-editorial py-14 md:py-20">
                 <article
                   className={`grid gap-10 md:grid-cols-12 md:items-center ${i % 2 ? "md:[&>figure]:order-2" : ""}`}
                 >
                   <figure className="overflow-hidden rounded-sm shadow-[0_18px_40px_-24px_rgba(36,23,17,0.35)] md:col-span-7">
                     <img
-                      src={imageBySlug[t.slug]}
-                      alt={t.name}
+                      src={imageBySlug[terr.slug]}
+                      alt={terr.name}
                       loading="lazy"
                       className="aspect-[5/4] w-full object-cover md:aspect-[4/3]"
                     />
                   </figure>
                   <div className="md:col-span-5">
-                    <div className="eyebrow">{t.name}</div>
+                    <div className="eyebrow">{terr.name}</div>
                     <h3 className="mt-3 font-serif text-3xl leading-tight text-ink md:text-4xl">
-                      {t.tagline}
+                      {terr.tagline}
                     </h3>
                     <div className="mt-5 h-px w-12 bg-warm-border" />
-                    <p className="mt-5 text-base leading-relaxed text-foreground/80">{t.body}</p>
+                    <p className="mt-5 text-base leading-relaxed text-foreground/80">{terr.body}</p>
                     <Link
                       to="/immobili"
                       className="group mt-7 inline-flex items-center gap-2 rounded-sm border border-primary/60 px-5 py-2.5 text-[0.7rem] uppercase tracking-[0.22em] text-primary transition hover:bg-primary hover:text-primary-foreground"
                     >
-                      Immobili a {t.name}
+                      {t("terr.borghi.cta")} {terr.name}
                       <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
                     </Link>
                   </div>
@@ -184,61 +155,45 @@ function TerritoriPage() {
       <section className="bg-warm-cream">
         <div className="container-editorial grid gap-12 py-20 md:grid-cols-12 md:py-24">
           <div className="md:col-span-5">
-            <span className="eyebrow">Comprare in Lunigiana</span>
+            <span className="eyebrow">{t("terr.market.eyebrow")}</span>
             <h2 className="mt-3 font-serif text-4xl text-ink md:text-5xl">
-              Cosa si trova,<br /><em className="italic">e a che condizioni.</em>
+              {t("terr.market.title1")}<br /><em className="italic">{t("terr.market.title2")}</em>
             </h2>
             <div className="mt-8 h-px w-16 bg-warm-border" />
           </div>
           <div className="space-y-5 text-[1.0625rem] leading-[1.75] text-foreground/85 md:col-span-6 md:col-start-7">
-          <p>
-            Il mercato lunigianese non assomiglia a quello di Lucca o della
-            Versilia. Qui si trovano ancora case di paese in pietra a vista,
-            rustici da recuperare con porzioni di terreno, casali isolati con
-            vista sull'Appennino, appartamenti nei centri storici e ville
-            indipendenti in collina. I valori al metro quadro sono fra i più
-            accessibili della Toscana, soprattutto fuori dai centri principali.
-          </p>
-          <p>
-            È un mercato che premia chi sa leggere le sfumature: l'esposizione
-            del versante, lo stato delle strutture portanti, la viabilità
-            invernale, i vincoli paesaggistici, le pratiche edilizie pregresse.
-            Sono proprio gli aspetti su cui ti accompagniamo, perché una bella
-            foto da sola non basta a dire se quella casa è davvero per te.
-          </p>
+          <p>{t("terr.market.p1")}</p>
+          <p>{t("terr.market.p2")}</p>
           </div>
         </div>
       </section>
 
       <section className="bg-ink py-20 text-cream md:py-24">
         <div className="container-editorial max-w-3xl text-center">
-          <span className="eyebrow text-cream/70">Trova la tua Lunigiana</span>
+          <span className="eyebrow text-cream/70">{t("terr.cta.eyebrow")}</span>
           <h2 className="mt-4 font-serif text-4xl leading-tight md:text-5xl">
-            Non sei sicuro<br />
-            <em className="italic">da dove cominciare?</em>
+            {t("terr.cta.title1")}<br />
+            <em className="italic">{t("terr.cta.title2")}</em>
           </h2>
           <p className="mx-auto mt-6 max-w-xl text-base leading-relaxed text-cream/80">
-            Raccontaci come immagini la tua casa, il tempo che vorresti
-            dedicarle e cosa cerchi intorno: borgo vivo, campagna silenziosa,
-            vicinanza al mare o alla montagna. Ti proponiamo i territori e gli
-            immobili più coerenti con la tua idea, senza farti perdere tempo.
+            {t("terr.cta.body")}
           </p>
           <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Link
               to="/contatti"
               className="inline-flex items-center justify-center gap-2 rounded-sm bg-cream px-8 py-4 text-xs uppercase tracking-[0.22em] text-ink transition hover:bg-cream/90"
             >
-              Parla con Elena <ArrowRight size={14} />
+              {t("cta.talkToElena")} <ArrowRight size={14} />
             </Link>
             <Link
               to="/immobili"
               className="inline-flex items-center justify-center gap-2 text-xs uppercase tracking-[0.22em] text-cream/85 hover:text-cream"
             >
-              Vedi gli immobili disponibili
+              {t("cta.viewProperties")}
             </Link>
           </div>
           <p className="mt-6 text-[0.7rem] uppercase tracking-[0.2em] text-cream/55">
-            Consulenza iniziale gratuita · risposta entro 24 ore
+            {t("terr.cta.note")}
           </p>
         </div>
       </section>

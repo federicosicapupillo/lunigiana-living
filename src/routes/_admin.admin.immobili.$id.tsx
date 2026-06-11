@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { generateDescription } from "@/lib/ai-description.functions";
+import { translatePropertyToEnglish } from "@/lib/property-translate.functions";
 import { ImageUploader } from "@/components/admin/image-uploader";
 import { LocationFields } from "@/components/admin/location-fields";
 import {
@@ -60,6 +61,7 @@ import {
   type StatusAction,
 } from "@/lib/admin/property-status";
 import { ConfirmDialog } from "@/components/admin/confirm-dialog";
+import { Languages } from "lucide-react";
 
 type Property = {
   id: string;
@@ -103,6 +105,10 @@ type Property = {
   status: PropertyStatus;
   featured: boolean;
   homepage_order: number | null;
+  title_en: string | null;
+  subtitle_en: string | null;
+  summary_en: string | null;
+  location_description_en: string | null;
 };
 
 type Description = {
@@ -112,6 +118,7 @@ type Description = {
   length_preference: string | null;
   seo_focus: string | null;
   generated_at: string | null;
+  description_en?: string | null;
 };
 
 const TABS = [
@@ -122,6 +129,7 @@ const TABS = [
   { id: "photos", label: "Foto" },
   { id: "narrative", label: "Parametri narrativi" },
   { id: "description", label: "Descrizione AI" },
+  { id: "english", label: "Versione inglese" },
 ] as const;
 type Tab = (typeof TABS)[number]["id"];
 
@@ -162,6 +170,8 @@ function PropertyEditor() {
   const [seoFocus, setSeoFocus] = useState("");
 
   const genDescFn = useServerFn(generateDescription);
+  const translateFn = useServerFn(translatePropertyToEnglish);
+  const [translating, setTranslating] = useState(false);
 
   const load = async () => {
     setLoading(true);
@@ -398,6 +408,68 @@ function PropertyEditor() {
             setTone={setGenTone}
             seoFocus={seoFocus}
             setSeoFocus={setSeoFocus}
+          />
+        )}
+        {tab === "english" && (
+          <EnglishTab
+            prop={prop}
+            update={update}
+            desc={desc}
+            setDesc={setDesc}
+            translating={translating}
+            onTranslate={async () => {
+              if (!prop) return;
+              if (!prop.title?.trim() && !features["descrizione_libera"]?.trim() && !features["long_description"]?.trim()) {
+                toast.error("Compila almeno il titolo o una descrizione in italiano prima di tradurre.");
+                return;
+              }
+              setTranslating(true);
+              const tid = toast.loading("Traduzione in corso…");
+              try {
+                const res = await translateFn({
+                  data: {
+                    title: prop.title,
+                    subtitle: features["descrizione_libera"] ?? "",
+                    summary: features["descrizione_libera"] ?? "",
+                    locationDescription: "",
+                    description: features["long_description"] ?? "",
+                  },
+                });
+                update({
+                  title_en: res.title_en || prop.title_en,
+                  subtitle_en: res.subtitle_en || prop.subtitle_en,
+                  summary_en: res.summary_en || prop.summary_en,
+                  location_description_en: res.location_description_en || prop.location_description_en,
+                });
+                setDesc((d) => ({
+                  ...(d ?? {
+                    generated_description: null,
+                    edited_description: null,
+                    tone_of_voice: null,
+                    length_preference: null,
+                    seo_focus: null,
+                    generated_at: null,
+                  }),
+                  description_en: res.description_en || d?.description_en || null,
+                }));
+                toast.success("Traduzione completata", { id: tid });
+              } catch (e) {
+                toast.error(e instanceof Error ? e.message : "Errore traduzione", { id: tid });
+              } finally {
+                setTranslating(false);
+              }
+            }}
+            onSaveDescEn={async () => {
+              const value = (desc?.description_en ?? "").trim();
+              const { error } = await supabase
+                .from("property_descriptions")
+                .upsert(
+                  { property_id: id, description_en: value || null },
+                  { onConflict: "property_id" },
+                );
+              if (error) toast.error(error.message);
+              else toast.success("Descrizione EN salvata");
+            }}
           />
         )}
       </div>
@@ -1323,5 +1395,110 @@ function RadioRow({
         <span className="block text-[11px] text-muted-foreground">{hint}</span>
       </span>
     </button>
+  );
+}
+function EnglishTab({
+  prop,
+  update,
+  desc,
+  setDesc,
+  translating,
+  onTranslate,
+  onSaveDescEn,
+}: {
+  prop: Property;
+  update: (p: Partial<Property>) => void;
+  desc: Description | null;
+  setDesc: React.Dispatch<React.SetStateAction<Description | null>>;
+  translating: boolean;
+  onTranslate: () => void | Promise<void>;
+  onSaveDescEn: () => void | Promise<void>;
+}) {
+  return (
+    <Section title="Versione inglese (opzionale)">
+      <Field label="Traduzione automatica" full>
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-sm border border-primary/30 bg-primary/5 p-3">
+          <p className="text-xs text-muted-foreground">
+            Compila a mano oppure traduci automaticamente dall'italiano con l'AI.
+            Se i campi EN restano vuoti, il sito mostra la versione italiana.
+          </p>
+          <button
+            type="button"
+            onClick={onTranslate}
+            disabled={translating}
+            className="inline-flex items-center gap-2 rounded-sm bg-primary px-4 py-2 text-xs uppercase tracking-wider text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
+          >
+            {translating ? <Loader2 size={13} className="animate-spin" /> : <Languages size={13} />}
+            Traduci con AI
+          </button>
+        </div>
+      </Field>
+      <Field label="Titolo (EN)" full>
+        <input
+          type="text"
+          value={prop.title_en ?? ""}
+          onChange={(e) => update({ title_en: e.target.value })}
+          className={inputCls}
+          placeholder="Stone farmhouse with views of the Apuan Alps"
+        />
+      </Field>
+      <Field label="Sottotitolo (EN)" full>
+        <input
+          type="text"
+          value={prop.subtitle_en ?? ""}
+          onChange={(e) => update({ subtitle_en: e.target.value })}
+          className={inputCls}
+          placeholder="Short tagline shown on the listing"
+        />
+      </Field>
+      <Field label="Riassunto (EN)" full>
+        <textarea
+          value={prop.summary_en ?? ""}
+          onChange={(e) => update({ summary_en: e.target.value })}
+          rows={3}
+          className={inputCls}
+          placeholder="Short summary in English."
+        />
+      </Field>
+      <Field label="Descrizione zona (EN)" full>
+        <textarea
+          value={prop.location_description_en ?? ""}
+          onChange={(e) => update({ location_description_en: e.target.value })}
+          rows={3}
+          className={inputCls}
+          placeholder="English description of the area."
+        />
+      </Field>
+      <Field label="Descrizione completa (EN)" full>
+        <textarea
+          value={desc?.description_en ?? ""}
+          onChange={(e) =>
+            setDesc((d) => ({
+              ...(d ?? {
+                generated_description: null,
+                edited_description: null,
+                tone_of_voice: null,
+                length_preference: null,
+                seo_focus: null,
+                generated_at: null,
+              }),
+              description_en: e.target.value,
+            }))
+          }
+          rows={8}
+          className={inputCls}
+          placeholder="Full English description shown on the property page."
+        />
+        <div className="mt-2 flex justify-end">
+          <button
+            type="button"
+            onClick={onSaveDescEn}
+            className="inline-flex items-center gap-2 rounded-sm border border-primary/40 bg-primary/5 px-4 py-2 text-xs uppercase tracking-wider text-primary hover:bg-primary/10"
+          >
+            <Save size={13} /> Salva descrizione EN
+          </button>
+        </div>
+      </Field>
+    </Section>
   );
 }

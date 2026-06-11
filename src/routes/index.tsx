@@ -12,6 +12,8 @@ import { listPublishedProperties, type PublicProperty } from "@/lib/public-prope
 import { getHomeHeroVariant, type HomeHeroVariant } from "@/lib/site-settings.functions";
 import { LeadForm } from "@/components/lead-form";
 import { ArrowRight, Compass, KeyRound, Sparkles, Star, ShieldCheck, MapPin, Home as HomeIcon } from "lucide-react";
+import { useT } from "@/lib/i18n/LanguageContext";
+import { useLocalizedHead } from "@/hooks/use-localized-head";
 
 const AGENCY_FACTS = {
   yearsActive: 18,
@@ -80,6 +82,8 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
+  const t = useT();
+  useLocalizedHead("seo.home.title", "seo.home.desc");
   const { properties, heroVariant } = Route.useLoaderData() as {
     properties: PublicProperty[];
     heroVariant: HomeHeroVariant;
@@ -114,30 +118,28 @@ function Index() {
           <div className="absolute inset-0 -z-10 bg-gradient-to-br from-cream via-cream to-[hsl(var(--muted))]" />
           <div className="container-editorial grid min-h-[88svh] grid-cols-1 items-center gap-10 pb-12 pt-32 sm:min-h-[92svh] sm:pb-16 sm:pt-40 md:min-h-[100svh] md:grid-cols-12 md:gap-12 md:pb-24">
             <div className="md:col-span-6 lg:col-span-6">
-              <span className="eyebrow text-primary">Agenzia immobiliare · Pontremoli · Lunigiana</span>
+              <span className="eyebrow text-primary">{t("home.eyebrow")}</span>
               <h1 className="mt-4 font-serif text-[2.4rem] leading-[1.05] text-ink sm:text-5xl sm:leading-[1.02] md:text-6xl lg:text-7xl">
-                Case in vendita in Lunigiana,<br />
-                <em className="font-normal italic">scelte una per una.</em>
+                {t("home.hero.title1")}<br />
+                <em className="font-normal italic">{t("home.hero.title2")}</em>
               </h1>
               <p className="mt-5 max-w-xl text-sm leading-relaxed text-foreground/80 sm:text-base md:text-lg">
-                Da 18 anni a Pontremoli. Elena e Cometa ti accompagnano a trovare
-                la casa giusta in Lunigiana: visite sul posto, conoscenza reale
-                dei borghi, nessuna pressione di vendita.
+                {t("home.hero.lead")}
               </p>
               <div className="mt-8 flex flex-wrap items-center gap-3 sm:mt-10 sm:gap-4">
                 <Link
                   to="/immobili"
                   className="inline-flex items-center gap-2 rounded-sm bg-ink px-6 py-3.5 text-[0.7rem] uppercase tracking-[0.2em] text-cream transition hover:bg-ink/90 sm:px-8 sm:py-4 sm:text-xs sm:tracking-[0.22em]"
                 >
-                  Cerca la tua casa <ArrowRight size={14} />
+                  {t("cta.searchYourHome")} <ArrowRight size={14} />
                 </Link>
                 <a
-                  href={`https://wa.me/393207019985?text=${encodeURIComponent("Ciao Elena, sto cercando casa in Lunigiana e vorrei ricevere maggiori informazioni.")}`}
+                  href={`https://wa.me/393207019985?text=${encodeURIComponent(t("wa.defaultMsg"))}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 rounded-sm border border-ink px-6 py-3.5 text-[0.7rem] uppercase tracking-[0.2em] text-ink transition hover:bg-ink hover:text-cream sm:px-8 sm:py-4 sm:text-xs sm:tracking-[0.22em]"
                 >
-                  Parla con Elena
+                  {t("cta.talkToElena")}
                 </a>
               </div>
             </div>
@@ -154,7 +156,7 @@ function Index() {
                 />
                 <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-ink/40 to-transparent p-5">
                   <div className="text-[0.65rem] uppercase tracking-[0.22em] text-cream/90">
-                    Elena e Cometa · Furia Immobiliare
+                    {t("home.hero.elenaCaption")}
                   </div>
                 </div>
               </div>
@@ -178,15 +180,13 @@ function Index() {
 
         <div className="container-editorial w-full pb-12 pt-32 sm:pb-16 sm:pt-40 md:pb-24">
           <div className="max-w-3xl">
-            <span className="eyebrow text-cream/90">Agenzia immobiliare · Pontremoli · Lunigiana</span>
+            <span className="eyebrow text-cream/90">{t("home.eyebrow")}</span>
             <h1 className="mt-4 font-serif text-[2.4rem] leading-[1.05] text-cream sm:text-5xl sm:leading-[1.02] md:text-7xl">
-              Case in vendita in Lunigiana,<br />
-              <em className="font-normal italic text-cream/95">scelte una per una.</em>
+              {t("home.hero.title1")}<br />
+              <em className="font-normal italic text-cream/95">{t("home.hero.title2")}</em>
             </h1>
             <p className="mt-5 max-w-xl text-sm leading-relaxed text-cream/85 sm:text-base md:text-lg">
-              Da 18 anni a Pontremoli. Case di pietra, ville panoramiche e
-              dimore di carattere in tutta la Lunigiana — selezionate da chi
-              questa terra la abita davvero.
+              {t("home.hero.leadAlt")}
             </p>
           </div>
 
@@ -195,15 +195,15 @@ function Index() {
               to="/immobili"
               className="inline-flex items-center gap-2 rounded-sm bg-cream px-6 py-3.5 text-[0.7rem] uppercase tracking-[0.2em] text-ink transition hover:bg-cream/90 sm:px-8 sm:py-4 sm:text-xs sm:tracking-[0.22em]"
             >
-              Vedi gli immobili <ArrowRight size={14} />
+              {t("cta.viewProperties")} <ArrowRight size={14} />
             </Link>
             <a
-              href={`https://wa.me/393207019985?text=${encodeURIComponent("Ciao Elena, sto cercando casa in Lunigiana e vorrei ricevere maggiori informazioni.")}`}
+              href={`https://wa.me/393207019985?text=${encodeURIComponent(t("wa.defaultMsg"))}`}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 rounded-sm border border-cream/70 px-6 py-3.5 text-[0.7rem] uppercase tracking-[0.2em] text-cream transition hover:bg-cream hover:text-ink sm:px-8 sm:py-4 sm:text-xs sm:tracking-[0.22em]"
             >
-              Parla con Elena su WhatsApp
+              {t("cta.talkToElenaWA")}
             </a>
           </div>
         </div>
@@ -214,10 +214,10 @@ function Index() {
       <section className="border-b border-warm-border/60 section-ivory">
         <div className="container-editorial grid grid-cols-2 gap-6 py-6 sm:grid-cols-4 sm:py-7">
           {[
-            { icon: HomeIcon, value: "18 anni", label: "a Pontremoli" },
-            { icon: MapPin, value: "500+", label: "immobili trattati" },
-            { icon: Compass, value: "6 comuni", label: "della Lunigiana" },
-            { icon: ShieldCheck, value: "FIAIP", label: "agenzia iscritta" },
+            { icon: HomeIcon, value: "18+", label: t("home.trust.years") },
+            { icon: MapPin, value: "500+", label: t("home.trust.properties") },
+            { icon: Compass, value: "6", label: t("home.trust.comuni") },
+            { icon: ShieldCheck, value: "FIAIP", label: t("home.trust.fiaip") },
           ].map((s) => (
             <div key={s.label} className="flex items-center gap-3 sm:gap-4">
               <s.icon size={22} className="shrink-0 text-primary" />
@@ -234,27 +234,19 @@ function Index() {
       <section className="section-cream">
       <div className="container-editorial grid gap-10 py-12 sm:py-16 md:grid-cols-12 md:gap-12 md:py-24">
         <div className="md:col-span-5">
-          <span className="eyebrow">Chi siamo</span>
+          <span className="eyebrow">{t("home.brand.eyebrow")}</span>
           <h2 className="mt-4 font-serif text-3xl leading-tight text-ink sm:text-4xl md:text-5xl">
-            Abitare la Lunigiana,<br />non solo comprarci casa.
+            {t("home.brand.title1")}<br />{t("home.brand.title2")}
           </h2>
         </div>
         <div className="space-y-5 text-base leading-relaxed text-foreground/85 md:col-span-6 md:col-start-7">
-          <p>
-            Da anni a Pontremoli, Furia Immobiliare nasce da un legame
-            profondo con questa terra di confine tra Toscana, Liguria ed Emilia.
-            Conosciamo le pietre dei borghi, sappiamo dove la luce arriva la
-            mattina, dove il bosco fa ombra in agosto.
-          </p>
-          <p>
-            Accompagniamo chi cerca casa con uno sguardo onesto: ti aiutiamo a
-            scegliere non solo l'immobile, ma il contesto di vita giusto.
-          </p>
+          <p>{t("home.brand.p1")}</p>
+          <p>{t("home.brand.p2")}</p>
           <Link
             to="/chi-siamo"
             className="group inline-flex items-center gap-2 pt-4 text-sm uppercase tracking-[0.2em] text-primary underline decoration-primary/40 decoration-1 underline-offset-[6px] transition-colors hover:text-[color:var(--terracotta-hover)] hover:decoration-[color:var(--terracotta-hover)]"
           >
-            La nostra storia
+            {t("cta.ourStory")}
             <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
           </Link>
         </div>
@@ -266,16 +258,16 @@ function Index() {
         <div className="container-editorial">
           <div className="flex flex-wrap items-end justify-between gap-6">
             <div>
-              <span className="eyebrow">Scelti per voi</span>
+              <span className="eyebrow">{t("home.featured.eyebrow")}</span>
               <h2 className="mt-3 font-serif text-3xl text-ink sm:text-4xl md:text-5xl">
-                Immobili del momento
+                {t("home.featured.title")}
               </h2>
             </div>
             <Link
               to="/immobili"
               className="group inline-flex items-center gap-2 text-sm uppercase tracking-[0.2em] text-primary underline decoration-primary/40 decoration-1 underline-offset-[6px] transition-colors hover:text-[color:var(--terracotta-hover)] hover:decoration-[color:var(--terracotta-hover)]"
             >
-              Tutti gli immobili
+              {t("cta.allProperties")}
               <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
             </Link>
           </div>
@@ -296,13 +288,12 @@ function Index() {
       <section className="section-ivory py-16 sm:py-20 md:py-24">
         <div className="container-editorial grid gap-10 md:grid-cols-12 md:gap-12">
           <div className="md:col-span-5">
-            <span className="eyebrow">Cerchi casa</span>
+            <span className="eyebrow">{t("home.lead.eyebrow")}</span>
             <h2 className="mt-3 font-serif text-3xl leading-tight text-ink sm:text-4xl md:text-5xl">
-              Cerchi una casa<br />in Lunigiana?
+              {t("home.lead.title1")}<br />{t("home.lead.title2")}
             </h2>
             <p className="mt-5 max-w-md text-base leading-relaxed text-foreground/80">
-              Racconta a Elena cosa stai cercando. Ti aiuterà a capire quali
-              immobili possono davvero fare al caso tuo.
+              {t("home.lead.subtitle")}
             </p>
             <div className="mt-6 hidden text-sm text-foreground/70 md:block">
               <div className="font-medium text-ink">Furia Immobiliare</div>
@@ -323,21 +314,18 @@ function Index() {
       <div className="container-editorial py-16 sm:py-20 md:py-32">
         <div className="grid gap-12 md:grid-cols-12 md:items-center">
           <div className="md:col-span-8 lg:col-span-7">
-            <span className="eyebrow">Vivere in Lunigiana</span>
+            <span className="eyebrow">{t("home.why.eyebrow")}</span>
             <h2 className="mt-4 font-serif text-3xl leading-tight text-ink sm:text-4xl md:text-5xl">
-              Una terra che<br />si misura in passi,<br />non in orari.
+              {t("home.why.title")}
             </h2>
             <p className="mt-6 max-w-xl text-base leading-relaxed text-foreground/80">
-              Borghi medievali, castelli sulle colline, pievi romaniche, cammini
-              storici, boschi di castagno e una cucina che racconta secoli di
-              passaggi. La Lunigiana è una scelta di vita, prima ancora che una
-              destinazione.
+              {t("home.why.body")}
             </p>
             <Link
               to="/territori"
               className="mt-8 inline-flex items-center gap-2 rounded-md bg-terracotta px-6 py-3.5 text-xs uppercase tracking-[0.2em] text-cream transition hover:bg-[color:var(--terracotta-hover)]"
             >
-              Esplora il territorio <ArrowRight size={14} />
+              {t("cta.exploreTerritory")} <ArrowRight size={14} />
             </Link>
           </div>
         </div>
@@ -347,28 +335,28 @@ function Index() {
       {/* TERRITORIES STRIP */}
       <section className="bg-ink py-16 text-cream sm:py-20 md:py-32">
         <div className="container-editorial">
-          <span className="eyebrow text-cream/70">Territori</span>
+          <span className="eyebrow text-cream/70">{t("home.territories.eyebrow")}</span>
           <h2 className="mt-3 max-w-2xl font-serif text-3xl text-cream sm:text-4xl md:text-5xl">
-            Sei modi diversi di abitare la stessa terra.
+            {t("home.territories.title")}
           </h2>
 
           <div className="mt-10 grid gap-px overflow-hidden rounded-sm bg-cream/10 sm:mt-14 md:grid-cols-3">
             {[
-                { name: "Pontremoli", img: territoryPontremoli.url, body: "Borgo capoluogo, vita culturale, vie acciottolate." },
-                { name: "Bagnone", img: territoryBagnone.url, body: "Castello, mercato, sapori antichi." },
-                { name: "Zeri", img: territoryZeri.url, body: "Boschi profondi, allevamenti, lentezza." },
-            ].map((t) => (
+                { name: "Pontremoli", img: territoryPontremoli.url, body: t("home.territories.t1.body") },
+                { name: "Bagnone", img: territoryBagnone.url, body: t("home.territories.t2.body") },
+                { name: "Zeri", img: territoryZeri.url, body: t("home.territories.t3.body") },
+            ].map((terr) => (
               <Link
-                key={t.name}
+                key={terr.name}
                 to="/territori"
                 className="group relative block aspect-[16/10] overflow-hidden bg-ink md:aspect-[4/5]"
               >
-                <img src={t.img} alt={t.name} loading="lazy" decoding="async"
+                <img src={terr.img} alt={terr.name} loading="lazy" decoding="async"
                   className="absolute inset-0 h-full w-full object-cover opacity-70 transition-all duration-700 group-hover:scale-105 group-hover:opacity-90" />
                 <div className="ink-overlay absolute inset-0" />
                 <div className="absolute inset-x-0 bottom-0 p-6 sm:p-8">
-                  <div className="font-serif text-2xl text-cream sm:text-3xl">{t.name}</div>
-                  <p className="mt-2 text-sm text-cream/75">{t.body}</p>
+                  <div className="font-serif text-2xl text-cream sm:text-3xl">{terr.name}</div>
+                  <p className="mt-2 text-sm text-cream/75">{terr.body}</p>
                 </div>
               </Link>
             ))}
@@ -381,20 +369,19 @@ function Index() {
       <div className="container-editorial py-16 sm:py-20 md:py-32">
         <div className="grid gap-12 md:grid-cols-12">
           <div className="md:col-span-5">
-            <span className="eyebrow">Cosa facciamo</span>
+            <span className="eyebrow">{t("home.services.eyebrow")}</span>
             <h2 className="mt-3 font-serif text-3xl leading-tight text-ink sm:text-4xl md:text-5xl">
-              Un servizio sartoriale,<br />una conoscenza locale.
+              {t("home.services.title1")}<br />{t("home.services.title2")}
             </h2>
             <p className="mt-5 max-w-md text-base leading-relaxed text-foreground/75">
-              Ogni richiesta ha la sua storia. Ti accompagniamo passo per passo,
-              con attenzione vera per la casa e per chi ci abiterà.
+              {t("home.services.lead")}
             </p>
           </div>
           <div className="grid gap-6 md:col-span-7">
             {[
-              { icon: Compass, title: "Ricerca su misura per te", body: "Ci racconti che casa cerchi: noi filtriamo l'inventario e ti portiamo solo gli immobili che hanno davvero senso." },
-              { icon: KeyRound, title: "Visite guidate sul posto", body: "Ti accompagniamo immobile per immobile, anche se vivi lontano. Ti raccontiamo il borgo, non solo le mura." },
-              { icon: Sparkles, title: "Trattativa e rogito chiari", body: "Ti seguiamo dalla prima visita al notaio, con stime oneste e nessuna pressione di vendita." },
+              { icon: Compass, title: t("home.services.s1.t"), body: t("home.services.s1.b") },
+              { icon: KeyRound, title: t("home.services.s2.t"), body: t("home.services.s2.b") },
+              { icon: Sparkles, title: t("home.services.s3.t"), body: t("home.services.s3.b") },
             ].map((s) => (
               <div key={s.title} className="card-service">
                 <span className="icon-badge"><s.icon size={20} /></span>
@@ -413,18 +400,17 @@ function Index() {
       <section className="section-sand py-16 sm:py-20 md:py-24">
         <div className="container-editorial">
           <div className="mx-auto max-w-3xl text-center">
-            <span className="eyebrow">Cosa dicono di noi</span>
+            <span className="eyebrow">{t("home.reviews.eyebrow")}</span>
             <div className="mt-4 flex items-center justify-center gap-1 text-primary" aria-hidden="true">
               {[0, 1, 2, 3, 4].map((i) => (
                 <Star key={i} size={22} fill="currentColor" strokeWidth={0} />
               ))}
             </div>
             <h2 className="mt-5 font-serif text-3xl leading-tight text-ink sm:text-4xl md:text-5xl">
-              Le recensioni delle persone<br />che ci hanno scelto.
+              {t("home.reviews.title1")}<br />{t("home.reviews.title2")}
             </h2>
             <p className="mt-5 text-base leading-relaxed text-foreground/80">
-              Leggi cosa raccontano i clienti che hanno comprato casa con
-              Furia Immobiliare sul nostro profilo Google verificato.
+              {t("home.reviews.body")}
             </p>
             <a
               href={AGENCY_FACTS.googleReviewsUrl}
@@ -432,7 +418,7 @@ function Index() {
               rel="noopener noreferrer"
               className="mt-8 inline-flex items-center gap-2 rounded-md bg-terracotta px-6 py-3.5 text-xs uppercase tracking-[0.2em] text-cream transition hover:bg-[color:var(--terracotta-hover)] sm:px-8 sm:py-4 sm:tracking-[0.22em]"
             >
-              Leggi le recensioni su Google <ArrowRight size={14} />
+              {t("home.reviews.cta")} <ArrowRight size={14} />
             </a>
           </div>
         </div>
@@ -441,29 +427,28 @@ function Index() {
       {/* CTA */}
       <section className="container-editorial pb-20 sm:pb-32">
         <div className="relative overflow-hidden rounded-sm bg-secondary px-6 py-14 text-center text-cream sm:px-8 sm:py-20 md:px-16 md:py-28 mt-16 sm:mt-20">
-          <span className="eyebrow text-cream/80">Iniziamo</span>
+          <span className="eyebrow text-cream/80">{t("home.finalCta.eyebrow")}</span>
           <h2 className="mx-auto mt-4 max-w-3xl font-serif text-3xl leading-tight sm:text-4xl md:text-6xl">
-            Dimmi che casa cerchi.<br />
-            <em className="font-normal italic">Te la trovo io.</em>
+            {t("home.finalCta.title1")}<br />
+            <em className="font-normal italic">{t("home.finalCta.title2")}</em>
           </h2>
           <p className="mx-auto mt-5 max-w-xl text-sm leading-relaxed text-cream/85 sm:text-base">
-            Scrivimi su WhatsApp o lasciami i tuoi contatti. Ti rispondo io, Elena,
-            entro 24 ore lavorative. Senza form complicati, senza spam.
+            {t("home.finalCta.body")}
           </p>
           <div className="mt-10 flex flex-wrap items-center justify-center gap-3 sm:gap-4">
             <a
-              href={`https://wa.me/393207019985?text=${encodeURIComponent("Ciao Elena, sto cercando casa in Lunigiana e vorrei ricevere informazioni.")}`}
+              href={`https://wa.me/393207019985?text=${encodeURIComponent(t("wa.defaultMsg"))}`}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 rounded-sm bg-cream px-7 py-4 text-xs uppercase tracking-[0.22em] text-ink transition hover:bg-cream/90"
             >
-              Scrivimi su WhatsApp <ArrowRight size={14} />
+              {t("home.finalCta.waBtn")} <ArrowRight size={14} />
             </a>
             <Link
               to="/contatti"
               className="inline-flex items-center gap-2 rounded-sm border border-cream/70 px-7 py-4 text-xs uppercase tracking-[0.22em] text-cream transition hover:bg-cream hover:text-ink"
             >
-              Modulo di contatto
+              {t("home.finalCta.formBtn")}
             </Link>
           </div>
         </div>

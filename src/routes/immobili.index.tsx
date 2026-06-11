@@ -5,6 +5,8 @@ import { PropertyCard } from "@/components/property-card";
 import { PropertySearchBar } from "@/components/property-search-bar";
 import { listPublishedProperties, type PublicProperty } from "@/lib/public-properties.functions";
 import { useMemo } from "react";
+import { useT } from "@/lib/i18n/LanguageContext";
+import { useLocalizedHead } from "@/hooks/use-localized-head";
 
 const searchSchema = z.object({
   contract: fallback(z.string(), "").default(""),
@@ -45,6 +47,8 @@ export const Route = createFileRoute("/immobili/")({
 });
 
 function ImmobiliPage() {
+  const t = useT();
+  useLocalizedHead("seo.immobili.title", "seo.immobili.desc");
   const { properties: allProperties } = Route.useLoaderData() as { properties: PublicProperty[] };
   const urlSearch = Route.useSearch();
   const uniqueLocations = useMemo(
@@ -133,13 +137,12 @@ function ImmobiliPage() {
     <>
       <section className="border-b border-border bg-muted/40 pb-12 pt-32 md:pt-40">
         <div className="container-editorial">
-          <span className="eyebrow">Immobili</span>
+          <span className="eyebrow">{t("list.eyebrow")}</span>
           <h1 className="mt-3 max-w-3xl font-serif text-5xl text-ink md:text-6xl">
-            La nostra selezione di case in Lunigiana.
+            {t("list.title")}
           </h1>
           <p className="mt-5 max-w-2xl text-base leading-relaxed text-foreground/75">
-            {allProperties.length} immobili reali importati dal nostro archivio.
-            Filtra per categoria o comune per trovare il tuo posto.
+            {allProperties.length} {t("list.intro")}
           </p>
 
           <div className="mt-10">
@@ -166,14 +169,14 @@ function ImmobiliPage() {
         <div className="mb-10 flex items-end justify-between border-b border-border pb-5">
           <p className="text-sm text-muted-foreground">
             <span className="font-serif text-lg text-ink">{filtered.length}</span>{" "}
-            immobili disponibili
+            {t("list.count.available")}
           </p>
         </div>
 
         {filtered.length === 0 ? (
           <div className="py-24 text-center">
             <p className="font-serif text-2xl text-muted-foreground">
-              Nessun immobile corrisponde ai filtri selezionati.
+              {t("list.empty")}
             </p>
           </div>
         ) : (
@@ -186,13 +189,13 @@ function ImmobiliPage() {
 
         <div className="mt-24 text-center">
           <p className="font-serif text-2xl italic text-foreground/70">
-            Non trovi quello che cerchi?
+            {t("list.notFound")}
           </p>
           <Link
             to="/contatti"
             className="mt-5 inline-block rounded-sm bg-primary px-8 py-4 text-xs uppercase tracking-[0.22em] text-primary-foreground"
           >
-            Raccontaci la casa che cerchi
+            {t("list.tellUs")}
           </Link>
         </div>
       </section>
