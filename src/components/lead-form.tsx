@@ -1,35 +1,31 @@
 import { useState, type FormEvent } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { ArrowRight, Loader2, CheckCircle2, MessageCircle } from "lucide-react";
+import { useT, useLanguage } from "@/lib/i18n/LanguageContext";
 
-const PROPERTY_TYPES = [
-  "Appartamento",
-  "Casa indipendente",
-  "Villetta",
-  "Rustico / casale",
-  "Villa",
-  "Terreno",
-  "Immobile da ristrutturare",
-  "Non ho ancora deciso",
+const PROPERTY_TYPES_IT = [
+  "Appartamento","Casa indipendente","Villetta","Rustico / casale","Villa","Terreno","Immobile da ristrutturare","Non ho ancora deciso",
 ];
-
-const BUDGETS = [
-  "Fino a 80.000 €",
-  "80.000 – 150.000 €",
-  "150.000 – 250.000 €",
-  "250.000 – 400.000 €",
-  "Oltre 400.000 €",
-  "Preferisco parlarne direttamente",
+const PROPERTY_TYPES_EN = [
+  "Apartment","Detached house","Townhouse","Farmhouse / country house","Villa","Land","Property to renovate","Not decided yet",
 ];
-
-const WHATSAPP_URL = `https://wa.me/393207019985?text=${encodeURIComponent(
-  "Ciao Elena, sto cercando casa in Lunigiana e vorrei ricevere qualche informazione.",
-)}`;
+const BUDGETS_IT = [
+  "Fino a 80.000 €","80.000 – 150.000 €","150.000 – 250.000 €","250.000 – 400.000 €","Oltre 400.000 €","Preferisco parlarne direttamente",
+];
+const BUDGETS_EN = [
+  "Up to € 80,000","€ 80,000 – 150,000","€ 150,000 – 250,000","€ 250,000 – 400,000","Over € 400,000","Prefer to discuss directly",
+];
 
 export function LeadForm() {
+  const t = useT();
+  const { language } = useLanguage();
   const [status, setStatus] = useState<"idle" | "submitting" | "ok" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [openedAt] = useState(() => Date.now());
+
+  const PROPERTY_TYPES = language === "en" ? PROPERTY_TYPES_EN : PROPERTY_TYPES_IT;
+  const BUDGETS = language === "en" ? BUDGETS_EN : BUDGETS_IT;
+  const WHATSAPP_URL = `https://wa.me/393207019985?text=${encodeURIComponent(t("wa.defaultMsg"))}`;
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -44,13 +40,13 @@ export function LeadForm() {
     }
     // Min time guard (2s)
     if (Date.now() - openedAt < 2000) {
-      setErrorMsg("Invio troppo rapido, riprova.");
+      setErrorMsg(t("form.err.tooFast"));
       return;
     }
 
     const privacy = fd.get("privacy") === "on";
     if (!privacy) {
-      setErrorMsg("Devi accettare l'informativa privacy.");
+      setErrorMsg(t("form.err.privacy"));
       return;
     }
 
@@ -67,11 +63,11 @@ export function LeadForm() {
     };
 
     if (!payload.full_name || !payload.email || !payload.phone) {
-      setErrorMsg("Compila i campi obbligatori.");
+      setErrorMsg(t("form.err.required"));
       return;
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(payload.email)) {
-      setErrorMsg("Email non valida.");
+      setErrorMsg(t("form.err.email"));
       return;
     }
 
@@ -79,7 +75,7 @@ export function LeadForm() {
     const { error } = await supabase.from("leads").insert(payload);
     if (error) {
       setStatus("error");
-      setErrorMsg("Si è verificato un problema. Riprova o scrivici su WhatsApp.");
+      setErrorMsg(t("form.err.generic"));
       return;
     }
     setStatus("ok");
@@ -90,9 +86,9 @@ export function LeadForm() {
     return (
       <div className="rounded-sm border border-border bg-cream p-8 text-center sm:p-12">
         <CheckCircle2 className="mx-auto text-primary" size={36} />
-        <h3 className="mt-4 font-serif text-2xl text-ink sm:text-3xl">Grazie.</h3>
+        <h3 className="mt-4 font-serif text-2xl text-ink sm:text-3xl">{t("form.thanks")}</h3>
         <p className="mt-3 text-sm leading-relaxed text-foreground/80 sm:text-base">
-          La tua richiesta è stata inviata. Elena ti ricontatterà appena possibile.
+          {t("form.thanksBody")}
         </p>
       </div>
     );
@@ -111,21 +107,21 @@ export function LeadForm() {
       />
 
       <div className="grid gap-3 sm:grid-cols-2 sm:gap-3.5">
-        <Field label="Nome e cognome *" name="full_name" required maxLength={200} autoComplete="name" />
-        <Field label="Email *" name="email" type="email" required maxLength={320} autoComplete="email" />
-        <Field label="Telefono / WhatsApp *" name="phone" type="tel" required maxLength={50} autoComplete="tel" />
-        <Field label="Comune o zona di interesse" name="preferred_area" maxLength={200} placeholder="Es. Pontremoli, Val di Magra…" />
-        <SelectField label="Budget indicativo" name="budget_range" options={BUDGETS} />
-        <SelectField label="Tipologia desiderata" name="property_type" options={PROPERTY_TYPES} />
+        <Field label={t("form.fullName")} name="full_name" required maxLength={200} autoComplete="name" />
+        <Field label={t("form.email")} name="email" type="email" required maxLength={320} autoComplete="email" />
+        <Field label={t("form.phone")} name="phone" type="tel" required maxLength={50} autoComplete="tel" />
+        <Field label={t("form.area")} name="preferred_area" maxLength={200} placeholder={t("form.areaPh")} />
+        <SelectField label={t("form.budget")} name="budget_range" options={BUDGETS} placeholder={t("form.select")} />
+        <SelectField label={t("form.propertyType")} name="property_type" options={PROPERTY_TYPES} placeholder={t("form.select")} />
       </div>
 
       <label className="grid gap-1.5 text-[0.7rem] uppercase tracking-[0.18em] text-foreground/70">
-        Messaggio
+        {t("form.message")}
         <textarea
           name="message"
           rows={3}
           maxLength={3000}
-          placeholder="Es. cerco una casa con giardino vicino a Pontremoli, possibilmente abitabile e con vista…"
+          placeholder={t("form.messagePh")}
           className="rounded-sm border border-border bg-background px-3 py-2 text-sm normal-case tracking-normal text-ink placeholder:text-foreground/40 focus:border-primary focus:outline-none"
         />
       </label>
@@ -138,7 +134,7 @@ export function LeadForm() {
           className="mt-0.5 h-4 w-4 shrink-0 cursor-pointer accent-primary"
         />
         <span>
-          Acconsento al trattamento dei dati personali per essere ricontattato da Furia Immobiliare in merito alla mia richiesta.
+          {t("form.privacy")}
         </span>
       </label>
 
@@ -154,23 +150,23 @@ export function LeadForm() {
         >
           {status === "submitting" ? (
             <>
-              <Loader2 size={14} className="animate-spin" /> Invio in corso…
+              <Loader2 size={14} className="animate-spin" /> {t("form.submitting")}
             </>
           ) : (
             <>
-              Invia la tua richiesta a Elena <ArrowRight size={14} />
+              {t("form.submit")} <ArrowRight size={14} />
             </>
           )}
         </button>
         <div className="text-xs text-foreground/70">
-          Preferisci fare prima una domanda veloce?{" "}
+          {t("form.askQuick")}{" "}
           <a
             href={WHATSAPP_URL}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-1.5 font-medium text-primary underline-offset-4 hover:underline"
           >
-            <MessageCircle size={14} /> Scrivi a Elena su WhatsApp
+            <MessageCircle size={14} /> {t("cta.talkToElenaWA")}
           </a>
         </div>
       </div>
@@ -201,10 +197,12 @@ function SelectField({
   label,
   name,
   options,
+  placeholder,
 }: {
   label: string;
   name: string;
   options: string[];
+  placeholder?: string;
 }) {
   return (
     <label className="grid gap-1.5 text-[0.7rem] uppercase tracking-[0.18em] text-foreground/70">
@@ -214,7 +212,7 @@ function SelectField({
         defaultValue=""
         className="rounded-sm border border-border bg-background px-3 py-2 text-sm normal-case tracking-normal text-ink focus:border-primary focus:outline-none"
       >
-        <option value="">— Seleziona —</option>
+        <option value="">{placeholder ?? "— Seleziona —"}</option>
         {options.map((o) => (
           <option key={o} value={o}>
             {o}
