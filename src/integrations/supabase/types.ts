@@ -98,6 +98,7 @@ export type Database = {
           internal_notes: string | null
           latitude: number | null
           locality: string | null
+          location_description_en: string | null
           longitude: number | null
           municipality: string | null
           panoramic_view: boolean
@@ -116,9 +117,12 @@ export type Database = {
           status: Database["public"]["Enums"]["property_status"]
           status_note: string | null
           status_updated_at: string | null
+          subtitle_en: string | null
+          summary_en: string | null
           suspended_at: string | null
           terrace: boolean
           title: string
+          title_en: string | null
           updated_at: string
         }
         Insert: {
@@ -156,6 +160,7 @@ export type Database = {
           internal_notes?: string | null
           latitude?: number | null
           locality?: string | null
+          location_description_en?: string | null
           longitude?: number | null
           municipality?: string | null
           panoramic_view?: boolean
@@ -174,9 +179,12 @@ export type Database = {
           status?: Database["public"]["Enums"]["property_status"]
           status_note?: string | null
           status_updated_at?: string | null
+          subtitle_en?: string | null
+          summary_en?: string | null
           suspended_at?: string | null
           terrace?: boolean
           title?: string
+          title_en?: string | null
           updated_at?: string
         }
         Update: {
@@ -214,6 +222,7 @@ export type Database = {
           internal_notes?: string | null
           latitude?: number | null
           locality?: string | null
+          location_description_en?: string | null
           longitude?: number | null
           municipality?: string | null
           panoramic_view?: boolean
@@ -232,15 +241,19 @@ export type Database = {
           status?: Database["public"]["Enums"]["property_status"]
           status_note?: string | null
           status_updated_at?: string | null
+          subtitle_en?: string | null
+          summary_en?: string | null
           suspended_at?: string | null
           terrace?: boolean
           title?: string
+          title_en?: string | null
           updated_at?: string
         }
         Relationships: []
       }
       property_descriptions: {
         Row: {
+          description_en: string | null
           edited_description: string | null
           generated_at: string | null
           generated_description: string | null
@@ -253,6 +266,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          description_en?: string | null
           edited_description?: string | null
           generated_at?: string | null
           generated_description?: string | null
@@ -265,6 +279,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          description_en?: string | null
           edited_description?: string | null
           generated_at?: string | null
           generated_description?: string | null
