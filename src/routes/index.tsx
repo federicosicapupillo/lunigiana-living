@@ -234,27 +234,19 @@ function Index() {
       <section className="section-cream">
       <div className="container-editorial grid gap-10 py-12 sm:py-16 md:grid-cols-12 md:gap-12 md:py-24">
         <div className="md:col-span-5">
-          <span className="eyebrow">Chi siamo</span>
+          <span className="eyebrow">{t("home.brand.eyebrow")}</span>
           <h2 className="mt-4 font-serif text-3xl leading-tight text-ink sm:text-4xl md:text-5xl">
-            Abitare la Lunigiana,<br />non solo comprarci casa.
+            {t("home.brand.title1")}<br />{t("home.brand.title2")}
           </h2>
         </div>
         <div className="space-y-5 text-base leading-relaxed text-foreground/85 md:col-span-6 md:col-start-7">
-          <p>
-            Da anni a Pontremoli, Furia Immobiliare nasce da un legame
-            profondo con questa terra di confine tra Toscana, Liguria ed Emilia.
-            Conosciamo le pietre dei borghi, sappiamo dove la luce arriva la
-            mattina, dove il bosco fa ombra in agosto.
-          </p>
-          <p>
-            Accompagniamo chi cerca casa con uno sguardo onesto: ti aiutiamo a
-            scegliere non solo l'immobile, ma il contesto di vita giusto.
-          </p>
+          <p>{t("home.brand.p1")}</p>
+          <p>{t("home.brand.p2")}</p>
           <Link
             to="/chi-siamo"
             className="group inline-flex items-center gap-2 pt-4 text-sm uppercase tracking-[0.2em] text-primary underline decoration-primary/40 decoration-1 underline-offset-[6px] transition-colors hover:text-[color:var(--terracotta-hover)] hover:decoration-[color:var(--terracotta-hover)]"
           >
-            La nostra storia
+            {t("cta.ourStory")}
             <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
           </Link>
         </div>
@@ -266,16 +258,16 @@ function Index() {
         <div className="container-editorial">
           <div className="flex flex-wrap items-end justify-between gap-6">
             <div>
-              <span className="eyebrow">Scelti per voi</span>
+              <span className="eyebrow">{t("home.featured.eyebrow")}</span>
               <h2 className="mt-3 font-serif text-3xl text-ink sm:text-4xl md:text-5xl">
-                Immobili del momento
+                {t("home.featured.title")}
               </h2>
             </div>
             <Link
               to="/immobili"
               className="group inline-flex items-center gap-2 text-sm uppercase tracking-[0.2em] text-primary underline decoration-primary/40 decoration-1 underline-offset-[6px] transition-colors hover:text-[color:var(--terracotta-hover)] hover:decoration-[color:var(--terracotta-hover)]"
             >
-              Tutti gli immobili
+              {t("cta.allProperties")}
               <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
             </Link>
           </div>
@@ -296,13 +288,12 @@ function Index() {
       <section className="section-ivory py-16 sm:py-20 md:py-24">
         <div className="container-editorial grid gap-10 md:grid-cols-12 md:gap-12">
           <div className="md:col-span-5">
-            <span className="eyebrow">Cerchi casa</span>
+            <span className="eyebrow">{t("home.lead.eyebrow")}</span>
             <h2 className="mt-3 font-serif text-3xl leading-tight text-ink sm:text-4xl md:text-5xl">
-              Cerchi una casa<br />in Lunigiana?
+              {t("home.lead.title1")}<br />{t("home.lead.title2")}
             </h2>
             <p className="mt-5 max-w-md text-base leading-relaxed text-foreground/80">
-              Racconta a Elena cosa stai cercando. Ti aiuterà a capire quali
-              immobili possono davvero fare al caso tuo.
+              {t("home.lead.subtitle")}
             </p>
             <div className="mt-6 hidden text-sm text-foreground/70 md:block">
               <div className="font-medium text-ink">Furia Immobiliare</div>
@@ -323,21 +314,18 @@ function Index() {
       <div className="container-editorial py-16 sm:py-20 md:py-32">
         <div className="grid gap-12 md:grid-cols-12 md:items-center">
           <div className="md:col-span-8 lg:col-span-7">
-            <span className="eyebrow">Vivere in Lunigiana</span>
+            <span className="eyebrow">{t("home.why.eyebrow")}</span>
             <h2 className="mt-4 font-serif text-3xl leading-tight text-ink sm:text-4xl md:text-5xl">
-              Una terra che<br />si misura in passi,<br />non in orari.
+              {t("home.why.title")}
             </h2>
             <p className="mt-6 max-w-xl text-base leading-relaxed text-foreground/80">
-              Borghi medievali, castelli sulle colline, pievi romaniche, cammini
-              storici, boschi di castagno e una cucina che racconta secoli di
-              passaggi. La Lunigiana è una scelta di vita, prima ancora che una
-              destinazione.
+              {t("home.why.body")}
             </p>
             <Link
               to="/territori"
               className="mt-8 inline-flex items-center gap-2 rounded-md bg-terracotta px-6 py-3.5 text-xs uppercase tracking-[0.2em] text-cream transition hover:bg-[color:var(--terracotta-hover)]"
             >
-              Esplora il territorio <ArrowRight size={14} />
+              {t("cta.exploreTerritory")} <ArrowRight size={14} />
             </Link>
           </div>
         </div>
@@ -347,16 +335,16 @@ function Index() {
       {/* TERRITORIES STRIP */}
       <section className="bg-ink py-16 text-cream sm:py-20 md:py-32">
         <div className="container-editorial">
-          <span className="eyebrow text-cream/70">Territori</span>
+          <span className="eyebrow text-cream/70">{t("home.territories.eyebrow")}</span>
           <h2 className="mt-3 max-w-2xl font-serif text-3xl text-cream sm:text-4xl md:text-5xl">
-            Sei modi diversi di abitare la stessa terra.
+            {t("home.territories.title")}
           </h2>
 
           <div className="mt-10 grid gap-px overflow-hidden rounded-sm bg-cream/10 sm:mt-14 md:grid-cols-3">
             {[
-                { name: "Pontremoli", img: territoryPontremoli.url, body: "Borgo capoluogo, vita culturale, vie acciottolate." },
-                { name: "Bagnone", img: territoryBagnone.url, body: "Castello, mercato, sapori antichi." },
-                { name: "Zeri", img: territoryZeri.url, body: "Boschi profondi, allevamenti, lentezza." },
+                { name: "Pontremoli", img: territoryPontremoli.url, body: t("home.territories.t1.body") },
+                { name: "Bagnone", img: territoryBagnone.url, body: t("home.territories.t2.body") },
+                { name: "Zeri", img: territoryZeri.url, body: t("home.territories.t3.body") },
             ].map((t) => (
               <Link
                 key={t.name}
