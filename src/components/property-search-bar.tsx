@@ -5,7 +5,7 @@ import { Search, X, ChevronDown, Star, SlidersHorizontal } from "lucide-react";
 import { PROPERTY_TYPES } from "@/lib/admin/property-constants";
 import { useT } from "@/lib/i18n/LanguageContext";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
-import { localizeType } from "@/lib/i18n/property-localize";
+import { localizeType, localizeAmenity } from "@/lib/i18n/property-localize";
 
 const COMUNI_FALLBACK = [
   "Pontremoli","Bagnone","Villafranca in Lunigiana","Mulazzo","Filattiera",
@@ -425,7 +425,7 @@ export function PropertySearchBar({
                           onChange={() => toggleFeature(f)}
                           className="h-3.5 w-3.5 accent-primary"
                         />
-                        <span className="leading-tight">{localizeKnownFeature(f, language)}</span>
+                        <span className="leading-tight">{localizeAmenity(f, language)}</span>
                       </label>
                     ))}
                   </div>
