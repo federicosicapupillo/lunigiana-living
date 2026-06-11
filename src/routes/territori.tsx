@@ -113,35 +113,35 @@ function TerritoriPage() {
           </p>
         </div>
 
-        {territories.map((t, i) => {
+        {territories.map((terr, i) => {
           const bands = ["bg-warm-soft", "bg-warm-sand", "bg-warm-cream"];
           const bg = bands[i % bands.length];
           return (
-            <div key={t.slug} className={`${bg} border-t border-warm-border/60`}>
+            <div key={terr.slug} className={`${bg} border-t border-warm-border/60`}>
               <div className="container-editorial py-14 md:py-20">
                 <article
                   className={`grid gap-10 md:grid-cols-12 md:items-center ${i % 2 ? "md:[&>figure]:order-2" : ""}`}
                 >
                   <figure className="overflow-hidden rounded-sm shadow-[0_18px_40px_-24px_rgba(36,23,17,0.35)] md:col-span-7">
                     <img
-                      src={imageBySlug[t.slug]}
-                      alt={t.name}
+                      src={imageBySlug[terr.slug]}
+                      alt={terr.name}
                       loading="lazy"
                       className="aspect-[5/4] w-full object-cover md:aspect-[4/3]"
                     />
                   </figure>
                   <div className="md:col-span-5">
-                    <div className="eyebrow">{t.name}</div>
+                    <div className="eyebrow">{terr.name}</div>
                     <h3 className="mt-3 font-serif text-3xl leading-tight text-ink md:text-4xl">
-                      {t.tagline}
+                      {terr.tagline}
                     </h3>
                     <div className="mt-5 h-px w-12 bg-warm-border" />
-                    <p className="mt-5 text-base leading-relaxed text-foreground/80">{t.body}</p>
+                    <p className="mt-5 text-base leading-relaxed text-foreground/80">{terr.body}</p>
                     <Link
                       to="/immobili"
                       className="group mt-7 inline-flex items-center gap-2 rounded-sm border border-primary/60 px-5 py-2.5 text-[0.7rem] uppercase tracking-[0.22em] text-primary transition hover:bg-primary hover:text-primary-foreground"
                     >
-                      {t("terr.borghi.cta")} {t.name}
+                      {t("terr.borghi.cta")} {terr.name}
                       <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
                     </Link>
                   </div>
