@@ -8,6 +8,15 @@ import { useServerFn } from "@tanstack/react-start";
 import { WatermarkedImage } from "@/components/watermarked-image";
 import { whatsappUrl } from "@/components/whatsapp-float";
 import { useLanguage, useT } from "@/lib/i18n/LanguageContext";
+import {
+  localizeType,
+  localizePrice,
+  localizeAttrKey,
+  localizeAttrValue,
+  localizeAmenity,
+  localizeKnown,
+  localizeRoomsLabel,
+} from "@/lib/i18n/property-localize";
 
 export const Route = createFileRoute("/immobili/$id")({
   loader: async ({ params }) => {
@@ -73,7 +82,8 @@ function PropertyDetail() {
   const p: PublicProperty = (localized?.property as PublicProperty | null) ?? base;
   const title = p.title;
   const desc = p.description;
-  const priceLabel = p.price;
+  const priceLabel = localizePrice(p.price, language);
+  const displayType = localizeType(p.type, language);
   const [active, setActive] = useState(0);
   const main = p.gallery[active] || p.image;
   const waMessage =
@@ -92,7 +102,7 @@ function PropertyDetail() {
           </Link>
           <div className="mt-6 flex flex-wrap items-end justify-between gap-4 sm:gap-6">
             <div className="min-w-0 flex-1">
-              <span className="eyebrow">{p.reference} · {p.type}</span>
+              <span className="eyebrow">{p.reference} · {displayType}</span>
               <h1 className="mt-3 font-serif text-3xl leading-tight text-ink sm:text-4xl md:text-5xl">{title}</h1>
               <div className="mt-3 flex items-center gap-2 text-sm text-muted-foreground">
                 <MapPin size={15} /> {p.location}
@@ -148,9 +158,9 @@ function PropertyDetail() {
           <div className="mt-12 grid grid-cols-2 gap-px overflow-hidden rounded-sm bg-border md:grid-cols-4">
             {[
               { icon: Maximize2, label: t("detail.surface"), value: p.sqmLabel ?? (p.sqm ? `${p.sqm} m²` : "—") },
-              { icon: BedDouble, label: t("detail.rooms"), value: p.roomsLabel ?? "—" },
+              { icon: BedDouble, label: t("detail.rooms"), value: localizeRoomsLabel(p.roomsLabel ?? "", language) || "—" },
               { icon: Bath, label: t("detail.bathrooms"), value: p.bathroomsLabel ?? "—" },
-              { icon: Building2, label: t("detail.floor"), value: p.floor || "—" },
+              { icon: Building2, label: t("detail.floor"), value: localizeAttrValue(p.floor || "", language) || "—" },
             ].map((f) => (
               <div key={f.label} className="bg-card p-5">
                 <f.icon size={18} className="text-primary" />
@@ -167,8 +177,8 @@ function PropertyDetail() {
             <dl className="mt-6 grid grid-cols-1 gap-x-8 md:grid-cols-2">
               {DETAIL_KEYS.filter((k) => p.attributes[k] && p.attributes[k].toLowerCase() !== "non indicato").map((k) => (
                 <div key={k} className="flex justify-between border-b border-border py-3 text-sm">
-                  <dt className="text-muted-foreground">{k}</dt>
-                  <dd className="text-right text-ink">{p.attributes[k]}</dd>
+                  <dt className="text-muted-foreground">{localizeAttrKey(k, language)}</dt>
+                  <dd className="text-right text-ink">{localizeAttrValue(p.attributes[k], language)}</dd>
                 </div>
               ))}
             </dl>
@@ -186,7 +196,7 @@ function PropertyDetail() {
                       key={a}
                       className="rounded-sm border border-border bg-card px-3 py-1.5 text-xs uppercase tracking-wider text-ink"
                     >
-                      {a}
+                      {localizeAmenity(a, language)}
                     </li>
                   ))}
                 </ul>
@@ -212,7 +222,7 @@ function PropertyDetail() {
                           key={it}
                           className="rounded-sm border border-primary/20 bg-primary/5 px-3 py-1.5 text-xs tracking-wide text-ink"
                         >
-                          {it}
+                          {localizeKnown(it, language)}
                         </li>
                       ))}
                     </ul>
