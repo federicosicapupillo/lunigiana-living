@@ -4,6 +4,8 @@ import { useNavigate } from "@tanstack/react-router";
 import { Search, X, ChevronDown, Star, SlidersHorizontal } from "lucide-react";
 import { PROPERTY_TYPES } from "@/lib/admin/property-constants";
 import { useT } from "@/lib/i18n/LanguageContext";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
+import { localizeType, localizeAmenity } from "@/lib/i18n/property-localize";
 
 const COMUNI_FALLBACK = [
   "Pontremoli","Bagnone","Villafranca in Lunigiana","Mulazzo","Filattiera",
@@ -11,61 +13,39 @@ const COMUNI_FALLBACK = [
   "Podenzana","Comano","Casola in Lunigiana",
 ];
 
-const SIZE_RANGES = [
-  { label: "Qualsiasi superficie", value: "" },
-  { label: "Fino a 80 mq", value: "0-80" },
-  { label: "80 - 120 mq", value: "80-120" },
-  { label: "120 - 200 mq", value: "120-200" },
-  { label: "200 - 300 mq", value: "200-300" },
-  { label: "Oltre 300 mq", value: "300-" },
+const SIZE_RANGE_KEYS: { key: string; value: string }[] = [
+  { key: "filter.anySize", value: "" },
+  { key: "filter.upTo80", value: "0-80" },
+  { key: "filter.80to120", value: "80-120" },
+  { key: "filter.120to200", value: "120-200" },
+  { key: "filter.200to300", value: "200-300" },
+  { key: "filter.over300", value: "300-" },
 ];
 
-const ROOM_OPTS = [
-  { label: "Qualsiasi numero", value: "" },
-  { label: "1 camera", value: "1" },
-  { label: "2 camere", value: "2" },
-  { label: "3 camere", value: "3" },
-  { label: "4 camere", value: "4" },
-  { label: "5 o più camere", value: "5" },
+const ROOM_OPT_KEYS: { key: string; value: string }[] = [
+  { key: "filter.anyRooms", value: "" },
+  { key: "filter.1bedroom", value: "1" },
+  { key: "filter.2bedrooms", value: "2" },
+  { key: "filter.3bedrooms", value: "3" },
+  { key: "filter.4bedrooms", value: "4" },
+  { key: "filter.5+bedrooms", value: "5" },
 ];
 
-const SORT_OPTS = [
-  { label: "Più recenti", value: "recent" },
-  { label: "Prezzo crescente", value: "price-asc" },
-  { label: "Prezzo decrescente", value: "price-desc" },
-  { label: "Superficie crescente", value: "size-asc" },
-  { label: "Superficie decrescente", value: "size-desc" },
+const SORT_OPT_KEYS: { key: string; value: string }[] = [
+  { key: "filter.sortRecent", value: "recent" },
+  { key: "filter.sortPriceAsc", value: "price-asc" },
+  { key: "filter.sortPriceDesc", value: "price-desc" },
+  { key: "filter.sortSizeAsc", value: "size-asc" },
+  { key: "filter.sortSizeDesc", value: "size-desc" },
 ];
 
 const PRICE_STEPS = [50000, 100000, 150000, 200000, 250000, 300000, 400000, 500000, 750000, 1000000];
-const fmtPrice = (n: number) => `${n.toLocaleString("it-IT")} €`;
-const PRICE_MIN_OPTS = [
-  { label: "Nessun minimo", value: "" },
-  ...PRICE_STEPS.map((n) => ({ label: fmtPrice(n), value: String(n) })),
-  { label: "Oltre 1.000.000 €", value: "1000001" },
-];
-const PRICE_MAX_OPTS = [
-  { label: "Nessun massimo", value: "" },
-  ...PRICE_STEPS.map((n) => ({ label: fmtPrice(n), value: String(n) })),
-  { label: "Oltre 1.000.000 €", value: "1000001" },
-];
-
 const RENT_MIN_STEPS = [300, 500, 700, 900, 1200, 1500, 2000];
 const RENT_MAX_STEPS = [500, 700, 900, 1200, 1500, 2000, 3000];
-const RENT_MIN_OPTS = [
-  { label: "Nessun minimo", value: "" },
-  ...RENT_MIN_STEPS.map((n) => ({ label: fmtPrice(n), value: String(n) })),
-  { label: "Oltre 2.000 €", value: "2001" },
-];
-const RENT_MAX_OPTS = [
-  { label: "Nessun massimo", value: "" },
-  ...RENT_MAX_STEPS.map((n) => ({ label: fmtPrice(n), value: String(n) })),
-  { label: "Oltre 3.000 €", value: "3001" },
-];
 
-const FEATURE_GROUPS: { label: string; items: string[] }[] = [
+const FEATURE_GROUPS: { labelKey: string; items: string[] }[] = [
   {
-    label: "Esterni",
+    labelKey: "feat.group.outdoor",
     items: [
       "Giardino","Giardino privato","Corte privata","Terreno","Uliveto","Vigneto","Bosco",
       "Terrazza","Terrazza panoramica","Balcone","Loggia","Portico","Patio","Veranda",
@@ -74,14 +54,14 @@ const FEATURE_GROUPS: { label: string; items: string[] }[] = [
     ],
   },
   {
-    label: "Pertinenze",
+    labelKey: "feat.group.pertinenze",
     items: [
       "Garage","Posto auto","Posto auto coperto","Cantina","Taverna","Soffitta","Mansarda",
       "Deposito","Legnaia","Fienile","Annesso agricolo","Dependence","Locale tecnico",
     ],
   },
   {
-    label: "Comfort e impianti",
+    labelKey: "feat.group.comfort",
     items: [
       "Camino","Stufa","Aria condizionata","Pannelli solari","Fotovoltaico","Impianto allarme",
       "Videosorveglianza","Domotica","Internet / fibra","Cancello automatico","Doppi vetri",
@@ -89,14 +69,14 @@ const FEATURE_GROUPS: { label: string; items: string[] }[] = [
     ],
   },
   {
-    label: "Accessibilità",
+    labelKey: "feat.group.access",
     items: [
       "Ascensore","Accesso disabili","Ingresso indipendente","Strada privata",
       "Facile accesso auto","Vicino ai servizi","Vicino al centro","Posizione riservata",
     ],
   },
   {
-    label: "Caratteristiche speciali",
+    labelKey: "feat.group.special",
     items: [
       "Immobile storico","Casale in pietra","Rustico","Travature a vista","Pavimenti originali",
       "Soffitti affrescati","Torretta","Mura storiche","Ideale per B&B","Ideale per agriturismo",
@@ -142,7 +122,33 @@ export function PropertySearchBar({
   onReset,
 }: PropertySearchBarProps) {
   const t = useT();
+  const { language } = useLanguage();
   const navigate = useNavigate();
+  const fmtPrice = (n: number) =>
+    language === "en" ? `€${n.toLocaleString("en-GB")}` : `${n.toLocaleString("it-IT")} €`;
+  const priceMinOptsList = [
+    { label: t("search.priceNoMin"), value: "" },
+    ...PRICE_STEPS.map((n) => ({ label: fmtPrice(n), value: String(n) })),
+    { label: t("filter.over1M"), value: "1000001" },
+  ];
+  const priceMaxOptsList = [
+    { label: t("search.priceNoMax"), value: "" },
+    ...PRICE_STEPS.map((n) => ({ label: fmtPrice(n), value: String(n) })),
+    { label: t("filter.over1M"), value: "1000001" },
+  ];
+  const rentMinOptsList = [
+    { label: t("search.priceNoMin"), value: "" },
+    ...RENT_MIN_STEPS.map((n) => ({ label: fmtPrice(n), value: String(n) })),
+    { label: t("filter.over2k"), value: "2001" },
+  ];
+  const rentMaxOptsList = [
+    { label: t("search.priceNoMax"), value: "" },
+    ...RENT_MAX_STEPS.map((n) => ({ label: fmtPrice(n), value: String(n) })),
+    { label: t("filter.over3k"), value: "3001" },
+  ];
+  const sizeRanges = SIZE_RANGE_KEYS.map((o) => ({ label: t(o.key), value: o.value }));
+  const roomOpts = ROOM_OPT_KEYS.map((o) => ({ label: t(o.key), value: o.value }));
+  const sortOpts = SORT_OPT_KEYS.map((o) => ({ label: t(o.key), value: o.value }));
   const [state, setState] = useState<SearchValues>({ ...EMPTY, ...initial });
   const [featOpen, setFeatOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -196,8 +202,8 @@ export function PropertySearchBar({
   const comuniList = comuni && comuni.length ? comuni : COMUNI_FALLBACK;
 
   const isRent = state.contract === "affitto";
-  const priceMinOpts = isRent ? RENT_MIN_OPTS : PRICE_MIN_OPTS;
-  const priceMaxOpts = isRent ? RENT_MAX_OPTS : PRICE_MAX_OPTS;
+  const priceMinOpts = isRent ? rentMinOptsList : priceMinOptsList;
+  const priceMaxOpts = isRent ? rentMaxOptsList : priceMaxOptsList;
   const priceMinLabel = isRent ? t("search.label.rentMin") : t("search.label.priceMin");
   const priceMaxLabel = isRent ? t("search.label.rentMax") : t("search.label.priceMax");
 
@@ -316,7 +322,7 @@ export function PropertySearchBar({
       <div className="grid grid-cols-1 gap-px bg-border sm:grid-cols-2 lg:grid-cols-4">
         <SelectField label={t("search.label.type")} value={state.type} onChange={(v) => setState({ ...state, type: v })}>
         <option value="">{t("search.label.allTypes")}</option>
-        {PROPERTY_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
+        {PROPERTY_TYPES.map((pt) => <option key={pt} value={pt}>{localizeType(pt, language)}</option>)}
         </SelectField>
         <SelectField label={t("search.label.comune")} value={state.comune} onChange={(v) => setState({ ...state, comune: v })}>
         <option value="">{t("search.label.allComuni")}</option>
@@ -334,10 +340,10 @@ export function PropertySearchBar({
       {advancedOpen && (
         <div className="grid grid-cols-1 gap-px border-t border-border bg-border sm:grid-cols-2 lg:grid-cols-4">
           <SelectField label={t("search.label.size")} value={state.size} onChange={(v) => setState({ ...state, size: v })}>
-        {SIZE_RANGES.map((p) => <option key={p.label} value={p.value}>{p.label}</option>)}
+        {sizeRanges.map((p) => <option key={p.label} value={p.value}>{p.label}</option>)}
           </SelectField>
           <SelectField label={t("search.label.rooms")} value={state.rooms} onChange={(v) => setState({ ...state, rooms: v })}>
-        {ROOM_OPTS.map((p) => <option key={p.label} value={p.value}>{p.label}</option>)}
+        {roomOpts.map((p) => <option key={p.label} value={p.value}>{p.label}</option>)}
           </SelectField>
           <div className="flex min-w-0 flex-col gap-0.5 bg-card px-3 py-2 text-left">
         <span className="eyebrow text-[0.6rem]">{t("search.label.features")}</span>
@@ -354,7 +360,7 @@ export function PropertySearchBar({
         </button>
           </div>
           <SelectField label={t("search.label.sort")} value={state.sort} onChange={(v) => setState({ ...state, sort: v })}>
-        {SORT_OPTS.map((p) => <option key={p.value} value={p.value}>{p.label}</option>)}
+        {sortOpts.map((p) => <option key={p.value} value={p.value}>{p.label}</option>)}
           </SelectField>
         </div>
       )}
@@ -372,7 +378,7 @@ export function PropertySearchBar({
           onClick={() => toggleFeature(f)}
           className="inline-flex items-center gap-1.5 rounded-full border border-border bg-muted/40 px-3 py-1 text-xs text-ink hover:border-primary/50"
         >
-          {f}
+          {localizeAmenity(f, language)}
           <X size={12} />
         </button>
       ))}
@@ -408,8 +414,8 @@ export function PropertySearchBar({
           >
             <div className="space-y-4">
               {FEATURE_GROUPS.map((g) => (
-                <div key={g.label}>
-                  <p className="eyebrow text-[0.6rem] text-primary">{g.label}</p>
+                <div key={g.labelKey}>
+                  <p className="eyebrow text-[0.6rem] text-primary">{t(g.labelKey)}</p>
                   <div className="mt-2 grid grid-cols-1 gap-1.5 sm:grid-cols-2">
                     {g.items.map((f) => (
                       <label key={f} className="flex cursor-pointer items-center gap-2 text-sm text-foreground/85 hover:text-ink">
@@ -419,7 +425,7 @@ export function PropertySearchBar({
                           onChange={() => toggleFeature(f)}
                           className="h-3.5 w-3.5 accent-primary"
                         />
-                        <span className="leading-tight">{f}</span>
+                        <span className="leading-tight">{localizeAmenity(f, language)}</span>
                       </label>
                     ))}
                   </div>

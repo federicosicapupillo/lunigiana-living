@@ -133,10 +133,10 @@ function TerritoriPage() {
                   <div className="md:col-span-5">
                     <div className="eyebrow">{terr.name}</div>
                     <h3 className="mt-3 font-serif text-3xl leading-tight text-ink md:text-4xl">
-                      {terr.tagline}
+                      {t(`terr.t.${terr.slug}.tagline`)}
                     </h3>
                     <div className="mt-5 h-px w-12 bg-warm-border" />
-                    <p className="mt-5 text-base leading-relaxed text-foreground/80">{terr.body}</p>
+                    <p className="mt-5 text-base leading-relaxed text-foreground/80">{t(`terr.t.${terr.slug}.body`)}</p>
                     <Link
                       to="/immobili"
                       className="group mt-7 inline-flex items-center gap-2 rounded-sm border border-primary/60 px-5 py-2.5 text-[0.7rem] uppercase tracking-[0.22em] text-primary transition hover:bg-primary hover:text-primary-foreground"
