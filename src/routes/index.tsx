@@ -12,6 +12,8 @@ import { listPublishedProperties, type PublicProperty } from "@/lib/public-prope
 import { getHomeHeroVariant, type HomeHeroVariant } from "@/lib/site-settings.functions";
 import { LeadForm } from "@/components/lead-form";
 import { ArrowRight, Compass, KeyRound, Sparkles, Star, ShieldCheck, MapPin, Home as HomeIcon } from "lucide-react";
+import { useT } from "@/lib/i18n/LanguageContext";
+import { useLocalizedHead } from "@/hooks/use-localized-head";
 
 const AGENCY_FACTS = {
   yearsActive: 18,
@@ -80,6 +82,8 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
+  const t = useT();
+  useLocalizedHead("seo.home.title", "seo.home.desc");
   const { properties, heroVariant } = Route.useLoaderData() as {
     properties: PublicProperty[];
     heroVariant: HomeHeroVariant;
