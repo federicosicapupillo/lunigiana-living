@@ -369,20 +369,19 @@ function Index() {
       <div className="container-editorial py-16 sm:py-20 md:py-32">
         <div className="grid gap-12 md:grid-cols-12">
           <div className="md:col-span-5">
-            <span className="eyebrow">Cosa facciamo</span>
+            <span className="eyebrow">{t("home.services.eyebrow")}</span>
             <h2 className="mt-3 font-serif text-3xl leading-tight text-ink sm:text-4xl md:text-5xl">
-              Un servizio sartoriale,<br />una conoscenza locale.
+              {t("home.services.title1")}<br />{t("home.services.title2")}
             </h2>
             <p className="mt-5 max-w-md text-base leading-relaxed text-foreground/75">
-              Ogni richiesta ha la sua storia. Ti accompagniamo passo per passo,
-              con attenzione vera per la casa e per chi ci abiterà.
+              {t("home.services.lead")}
             </p>
           </div>
           <div className="grid gap-6 md:col-span-7">
             {[
-              { icon: Compass, title: "Ricerca su misura per te", body: "Ci racconti che casa cerchi: noi filtriamo l'inventario e ti portiamo solo gli immobili che hanno davvero senso." },
-              { icon: KeyRound, title: "Visite guidate sul posto", body: "Ti accompagniamo immobile per immobile, anche se vivi lontano. Ti raccontiamo il borgo, non solo le mura." },
-              { icon: Sparkles, title: "Trattativa e rogito chiari", body: "Ti seguiamo dalla prima visita al notaio, con stime oneste e nessuna pressione di vendita." },
+              { icon: Compass, title: t("home.services.s1.t"), body: t("home.services.s1.b") },
+              { icon: KeyRound, title: t("home.services.s2.t"), body: t("home.services.s2.b") },
+              { icon: Sparkles, title: t("home.services.s3.t"), body: t("home.services.s3.b") },
             ].map((s) => (
               <div key={s.title} className="card-service">
                 <span className="icon-badge"><s.icon size={20} /></span>
@@ -401,18 +400,17 @@ function Index() {
       <section className="section-sand py-16 sm:py-20 md:py-24">
         <div className="container-editorial">
           <div className="mx-auto max-w-3xl text-center">
-            <span className="eyebrow">Cosa dicono di noi</span>
+            <span className="eyebrow">{t("home.reviews.eyebrow")}</span>
             <div className="mt-4 flex items-center justify-center gap-1 text-primary" aria-hidden="true">
               {[0, 1, 2, 3, 4].map((i) => (
                 <Star key={i} size={22} fill="currentColor" strokeWidth={0} />
               ))}
             </div>
             <h2 className="mt-5 font-serif text-3xl leading-tight text-ink sm:text-4xl md:text-5xl">
-              Le recensioni delle persone<br />che ci hanno scelto.
+              {t("home.reviews.title1")}<br />{t("home.reviews.title2")}
             </h2>
             <p className="mt-5 text-base leading-relaxed text-foreground/80">
-              Leggi cosa raccontano i clienti che hanno comprato casa con
-              Furia Immobiliare sul nostro profilo Google verificato.
+              {t("home.reviews.body")}
             </p>
             <a
               href={AGENCY_FACTS.googleReviewsUrl}
@@ -420,7 +418,7 @@ function Index() {
               rel="noopener noreferrer"
               className="mt-8 inline-flex items-center gap-2 rounded-md bg-terracotta px-6 py-3.5 text-xs uppercase tracking-[0.2em] text-cream transition hover:bg-[color:var(--terracotta-hover)] sm:px-8 sm:py-4 sm:tracking-[0.22em]"
             >
-              Leggi le recensioni su Google <ArrowRight size={14} />
+              {t("home.reviews.cta")} <ArrowRight size={14} />
             </a>
           </div>
         </div>
@@ -429,29 +427,28 @@ function Index() {
       {/* CTA */}
       <section className="container-editorial pb-20 sm:pb-32">
         <div className="relative overflow-hidden rounded-sm bg-secondary px-6 py-14 text-center text-cream sm:px-8 sm:py-20 md:px-16 md:py-28 mt-16 sm:mt-20">
-          <span className="eyebrow text-cream/80">Iniziamo</span>
+          <span className="eyebrow text-cream/80">{t("home.finalCta.eyebrow")}</span>
           <h2 className="mx-auto mt-4 max-w-3xl font-serif text-3xl leading-tight sm:text-4xl md:text-6xl">
-            Dimmi che casa cerchi.<br />
-            <em className="font-normal italic">Te la trovo io.</em>
+            {t("home.finalCta.title1")}<br />
+            <em className="font-normal italic">{t("home.finalCta.title2")}</em>
           </h2>
           <p className="mx-auto mt-5 max-w-xl text-sm leading-relaxed text-cream/85 sm:text-base">
-            Scrivimi su WhatsApp o lasciami i tuoi contatti. Ti rispondo io, Elena,
-            entro 24 ore lavorative. Senza form complicati, senza spam.
+            {t("home.finalCta.body")}
           </p>
           <div className="mt-10 flex flex-wrap items-center justify-center gap-3 sm:gap-4">
             <a
-              href={`https://wa.me/393207019985?text=${encodeURIComponent("Ciao Elena, sto cercando casa in Lunigiana e vorrei ricevere informazioni.")}`}
+              href={`https://wa.me/393207019985?text=${encodeURIComponent(t("wa.defaultMsg"))}`}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 rounded-sm bg-cream px-7 py-4 text-xs uppercase tracking-[0.22em] text-ink transition hover:bg-cream/90"
             >
-              Scrivimi su WhatsApp <ArrowRight size={14} />
+              {t("home.finalCta.waBtn")} <ArrowRight size={14} />
             </a>
             <Link
               to="/contatti"
               className="inline-flex items-center gap-2 rounded-sm border border-cream/70 px-7 py-4 text-xs uppercase tracking-[0.22em] text-cream transition hover:bg-cream hover:text-ink"
             >
-              Modulo di contatto
+              {t("home.finalCta.formBtn")}
             </Link>
           </div>
         </div>
