@@ -345,18 +345,18 @@ function Index() {
                 { name: "Pontremoli", img: territoryPontremoli.url, body: t("home.territories.t1.body") },
                 { name: "Bagnone", img: territoryBagnone.url, body: t("home.territories.t2.body") },
                 { name: "Zeri", img: territoryZeri.url, body: t("home.territories.t3.body") },
-            ].map((t) => (
+            ].map((terr) => (
               <Link
-                key={t.name}
+                key={terr.name}
                 to="/territori"
                 className="group relative block aspect-[16/10] overflow-hidden bg-ink md:aspect-[4/5]"
               >
-                <img src={t.img} alt={t.name} loading="lazy" decoding="async"
+                <img src={terr.img} alt={terr.name} loading="lazy" decoding="async"
                   className="absolute inset-0 h-full w-full object-cover opacity-70 transition-all duration-700 group-hover:scale-105 group-hover:opacity-90" />
                 <div className="ink-overlay absolute inset-0" />
                 <div className="absolute inset-x-0 bottom-0 p-6 sm:p-8">
-                  <div className="font-serif text-2xl text-cream sm:text-3xl">{t.name}</div>
-                  <p className="mt-2 text-sm text-cream/75">{t.body}</p>
+                  <div className="font-serif text-2xl text-cream sm:text-3xl">{terr.name}</div>
+                  <p className="mt-2 text-sm text-cream/75">{terr.body}</p>
                 </div>
               </Link>
             ))}
