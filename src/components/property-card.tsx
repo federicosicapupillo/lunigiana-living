@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { MapPin, Maximize2, BedDouble, ArrowRight } from "lucide-react";
 import { WatermarkedImage } from "@/components/watermarked-image";
 import { whatsappUrl } from "@/components/whatsapp-float";
+import { useT } from "@/lib/i18n/LanguageContext";
 
 type PropertyCardData = {
   id: number | string;
@@ -18,8 +19,9 @@ type PropertyCardData = {
 };
 
 export function PropertyCard({ p }: { p: PropertyCardData }) {
+  const t = useT();
   const waHref = whatsappUrl(
-    `Ciao Elena, vorrei ricevere informazioni su questo immobile: ${p.reference} — ${p.title} (${p.location}).`,
+    `${t("wa.propertyMsgPrefix")} ${p.reference} — ${p.title} (${p.location}).`,
   );
   return (
     <div className="card-property group block overflow-hidden">
@@ -44,7 +46,7 @@ export function PropertyCard({ p }: { p: PropertyCardData }) {
             </span>
           )}
           <span className="pointer-events-none absolute inset-x-0 bottom-0 flex items-center justify-end gap-2 bg-gradient-to-t from-ink/75 via-ink/25 to-transparent p-4 text-[0.65rem] uppercase tracking-[0.2em] text-cream opacity-0 transition-opacity duration-500 group-hover:opacity-100">
-            Apri scheda <ArrowRight size={14} />
+            {t("cta.openListing")} <ArrowRight size={14} />
           </span>
         </div>
         <div className="px-5 pt-5 pb-3">
@@ -61,18 +63,18 @@ export function PropertyCard({ p }: { p: PropertyCardData }) {
                 <span className="flex items-center gap-1"><Maximize2 size={13} /> {p.sqm} m²</span>
               )}
               {p.rooms != null && (
-                <span className="flex items-center gap-1"><BedDouble size={13} /> {p.rooms} locali</span>
+                <span className="flex items-center gap-1"><BedDouble size={13} /> {p.rooms} {t("card.rooms")}</span>
               )}
             </div>
             <div className="font-serif text-xl font-medium text-terracotta">{p.price}</div>
           </div>
           {p.epi && (
             <div className="mt-2 text-[0.7rem] uppercase tracking-wider text-muted-foreground">
-              IPE: {p.epi}
+              {t("card.epi")}: {p.epi}
             </div>
           )}
           <span className="mt-5 flex items-center justify-between rounded-md bg-ink px-5 py-3 text-[0.7rem] uppercase tracking-[0.2em] text-cream transition-colors group-hover:bg-terracotta">
-            Vedi immobile
+            {t("cta.viewProperty")}
             <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
           </span>
         </div>
@@ -85,7 +87,7 @@ export function PropertyCard({ p }: { p: PropertyCardData }) {
           className="mt-2 inline-flex items-center gap-2 rounded-full border border-[#25D366]/30 bg-[#25D366]/10 px-3.5 py-1.5 text-[0.7rem] uppercase tracking-[0.18em] text-[#1f8a4c] transition hover:border-[#25D366]/60 hover:bg-[#25D366]/15"
         >
           <span className="inline-block h-1.5 w-1.5 rounded-full bg-[#25D366]" />
-          Info su WhatsApp
+          {t("cta.infoOnWhatsapp")}
         </a>
       </div>
     </div>
