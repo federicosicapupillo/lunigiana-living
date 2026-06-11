@@ -775,11 +775,11 @@ function NewPropertyPage() {
           </Field>
         </Section>
 
-        {/* SEZIONE 4-bis — Versione inglese */}
-        <Section title="5. Versione inglese (opzionale)" subtitle="Mostrata agli utenti che selezionano EN. Se vuota, si usa la versione italiana.">
+        {/* SEZIONE 4-bis — Versione inglese (auto-gestita) */}
+        <Section title="5. Versione inglese (automatica)" subtitle="Non serve compilare nulla: la traduzione viene generata in automatico la prima volta che un visitatore apre la scheda in inglese, poi viene salvata in cache.">
           <div className="md:col-span-2 flex flex-wrap items-center justify-between gap-3 rounded-sm border border-primary/30 bg-primary/5 p-3">
             <p className="text-xs text-muted-foreground">
-              Compila a mano oppure traduci automaticamente dall'italiano con l'AI.
+              <strong className="text-ink">Nessuna azione richiesta.</strong> I campi qui sotto sono una cache tecnica opzionale: lasciali vuoti e il sito tradurrà tutto da solo. Compilali solo se vuoi forzare una traduzione manuale specifica. Puoi anche generarla subito con un clic.
             </p>
             <button
               type="button"
