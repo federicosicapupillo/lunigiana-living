@@ -501,8 +501,9 @@ const FlyerSheet = forwardRef<
     layout: Layout;
     lang: Lang;
     longDescription: string | null;
+    thumbSwap?: boolean;
   }
->(function FlyerSheet({ property, images, layout, lang, longDescription }, ref) {
+>(function FlyerSheet({ property, images, layout, lang, longDescription, thumbSwap }, ref) {
   // `layout` kept for prop-compat; structure is fixed (header / body / desc)
   void layout;
   const t = STR[lang];
@@ -527,7 +528,8 @@ const FlyerSheet = forwardRef<
   const hasRender = images.some((i) => i.isRender);
 
   const hero = images[0];
-  const thumbs = images.slice(1, 3);
+  const thumbsRaw = images.slice(1, 3);
+  const thumbs = thumbSwap ? [...thumbsRaw].reverse() : thumbsRaw;
 
   const featureChips: string[] = [];
   if (property.panoramic_view) featureChips.push(lang === "it" ? "Vista panoramica" : "Panoramic view");
