@@ -89,6 +89,7 @@ function PropertyDetail() {
   const [active, setActive] = useState(0);
   const main = p.gallery[active] || p.image;
   const galleryCount = p.gallery.length;
+  const renderFor = p.galleryPairs?.[main];
   const goPrev = () => setActive((i) => (galleryCount ? (i - 1 + galleryCount) % galleryCount : 0));
   const goNext = () => setActive((i) => (galleryCount ? (i + 1) % galleryCount : 0));
   const waMessage =
@@ -125,14 +126,30 @@ function PropertyDetail() {
       <section className="container-editorial mt-8 sm:mt-10">
         <div className="group relative overflow-hidden rounded-sm bg-muted">
           <div className="mx-auto w-full max-h-[450px] sm:max-h-[550px] md:max-h-[600px] lg:max-h-[650px] aspect-[4/3] sm:aspect-[16/10] md:aspect-[16/9]">
-            <WatermarkedImage
-              src={main}
-              alt={title}
-              fetchPriority="high"
-              sizes="(max-width: 1024px) 100vw, 70vw"
-              watermarkSize="lg"
-              className="h-full w-full object-cover transition-opacity duration-300"
-            />
+            {renderFor ? (
+              <BeforeAfterSlider
+                key={main}
+                before={main}
+                after={renderFor}
+                alt={title}
+                beforeLabel={t("detail.beforeLabel")}
+                afterLabel={t("detail.afterLabel")}
+                beforeCaption={t("detail.beforeCaption")}
+                afterCaption={t("detail.afterCaption")}
+                aiBadge={t("detail.emotionalBadge")}
+                illustrativeNote={t("detail.illustrativeNote")}
+                className="h-full w-full border-0 rounded-sm"
+              />
+            ) : (
+              <WatermarkedImage
+                src={main}
+                alt={title}
+                fetchPriority="high"
+                sizes="(max-width: 1024px) 100vw, 70vw"
+                watermarkSize="lg"
+                className="h-full w-full object-cover transition-opacity duration-300"
+              />
+            )}
           </div>
           {galleryCount > 1 && (
             <>
@@ -165,99 +182,23 @@ function PropertyDetail() {
                 key={g + i}
                 onClick={() => setActive(i)}
                 aria-label={`Vai all'immagine ${i + 1}`}
-                className={`aspect-[4/3] overflow-hidden rounded-sm bg-muted transition-all duration-200 ${
+                className={`relative aspect-[4/3] overflow-hidden rounded-sm bg-muted transition-all duration-200 ${
                   i === active
                     ? "ring-2 ring-primary ring-offset-2 ring-offset-background opacity-100"
                     : "opacity-70 hover:opacity-100 hover:ring-1 hover:ring-primary/40"
                 }`}
               >
                 <WatermarkedImage src={g} alt="" loading="lazy" sizes="160px" watermark={false} className="h-full w-full object-cover transition-transform duration-300 hover:scale-105" />
+                {p.galleryPairs?.[g] && (
+                  <span className="pointer-events-none absolute left-1 top-1 inline-flex items-center gap-1 rounded-sm bg-primary/90 px-1.5 py-0.5 text-[9px] font-medium uppercase tracking-wider text-primary-foreground backdrop-blur">
+                    <Sparkles size={9} /> {t("detail.beforeLabel")}/{t("detail.afterLabel")}
+                  </span>
+                )}
               </button>
             ))}
           </div>
         )}
       </section>
-
-      {/* Rendering emozionale — visibile solo se ci sono rendering AI pubblicati come emozionali */}
-      {((p.emotionalPairs && p.emotionalPairs.length > 0) ||
-        (p.emotionalRenders && p.emotionalRenders.length > 0)) && (
-        <section className="container-editorial mt-12 sm:mt-16">
-          <div className="rounded-sm border border-primary/20 bg-primary/5 p-6 sm:p-8 md:p-10">
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-              <div>
-                <span className="eyebrow inline-flex items-center gap-2 text-primary">
-                  <Sparkles size={14} /> {t("detail.emotionalEyebrow")}
-                </span>
-                <h2 className="mt-3 font-serif text-2xl text-ink sm:text-3xl">
-                  {t("detail.emotionalTitle")}
-                </h2>
-                <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">
-                  {t("detail.emotionalIntro")}
-                </p>
-              </div>
-              <span className="inline-flex w-fit items-center gap-1.5 rounded-sm border border-primary/30 bg-background px-3 py-1.5 text-[10px] uppercase tracking-[0.18em] text-primary">
-                <Sparkles size={11} /> {t("detail.emotionalBadge")}
-              </span>
-            </div>
-            {p.emotionalPairs && p.emotionalPairs.length > 0 && (
-              <>
-                <p className="mt-4 text-xs uppercase tracking-[0.18em] text-muted-foreground">
-                  {t("detail.compareHint")}
-                </p>
-                <div className="mt-4 grid gap-6 sm:grid-cols-2">
-                  {p.emotionalPairs.map((pair, i) => (
-                    <BeforeAfterSlider
-                      key={pair.after + i}
-                      before={pair.before}
-                      after={pair.after}
-                      alt={title}
-                      beforeLabel={t("detail.beforeLabel")}
-                      afterLabel={t("detail.afterLabel")}
-                      beforeCaption={t("detail.beforeCaption")}
-                      afterCaption={t("detail.afterCaption")}
-                      aiBadge={t("detail.emotionalBadge")}
-                      illustrativeNote={t("detail.illustrativeNote")}
-                    />
-                  ))}
-                </div>
-              </>
-            )}
-            {/* Render-only fallback: renderings without a paired original */}
-            {(() => {
-              const pairedAfters = new Set((p.emotionalPairs ?? []).map((x) => x.after));
-              const orphans = (p.emotionalRenders ?? []).filter((src) => !pairedAfters.has(src));
-              if (orphans.length === 0) return null;
-              return (
-                <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                  {orphans.map((src: string, i: number) => (
-                    <figure key={src + i} className="group overflow-hidden rounded-sm border border-border bg-card">
-                      <div className="relative aspect-[4/3] overflow-hidden bg-muted">
-                        <WatermarkedImage
-                          src={src}
-                          alt={`${title} — ${t("detail.emotionalBadge")} ${i + 1}`}
-                          loading="lazy"
-                          sizes="(max-width: 768px) 100vw, 33vw"
-                          watermark={false}
-                          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
-                        />
-                        <span className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-sm bg-background/90 px-2 py-1 text-[10px] uppercase tracking-wider text-primary backdrop-blur">
-                          <Sparkles size={11} /> {t("detail.emotionalBadge")}
-                        </span>
-                      </div>
-                      <figcaption className="px-3 py-2 text-[11px] italic text-muted-foreground">
-                        {t("detail.emotionalCaption")}
-                      </figcaption>
-                    </figure>
-                  ))}
-                </div>
-              );
-            })()}
-            <p className="mt-6 border-t border-primary/20 pt-4 text-xs italic leading-relaxed text-muted-foreground">
-              {t("detail.emotionalDisclaimer")}
-            </p>
-          </div>
-        </section>
-      )}
 
       {/* Body */}
       <section className="container-editorial mt-12 grid gap-12 sm:mt-16 sm:gap-16 md:grid-cols-12">
