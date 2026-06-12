@@ -3,7 +3,7 @@ import { zodValidator, fallback } from "@tanstack/zod-adapter";
 import { z } from "zod";
 import { PropertyCard } from "@/components/property-card";
 import { PropertySearchBar } from "@/components/property-search-bar";
-import { listPublishedProperties, type PublicProperty } from "@/lib/public-properties.functions";
+import { listPublishedPropertiesSummary, type PublicProperty } from "@/lib/public-properties.functions";
 import { getLocalizedProperties } from "@/lib/property-i18n.functions";
 import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -27,7 +27,7 @@ const searchSchema = z.object({
 
 export const Route = createFileRoute("/immobili/")({
   validateSearch: zodValidator(searchSchema),
-  loader: () => listPublishedProperties(),
+  loader: () => listPublishedPropertiesSummary(),
   head: () => ({
     meta: [
       { title: "Immobili in vendita in Lunigiana — Furia Immobiliare" },
