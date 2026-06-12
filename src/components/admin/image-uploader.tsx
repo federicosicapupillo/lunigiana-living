@@ -445,6 +445,20 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
         </button>
       </div>
 
+      {lastError && (
+        <div className="mt-3 flex items-start justify-between gap-3 rounded-sm border border-destructive/40 bg-destructive/5 px-3 py-2 text-xs text-destructive">
+          <span className="leading-relaxed">Errore caricamento foto: {lastError}</span>
+          <button
+            type="button"
+            onClick={() => setLastError(null)}
+            className="shrink-0 rounded-sm p-1 hover:bg-destructive/10"
+            aria-label="Chiudi"
+          >
+            <X size={12} />
+          </button>
+        </div>
+      )}
+
       {loading ? (
         <div className="mt-8 flex justify-center">
           <Loader2 className="h-5 w-5 animate-spin text-primary" />
