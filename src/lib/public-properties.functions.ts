@@ -257,6 +257,7 @@ function adapt(
     tag: buildTag(p),
     isRent: p.contract_type === "affitto",
     galleryPairs,
+    createdAt: p.created_at,
   };
 }
 
@@ -264,7 +265,7 @@ export const listPublishedProperties = createServerFn({ method: "GET" }).handler
   const { data: props, error } = await supabaseAdmin
     .from("properties")
     .select(
-      "id, slug, reference_code, title, title_en, subtitle_en, summary_en, location_description_en, municipality, area_zone, price, price_on_request, property_type, contract_type, size_sqm, bedrooms, bathrooms, floors, short_notes, panoramic_view, historic_property, featured, homepage_order, featured_at, energy_class, energy_performance_index_status, energy_performance_index_value",
+      "id, slug, reference_code, title, title_en, subtitle_en, summary_en, location_description_en, municipality, area_zone, price, price_on_request, property_type, contract_type, size_sqm, bedrooms, bathrooms, floors, short_notes, panoramic_view, historic_property, featured, homepage_order, featured_at, energy_class, energy_performance_index_status, energy_performance_index_value, created_at",
     )
     .eq("status", "published")
     .order("homepage_order", { ascending: true, nullsFirst: false })
@@ -327,9 +328,9 @@ export const getPublishedProperty = createServerFn({ method: "GET" })
   .handler(async ({ data }) => {
     const { data: p, error } = await supabaseAdmin
       .from("properties")
-      .select(
-      "id, slug, reference_code, title, title_en, subtitle_en, summary_en, location_description_en, municipality, area_zone, price, price_on_request, property_type, contract_type, size_sqm, bedrooms, bathrooms, floors, short_notes, panoramic_view, historic_property, featured, energy_class, energy_performance_index_status, energy_performance_index_value",
-      )
+    .select(
+      "id, slug, reference_code, title, title_en, subtitle_en, summary_en, location_description_en, municipality, area_zone, price, price_on_request, property_type, contract_type, size_sqm, bedrooms, bathrooms, floors, short_notes, panoramic_view, historic_property, featured, energy_class, energy_performance_index_status, energy_performance_index_value, created_at",
+    )
       .eq("status", "published")
       .or(`id.eq.${data.id},slug.eq.${data.id}`)
       .maybeSingle();
