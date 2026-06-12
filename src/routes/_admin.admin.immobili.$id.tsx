@@ -167,8 +167,6 @@ function PropertyEditor() {
   const [seoFocus, setSeoFocus] = useState("");
 
   const genDescFn = useServerFn(generateDescription);
-  const translateFn = useServerFn(translatePropertyToEnglish);
-  const [translating, setTranslating] = useState(false);
 
   const load = async () => {
     setLoading(true);
@@ -405,68 +403,6 @@ function PropertyEditor() {
             setTone={setGenTone}
             seoFocus={seoFocus}
             setSeoFocus={setSeoFocus}
-          />
-        )}
-        {tab === "english" && (
-          <EnglishTab
-            prop={prop}
-            update={update}
-            desc={desc}
-            setDesc={setDesc}
-            translating={translating}
-            onTranslate={async () => {
-              if (!prop) return;
-              if (!prop.title?.trim() && !features["descrizione_libera"]?.trim() && !features["long_description"]?.trim()) {
-                toast.error("Compila almeno il titolo o una descrizione in italiano prima di tradurre.");
-                return;
-              }
-              setTranslating(true);
-              const tid = toast.loading("Traduzione in corso…");
-              try {
-                const res = await translateFn({
-                  data: {
-                    title: prop.title,
-                    subtitle: features["descrizione_libera"] ?? "",
-                    summary: features["descrizione_libera"] ?? "",
-                    locationDescription: "",
-                    description: features["long_description"] ?? "",
-                  },
-                });
-                update({
-                  title_en: res.title_en || prop.title_en,
-                  subtitle_en: res.subtitle_en || prop.subtitle_en,
-                  summary_en: res.summary_en || prop.summary_en,
-                  location_description_en: res.location_description_en || prop.location_description_en,
-                });
-                setDesc((d) => ({
-                  ...(d ?? {
-                    generated_description: null,
-                    edited_description: null,
-                    tone_of_voice: null,
-                    length_preference: null,
-                    seo_focus: null,
-                    generated_at: null,
-                  }),
-                  description_en: res.description_en || d?.description_en || null,
-                }));
-                toast.success("Traduzione completata", { id: tid });
-              } catch (e) {
-                toast.error(e instanceof Error ? e.message : "Errore traduzione", { id: tid });
-              } finally {
-                setTranslating(false);
-              }
-            }}
-            onSaveDescEn={async () => {
-              const value = (desc?.description_en ?? "").trim();
-              const { error } = await supabase
-                .from("property_descriptions")
-                .upsert(
-                  { property_id: id, description_en: value || null },
-                  { onConflict: "property_id" },
-                );
-              if (error) toast.error(error.message);
-              else toast.success("Descrizione EN salvata");
-            }}
           />
         )}
       </div>
