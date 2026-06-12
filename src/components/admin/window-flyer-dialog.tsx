@@ -55,17 +55,23 @@ type FlyerImage = {
 
 type Lang = "it" | "en";
 
-const LAYOUTS = ["hero-stack", "split-duo", "grid-quad", "hero-side", "vertical-editorial"] as const;
+const LAYOUTS = [
+  "hero-left",
+  "split-trio",
+  "mosaic-quad",
+  "portrait-hero",
+  "filmstrip",
+] as const;
 type Layout = (typeof LAYOUTS)[number];
 
 const STR = {
   it: {
-    title: "Genera cartello A4",
+    title: "Genera cartello vetrina A3",
     selectPhotos: "Seleziona foto (max 4)",
     layout: "Layout",
     language: "Lingua",
     regenerate: "Rigenera layout",
-    pdf: "Scarica PDF A4",
+    pdf: "Scarica PDF A3",
     image: "Scarica immagine",
     print: "Stampa",
     close: "Chiudi",
@@ -83,6 +89,8 @@ const STR = {
     scan: "Scansiona per la scheda online",
     ref: "Rif.",
     features: "Caratteristiche",
+    techData: "Dati tecnici",
+    description: "Descrizione",
     feat: {
       panoramic_view: "Vista panoramica",
       historic_property: "Immobile storico",
@@ -96,12 +104,12 @@ const STR = {
     },
   },
   en: {
-    title: "Generate A4 window flyer",
+    title: "Generate A3 window flyer",
     selectPhotos: "Select photos (max 4)",
     layout: "Layout",
     language: "Language",
     regenerate: "Regenerate layout",
-    pdf: "Download A4 PDF",
+    pdf: "Download A3 PDF",
     image: "Download image",
     print: "Print",
     close: "Close",
@@ -119,6 +127,8 @@ const STR = {
     scan: "Scan for the online listing",
     ref: "Ref.",
     features: "Features",
+    techData: "Technical data",
+    description: "Description",
     feat: {
       panoramic_view: "Panoramic view",
       historic_property: "Historic property",
@@ -138,7 +148,7 @@ const AGENCY = {
   phone: "0187 830229",
   mobile: "320 7019985",
   email: "furiaimmobiliare@libero.it",
-  address: "Via Pirandello 7, 54027 Pontremoli (MS)",
+  city: "Pontremoli (MS)",
 };
 
 function formatPrice(p: PropertyData, lang: Lang) {
@@ -150,11 +160,14 @@ function formatPrice(p: PropertyData, lang: Lang) {
   }).format(p.price);
 }
 
-function shorten(text: string | null | undefined, max = 280) {
-  if (!text) return "";
-  const t = text.trim().replace(/\s+/g, " ");
-  if (t.length <= max) return t;
-  return t.slice(0, max - 1).replace(/[,.;\s]\S*$/, "") + "…";
+function splitParagraphs(text: string | null | undefined, max = 1200): string[] {
+  if (!text) return [];
+  const cleaned = text.trim().replace(/\r\n/g, "\n");
+  const truncated = cleaned.length > max ? cleaned.slice(0, max - 1).replace(/[\s,.;]\S*$/, "") + "…" : cleaned;
+  return truncated
+    .split(/\n\s*\n|\n/)
+    .map((s) => s.trim())
+    .filter(Boolean);
 }
 
 export function WindowFlyerDialog({
@@ -170,57 +183,50 @@ export function WindowFlyerDialog({
   const [selected, setSelected] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [lang, setLang] = useState<Lang>("it");
-  const [layout, setLayout] = useState<Layout>("hero-stack");
+  const [layout, setLayout] = useState<Layout>("hero-left");
   const [qrData, setQrData] = useState<string | null>(null);
   const [exporting, setExporting] = useState(false);
+  const [longDescription, setLongDescription] = useState<string | null>(null);
   const flyerRef = useRef<HTMLDivElement>(null);
 
-  // Load images when opened
   useEffect(() => {
     if (!open) return;
     let cancelled = false;
     (async () => {
       setLoading(true);
-      const { data, error } = await supabase
-        .from("property_images")
-        .select(
-          "id, image_url, rendered_image_url, published_image_url, enhanced_image_url, use_rendered, use_enhanced, sort_order, is_cover",
-        )
-        .eq("property_id", property.id)
-        .order("is_cover", { ascending: false })
-        .order("sort_order", { ascending: true });
+      const [imgRes, descRes] = await Promise.all([
+        supabase
+          .from("property_images")
+          .select(
+            "id, image_url, rendered_image_url, published_image_url, enhanced_image_url, use_rendered, use_enhanced, sort_order, is_cover",
+          )
+          .eq("property_id", property.id)
+          .order("is_cover", { ascending: false })
+          .order("sort_order", { ascending: true }),
+        supabase
+          .from("property_descriptions")
+          .select("edited_description, generated_description")
+          .eq("property_id", property.id)
+          .maybeSingle(),
+      ]);
       if (cancelled) return;
-      if (error) {
+      if (imgRes.error) {
         toast.error("Impossibile caricare le foto");
         setLoading(false);
         return;
       }
       const mapped: FlyerImage[] = [];
-      for (const r of data ?? []) {
-        // Original
-        if (r.image_url) {
-          mapped.push({ id: `${r.id}-o`, url: r.image_url, isRender: false, isEnhanced: false });
-        }
-        if (r.enhanced_image_url) {
-          mapped.push({
-            id: `${r.id}-e`,
-            url: r.enhanced_image_url,
-            isRender: false,
-            isEnhanced: true,
-          });
-        }
-        if (r.rendered_image_url) {
-          mapped.push({
-            id: `${r.id}-r`,
-            url: r.rendered_image_url,
-            isRender: true,
-            isEnhanced: false,
-          });
-        }
+      for (const r of imgRes.data ?? []) {
+        if (r.image_url) mapped.push({ id: `${r.id}-o`, url: r.image_url, isRender: false, isEnhanced: false });
+        if (r.enhanced_image_url)
+          mapped.push({ id: `${r.id}-e`, url: r.enhanced_image_url, isRender: false, isEnhanced: true });
+        if (r.rendered_image_url)
+          mapped.push({ id: `${r.id}-r`, url: r.rendered_image_url, isRender: true, isEnhanced: false });
       }
       setImages(mapped);
-      // Pre-select up to 4 originals (cover first)
       setSelected(mapped.slice(0, 4).map((i) => i.id));
+      const d = descRes.data as { edited_description?: string | null; generated_description?: string | null } | null;
+      setLongDescription(d?.edited_description || d?.generated_description || null);
       setLoading(false);
     })();
     return () => {
@@ -228,14 +234,13 @@ export function WindowFlyerDialog({
     };
   }, [open, property.id]);
 
-  // Generate QR code for property page
   useEffect(() => {
     if (!open) return;
     const slug = property.slug || property.id;
     const origin =
       typeof window !== "undefined" ? window.location.origin : "https://furia.cap-ann-one.life";
     const url = `${origin}/immobili/${slug}`;
-    QRCode.toDataURL(url, { width: 256, margin: 1, color: { dark: "#241711", light: "#ECE1D3" } })
+    QRCode.toDataURL(url, { width: 320, margin: 1, color: { dark: "#241711", light: "#ECE1D3" } })
       .then(setQrData)
       .catch(() => setQrData(null));
   }, [open, property.id, property.slug]);
@@ -276,8 +281,9 @@ export function WindowFlyerDialog({
       const canvas = await captureCanvas();
       if (!canvas) return;
       const img = canvas.toDataURL("image/jpeg", 0.92);
-      const pdf = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
-      pdf.addImage(img, "JPEG", 0, 0, 210, 297);
+      // A3 landscape: 420mm x 297mm
+      const pdf = new jsPDF({ unit: "mm", format: "a3", orientation: "landscape" });
+      pdf.addImage(img, "JPEG", 0, 0, 420, 297);
       pdf.save(`cartello-${property.reference_code || property.id}.pdf`);
     } catch (e) {
       console.error(e);
@@ -313,9 +319,9 @@ export function WindowFlyerDialog({
       const w = window.open("", "_blank");
       if (!w) return;
       w.document.write(`<!doctype html><html><head><title>Cartello</title>
-        <style>@page{size:A4;margin:0} html,body{margin:0;padding:0;background:#fff}
-        img{width:210mm;height:297mm;display:block}</style></head>
-        <body><img src="${img}" onload="setTimeout(()=>{window.print();},200)"/></body></html>`);
+        <style>@page{size:A3 landscape;margin:0} html,body{margin:0;padding:0;background:#fff}
+        img{width:420mm;height:297mm;display:block}</style></head>
+        <body><img src="${img}" onload="setTimeout(()=>{window.print();},250)"/></body></html>`);
       w.document.close();
     } catch (e) {
       console.error(e);
@@ -343,7 +349,6 @@ export function WindowFlyerDialog({
       </div>
 
       <div className="flex flex-1 flex-col overflow-hidden lg:flex-row">
-        {/* Sidebar controls */}
         <aside className="w-full shrink-0 overflow-y-auto border-b border-white/10 bg-background p-4 lg:w-80 lg:border-b-0 lg:border-r">
           <div className="space-y-5 text-sm">
             <div>
@@ -376,11 +381,11 @@ export function WindowFlyerDialog({
                 onChange={(e) => setLayout(e.target.value as Layout)}
                 className="w-full rounded-sm border border-border bg-background px-3 py-2 text-sm"
               >
-                <option value="hero-stack">Hero + dati sotto</option>
-                <option value="split-duo">Due foto affiancate</option>
-                <option value="grid-quad">Griglia 4 foto</option>
-                <option value="hero-side">Hero + colonna dati</option>
-                <option value="vertical-editorial">Editoriale verticale</option>
+                <option value="hero-left">Hero a sinistra</option>
+                <option value="split-trio">Hero + 2 thumbnails</option>
+                <option value="mosaic-quad">Mosaico 4 foto</option>
+                <option value="portrait-hero">Singola foto grande</option>
+                <option value="filmstrip">Strip orizzontale</option>
               </select>
               <button
                 onClick={regenerate}
@@ -471,13 +476,9 @@ export function WindowFlyerDialog({
           </div>
         </aside>
 
-        {/* Preview */}
         <main className="flex-1 overflow-auto bg-zinc-700 p-4 sm:p-8">
-          <div className="mx-auto" style={{ width: "min(100%, 794px)" }}>
-            <div
-              className="origin-top shadow-2xl"
-              style={{ transform: "scale(1)", transformOrigin: "top center" }}
-            >
+          <div className="mx-auto" style={{ width: "min(100%, 1400px)" }}>
+            <div className="origin-top shadow-2xl" style={{ transformOrigin: "top center" }}>
               <FlyerSheet
                 ref={flyerRef}
                 property={property}
@@ -485,6 +486,7 @@ export function WindowFlyerDialog({
                 layout={layout}
                 lang={lang}
                 qrData={qrData}
+                longDescription={longDescription}
               />
             </div>
           </div>
@@ -495,7 +497,12 @@ export function WindowFlyerDialog({
   );
 }
 
-// ---------------- A4 Flyer Sheet ----------------
+// ---------------- A3 Landscape Flyer Sheet ----------------
+
+// A3 at 96dpi: 420mm x 297mm = ~1587 x 1123 px
+const SHEET_W = 1587;
+const SHEET_H = 1123;
+const PAD = 56;
 
 const FlyerSheet = forwardRef<
   HTMLDivElement,
@@ -505,18 +512,19 @@ const FlyerSheet = forwardRef<
     layout: Layout;
     lang: Lang;
     qrData: string | null;
+    longDescription: string | null;
   }
->(function FlyerSheet({ property, images, layout, lang, qrData }, ref) {
+>(function FlyerSheet({ property, images, layout, lang, qrData, longDescription }, ref) {
   const t = STR[lang];
-  // A4 at 96dpi: 794 x 1123 px
-  const SHEET_W = 794;
-  const SHEET_H = 1123;
 
   const price = formatPrice(property, lang);
+  // Generic location only — NO street/civic number
   const location = [property.area_zone, property.municipality, property.province]
     .filter(Boolean)
     .join(" · ");
-  const description = shorten(property.short_notes, 320);
+
+  const descriptionSource = longDescription || property.short_notes;
+  const paragraphs = splitParagraphs(descriptionSource, 900);
 
   const featuresList = (
     [
@@ -534,14 +542,17 @@ const FlyerSheet = forwardRef<
     .filter(([, v]) => v)
     .map(([k]) => t.feat[k as keyof typeof t.feat]);
 
-  const stats = [
-    property.size_sqm ? `${property.size_sqm} ${t.sqm}` : null,
-    property.bedrooms != null ? `${property.bedrooms} ${t.rooms}` : null,
-    property.bathrooms != null ? `${property.bathrooms} ${t.baths}` : null,
-  ].filter(Boolean) as string[];
+  const techData: { label: string; value: string }[] = [];
+  if (property.size_sqm) techData.push({ label: t.sqm.toUpperCase(), value: String(property.size_sqm) });
+  if (property.bedrooms != null) techData.push({ label: t.rooms, value: String(property.bedrooms) });
+  if (property.bathrooms != null) techData.push({ label: t.baths, value: String(property.bathrooms) });
+  if (property.energy_class) techData.push({ label: t.energy, value: property.energy_class });
+  if (property.energy_performance_index_value != null)
+    techData.push({ label: t.ipe, value: `${property.energy_performance_index_value} kWh/m²` });
 
   const hasRender = images.some((i) => i.isRender);
 
+  // Sheet is split: left visual zone, right info column
   return (
     <div
       ref={ref}
@@ -553,19 +564,23 @@ const FlyerSheet = forwardRef<
         fontFamily: "Georgia, 'Times New Roman', serif",
         position: "relative",
         overflow: "hidden",
-        padding: 48,
+        padding: PAD,
         boxSizing: "border-box",
-        display: "flex",
-        flexDirection: "column",
+        display: "grid",
+        gridTemplateColumns: "1.35fr 1fr",
+        gridTemplateRows: "auto 1fr auto",
+        columnGap: 40,
+        rowGap: 22,
       }}
     >
-      {/* Header band */}
+      {/* Header spans both columns */}
       <header
         style={{
+          gridColumn: "1 / -1",
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          paddingBottom: 16,
+          paddingBottom: 18,
           borderBottom: "1px solid #B76A4C",
         }}
       >
@@ -573,193 +588,241 @@ const FlyerSheet = forwardRef<
           src={logoAsset.url}
           alt="Furia"
           crossOrigin="anonymous"
-          style={{ height: 56, width: "auto", objectFit: "contain" }}
+          style={{ height: 72, width: "auto", objectFit: "contain" }}
         />
-        <div style={{ textAlign: "right", fontSize: 11, color: "#4A3A30", letterSpacing: 1.5 }}>
-          <div style={{ textTransform: "uppercase" }}>{AGENCY.name}</div>
-          <div style={{ marginTop: 2 }}>
+        <div style={{ textAlign: "right", fontSize: 13, color: "#4A3A30", letterSpacing: 1.6 }}>
+          <div style={{ textTransform: "uppercase", fontWeight: 600 }}>{AGENCY.name}</div>
+          <div style={{ marginTop: 3 }}>
             {t.ref} {property.reference_code || "—"}
           </div>
         </div>
       </header>
 
-      {/* Layout body */}
-      <FlyerLayout layout={layout} images={images} hasRender={hasRender} lang={lang} />
+      {/* Left: visual zone */}
+      <section style={{ minHeight: 0, display: "flex", flexDirection: "column" }}>
+        <FlyerLayout layout={layout} images={images} lang={lang} />
+      </section>
 
-      {/* Title + location + price block */}
-      <section style={{ marginTop: 18 }}>
-        <div
-          style={{
-            fontSize: 10,
-            letterSpacing: 2,
-            textTransform: "uppercase",
-            color: "#B76A4C",
-          }}
-        >
-          {[property.contract_type, property.property_type].filter(Boolean).join(" · ") || ""}
-        </div>
-        <h1
-          style={{
-            margin: "6px 0 6px",
-            fontSize: 32,
-            lineHeight: 1.1,
-            fontWeight: 400,
-            letterSpacing: -0.5,
-          }}
-        >
-          {property.title}
-        </h1>
-        {location && (
-          <div style={{ fontSize: 13, color: "#4A3A30", fontFamily: "Helvetica, Arial, sans-serif" }}>
-            {location}
+      {/* Right: info column */}
+      <section
+        style={{
+          minHeight: 0,
+          display: "flex",
+          flexDirection: "column",
+          gap: 16,
+          overflow: "hidden",
+        }}
+      >
+        <div>
+          <div
+            style={{
+              fontSize: 12,
+              letterSpacing: 2.4,
+              textTransform: "uppercase",
+              color: "#B76A4C",
+              fontFamily: "Helvetica, Arial, sans-serif",
+              fontWeight: 600,
+            }}
+          >
+            {[property.contract_type, property.property_type].filter(Boolean).join(" · ") || ""}
           </div>
-        )}
+          <h1
+            style={{
+              margin: "8px 0 6px",
+              fontSize: 42,
+              lineHeight: 1.08,
+              fontWeight: 400,
+              letterSpacing: -0.5,
+            }}
+          >
+            {property.title}
+          </h1>
+          {location && (
+            <div
+              style={{
+                fontSize: 15,
+                color: "#4A3A30",
+                fontFamily: "Helvetica, Arial, sans-serif",
+                letterSpacing: 0.3,
+              }}
+            >
+              {location}
+            </div>
+          )}
+        </div>
+
         <div
           style={{
-            marginTop: 14,
             display: "flex",
             alignItems: "baseline",
             justifyContent: "space-between",
-            gap: 16,
+            gap: 12,
+            padding: "10px 0",
+            borderTop: "1px solid #D1BCA6",
+            borderBottom: "1px solid #D1BCA6",
           }}
         >
           <div
             style={{
-              fontSize: 30,
+              fontSize: 38,
               fontWeight: 700,
               color: "#B76A4C",
               fontFamily: "Helvetica, Arial, sans-serif",
+              letterSpacing: -0.5,
             }}
           >
             {price}
           </div>
-          <div
-            style={{
-              fontSize: 12,
-              color: "#241711",
-              fontFamily: "Helvetica, Arial, sans-serif",
-              display: "flex",
-              gap: 14,
-              flexWrap: "wrap",
-              justifyContent: "flex-end",
-            }}
-          >
-            {stats.map((s) => (
-              <span key={s}>{s}</span>
-            ))}
-            {property.energy_class && (
-              <span>
-                {t.energy}: <strong>{property.energy_class}</strong>
-              </span>
-            )}
-            {property.energy_performance_index_value != null && (
-              <span>
-                {t.ipe}: {property.energy_performance_index_value} kWh/m²
-              </span>
-            )}
-          </div>
         </div>
-      </section>
 
-      {/* Description */}
-      {description && (
-        <p
-          style={{
-            marginTop: 14,
-            fontSize: 12.5,
-            lineHeight: 1.55,
-            color: "#3A2A22",
-            fontFamily: "Helvetica, Arial, sans-serif",
-          }}
-        >
-          {description}
-        </p>
-      )}
-
-      {/* Features chips */}
-      {featuresList.length > 0 && (
-        <div
-          style={{
-            marginTop: 12,
-            display: "flex",
-            flexWrap: "wrap",
-            gap: 6,
-            fontFamily: "Helvetica, Arial, sans-serif",
-          }}
-        >
-          {featuresList.slice(0, 8).map((f) => (
-            <span
-              key={f}
+        {paragraphs.length > 0 && (
+          <div style={{ minHeight: 0, overflow: "hidden" }}>
+            <SectionHeading>{t.description}</SectionHeading>
+            <div
               style={{
-                fontSize: 10,
-                padding: "4px 10px",
-                border: "1px solid #B76A4C",
-                color: "#B76A4C",
-                borderRadius: 999,
-                textTransform: "uppercase",
-                letterSpacing: 0.5,
+                marginTop: 6,
+                fontSize: 13.5,
+                lineHeight: 1.55,
+                color: "#3A2A22",
+                fontFamily: "Helvetica, Arial, sans-serif",
               }}
             >
-              {f}
-            </span>
-          ))}
-        </div>
-      )}
+              {paragraphs.slice(0, 3).map((p, i) => (
+                <p key={i} style={{ margin: "0 0 8px 0" }}>
+                  {p}
+                </p>
+              ))}
+            </div>
+          </div>
+        )}
 
-      {/* Rendering disclaimer */}
-      {hasRender && (
-        <div
-          style={{
-            marginTop: 10,
-            fontSize: 9,
-            color: "#4A3A30",
-            fontStyle: "italic",
-            fontFamily: "Helvetica, Arial, sans-serif",
-          }}
-        >
-          * {t.renderingNote}
-        </div>
-      )}
+        {techData.length > 0 && (
+          <div>
+            <SectionHeading>{t.techData}</SectionHeading>
+            <div
+              style={{
+                marginTop: 6,
+                display: "grid",
+                gridTemplateColumns: "repeat(3, 1fr)",
+                gap: 8,
+                fontFamily: "Helvetica, Arial, sans-serif",
+              }}
+            >
+              {techData.map((d) => (
+                <div
+                  key={d.label}
+                  style={{
+                    border: "1px solid #D1BCA6",
+                    padding: "8px 10px",
+                    background: "#F3E8DB",
+                  }}
+                >
+                  <div
+                    style={{
+                      fontSize: 9,
+                      letterSpacing: 1.5,
+                      textTransform: "uppercase",
+                      color: "#4A3A30",
+                    }}
+                  >
+                    {d.label}
+                  </div>
+                  <div style={{ fontSize: 16, fontWeight: 600, color: "#241711", marginTop: 2 }}>
+                    {d.value}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
-      {/* Footer: contacts + QR */}
+        {featuresList.length > 0 && (
+          <div>
+            <SectionHeading>{t.features}</SectionHeading>
+            <div
+              style={{
+                marginTop: 6,
+                display: "flex",
+                flexWrap: "wrap",
+                gap: 6,
+                fontFamily: "Helvetica, Arial, sans-serif",
+              }}
+            >
+              {featuresList.slice(0, 10).map((f) => (
+                <span
+                  key={f}
+                  style={{
+                    fontSize: 11,
+                    padding: "5px 12px",
+                    border: "1px solid #B76A4C",
+                    color: "#B76A4C",
+                    borderRadius: 999,
+                    textTransform: "uppercase",
+                    letterSpacing: 0.6,
+                  }}
+                >
+                  {f}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {hasRender && (
+          <div
+            style={{
+              fontSize: 10,
+              color: "#4A3A30",
+              fontStyle: "italic",
+              fontFamily: "Helvetica, Arial, sans-serif",
+            }}
+          >
+            * {t.renderingNote}
+          </div>
+        )}
+      </section>
+
+      {/* Footer spans both columns */}
       <footer
         style={{
-          marginTop: "auto",
-          paddingTop: 16,
+          gridColumn: "1 / -1",
+          paddingTop: 18,
           borderTop: "1px solid #B76A4C",
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          gap: 16,
+          gap: 24,
           fontFamily: "Helvetica, Arial, sans-serif",
         }}
       >
-        <div style={{ fontSize: 11.5, lineHeight: 1.5, color: "#241711" }}>
+        <div style={{ fontSize: 13, lineHeight: 1.55, color: "#241711" }}>
           <div
             style={{
-              fontSize: 9,
-              letterSpacing: 2,
+              fontSize: 10,
+              letterSpacing: 2.2,
               textTransform: "uppercase",
               color: "#B76A4C",
               marginBottom: 4,
+              fontWeight: 600,
             }}
           >
             {t.contact}
           </div>
           <div>
-            <strong>{t.phone}.</strong> {AGENCY.phone} &nbsp;·&nbsp; <strong>{t.whatsapp}</strong> {AGENCY.mobile}
+            <strong>{t.phone}.</strong> {AGENCY.phone} &nbsp;·&nbsp; <strong>{t.whatsapp}</strong>{" "}
+            {AGENCY.mobile}
           </div>
           <div>{AGENCY.email}</div>
-          <div style={{ color: "#4A3A30" }}>{AGENCY.address}</div>
+          <div style={{ color: "#4A3A30" }}>{AGENCY.city}</div>
         </div>
         {qrData && (
           <div style={{ textAlign: "center" }}>
             <img
               src={qrData}
               alt="QR"
-              style={{ width: 84, height: 84, display: "block", background: "#ECE1D3" }}
+              style={{ width: 120, height: 120, display: "block", background: "#ECE1D3" }}
             />
-            <div style={{ fontSize: 8, marginTop: 4, color: "#4A3A30", maxWidth: 90 }}>
+            <div style={{ fontSize: 10, marginTop: 4, color: "#4A3A30", maxWidth: 130 }}>
               {t.scan}
             </div>
           </div>
@@ -769,23 +832,42 @@ const FlyerSheet = forwardRef<
   );
 });
 
-// ---------------- Layouts ----------------
+function SectionHeading({ children }: { children: React.ReactNode }) {
+  return (
+    <div
+      style={{
+        fontSize: 10,
+        letterSpacing: 2.2,
+        textTransform: "uppercase",
+        color: "#B76A4C",
+        fontFamily: "Helvetica, Arial, sans-serif",
+        fontWeight: 600,
+        paddingBottom: 4,
+        borderBottom: "1px solid #D1BCA6",
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
+// ---------------- Layouts (left visual column) ----------------
 
 function RenderBadge({ lang }: { lang: Lang }) {
   return (
     <span
       style={{
         position: "absolute",
-        top: 10,
-        left: 10,
+        top: 12,
+        left: 12,
         background: "#B76A4C",
         color: "#ECE1D3",
-        fontSize: 9,
-        letterSpacing: 1.5,
-        padding: "4px 8px",
+        fontSize: 11,
+        letterSpacing: 1.8,
+        padding: "5px 10px",
         textTransform: "uppercase",
         fontFamily: "Helvetica, Arial, sans-serif",
-        fontWeight: 600,
+        fontWeight: 700,
       }}
     >
       {STR[lang].rendering}
@@ -793,7 +875,15 @@ function RenderBadge({ lang }: { lang: Lang }) {
   );
 }
 
-function Img({ img, style }: { img: FlyerImage; style?: React.CSSProperties }) {
+function Img({
+  img,
+  style,
+  lang,
+}: {
+  img: FlyerImage;
+  style?: React.CSSProperties;
+  lang: Lang;
+}) {
   return (
     <div style={{ position: "relative", overflow: "hidden", background: "#241711", ...style }}>
       <img
@@ -802,7 +892,7 @@ function Img({ img, style }: { img: FlyerImage; style?: React.CSSProperties }) {
         alt=""
         style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
       />
-      {img.isRender && <RenderBadge lang="it" />}
+      {img.isRender && <RenderBadge lang={lang} />}
     </div>
   );
 }
@@ -814,105 +904,123 @@ function FlyerLayout({
 }: {
   layout: Layout;
   images: FlyerImage[];
-  hasRender: boolean;
   lang: Lang;
 }) {
-  const HEIGHT = 460; // total visual area for images
-  const placeholder = (
-    <div
-      style={{
-        height: HEIGHT,
-        background: "#D9C8B4",
-        display: "grid",
-        placeItems: "center",
-        color: "#4A3A30",
-        fontSize: 12,
-        fontFamily: "Helvetica, Arial, sans-serif",
-      }}
-    >
-      Seleziona almeno una foto
-    </div>
-  );
-  if (images.length === 0) return <div style={{ marginTop: 18 }}>{placeholder}</div>;
-
-  const wrap = (children: React.ReactNode) => (
-    <div style={{ marginTop: 18 }}>{children}</div>
-  );
-
-  void lang;
+  if (images.length === 0) {
+    return (
+      <div
+        style={{
+          flex: 1,
+          background: "#D9C8B4",
+          display: "grid",
+          placeItems: "center",
+          color: "#4A3A30",
+          fontSize: 14,
+          fontFamily: "Helvetica, Arial, sans-serif",
+        }}
+      >
+        Seleziona almeno una foto
+      </div>
+    );
+  }
 
   switch (layout) {
-    case "hero-stack": {
+    case "hero-left": {
       const [hero, ...rest] = images;
-      return wrap(
-        <div style={{ display: "flex", flexDirection: "column", gap: 8, height: HEIGHT }}>
-          <Img img={hero} style={{ flex: rest.length ? 2 : 1, minHeight: 0 }} />
+      return (
+        <div style={{ display: "flex", flexDirection: "column", gap: 10, flex: 1, minHeight: 0 }}>
+          <Img img={hero} lang={lang} style={{ flex: rest.length ? 2.4 : 1, minHeight: 0 }} />
           {rest.length > 0 && (
-            <div style={{ display: "grid", gridTemplateColumns: `repeat(${rest.length}, 1fr)`, gap: 8, flex: 1, minHeight: 0 }}>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: `repeat(${rest.length}, 1fr)`,
+                gap: 10,
+                flex: 1,
+                minHeight: 0,
+              }}
+            >
               {rest.map((i) => (
-                <Img key={i.id} img={i} style={{ height: "100%" }} />
+                <Img key={i.id} img={i} lang={lang} style={{ height: "100%" }} />
               ))}
             </div>
           )}
-        </div>,
+        </div>
       );
     }
-    case "split-duo": {
-      const pair = images.slice(0, 2);
-      return wrap(
+    case "split-trio": {
+      const [hero, ...rest] = images;
+      const side = rest.slice(0, 2);
+      return (
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: pair.length === 2 ? "1fr 1fr" : "1fr",
-            gap: 8,
-            height: HEIGHT,
+            gridTemplateColumns: side.length ? "2fr 1fr" : "1fr",
+            gap: 10,
+            flex: 1,
+            minHeight: 0,
           }}
         >
-          {pair.map((i) => (
-            <Img key={i.id} img={i} style={{ height: "100%" }} />
-          ))}
-        </div>,
+          <Img img={hero} lang={lang} style={{ height: "100%" }} />
+          {side.length > 0 && (
+            <div
+              style={{
+                display: "grid",
+                gridTemplateRows: `repeat(${side.length}, 1fr)`,
+                gap: 10,
+              }}
+            >
+              {side.map((i) => (
+                <Img key={i.id} img={i} lang={lang} style={{ height: "100%" }} />
+              ))}
+            </div>
+          )}
+        </div>
       );
     }
-    case "grid-quad": {
+    case "mosaic-quad": {
       const quad = images.slice(0, 4);
-      return wrap(
+      return (
         <div
           style={{
             display: "grid",
             gridTemplateColumns: "1fr 1fr",
             gridTemplateRows: quad.length > 2 ? "1fr 1fr" : "1fr",
-            gap: 8,
-            height: HEIGHT,
+            gap: 10,
+            flex: 1,
+            minHeight: 0,
           }}
         >
           {quad.map((i) => (
-            <Img key={i.id} img={i} style={{ height: "100%" }} />
+            <Img key={i.id} img={i} lang={lang} style={{ height: "100%" }} />
           ))}
-        </div>,
+        </div>
       );
     }
-    case "hero-side": {
-      const [hero, ...rest] = images;
-      const side = rest.slice(0, 3);
-      return wrap(
-        <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 8, height: HEIGHT }}>
-          <Img img={hero} style={{ height: "100%" }} />
-          <div style={{ display: "grid", gridTemplateRows: `repeat(${Math.max(side.length, 1)}, 1fr)`, gap: 8 }}>
-            {side.length > 0
-              ? side.map((i) => <Img key={i.id} img={i} style={{ height: "100%" }} />)
-              : <Img img={hero} style={{ height: "100%", opacity: 0.5 }} />}
-          </div>
-        </div>,
+    case "portrait-hero": {
+      const hero = images[0];
+      return (
+        <div style={{ flex: 1, minHeight: 0 }}>
+          <Img img={hero} lang={lang} style={{ height: "100%" }} />
+        </div>
       );
     }
-    case "vertical-editorial": {
-      const [hero, second] = images;
-      return wrap(
-        <div style={{ display: "flex", flexDirection: "column", gap: 8, height: HEIGHT }}>
-          <Img img={hero} style={{ height: second ? "65%" : "100%" }} />
-          {second && <Img img={second} style={{ height: "35%" }} />}
-        </div>,
+    case "filmstrip": {
+      const strip = images.slice(0, 4);
+      return (
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: `repeat(${strip.length}, 1fr)`,
+            gap: 10,
+            flex: 1,
+            minHeight: 0,
+          }}
+        >
+          {strip.map((i) => (
+            <Img key={i.id} img={i} lang={lang} style={{ height: "100%" }} />
+          ))}
+        </div>
       );
     }
   }
