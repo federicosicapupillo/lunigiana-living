@@ -41,6 +41,7 @@ export type PublicProperty = {
   tag?: string;
   isRent: boolean;
   emotionalRenders: string[];
+  emotionalPairs: Array<{ before: string; after: string }>;
 };
 
 const PLACEHOLDER =
