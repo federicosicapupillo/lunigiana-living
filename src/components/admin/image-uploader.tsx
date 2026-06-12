@@ -730,6 +730,7 @@ function VersionCard({
   alt,
   downloadUrl,
   downloadName,
+  statusPill,
 }: {
   label: string;
   inUse: boolean;
@@ -737,6 +738,7 @@ function VersionCard({
   alt: string;
   downloadUrl: string;
   downloadName: string;
+  statusPill?: string;
 }) {
   return (
     <div
@@ -750,6 +752,11 @@ function VersionCard({
           {label}
           {inUse && <span className="ml-1 text-primary">· in uso</span>}
         </span>
+        {statusPill && (
+          <span className="absolute bottom-1.5 left-1.5 right-1.5 truncate rounded-sm bg-background/85 px-1.5 py-0.5 text-[9px] uppercase tracking-wider text-foreground">
+            {statusPill}
+          </span>
+        )}
         <a
           href={downloadUrl}
           download={downloadName}
@@ -762,6 +769,44 @@ function VersionCard({
         </a>
       </div>
     </div>
+  );
+}
+
+function CompactBtn({
+  children,
+  onClick,
+  disabled,
+  title,
+  icon,
+  active,
+  danger,
+}: {
+  children: React.ReactNode;
+  onClick?: () => void;
+  disabled?: boolean;
+  title?: string;
+  icon?: React.ReactNode;
+  active?: boolean;
+  danger?: boolean;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      title={title}
+      className={`inline-flex items-center gap-1 rounded-sm border px-1.5 py-0.5 text-[9px] uppercase tracking-wider transition disabled:opacity-40 ${
+        active
+          ? "border-primary bg-primary/10 text-primary"
+          : danger
+          ? "border-border bg-background text-destructive hover:border-destructive/50"
+          : "border-border bg-background text-foreground hover:border-primary/50"
+      }`}
+    >
+      {active && <Check size={10} className="text-primary" />}
+      {icon}
+      {children}
+    </button>
   );
 }
 
