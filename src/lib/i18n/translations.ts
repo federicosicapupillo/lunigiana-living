@@ -283,6 +283,12 @@ const it: Dict = {
   "detail.submit": "Richiedi informazioni o visita",
   "detail.orCall": "oppure chiamaci",
   "detail.waBtn": "Chiedi informazioni a Elena su WhatsApp",
+ "detail.emotionalEyebrow": "Rendering emozionale",
+ "detail.emotionalTitle": "Come potrebbe diventare",
+ "detail.emotionalIntro": "Una visione di come questo immobile potrebbe essere valorizzato. Le immagini sono generate con rendering AI a scopo puramente illustrativo.",
+ "detail.emotionalBadge": "Rendering AI",
+ "detail.emotionalCaption": "Immagine a scopo illustrativo",
+ "detail.emotionalDisclaimer": "Immagini generate con rendering AI a scopo illustrativo. Mostrano una possibile valorizzazione dell'immobile e non rappresentano lo stato attuale.",
 
   // SEO meta
   "seo.home.title": "Furia Immobiliare — Case di carattere in Lunigiana",
