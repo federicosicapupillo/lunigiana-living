@@ -14,6 +14,53 @@ export type Database = {
   }
   public: {
     Tables: {
+      idealista_publish_logs: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          error_message: string | null
+          external_id: string | null
+          external_url: string | null
+          id: string
+          image_ids: string[]
+          outcome: string
+          payload: Json
+          property_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          error_message?: string | null
+          external_id?: string | null
+          external_url?: string | null
+          id?: string
+          image_ids?: string[]
+          outcome?: string
+          payload: Json
+          property_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          error_message?: string | null
+          external_id?: string | null
+          external_url?: string | null
+          id?: string
+          image_ids?: string[]
+          outcome?: string
+          payload?: Json
+          property_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "idealista_publish_logs_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       leads: {
         Row: {
           budget_range: string | null
@@ -95,6 +142,11 @@ export type Database = {
           historic_property: boolean
           homepage_order: number | null
           id: string
+          idealista_external_id: string | null
+          idealista_last_error: string | null
+          idealista_last_sync_at: string | null
+          idealista_status: string
+          idealista_url: string | null
           internal_notes: string | null
           latitude: number | null
           locality: string | null
@@ -157,6 +209,11 @@ export type Database = {
           historic_property?: boolean
           homepage_order?: number | null
           id?: string
+          idealista_external_id?: string | null
+          idealista_last_error?: string | null
+          idealista_last_sync_at?: string | null
+          idealista_status?: string
+          idealista_url?: string | null
           internal_notes?: string | null
           latitude?: number | null
           locality?: string | null
@@ -219,6 +276,11 @@ export type Database = {
           historic_property?: boolean
           homepage_order?: number | null
           id?: string
+          idealista_external_id?: string | null
+          idealista_last_error?: string | null
+          idealista_last_sync_at?: string | null
+          idealista_status?: string
+          idealista_url?: string | null
           internal_notes?: string | null
           latitude?: number | null
           locality?: string | null
