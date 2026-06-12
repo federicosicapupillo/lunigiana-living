@@ -852,7 +852,6 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
   );
 }
 
-
 function IconBtn({
   children,
   onClick,
@@ -880,6 +879,7 @@ function IconBtn({
     </button>
   );
 }
+
 
 function VersionCard({
   label,
