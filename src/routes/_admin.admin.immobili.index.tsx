@@ -204,7 +204,6 @@ function AdminPropertiesPage() {
   }, [rows]);
 
   const requestAction = (id: string, action: StatusAction) => {
-    setOpenMenu(null);
     if (!CONFIRM_COPY[action]) {
       void runAction(id, action);
       return;
