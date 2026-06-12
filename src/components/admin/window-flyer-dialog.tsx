@@ -509,20 +509,18 @@ const FlyerSheet = forwardRef<
     longDescription: string | null;
   }
 >(function FlyerSheet({ property, images, layout, lang, longDescription }, ref) {
+  // `layout` kept for prop-compat; structure is fixed (header / body / desc)
+  void layout;
   const t = STR[lang];
 
   const price = formatPrice(property, lang);
 
-  // Dominant city line — NO street or civic number
   const cityMain = (property.municipality || property.area_zone || "").toUpperCase();
   const cityProv = property.province ? `(${property.province.toUpperCase()})` : "";
-  const cityZone =
-    property.area_zone && property.municipality && property.area_zone !== property.municipality
-      ? property.area_zone
-      : "";
+  const subRegion = "LUNIGIANA — TOSCANA";
 
   const rawDescription = (longDescription || property.short_notes || "").trim();
-  const condensed = rawDescription ? condenseDescription(rawDescription, 560) : "";
+  const condensed = rawDescription ? condenseDescription(rawDescription, 720) : "";
   const paragraphs = condensed ? splitParagraphs(condensed) : [];
 
   const techData: { label: string; value: string }[] = [];
@@ -533,6 +531,20 @@ const FlyerSheet = forwardRef<
   if (property.energy_class) techData.push({ label: t.energy, value: property.energy_class });
 
   const hasRender = images.some((i) => i.isRender);
+
+  const hero = images[0];
+  const thumbs = images.slice(1, 3);
+
+  const featureChips: string[] = [];
+  if (property.panoramic_view) featureChips.push(lang === "it" ? "Vista panoramica" : "Panoramic view");
+  if (property.garden) featureChips.push(lang === "it" ? "Giardino" : "Garden");
+  if (property.terrace) featureChips.push(lang === "it" ? "Terrazza" : "Terrace");
+  if (property.balcony) featureChips.push(lang === "it" ? "Balcone" : "Balcony");
+  if (property.garage) featureChips.push("Garage");
+  if (property.cellar) featureChips.push(lang === "it" ? "Cantina" : "Cellar");
+  if (property.elevator) featureChips.push(lang === "it" ? "Ascensore" : "Elevator");
+  if (property.furnished) featureChips.push(lang === "it" ? "Arredato" : "Furnished");
+  if (property.historic_property) featureChips.push(lang === "it" ? "Storico" : "Historic");
 
   return (
     <div
@@ -548,50 +560,85 @@ const FlyerSheet = forwardRef<
         padding: PAD,
         boxSizing: "border-box",
         display: "grid",
-        gridTemplateColumns: "1.25fr 1fr",
-        gridTemplateRows: "auto 1fr",
-        columnGap: 44,
-        rowGap: 24,
+        gridTemplateColumns: "1fr",
+        gridTemplateRows: "auto 1fr auto",
+        rowGap: 22,
       }}
     >
-      {/* Header spans both columns: logo + listing code */}
+      {/* Header: logo | city | code */}
       <header
         style={{
-          gridColumn: "1 / -1",
-          display: "flex",
+          display: "grid",
+          gridTemplateColumns: "auto 1fr auto",
           alignItems: "center",
-          justifyContent: "space-between",
-          paddingBottom: 18,
-          borderBottom: "2px solid #B76A4C",
+          gap: 32,
+          paddingBottom: 20,
+          borderBottom: "3px solid #B76A4C",
         }}
       >
         <img
           src={logoAsset.url}
           alt="Furia"
           crossOrigin="anonymous"
-          style={{ height: 80, width: "auto", objectFit: "contain" }}
+          style={{ height: 130, width: "auto", objectFit: "contain" }}
         />
-        <div style={{ textAlign: "right" }}>
+        <div style={{ textAlign: "center", minWidth: 0 }}>
           <div
             style={{
-              fontSize: 13,
-              letterSpacing: 2.6,
+              fontSize: 64,
+              fontWeight: 800,
+              lineHeight: 1,
+              letterSpacing: -0.5,
+              color: "#241711",
+              fontFamily: "Georgia, 'Times New Roman', serif",
+            }}
+          >
+            {cityMain}{" "}
+            {cityProv && <span style={{ color: "#B76A4C" }}>{cityProv}</span>}
+          </div>
+          <div
+            style={{
+              marginTop: 8,
+              fontSize: 18,
+              letterSpacing: 5,
               textTransform: "uppercase",
               color: "#4A3A30",
               fontFamily: "Helvetica, Arial, sans-serif",
               fontWeight: 600,
             }}
           >
+            {subRegion}
+          </div>
+        </div>
+        <div
+          style={{
+            textAlign: "center",
+            border: "3px solid #B76A4C",
+            background: "#F3E8DB",
+            padding: "12px 22px",
+            minWidth: 230,
+          }}
+        >
+          <div
+            style={{
+              fontSize: 14,
+              letterSpacing: 3,
+              textTransform: "uppercase",
+              color: "#4A3A30",
+              fontFamily: "Helvetica, Arial, sans-serif",
+              fontWeight: 700,
+            }}
+          >
             {t.code}
           </div>
           <div
             style={{
-              fontSize: 38,
+              fontSize: 40,
               fontWeight: 800,
               color: "#B76A4C",
               fontFamily: "Helvetica, Arial, sans-serif",
               letterSpacing: 1.5,
-              marginTop: 2,
+              marginTop: 4,
             }}
           >
             {property.reference_code || "—"}
@@ -599,163 +646,198 @@ const FlyerSheet = forwardRef<
         </div>
       </header>
 
-      {/* Left: visual zone */}
-      <section style={{ minHeight: 0, display: "flex", flexDirection: "column" }}>
-        <FlyerLayout layout={layout} images={images} lang={lang} />
-      </section>
-
-      {/* Right: info column */}
+      {/* Body: hero | thumbs | info box */}
       <section
         style={{
           minHeight: 0,
-          display: "flex",
-          flexDirection: "column",
+          display: "grid",
+          gridTemplateColumns: "1.55fr 0.55fr 0.95fr",
           gap: 18,
           overflow: "hidden",
         }}
       >
-        {/* City dominant */}
-        <div>
-          <div
-            style={{
-              fontSize: 12,
-              letterSpacing: 2.6,
-              textTransform: "uppercase",
-              color: "#B76A4C",
-              fontFamily: "Helvetica, Arial, sans-serif",
-              fontWeight: 600,
-            }}
-          >
-            {[property.contract_type, property.property_type].filter(Boolean).join(" · ") || ""}
-          </div>
-          <h1
-            style={{
-              margin: "6px 0 4px",
-              fontSize: 58,
-              lineHeight: 1,
-              fontWeight: 700,
-              letterSpacing: -1,
-              color: "#241711",
-            }}
-          >
-            {cityMain} {cityProv && (
-              <span style={{ color: "#B76A4C", fontWeight: 600 }}>{cityProv}</span>
-            )}
-          </h1>
-          {cityZone && (
-            <div
-              style={{
-                fontSize: 18,
-                color: "#4A3A30",
-                fontFamily: "Helvetica, Arial, sans-serif",
-                letterSpacing: 0.4,
-                marginTop: 4,
-              }}
-            >
-              {cityZone}
-            </div>
+        <div style={{ minHeight: 0 }}>
+          {hero ? (
+            <Img img={hero} lang={lang} style={{ width: "100%", height: "100%" }} />
+          ) : (
+            <EmptyPhoto />
           )}
         </div>
 
-        {/* Price */}
         <div
           style={{
-            display: "flex",
-            alignItems: "baseline",
-            gap: 12,
-            padding: "12px 0",
-            borderTop: "1px solid #D1BCA6",
-            borderBottom: "1px solid #D1BCA6",
+            display: "grid",
+            gridTemplateRows: "1fr 1fr",
+            gap: 18,
+            minHeight: 0,
           }}
         >
-          <div
-            style={{
-              fontSize: 46,
-              fontWeight: 800,
-              color: "#B76A4C",
-              fontFamily: "Helvetica, Arial, sans-serif",
-              letterSpacing: -0.5,
-            }}
-          >
-            {price}
-          </div>
+          {[0, 1].map((idx) => {
+            const ti = thumbs[idx];
+            return ti ? (
+              <Img key={ti.id} img={ti} lang={lang} style={{ width: "100%", height: "100%" }} />
+            ) : (
+              <div
+                key={`empty-${idx}`}
+                style={{ background: "#E3D3BD", border: "1px dashed #B76A4C" }}
+              />
+            );
+          })}
         </div>
 
-        {/* Tech data row */}
-        {techData.length > 0 && (
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: `repeat(${techData.length}, 1fr)`,
-              gap: 10,
-              fontFamily: "Helvetica, Arial, sans-serif",
-            }}
-          >
-            {techData.map((d) => (
-              <div
-                key={d.label}
-                style={{
-                  border: "1px solid #B76A4C",
-                  padding: "10px 8px",
-                  background: "#F3E8DB",
-                  textAlign: "center",
-                }}
-              >
-                <div
-                  style={{
-                    fontSize: 22,
-                    fontWeight: 800,
-                    color: "#241711",
-                    lineHeight: 1,
-                  }}
-                >
-                  {d.value}
-                </div>
-                <div
-                  style={{
-                    fontSize: 10,
-                    letterSpacing: 1.6,
-                    textTransform: "uppercase",
-                    color: "#4A3A30",
-                    marginTop: 4,
-                  }}
-                >
-                  {d.label}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* Large readable description */}
-        {paragraphs.length > 0 && (
-          <div style={{ flex: 1, minHeight: 0, overflow: "hidden" }}>
+        <aside
+          style={{
+            background: "#F3E8DB",
+            border: "2px solid #B76A4C",
+            padding: 22,
+            display: "flex",
+            flexDirection: "column",
+            gap: 16,
+            minHeight: 0,
+            overflow: "hidden",
+          }}
+        >
+          <div>
             <div
               style={{
-                fontSize: 22,
-                lineHeight: 1.45,
-                color: "#241711",
-                fontFamily: "Georgia, 'Times New Roman', serif",
+                fontSize: 12,
+                letterSpacing: 2.6,
+                textTransform: "uppercase",
+                color: "#4A3A30",
+                fontFamily: "Helvetica, Arial, sans-serif",
+                fontWeight: 700,
               }}
             >
-              {paragraphs.map((p, i) => (
-                <p key={i} style={{ margin: i === 0 ? "0 0 14px 0" : "0 0 14px 0" }}>
-                  <HighlightedText text={p} />
-                </p>
-              ))}
+              {[property.contract_type, property.property_type].filter(Boolean).join(" · ") || ""}
+            </div>
+            <div
+              style={{
+                marginTop: 6,
+                fontSize: 44,
+                fontWeight: 800,
+                lineHeight: 1.05,
+                color: "#B76A4C",
+                fontFamily: "Helvetica, Arial, sans-serif",
+                letterSpacing: -0.5,
+                wordBreak: "break-word",
+              }}
+            >
+              {price}
             </div>
           </div>
-        )}
 
+          {techData.length > 0 && (
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                gap: 8,
+                fontFamily: "Helvetica, Arial, sans-serif",
+              }}
+            >
+              {techData.map((d) => (
+                <div
+                  key={d.label}
+                  style={{
+                    border: "1px solid #B76A4C",
+                    background: "#ECE1D3",
+                    padding: "10px 8px",
+                    textAlign: "center",
+                  }}
+                >
+                  <div style={{ fontSize: 26, fontWeight: 800, color: "#241711", lineHeight: 1 }}>
+                    {d.value}
+                  </div>
+                  <div
+                    style={{
+                      fontSize: 10,
+                      letterSpacing: 1.6,
+                      textTransform: "uppercase",
+                      color: "#4A3A30",
+                      marginTop: 4,
+                    }}
+                  >
+                    {d.label}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {featureChips.length > 0 && (
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                gap: 6,
+                fontFamily: "Helvetica, Arial, sans-serif",
+              }}
+            >
+              {featureChips.slice(0, 8).map((c) => (
+                <span
+                  key={c}
+                  style={{
+                    border: "1px solid #B76A4C",
+                    padding: "5px 10px",
+                    fontSize: 12,
+                    color: "#241711",
+                    background: "#ECE1D3",
+                    letterSpacing: 0.4,
+                  }}
+                >
+                  {c}
+                </span>
+              ))}
+            </div>
+          )}
+        </aside>
+      </section>
+
+      {/* Bottom: large description band */}
+      <section
+        style={{
+          borderTop: "3px solid #B76A4C",
+          paddingTop: 18,
+          minHeight: 0,
+          overflow: "hidden",
+          display: "flex",
+          flexDirection: "column",
+          gap: 8,
+        }}
+      >
+        {paragraphs.length > 0 ? (
+          <div
+            style={{
+              fontSize: 26,
+              lineHeight: 1.4,
+              color: "#241711",
+              fontFamily: "Georgia, 'Times New Roman', serif",
+              columnCount: paragraphs.length > 2 ? 2 : 1,
+              columnGap: 36,
+            }}
+          >
+            {paragraphs.map((p, i) => (
+              <p
+                key={i}
+                style={{ margin: "0 0 12px 0", breakInside: "avoid" }}
+              >
+                <HighlightedText text={p} />
+              </p>
+            ))}
+          </div>
+        ) : (
+          <div style={{ fontSize: 20, color: "#4A3A30", fontStyle: "italic" }}>
+            {lang === "it" ? "Descrizione non disponibile." : "Description not available."}
+          </div>
+        )}
         {hasRender && (
           <div
             style={{
-              fontSize: 11,
+              fontSize: 12,
               color: "#4A3A30",
               fontStyle: "italic",
               fontFamily: "Helvetica, Arial, sans-serif",
-              borderTop: "1px solid #D1BCA6",
-              paddingTop: 8,
+              marginTop: 4,
             }}
           >
             * {t.renderingNote}
@@ -765,6 +847,29 @@ const FlyerSheet = forwardRef<
     </div>
   );
 });
+
+function EmptyPhoto() {
+  return (
+    <div
+      style={{
+        width: "100%",
+        height: "100%",
+        background: "#E3D3BD",
+        border: "2px dashed #B76A4C",
+        display: "grid",
+        placeItems: "center",
+        textAlign: "center",
+        padding: 24,
+        color: "#4A3A30",
+        fontFamily: "Helvetica, Arial, sans-serif",
+        fontSize: 20,
+        fontWeight: 600,
+      }}
+    >
+      Seleziona almeno una foto per generare il cartello
+    </div>
+  );
+}
 
 // ---------------- Layouts (left visual column) ----------------
 
