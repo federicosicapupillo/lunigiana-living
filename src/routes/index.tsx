@@ -8,7 +8,7 @@ import territoryBagnone from "@/assets/real/bagnone-lunigiana.png.asset.json";
 import territoryZeri from "@/assets/real/zeri-lunigiana.png.asset.json";
 import { PropertyCard } from "@/components/property-card";
 import { PropertySearchBar } from "@/components/property-search-bar";
-import { listPublishedProperties, type PublicProperty } from "@/lib/public-properties.functions";
+import { listPublishedPropertiesSummary, type PublicProperty } from "@/lib/public-properties.functions";
 import { getLocalizedProperties } from "@/lib/property-i18n.functions";
 import { getHomeHeroVariant, type HomeHeroVariant } from "@/lib/site-settings.functions";
 import { LeadForm } from "@/components/lead-form";
@@ -61,7 +61,7 @@ const ORGANIZATION_JSONLD = {
 
 export const Route = createFileRoute("/")({
   loader: async () => {
-    const [props, hero] = await Promise.all([listPublishedProperties(), getHomeHeroVariant()]);
+    const [props, hero] = await Promise.all([listPublishedPropertiesSummary(), getHomeHeroVariant()]);
     return { ...props, heroVariant: hero.variant };
   },
   head: () => ({
