@@ -406,6 +406,7 @@ export type Database = {
           enhancement_error: string | null
           enhancement_status: string
           id: string
+          idealista_included: boolean
           image_url: string
           import_status: string | null
           imported_source_url: string | null
@@ -444,6 +445,7 @@ export type Database = {
           enhancement_error?: string | null
           enhancement_status?: string
           id?: string
+          idealista_included?: boolean
           image_url: string
           import_status?: string | null
           imported_source_url?: string | null
@@ -482,6 +484,7 @@ export type Database = {
           enhancement_error?: string | null
           enhancement_status?: string
           id?: string
+          idealista_included?: boolean
           image_url?: string
           import_status?: string | null
           imported_source_url?: string | null
