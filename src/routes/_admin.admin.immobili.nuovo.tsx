@@ -168,44 +168,9 @@ function NewPropertyPage() {
   const navigate = useNavigate();
   const [f, setF] = useState<FormState>(empty);
   const [saving, setSaving] = useState(false);
-  const [translating, setTranslating] = useState(false);
-  const translateFn = useServerFn(translatePropertyToEnglish);
 
   const upd = <K extends keyof FormState>(k: K, v: FormState[K]) =>
     setF((s) => ({ ...s, [k]: v }));
-
-  const onTranslateAi = async () => {
-    if (!f.title.trim() && !f.descrizione_libera.trim() && !f.long_description.trim()) {
-      toast.error("Compila almeno il titolo o una descrizione in italiano prima di tradurre.");
-      return;
-    }
-    setTranslating(true);
-    const tid = toast.loading("Traduzione in corso…");
-    try {
-      const res = await translateFn({
-        data: {
-          title: f.title,
-          subtitle: f.descrizione_libera,
-          summary: f.descrizione_libera,
-          locationDescription: "",
-          description: f.long_description,
-        },
-      });
-      setF((s) => ({
-        ...s,
-        title_en: res.title_en || s.title_en,
-        subtitle_en: res.subtitle_en || s.subtitle_en,
-        summary_en: res.summary_en || s.summary_en,
-        location_description_en: res.location_description_en || s.location_description_en,
-        description_en: res.description_en || s.description_en,
-      }));
-      toast.success("Traduzione completata", { id: tid });
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Errore traduzione", { id: tid });
-    } finally {
-      setTranslating(false);
-    }
-  };
 
   /**
    * Crea l'immobile + features narrative.
