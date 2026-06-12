@@ -854,6 +854,27 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
           ))}
         </div>
       )}
+      {compareState && (
+        <BeforeAfterDialog
+          open={!!compareState}
+          onClose={() => setCompareState(null)}
+          originalUrl={compareState.image.image_url}
+          enhancedUrl={compareState.image.enhanced_image_url}
+          renderedUrl={compareState.image.rendered_signed_url}
+          initialMode={compareState.mode}
+          afterMissing={compareState.afterMissing}
+          onUseEnhanced={
+            compareState.image.enhanced_storage_path
+              ? () => toggleEnhancedPublished(compareState.image, true)
+              : undefined
+          }
+          onKeepOriginal={
+            compareState.image.enhanced_storage_path
+              ? () => toggleEnhancedPublished(compareState.image, false)
+              : undefined
+          }
+        />
+      )}
     </div>
   );
 }
