@@ -315,6 +315,33 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
     }
   };
 
+  const setPublishMode = async (img: Image, mode: "main" | "emotional" | "none") => {
+    try {
+      await runSetPublishMode({ data: { imageId: img.id, mode } });
+      toast.success(
+        mode === "main"
+          ? "Rendering pubblicato come foto principale (originale conservata)"
+          : mode === "emotional"
+          ? "Rendering aggiunto alla sezione 'Rendering emozionale'"
+          : "Rendering non pubblicato",
+      );
+      await load();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Errore");
+    }
+  };
+
+  const discard = async (img: Image) => {
+    if (!confirm("Scartare il rendering generato? La foto originale resterà intatta.")) return;
+    try {
+      await runDiscardRender({ data: { imageId: img.id } });
+      toast.success("Rendering scartato. Foto originale ripristinata.");
+      await load();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Errore");
+    }
+  };
+
   const enhance = async (img: Image) => {
     if (!img.render_availability?.canRender) {
       toast.error("Sincronizza prima la foto nello storage interno");
