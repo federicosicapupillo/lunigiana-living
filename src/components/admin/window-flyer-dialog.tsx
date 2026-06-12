@@ -516,18 +516,37 @@ const FlyerSheet = forwardRef<
 
   const cityMain = (property.municipality || property.area_zone || "").toUpperCase();
   const cityProv = property.province ? `(${property.province.toUpperCase()})` : "";
-  const subRegion = "LUNIGIANA — TOSCANA";
+  const subRegion = "LUNIGIANA - TOSCANA";
 
   const rawDescription = (longDescription || property.short_notes || "").trim();
   const condensed = rawDescription ? condenseDescription(rawDescription, 720) : "";
   const paragraphs = condensed ? splitParagraphs(condensed) : [];
 
-  const techData: { label: string; value: string }[] = [];
-  if (property.size_sqm) techData.push({ label: t.sqm.toUpperCase(), value: String(property.size_sqm) });
-  if (property.bedrooms != null) techData.push({ label: t.rooms, value: String(property.bedrooms) });
-  if (property.bathrooms != null) techData.push({ label: t.baths, value: String(property.bathrooms) });
-  if (property.floor) techData.push({ label: t.floor, value: property.floor });
-  if (property.energy_class) techData.push({ label: t.energy, value: property.energy_class });
+  type TechCell = { label: string; value: string; icon: React.ReactNode };
+  const ICON_SZ = 30;
+  const ICON_COLOR = "#B23D2A";
+  const techData: TechCell[] = [
+    {
+      label: t.sqm.toUpperCase(),
+      value: property.size_sqm ? String(property.size_sqm) : "—",
+      icon: <Maximize size={ICON_SZ} color={ICON_COLOR} strokeWidth={2.2} />,
+    },
+    {
+      label: (lang === "it" ? "CAMERE" : "BEDROOMS"),
+      value: property.bedrooms != null ? String(property.bedrooms) : "—",
+      icon: <BedDouble size={ICON_SZ} color={ICON_COLOR} strokeWidth={2.2} />,
+    },
+    {
+      label: (lang === "it" ? "BAGNO" : "BATH"),
+      value: property.bathrooms != null ? String(property.bathrooms) : "—",
+      icon: <Bath size={ICON_SZ} color={ICON_COLOR} strokeWidth={2.2} />,
+    },
+    {
+      label: (lang === "it" ? "PIANO" : "FLOOR"),
+      value: property.floor ? String(property.floor) : "—",
+      icon: <ArrowUpDown size={ICON_SZ} color={ICON_COLOR} strokeWidth={2.2} />,
+    },
+  ];
 
   const hasRender = images.some((i) => i.isRender);
 
@@ -535,16 +554,45 @@ const FlyerSheet = forwardRef<
   const thumbsRaw = images.slice(1, 3);
   const thumbs = thumbSwap ? [...thumbsRaw].reverse() : thumbsRaw;
 
-  const featureChips: string[] = [];
-  if (property.panoramic_view) featureChips.push(lang === "it" ? "Vista panoramica" : "Panoramic view");
-  if (property.garden) featureChips.push(lang === "it" ? "Giardino" : "Garden");
-  if (property.terrace) featureChips.push(lang === "it" ? "Terrazza" : "Terrace");
-  if (property.balcony) featureChips.push(lang === "it" ? "Balcone" : "Balcony");
-  if (property.garage) featureChips.push("Garage");
-  if (property.cellar) featureChips.push(lang === "it" ? "Cantina" : "Cellar");
-  if (property.elevator) featureChips.push(lang === "it" ? "Ascensore" : "Elevator");
-  if (property.furnished) featureChips.push(lang === "it" ? "Arredato" : "Furnished");
-  if (property.historic_property) featureChips.push(lang === "it" ? "Storico" : "Historic");
+  // Checklist principale (max 8 voci, 2 colonne). Usa attributi reali quando presenti,
+  // poi completa con un set standard di pregi sempre validi per il cartello vetrina.
+  const checklist: string[] = [];
+  const add = (s: string) => {
+    if (s && !checklist.includes(s) && checklist.length < 8) checklist.push(s);
+  };
+  if (property.panoramic_view) add(lang === "it" ? "Vista panoramica" : "Panoramic view");
+  if (property.garden) add(lang === "it" ? "Giardino" : "Garden");
+  if (property.terrace) add(lang === "it" ? "Terrazza" : "Terrace");
+  if (property.balcony) add(lang === "it" ? "Balcone" : "Balcony");
+  if (property.garage) add("Garage");
+  if (property.cellar) add(lang === "it" ? "Cantina" : "Cellar");
+  if (property.elevator) add(lang === "it" ? "Ascensore" : "Elevator");
+  if (property.furnished) add(lang === "it" ? "Arredato" : "Furnished");
+  if (property.historic_property) add(lang === "it" ? "Storico" : "Historic");
+  // Standard fillers (sempre veri per la maggior parte degli annunci Furia)
+  const fillers =
+    lang === "it"
+      ? [
+          "Luminoso",
+          "Cucina abitabile",
+          "Riscaldamento autonomo",
+          "Infissi doppio vetro",
+          "Spazi ampi",
+          "Buone condizioni",
+          "Zona servita",
+          "Balcone",
+        ]
+      : [
+          "Bright",
+          "Eat-in kitchen",
+          "Independent heating",
+          "Double-glazed windows",
+          "Spacious",
+          "Good condition",
+          "Well served area",
+          "Balcony",
+        ];
+  for (const f of fillers) add(f);
 
   return (
     <div
@@ -552,9 +600,9 @@ const FlyerSheet = forwardRef<
       style={{
         width: SHEET_W,
         height: SHEET_H,
-        background: "#ECE1D3",
-        color: "#241711",
-        fontFamily: "Georgia, 'Times New Roman', serif",
+        background: "#F5ECDD",
+        color: "#1A1A1A",
+        fontFamily: "Helvetica, Arial, sans-serif",
         position: "relative",
         overflow: "hidden",
         padding: PAD,
@@ -562,49 +610,50 @@ const FlyerSheet = forwardRef<
         display: "grid",
         gridTemplateColumns: "1fr",
         gridTemplateRows: "auto 1fr auto",
-        rowGap: 22,
+        rowGap: 18,
+        outline: "3px solid #B23D2A",
+        outlineOffset: -PAD / 2,
       }}
     >
       {/* Header: logo | city | code */}
       <header
         style={{
           display: "grid",
-          gridTemplateColumns: "auto 1fr auto",
+          gridTemplateColumns: "auto 1px 1fr auto",
           alignItems: "center",
-          gap: 32,
-          paddingBottom: 20,
-          borderBottom: "3px solid #B76A4C",
+          gap: 26,
+          paddingBottom: 12,
         }}
       >
         <img
           src={logoAsset.url}
           alt="Furia"
           crossOrigin="anonymous"
-          style={{ height: 130, width: "auto", objectFit: "contain" }}
+          style={{ height: 170, width: "auto", objectFit: "contain" }}
         />
+        <div style={{ width: 2, height: 130, background: "#1A1A1A", justifySelf: "center" }} />
         <div style={{ textAlign: "center", minWidth: 0 }}>
           <div
             style={{
-              fontSize: 64,
-              fontWeight: 800,
+              fontSize: 96,
+              fontWeight: 900,
               lineHeight: 1,
-              letterSpacing: -0.5,
-              color: "#241711",
-              fontFamily: "Georgia, 'Times New Roman', serif",
+              letterSpacing: -1,
+              color: "#0F0F0F",
+              fontFamily: "Helvetica, Arial, sans-serif",
             }}
           >
-            {cityMain}{" "}
-            {cityProv && <span style={{ color: "#B76A4C" }}>{cityProv}</span>}
+            {cityMain} {cityProv}
           </div>
           <div
             style={{
-              marginTop: 8,
-              fontSize: 18,
-              letterSpacing: 5,
+              marginTop: 10,
+              fontSize: 26,
+              letterSpacing: 8,
               textTransform: "uppercase",
-              color: "#4A3A30",
+              color: "#B23D2A",
               fontFamily: "Helvetica, Arial, sans-serif",
-              fontWeight: 600,
+              fontWeight: 700,
             }}
           >
             {subRegion}
@@ -613,18 +662,18 @@ const FlyerSheet = forwardRef<
         <div
           style={{
             textAlign: "center",
-            border: "3px solid #B76A4C",
-            background: "#F3E8DB",
-            padding: "12px 22px",
-            minWidth: 230,
+            border: "3px solid #B23D2A",
+            background: "transparent",
+            padding: "14px 28px",
+            minWidth: 280,
           }}
         >
           <div
             style={{
-              fontSize: 14,
-              letterSpacing: 3,
+              fontSize: 18,
+              letterSpacing: 2,
               textTransform: "uppercase",
-              color: "#4A3A30",
+              color: "#1A1A1A",
               fontFamily: "Helvetica, Arial, sans-serif",
               fontWeight: 700,
             }}
@@ -633,12 +682,13 @@ const FlyerSheet = forwardRef<
           </div>
           <div
             style={{
-              fontSize: 40,
-              fontWeight: 800,
-              color: "#B76A4C",
+              fontSize: 64,
+              fontWeight: 900,
+              color: "#B23D2A",
               fontFamily: "Helvetica, Arial, sans-serif",
-              letterSpacing: 1.5,
-              marginTop: 4,
+              letterSpacing: 1,
+              marginTop: 2,
+              lineHeight: 1,
             }}
           >
             {property.reference_code || "—"}
@@ -651,8 +701,8 @@ const FlyerSheet = forwardRef<
         style={{
           minHeight: 0,
           display: "grid",
-          gridTemplateColumns: "1.55fr 0.55fr 0.95fr",
-          gap: 18,
+          gridTemplateColumns: "1.55fr 0.6fr 1fr",
+          gap: 14,
           overflow: "hidden",
         }}
       >
@@ -668,7 +718,7 @@ const FlyerSheet = forwardRef<
           style={{
             display: "grid",
             gridTemplateRows: "1fr 1fr",
-            gap: 18,
+            gap: 14,
             minHeight: 0,
           }}
         >
@@ -679,7 +729,7 @@ const FlyerSheet = forwardRef<
             ) : (
               <div
                 key={`empty-${idx}`}
-                style={{ background: "#E3D3BD", border: "1px dashed #B76A4C" }}
+                style={{ background: "#E8DCC8", border: "1px dashed #B23D2A" }}
               />
             );
           })}
@@ -687,38 +737,39 @@ const FlyerSheet = forwardRef<
 
         <aside
           style={{
-            background: "#F3E8DB",
-            border: "2px solid #B76A4C",
-            padding: 22,
+            background: "transparent",
+            border: "3px solid #B23D2A",
+            padding: "22px 26px",
             display: "flex",
             flexDirection: "column",
-            gap: 16,
+            gap: 14,
             minHeight: 0,
             overflow: "hidden",
           }}
         >
+          {/* Price */}
           <div>
             <div
               style={{
-                fontSize: 12,
-                letterSpacing: 2.6,
+                fontSize: 22,
+                letterSpacing: 3,
                 textTransform: "uppercase",
-                color: "#4A3A30",
+                color: "#B23D2A",
                 fontFamily: "Helvetica, Arial, sans-serif",
                 fontWeight: 700,
               }}
             >
-              {[property.contract_type, property.property_type].filter(Boolean).join(" · ") || ""}
+              {lang === "it" ? "PREZZO" : "PRICE"}
             </div>
             <div
               style={{
-                marginTop: 6,
-                fontSize: 44,
-                fontWeight: 800,
-                lineHeight: 1.05,
-                color: "#B76A4C",
+                marginTop: 4,
+                fontSize: 72,
+                fontWeight: 900,
+                lineHeight: 1,
+                color: "#B23D2A",
                 fontFamily: "Helvetica, Arial, sans-serif",
-                letterSpacing: -0.5,
+                letterSpacing: -1,
                 wordBreak: "break-word",
               }}
             >
@@ -726,67 +777,79 @@ const FlyerSheet = forwardRef<
             </div>
           </div>
 
-          {techData.length > 0 && (
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "1fr 1fr",
-                gap: 8,
-                fontFamily: "Helvetica, Arial, sans-serif",
-              }}
-            >
-              {techData.map((d) => (
-                <div
-                  key={d.label}
-                  style={{
-                    border: "1px solid #B76A4C",
-                    background: "#ECE1D3",
-                    padding: "10px 8px",
-                    textAlign: "center",
-                  }}
-                >
-                  <div style={{ fontSize: 26, fontWeight: 800, color: "#241711", lineHeight: 1 }}>
+          {/* 2x2 data grid with icons */}
+          <div
+            style={{
+              borderTop: "1px solid #B23D2A",
+              paddingTop: 14,
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr",
+              rowGap: 14,
+              columnGap: 18,
+              fontFamily: "Helvetica, Arial, sans-serif",
+            }}
+          >
+            {techData.map((d) => (
+              <div
+                key={d.label}
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "auto 1fr",
+                  alignItems: "center",
+                  gap: 10,
+                }}
+              >
+                <div style={{ display: "grid", placeItems: "center", width: 44 }}>{d.icon}</div>
+                <div style={{ lineHeight: 1 }}>
+                  <div style={{ fontSize: 30, fontWeight: 900, color: "#1A1A1A" }}>
                     {d.value}
                   </div>
                   <div
                     style={{
-                      fontSize: 10,
+                      fontSize: 12,
                       letterSpacing: 1.6,
                       textTransform: "uppercase",
-                      color: "#4A3A30",
-                      marginTop: 4,
+                      color: "#1A1A1A",
+                      marginTop: 2,
+                      fontWeight: 700,
                     }}
                   >
                     {d.label}
                   </div>
                 </div>
-              ))}
-            </div>
-          )}
+              </div>
+            ))}
+          </div>
 
-          {featureChips.length > 0 && (
+          {/* Checklist 2-col with red checks */}
+          {checklist.length > 0 && (
             <div
               style={{
-                display: "flex",
-                flexWrap: "wrap",
-                gap: 6,
+                borderTop: "1px solid #B23D2A",
+                paddingTop: 12,
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                columnGap: 14,
+                rowGap: 8,
                 fontFamily: "Helvetica, Arial, sans-serif",
               }}
             >
-              {featureChips.slice(0, 8).map((c) => (
-                <span
+              {checklist.slice(0, 8).map((c) => (
+                <div
                   key={c}
                   style={{
-                    border: "1px solid #B76A4C",
-                    padding: "5px 10px",
-                    fontSize: 12,
-                    color: "#241711",
-                    background: "#ECE1D3",
-                    letterSpacing: 0.4,
+                    display: "grid",
+                    gridTemplateColumns: "auto 1fr",
+                    alignItems: "center",
+                    gap: 8,
+                    fontSize: 15,
+                    color: "#1A1A1A",
+                    fontWeight: 600,
                   }}
                 >
-                  {c}
-                </span>
+                  <Check size={16} color="#B23D2A" strokeWidth={3.2} />
+                  <span>{c}</span>
+                </div>
               ))}
             </div>
           )}
@@ -796,8 +859,8 @@ const FlyerSheet = forwardRef<
       {/* Bottom: large description band */}
       <section
         style={{
-          borderTop: "3px solid #B76A4C",
-          paddingTop: 18,
+          border: "3px solid #B23D2A",
+          padding: "20px 24px",
           minHeight: 0,
           overflow: "hidden",
           display: "flex",
@@ -808,25 +871,25 @@ const FlyerSheet = forwardRef<
         {paragraphs.length > 0 ? (
           <div
             style={{
-              fontSize: 26,
-              lineHeight: 1.4,
-              color: "#241711",
-              fontFamily: "Georgia, 'Times New Roman', serif",
-              columnCount: paragraphs.length > 2 ? 2 : 1,
-              columnGap: 36,
+              fontSize: 24,
+              lineHeight: 1.35,
+              color: "#1A1A1A",
+              fontFamily: "Helvetica, Arial, sans-serif",
+              fontWeight: 500,
+              columnCount: 1,
             }}
           >
-            {paragraphs.map((p, i) => (
+            {paragraphs.slice(0, 3).map((p, i) => (
               <p
                 key={i}
-                style={{ margin: "0 0 12px 0", breakInside: "avoid" }}
+                style={{ margin: "0 0 10px 0", breakInside: "avoid" }}
               >
                 <HighlightedText text={p} />
               </p>
             ))}
           </div>
         ) : (
-          <div style={{ fontSize: 20, color: "#4A3A30", fontStyle: "italic" }}>
+          <div style={{ fontSize: 20, color: "#5A4A40", fontStyle: "italic" }}>
             {lang === "it" ? "Descrizione non disponibile." : "Description not available."}
           </div>
         )}
@@ -834,7 +897,7 @@ const FlyerSheet = forwardRef<
           <div
             style={{
               fontSize: 12,
-              color: "#4A3A30",
+              color: "#5A4A40",
               fontStyle: "italic",
               fontFamily: "Helvetica, Arial, sans-serif",
               marginTop: 4,
