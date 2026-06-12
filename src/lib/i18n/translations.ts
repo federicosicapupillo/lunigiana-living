@@ -679,6 +679,12 @@ const en: Dict = {
   "detail.emotionalBadge": "AI rendering",
   "detail.emotionalCaption": "Illustrative image",
   "detail.emotionalDisclaimer": "Images generated with AI rendering for illustrative purposes. They show a possible enhancement of the property and do not represent its current condition.",
+  "detail.beforeLabel": "Before",
+  "detail.afterLabel": "After",
+  "detail.beforeCaption": "Current state",
+  "detail.afterCaption": "Potential transformation",
+  "detail.illustrativeNote": "Illustrative image, not representing the current state",
+  "detail.compareHint": "Drag the slider to compare",
 
   // SEO meta
   "seo.home.title": "Furia Immobiliare — Homes with character in Lunigiana",
