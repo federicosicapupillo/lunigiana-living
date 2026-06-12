@@ -5,7 +5,6 @@ import { ImagePlus, Star, StarOff, Trash2, ArrowUp, ArrowDown, Loader2, Sparkles
 import { useServerFn } from "@tanstack/react-start";
 import {
   renderPropertyImage,
-  setPropertyImagePublished,
   syncImportedImage,
   forceSyncPhotosBatch,
   setRenderPublishMode,
@@ -132,7 +131,6 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
   const [enhancingId, setEnhancingId] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const runRender = useServerFn(renderPropertyImage);
-  const runSetPublished = useServerFn(setPropertyImagePublished);
   const runSetPublishMode = useServerFn(setRenderPublishMode);
   const runDiscardRender = useServerFn(discardRender);
   const runSync = useServerFn(syncImportedImage);
