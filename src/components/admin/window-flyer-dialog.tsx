@@ -170,12 +170,13 @@ function HighlightedText({ text }: { text: string }) {
     (a, b) => b.length - a.length,
   );
   const re = new RegExp(`(${escaped.join("|")})`, "gi");
+  const testRe = new RegExp(`^(?:${escaped.join("|")})$`, "i");
   const parts = text.split(re);
   return (
     <>
       {parts.map((p, i) =>
-        re.test(p) ? (
-          <strong key={i} style={{ color: "#B76A4C", fontWeight: 700 }}>
+        testRe.test(p) ? (
+          <strong key={i} style={{ color: "#B23D2A", fontWeight: 800 }}>
             {p}
           </strong>
         ) : (
@@ -941,16 +942,16 @@ function RenderBadge({ lang }: { lang: Lang }) {
     <span
       style={{
         position: "absolute",
-        top: 12,
-        left: 12,
-        background: "#B76A4C",
+        top: 14,
+        left: 14,
+        background: "#B23D2A",
         color: "#ECE1D3",
-        fontSize: 12,
-        letterSpacing: 1.8,
-        padding: "6px 12px",
+        fontSize: 16,
+        letterSpacing: 2.5,
+        padding: "7px 14px",
         textTransform: "uppercase",
         fontFamily: "Helvetica, Arial, sans-serif",
-        fontWeight: 700,
+        fontWeight: 800,
       }}
     >
       {STR[lang].rendering}
