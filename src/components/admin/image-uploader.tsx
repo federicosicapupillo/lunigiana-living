@@ -306,7 +306,7 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
         mode === "main"
           ? "Rendering pubblicato come foto principale (originale conservata)"
           : mode === "emotional"
-          ? "Rendering aggiunto alla sezione 'Rendering emozionale'"
+          ? "Rendering usato come Prima/Dopo"
           : "Rendering non pubblicato",
       );
       await load();
