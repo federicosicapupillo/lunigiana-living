@@ -273,12 +273,42 @@ export function WindowFlyerDialog({
 
   const captureCanvas = async () => {
     if (!flyerRef.current) return null;
-    return await html2canvas(flyerRef.current, {
-      scale: 2,
-      useCORS: true,
-      backgroundColor: "#ECE1D3",
-      logging: false,
-    });
+    const el = flyerRef.current;
+    // Lock export layout
+    el.classList.add("a3-export-mode");
+    try {
+      // Wait for fonts
+      if (document.fonts && document.fonts.ready) {
+        await document.fonts.ready;
+      }
+      // Wait for all images inside to be loaded/decoded
+      const imgs = Array.from(el.querySelectorAll("img"));
+      await Promise.all(
+        imgs.map((im) => {
+          if (im.complete && im.naturalWidth > 0) return Promise.resolve();
+          return new Promise<void>((resolve) => {
+            im.addEventListener("load", () => resolve(), { once: true });
+            im.addEventListener("error", () => resolve(), { once: true });
+          });
+        }),
+      );
+      // Two animation frames so the browser commits final layout
+      await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+      return await html2canvas(el, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: "#F5ECDD",
+        logging: false,
+        width: SHEET_W,
+        height: SHEET_H,
+        windowWidth: SHEET_W,
+        windowHeight: SHEET_H,
+        scrollX: 0,
+        scrollY: 0,
+      });
+    } finally {
+      el.classList.remove("a3-export-mode");
+    }
   };
 
   const downloadPDF = async () => {
