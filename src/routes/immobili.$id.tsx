@@ -2,10 +2,11 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { getPublishedProperty, type PublicProperty } from "@/lib/public-properties.functions";
 import { getLocalizedProperty } from "@/lib/property-i18n.functions";
 import { ArrowLeft, ChevronLeft, ChevronRight, MapPin, Maximize2, BedDouble, Bath, Building2, Sparkles } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { WatermarkedImage } from "@/components/watermarked-image";
+import { Skeleton } from "@/components/ui/skeleton";
 import { BeforeAfterSlider } from "@/components/before-after-slider";
 import { whatsappUrl } from "@/components/whatsapp-float";
 import { useLanguage, useT } from "@/lib/i18n/LanguageContext";
@@ -90,6 +91,29 @@ function PropertyDetail() {
   const main = p.gallery[active] || p.image;
   const galleryCount = p.gallery.length;
   const renderFor = p.galleryPairs?.[main];
+  const [mainLoaded, setMainLoaded] = useState(false);
+  useEffect(() => {
+    setMainLoaded(false);
+  }, [main]);
+  // Preload neighbor images so prev/next feels instant.
+  useEffect(() => {
+    if (typeof window === "undefined" || galleryCount <= 1) return;
+    const neighbors = [
+      p.gallery[(active + 1) % galleryCount],
+      p.gallery[(active - 1 + galleryCount) % galleryCount],
+    ];
+    const imgs: HTMLImageElement[] = [];
+    for (const src of neighbors) {
+      if (!src) continue;
+      const img = new Image();
+      img.decoding = "async";
+      img.src = src;
+      imgs.push(img);
+    }
+    return () => {
+      imgs.forEach((i) => (i.src = ""));
+    };
+  }, [active, galleryCount, p.gallery]);
   const goPrev = () => setActive((i) => (galleryCount ? (i - 1 + galleryCount) % galleryCount : 0));
   const goNext = () => setActive((i) => (galleryCount ? (i + 1) % galleryCount : 0));
   const waMessage =
@@ -144,14 +168,22 @@ function PropertyDetail() {
                 objectFit="contain"
               />
             ) : (
-              <WatermarkedImage
-                src={main}
-                alt={title}
-                fetchPriority="high"
-                sizes="(max-width: 1024px) 100vw, 70vw"
-                watermarkSize="lg"
-                className="h-full w-full object-contain transition-opacity duration-300"
-              />
+              <>
+                {!mainLoaded && (
+                  <Skeleton className="absolute inset-0 h-full w-full rounded-sm" />
+                )}
+                <WatermarkedImage
+                  key={main}
+                  src={main}
+                  alt={title}
+                  fetchPriority="high"
+                  sizes="(max-width: 1024px) 100vw, 70vw"
+                  watermarkSize="lg"
+                  onLoad={() => setMainLoaded(true)}
+                  onError={() => setMainLoaded(true)}
+                  className={`h-full w-full object-contain transition-opacity duration-300 ${mainLoaded ? "opacity-100" : "opacity-0"}`}
+                />
+              </>
             )}
           </div>
           {galleryCount > 1 && (
