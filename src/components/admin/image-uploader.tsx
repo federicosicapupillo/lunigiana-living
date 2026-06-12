@@ -147,7 +147,8 @@ function computeAvailability(row: {
       canRender: false,
       state: "sync_error",
       statusLabel: "Errore sincronizzazione",
-      message: "Impossibile recuperare questa foto dalla fonte originale. Ricarica manualmente l’immagine.",
+      message:
+        "Impossibile recuperare questa foto dalla fonte originale. Ricarica manualmente l’immagine.",
     };
   }
   return {
@@ -159,6 +160,7 @@ function computeAvailability(row: {
     message: null,
   };
 }
+
 
 function extractSettings(img: Image): RenderSettings {
   return {
