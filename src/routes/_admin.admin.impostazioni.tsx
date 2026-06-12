@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Loader2, Save, CloudDownload, RefreshCw, Wand2, Upload, ShieldCheck } from "lucide-react";
+import { Loader2, Save, CloudDownload, RefreshCw, Wand2, Upload, ShieldCheck, Zap } from "lucide-react";
 import { toast } from "sonner";
 import { useServerFn } from "@tanstack/react-start";
 import {
@@ -8,7 +8,11 @@ import {
   setHomeHeroVariant,
   type HomeHeroVariant,
 } from "@/lib/site-settings.functions";
-import { syncAllImportedImages, verifyAndSyncAllPhotos } from "@/lib/property-render.functions";
+import {
+  syncAllImportedImages,
+  verifyAndSyncAllPhotos,
+  forceSyncPhotosBatch,
+} from "@/lib/property-render.functions";
 import {
   enhanceAllImages,
   publishAllEnhancedImages,
@@ -53,6 +57,7 @@ function SettingsPage() {
   const set = useServerFn(setHomeHeroVariant);
   const syncAll = useServerFn(syncAllImportedImages);
   const verifySyncAll = useServerFn(verifyAndSyncAllPhotos);
+  const forceSyncBatch = useServerFn(forceSyncPhotosBatch);
   const enhanceAll = useServerFn(enhanceAllImages);
   const publishAll = useServerFn(publishAllEnhancedImages);
   const [variant, setVariant] = useState<HomeHeroVariant>("lunigiana_emotional");
@@ -78,6 +83,19 @@ function SettingsPage() {
         totalImages: number;
         alreadyOk: number;
         synced: number;
+        failed: number;
+        errors: Array<{ imageId: string; propertyId: string; message: string }>;
+      }
+    | null
+  >(null);
+  const [forceConfirmOpen, setForceConfirmOpen] = useState(false);
+  const [forcing, setForcing] = useState(false);
+  const [forceProgress, setForceProgress] = useState<{ processed: number; remaining: number } | null>(null);
+  const [forceResult, setForceResult] = useState<
+    | {
+        processed: number;
+        synced: number;
+        alreadyOk: number;
         failed: number;
         errors: Array<{ imageId: string; propertyId: string; message: string }>;
       }
@@ -166,6 +184,47 @@ function SettingsPage() {
       toast.error(e instanceof Error ? e.message : "Errore verifica foto");
     } finally {
       setVerifying(false);
+    }
+  };
+
+  const runForceSyncAll = async () => {
+    setForceConfirmOpen(false);
+    setForcing(true);
+    setForceResult(null);
+    setForceProgress({ processed: 0, remaining: 0 });
+    let totalProcessed = 0;
+    let totalSynced = 0;
+    let totalAlready = 0;
+    let totalFailed = 0;
+    const allErrors: Array<{ imageId: string; propertyId: string; message: string }> = [];
+    try {
+      // Loop batches until nothing remains. Safety cap to avoid infinite loops.
+      for (let i = 0; i < 500; i++) {
+        const res = await forceSyncBatch({ data: { limit: 15 } });
+        totalProcessed += res.processed;
+        totalSynced += res.synced;
+        totalAlready += res.alreadyOk;
+        totalFailed += res.failed;
+        allErrors.push(...res.errors);
+        setForceProgress({ processed: totalProcessed, remaining: res.remaining });
+        if (res.processed === 0 || res.remaining === 0) break;
+      }
+      setForceResult({
+        processed: totalProcessed,
+        synced: totalSynced,
+        alreadyOk: totalAlready,
+        failed: totalFailed,
+        errors: allErrors,
+      });
+      if (totalFailed === 0) {
+        toast.success(`Sincronizzate ${totalSynced} foto · ${totalAlready} già ok`);
+      } else {
+        toast.warning(`${totalSynced} sincronizzate · ${totalFailed} errori`);
+      }
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Errore sincronizzazione forzata");
+    } finally {
+      setForcing(false);
     }
   };
 
