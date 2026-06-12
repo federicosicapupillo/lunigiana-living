@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { ImagePlus, Star, StarOff, Trash2, ArrowUp, ArrowDown, Loader2, Sparkles, Check, CloudDownload, Wand2, Download } from "lucide-react";
+import { ImagePlus, Star, StarOff, Trash2, ArrowUp, ArrowDown, Loader2, Sparkles, Check, CloudDownload, Wand2, Download, Zap } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import {
   renderPropertyImage,
   setPropertyImagePublished,
   syncImportedImage,
+  forceSyncPhotosBatch,
 } from "@/lib/property-render.functions";
 import {
   enhancePropertyImage,
@@ -130,8 +131,32 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
   const runRender = useServerFn(renderPropertyImage);
   const runSetPublished = useServerFn(setPropertyImagePublished);
   const runSync = useServerFn(syncImportedImage);
+  const runForceSync = useServerFn(forceSyncPhotosBatch);
+  const [bulkSyncing, setBulkSyncing] = useState(false);
   const runEnhance = useServerFn(enhancePropertyImage);
   const runSetEnhancedPublished = useServerFn(setPropertyImageEnhancedPublished);
+
+  const syncAllForProperty = async () => {
+    setBulkSyncing(true);
+    const tid = toast.loading("Sincronizzazione foto in corso…");
+    let synced = 0;
+    let failed = 0;
+    try {
+      for (let i = 0; i < 100; i++) {
+        const res = await runForceSync({ data: { propertyId, limit: 15 } });
+        synced += res.synced;
+        failed += res.failed;
+        if (res.processed === 0 || res.remaining === 0) break;
+      }
+      await load();
+      if (failed === 0) toast.success(`Sincronizzazione completata · ${synced} foto`, { id: tid });
+      else toast.warning(`${synced} sincronizzate · ${failed} errori`, { id: tid });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Errore sincronizzazione", { id: tid });
+    } finally {
+      setBulkSyncing(false);
+    }
+  };
 
   const load = async () => {
     setLoading(true);
@@ -350,6 +375,18 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
             disabled={uploading}
           />
         </label>
+      </div>
+
+      <div className="mt-3 flex justify-end">
+        <button
+          type="button"
+          onClick={syncAllForProperty}
+          disabled={bulkSyncing}
+          className="inline-flex items-center gap-2 rounded-sm border border-border bg-background px-3 py-1.5 text-[11px] uppercase tracking-[0.18em] text-ink hover:border-primary/50 disabled:opacity-60"
+        >
+          {bulkSyncing ? <Loader2 size={12} className="animate-spin" /> : <Zap size={12} />}
+          Sincronizza tutte le foto di questo immobile
+        </button>
       </div>
 
       {loading ? (
