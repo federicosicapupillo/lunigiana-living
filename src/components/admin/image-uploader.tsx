@@ -138,6 +138,8 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
   const [bulkSyncing, setBulkSyncing] = useState(false);
   const runEnhance = useServerFn(enhancePropertyImage);
   const runSetEnhancedPublished = useServerFn(setPropertyImageEnhancedPublished);
+  const [lastError, setLastError] = useState<string | null>(null);
+  const [dragOver, setDragOver] = useState(false);
 
   const syncAllForProperty = async () => {
     setBulkSyncing(true);
@@ -203,25 +205,35 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
   const handleFiles = async (files: FileList | null) => {
     if (!files || files.length === 0) return;
     setUploading(true);
+    setLastError(null);
+    const errors: string[] = [];
     try {
       const baseOrder = images.length;
       const willBeFirstUpload = images.length === 0;
       let count = 0;
       for (const file of Array.from(files)) {
+        if (!file.type.startsWith("image/")) {
+          errors.push(`${file.name}: tipo file non supportato (${file.type || "sconosciuto"})`);
+          continue;
+        }
         const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
         const path = `${propertyId}/${crypto.randomUUID()}.${ext}`;
         const { error: upErr } = await supabase.storage
           .from("property-images")
           .upload(path, file, { cacheControl: "31536000", upsert: false });
         if (upErr) {
-          toast.error(`Upload fallito (${file.name}): ${upErr.message}`);
+          const msg = `Upload fallito (${file.name}): ${upErr.message}`;
+          toast.error(msg);
+          errors.push(msg);
           continue;
         }
         const { data: signed, error: signErr } = await supabase.storage
           .from("property-images")
           .createSignedUrl(path, SIGNED_URL_TTL_SECONDS);
         if (signErr || !signed) {
-          toast.error(`URL fallito: ${signErr?.message ?? "n/d"}`);
+          const msg = `URL firmato fallito (${file.name}): ${signErr?.message ?? "n/d"}`;
+          toast.error(msg);
+          errors.push(msg);
           continue;
         }
         const { error: insErr } = await supabase.from("property_images").insert({
@@ -236,15 +248,43 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
           import_status: "synced_to_storage",
           render_status: "not_generated",
         });
-        if (insErr) toast.error(`Salvataggio metadati: ${insErr.message}`);
+        if (insErr) {
+          const msg = `Errore caricamento foto (${file.name}): ${insErr.message}`;
+          toast.error(msg);
+          errors.push(msg);
+          // best-effort cleanup of orphan storage object
+          await supabase.storage.from("property-images").remove([path]);
+          continue;
+        }
         count++;
       }
-      toast.success(`${count} immagine/i caricate`);
+      if (count > 0) toast.success(`${count} immagine/i caricate`);
+      if (errors.length > 0) setLastError(errors.join(" · "));
       await load();
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Errore sconosciuto";
+      toast.error(`Errore caricamento foto: ${msg}`);
+      setLastError(`Errore caricamento foto: ${msg}`);
     } finally {
       setUploading(false);
       if (fileRef.current) fileRef.current.value = "";
     }
+  };
+
+  const onDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setDragOver(false);
+    if (uploading) return;
+    const files = e.dataTransfer?.files;
+    if (files && files.length > 0) handleFiles(files);
+  };
+  const onDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    if (!dragOver) setDragOver(true);
+  };
+  const onDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setDragOver(false);
   };
 
   const setCover = async (id: string) => {
@@ -405,23 +445,56 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
         </button>
       </div>
 
+      {lastError && (
+        <div className="mt-3 flex items-start justify-between gap-3 rounded-sm border border-destructive/40 bg-destructive/5 px-3 py-2 text-xs text-destructive">
+          <span className="leading-relaxed">Errore caricamento foto: {lastError}</span>
+          <button
+            type="button"
+            onClick={() => setLastError(null)}
+            className="shrink-0 rounded-sm p-1 hover:bg-destructive/10"
+            aria-label="Chiudi"
+          >
+            <X size={12} />
+          </button>
+        </div>
+      )}
+
       {loading ? (
         <div className="mt-8 flex justify-center">
           <Loader2 className="h-5 w-5 animate-spin text-primary" />
         </div>
       ) : images.length === 0 ? (
-        <label className="mt-6 flex h-48 cursor-pointer items-center justify-center rounded-sm border-2 border-dashed border-border bg-muted/30 text-sm text-muted-foreground hover:border-primary/50">
-          <input
-            type="file"
-            accept="image/*"
-            multiple
-            className="hidden"
-            onChange={(e) => handleFiles(e.target.files)}
-          />
-          Trascina o seleziona le foto per iniziare
-        </label>
+        <button
+          type="button"
+          onClick={() => fileRef.current?.click()}
+          onDrop={onDrop}
+          onDragOver={onDragOver}
+          onDragLeave={onDragLeave}
+          disabled={uploading}
+          className={`mt-6 flex h-48 w-full cursor-pointer flex-col items-center justify-center gap-2 rounded-sm border-2 border-dashed text-sm transition-colors disabled:opacity-60 ${
+            dragOver
+              ? "border-primary bg-primary/5 text-ink"
+              : "border-border bg-muted/30 text-muted-foreground hover:border-primary/50"
+          }`}
+        >
+          {uploading ? (
+            <Loader2 className="h-5 w-5 animate-spin text-primary" />
+          ) : (
+            <ImagePlus size={20} />
+          )}
+          <span>
+            {uploading
+              ? "Caricamento in corso…"
+              : "Trascina qui le foto oppure clicca per selezionarle"}
+          </span>
+        </button>
       ) : (
-        <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div
+          className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+          onDrop={onDrop}
+          onDragOver={onDragOver}
+          onDragLeave={onDragLeave}
+        >
           {images.map((img, idx) => (
             <div
               key={img.id}
