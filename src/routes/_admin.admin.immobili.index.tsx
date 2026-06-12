@@ -467,6 +467,14 @@ function AdminPropertiesPage() {
         onCancel={() => setPending(null)}
         onConfirm={() => pending && runAction(pending.id, pending.action)}
       />
+
+      <PreviewPublishDialog
+        propertyId={previewId}
+        onClose={() => setPreviewId(null)}
+        onPublished={() => {
+          void load();
+        }}
+      />
     </div>
   );
 }
