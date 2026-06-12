@@ -168,6 +168,17 @@ function adapt(
     .filter((i) => i.render_publish_mode === "emotional" && (i.rendered_image_url || i.rendered_storage_path))
     .map((i) => i.rendered_image_url ?? (i.rendered_storage_path ? signedMap[i.rendered_storage_path] : null))
     .filter((v): v is string => !!v);
+  const emotionalPairs = sortedImages
+    .filter((i) => i.render_publish_mode === "emotional" && (i.rendered_image_url || i.rendered_storage_path))
+    .map((i) => {
+      const after = i.rendered_image_url ?? (i.rendered_storage_path ? signedMap[i.rendered_storage_path] : null);
+      const before =
+        (i.use_enhanced && i.enhanced_storage_path
+          ? i.enhanced_image_url ?? signedMap[i.enhanced_storage_path]
+          : signedMap[i.storage_path]) ?? i.published_image_url ?? null;
+      return after && before ? { before, after } : null;
+    })
+    .filter((v): v is { before: string; after: string } => !!v);
   const attrs: Record<string, string> = {};
   const amenities: string[] = [];
   let altre: string | null = null;
@@ -243,6 +254,7 @@ function adapt(
     tag: buildTag(p),
     isRent: p.contract_type === "affitto",
     emotionalRenders,
+    emotionalPairs,
   };
 }
 
