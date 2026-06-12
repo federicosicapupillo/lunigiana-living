@@ -10,6 +10,10 @@ import {
   X,
   Image as ImageIcon,
   Check,
+  Maximize,
+  BedDouble,
+  Bath,
+  ArrowUpDown,
 } from "lucide-react";
 import { toast } from "sonner";
 import jsPDF from "jspdf";
