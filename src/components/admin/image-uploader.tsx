@@ -621,8 +621,8 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
                         img.enhancement_status === "processing"
                           ? "In elaborazione…"
                           : img.enhancement_status === "error"
-                          ? "Errore: riprova"
-                          : undefined
+                            ? "Errore: riprova"
+                            : undefined
                       }
                     />
                   )}
@@ -640,8 +640,8 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
                           img.render_publish_mode === "main"
                             ? "Sostituisce originale"
                             : img.render_publish_mode === "emotional"
-                            ? "Prima/Dopo"
-                            : "Generato · non pubblicato"
+                              ? "Prima/Dopo"
+                              : "Generato · non pubblicato"
                         }
                       />
                       <div className="flex flex-wrap gap-1">
@@ -690,8 +690,8 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
                         img.render_status === "processing"
                           ? "In elaborazione…"
                           : img.render_status === "error"
-                          ? "Errore: riprova"
-                          : undefined
+                            ? "Errore: riprova"
+                            : undefined
                       }
                     />
                   )}
