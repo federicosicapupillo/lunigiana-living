@@ -31,7 +31,7 @@ type PropertyData = {
   size_sqm: number | null;
   bedrooms: number | null;
   bathrooms: number | null;
-  floor: string | null;
+  floor?: string | null;
   energy_class: string | null;
   energy_performance_index_value: number | null;
   short_notes: string | null;
