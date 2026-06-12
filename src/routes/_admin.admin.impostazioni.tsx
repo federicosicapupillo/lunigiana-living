@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Loader2, Save, CloudDownload, RefreshCw, Wand2, Upload, ShieldCheck } from "lucide-react";
+import { Loader2, Save, CloudDownload, RefreshCw, Wand2, Upload, ShieldCheck, Zap } from "lucide-react";
 import { toast } from "sonner";
 import { useServerFn } from "@tanstack/react-start";
 import {
@@ -8,7 +8,11 @@ import {
   setHomeHeroVariant,
   type HomeHeroVariant,
 } from "@/lib/site-settings.functions";
-import { syncAllImportedImages, verifyAndSyncAllPhotos } from "@/lib/property-render.functions";
+import {
+  syncAllImportedImages,
+  verifyAndSyncAllPhotos,
+  forceSyncPhotosBatch,
+} from "@/lib/property-render.functions";
 import {
   enhanceAllImages,
   publishAllEnhancedImages,
@@ -53,6 +57,7 @@ function SettingsPage() {
   const set = useServerFn(setHomeHeroVariant);
   const syncAll = useServerFn(syncAllImportedImages);
   const verifySyncAll = useServerFn(verifyAndSyncAllPhotos);
+  const forceSyncBatch = useServerFn(forceSyncPhotosBatch);
   const enhanceAll = useServerFn(enhanceAllImages);
   const publishAll = useServerFn(publishAllEnhancedImages);
   const [variant, setVariant] = useState<HomeHeroVariant>("lunigiana_emotional");
@@ -78,6 +83,19 @@ function SettingsPage() {
         totalImages: number;
         alreadyOk: number;
         synced: number;
+        failed: number;
+        errors: Array<{ imageId: string; propertyId: string; message: string }>;
+      }
+    | null
+  >(null);
+  const [forceConfirmOpen, setForceConfirmOpen] = useState(false);
+  const [forcing, setForcing] = useState(false);
+  const [forceProgress, setForceProgress] = useState<{ processed: number; remaining: number } | null>(null);
+  const [forceResult, setForceResult] = useState<
+    | {
+        processed: number;
+        synced: number;
+        alreadyOk: number;
         failed: number;
         errors: Array<{ imageId: string; propertyId: string; message: string }>;
       }
@@ -166,6 +184,47 @@ function SettingsPage() {
       toast.error(e instanceof Error ? e.message : "Errore verifica foto");
     } finally {
       setVerifying(false);
+    }
+  };
+
+  const runForceSyncAll = async () => {
+    setForceConfirmOpen(false);
+    setForcing(true);
+    setForceResult(null);
+    setForceProgress({ processed: 0, remaining: 0 });
+    let totalProcessed = 0;
+    let totalSynced = 0;
+    let totalAlready = 0;
+    let totalFailed = 0;
+    const allErrors: Array<{ imageId: string; propertyId: string; message: string }> = [];
+    try {
+      // Loop batches until nothing remains. Safety cap to avoid infinite loops.
+      for (let i = 0; i < 500; i++) {
+        const res = await forceSyncBatch({ data: { limit: 15 } });
+        totalProcessed += res.processed;
+        totalSynced += res.synced;
+        totalAlready += res.alreadyOk;
+        totalFailed += res.failed;
+        allErrors.push(...res.errors);
+        setForceProgress({ processed: totalProcessed, remaining: res.remaining });
+        if (res.processed === 0 || res.remaining === 0) break;
+      }
+      setForceResult({
+        processed: totalProcessed,
+        synced: totalSynced,
+        alreadyOk: totalAlready,
+        failed: totalFailed,
+        errors: allErrors,
+      });
+      if (totalFailed === 0) {
+        toast.success(`Sincronizzate ${totalSynced} foto · ${totalAlready} già ok`);
+      } else {
+        toast.warning(`${totalSynced} sincronizzate · ${totalFailed} errori`);
+      }
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Errore sincronizzazione forzata");
+    } finally {
+      setForcing(false);
     }
   };
 
@@ -311,7 +370,49 @@ function SettingsPage() {
             {verifying ? <Loader2 className="h-4 w-4 animate-spin" /> : <ShieldCheck size={14} />}
             Sincronizza foto nello Storage
           </button>
+          <button
+            type="button"
+            onClick={() => setForceConfirmOpen(true)}
+            disabled={forcing}
+            className="inline-flex items-center gap-2 rounded-sm bg-primary px-5 py-2.5 text-xs uppercase tracking-[0.2em] text-primary-foreground transition hover:bg-primary/90 disabled:opacity-60"
+          >
+            {forcing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Zap size={14} />}
+            Forza sincronizzazione tutte le foto
+          </button>
         </div>
+        {forcing && forceProgress && (
+          <p className="mt-4 text-sm text-muted-foreground">
+            Sincronizzazione forzata in corso… elaborate {forceProgress.processed} foto · ancora {forceProgress.remaining} da analizzare
+          </p>
+        )}
+        {forceResult && (
+          <div className="mt-6 rounded-sm border border-primary/30 bg-primary/5 p-4 text-sm">
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+              <Stat label="Foto elaborate" value={forceResult.processed} />
+              <Stat label="Sincronizzate ora" value={forceResult.synced} tone="ok" />
+              <Stat label="Già sincronizzate" value={forceResult.alreadyOk} />
+              <Stat
+                label="Non recuperabili"
+                value={forceResult.failed}
+                tone={forceResult.failed > 0 ? "error" : undefined}
+              />
+            </div>
+            {forceResult.errors.length > 0 && (
+              <details className="mt-4" open>
+                <summary className="cursor-pointer text-xs uppercase tracking-wider text-muted-foreground">
+                  Foto ancora problematiche ({forceResult.errors.length})
+                </summary>
+                <ul className="mt-2 max-h-72 space-y-1 overflow-auto text-xs text-destructive">
+                  {forceResult.errors.map((e) => (
+                    <li key={e.imageId} className="font-mono">
+                      immobile {e.propertyId.slice(0, 8)}… · foto {e.imageId.slice(0, 8)}… — {e.message}
+                    </li>
+                  ))}
+                </ul>
+              </details>
+            )}
+          </div>
+        )}
         {verifying && (
           <p className="mt-4 text-sm text-muted-foreground">
             Verifica in corso… (può richiedere alcuni minuti su archivi grandi)
@@ -377,6 +478,42 @@ function SettingsPage() {
                   className="inline-flex items-center gap-2 rounded-sm bg-ink px-4 py-2 text-xs uppercase tracking-[0.18em] text-cream hover:bg-ink/90"
                 >
                   <ShieldCheck size={13} /> Avvia sincronizzazione
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {forceConfirmOpen && (
+          <div
+            role="dialog"
+            aria-modal="true"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-ink/60 px-4"
+            onClick={() => setForceConfirmOpen(false)}
+          >
+            <div
+              className="w-full max-w-md rounded-sm border border-border bg-background p-6 shadow-xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <h3 className="font-serif text-xl text-ink">Forzare la sincronizzazione di TUTTE le foto?</h3>
+              <p className="mt-3 text-sm text-muted-foreground">
+                Verranno scaricate dalla sorgente originale e ricaricate nello Storage tutte le foto non
+                ancora sincronizzate, in più passaggi automatici. Nessuna foto verrà cancellata. Vuoi procedere?
+              </p>
+              <div className="mt-6 flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setForceConfirmOpen(false)}
+                  className="rounded-sm border border-border bg-background px-4 py-2 text-xs uppercase tracking-[0.18em] text-ink hover:border-primary/50"
+                >
+                  Annulla
+                </button>
+                <button
+                  type="button"
+                  onClick={runForceSyncAll}
+                  className="inline-flex items-center gap-2 rounded-sm bg-primary px-4 py-2 text-xs uppercase tracking-[0.18em] text-primary-foreground hover:bg-primary/90"
+                >
+                  <Zap size={13} /> Avvia sincronizzazione forzata
                 </button>
               </div>
             </div>
