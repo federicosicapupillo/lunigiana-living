@@ -2,7 +2,7 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { getPublishedProperty, type PublicProperty } from "@/lib/public-properties.functions";
 import { getLocalizedProperty } from "@/lib/property-i18n.functions";
 import { ArrowLeft, ChevronLeft, ChevronRight, MapPin, Maximize2, BedDouble, Bath, Building2, Sparkles } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { WatermarkedImage } from "@/components/watermarked-image";
@@ -10,6 +10,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { BeforeAfterSlider } from "@/components/before-after-slider";
 import { whatsappUrl } from "@/components/whatsapp-float";
 import { useLanguage, useT } from "@/lib/i18n/LanguageContext";
+import { supabase } from "@/integrations/supabase/client";
+import { sendLeadNotification } from "@/lib/lead-notify.functions";
+import { Loader2, CheckCircle2 } from "lucide-react";
 import {
   localizeType,
   localizePrice,
@@ -95,6 +98,69 @@ function PropertyDetail() {
   useEffect(() => {
     setMainLoaded(false);
   }, [main]);
+  const notify = useServerFn(sendLeadNotification);
+  const [submitState, setSubmitState] = useState<"idle" | "submitting" | "ok" | "error">("idle");
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
+  async function onSubmitLead(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setSubmitError(null);
+    const form = e.currentTarget;
+    const fd = new FormData(form);
+    const full_name = String(fd.get("nome") ?? "").trim().slice(0, 200);
+    const email = String(fd.get("email") ?? "").trim().slice(0, 320);
+    const phone = String(fd.get("telefono") ?? "").trim().slice(0, 50);
+    const message = String(fd.get("messaggio") ?? "").trim().slice(0, 3000);
+
+    if (!full_name || !email || !phone) {
+      setSubmitError(t("form.err.required"));
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setSubmitError(t("form.err.email"));
+      return;
+    }
+    if (phone.length < 3) {
+      setSubmitError(t("form.err.required"));
+      return;
+    }
+
+    setSubmitState("submitting");
+    const source_page = typeof window !== "undefined" ? window.location.pathname : `/immobili/${base.id}`;
+    const composedMessage = `[${p.reference}] ${p.title} — ${p.location}${message ? `\n\n${message}` : ""}`;
+
+    const { error } = await supabase.from("leads").insert({
+      full_name,
+      email,
+      phone,
+      message: composedMessage,
+      source_page,
+      privacy_accepted: true,
+    });
+    if (error) {
+      setSubmitState("error");
+      setSubmitError(t("form.err.generic"));
+      return;
+    }
+
+    try {
+      await notify({
+        data: {
+          full_name,
+          email,
+          phone,
+          message: message || null,
+          property_reference: p.reference,
+          source_page,
+        },
+      });
+    } catch (err) {
+      console.error("[lead notify] failed", err);
+    }
+
+    form.reset();
+    setSubmitState("ok");
+  }
   // Preload neighbor images so prev/next feels instant.
   useEffect(() => {
     if (typeof window === "undefined" || galleryCount <= 1) return;
@@ -339,27 +405,36 @@ function PropertyDetail() {
               {t("detail.contactBody")}
             </p>
 
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                const form = e.currentTarget;
-                const data = new FormData(form);
-                const body = encodeURIComponent(
-                  `Richiesta informazioni per: ${p.reference} — ${p.title} (${p.location})\n\n` +
-                  `Nome: ${data.get("nome")}\nEmail: ${data.get("email")}\nTelefono: ${data.get("telefono")}\n\nMessaggio:\n${data.get("messaggio")}`,
-                );
-                window.location.href = `mailto:furiaimmobiliare@libero.it?subject=Richiesta ${p.reference}&body=${body}`;
-              }}
-              className="mt-6 space-y-3"
-            >
-              <input name="nome" required placeholder={t("detail.namePh")} className="w-full rounded-sm border border-border bg-background px-4 py-3 text-sm focus:border-primary focus:outline-none" />
-              <input name="email" type="email" required placeholder={t("detail.emailPh")} className="w-full rounded-sm border border-border bg-background px-4 py-3 text-sm focus:border-primary focus:outline-none" />
-              <input name="telefono" placeholder={t("detail.phonePh")} className="w-full rounded-sm border border-border bg-background px-4 py-3 text-sm focus:border-primary focus:outline-none" />
-              <textarea name="messaggio" rows={4} placeholder={t("detail.msgPh")} className="w-full rounded-sm border border-border bg-background px-4 py-3 text-sm focus:border-primary focus:outline-none" />
-              <button type="submit" className="w-full rounded-sm bg-primary px-6 py-4 text-xs uppercase tracking-[0.22em] text-primary-foreground transition hover:bg-primary/90">
-                {t("detail.submit")}
-              </button>
-            </form>
+            {submitState === "ok" ? (
+              <div className="mt-6 rounded-sm border border-border bg-cream p-6 text-center">
+                <CheckCircle2 className="mx-auto text-primary" size={28} />
+                <h4 className="mt-3 font-serif text-lg text-ink">{t("form.thanks")}</h4>
+                <p className="mt-2 text-sm leading-relaxed text-foreground/80">{t("form.thanksBody")}</p>
+              </div>
+            ) : (
+              <form onSubmit={onSubmitLead} className="mt-6 space-y-3" noValidate>
+                <input name="nome" required maxLength={200} autoComplete="name" placeholder={t("detail.namePh")} className="w-full rounded-sm border border-border bg-background px-4 py-3 text-sm focus:border-primary focus:outline-none" />
+                <input name="email" type="email" required maxLength={320} autoComplete="email" placeholder={t("detail.emailPh")} className="w-full rounded-sm border border-border bg-background px-4 py-3 text-sm focus:border-primary focus:outline-none" />
+                <input name="telefono" type="tel" required maxLength={50} autoComplete="tel" placeholder={t("detail.phonePh")} className="w-full rounded-sm border border-border bg-background px-4 py-3 text-sm focus:border-primary focus:outline-none" />
+                <textarea name="messaggio" rows={4} maxLength={3000} placeholder={t("detail.msgPh")} className="w-full rounded-sm border border-border bg-background px-4 py-3 text-sm focus:border-primary focus:outline-none" />
+                {submitError && (
+                  <p className="text-sm text-destructive">{submitError}</p>
+                )}
+                <button
+                  type="submit"
+                  disabled={submitState === "submitting"}
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-sm bg-primary px-6 py-4 text-xs uppercase tracking-[0.22em] text-primary-foreground transition hover:bg-primary/90 disabled:opacity-60"
+                >
+                  {submitState === "submitting" ? (
+                    <>
+                      <Loader2 size={14} className="animate-spin" /> {t("form.submitting")}
+                    </>
+                  ) : (
+                    t("detail.submit")
+                  )}
+                </button>
+              </form>
+            )}
 
             <div className="mt-6 border-t border-border pt-6 text-sm text-muted-foreground">
               <div>{t("detail.orCall")}</div>
