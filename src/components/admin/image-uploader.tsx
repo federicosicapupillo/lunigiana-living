@@ -400,7 +400,9 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
 
   const generate = async (img: Image) => {
     if (!img.render_availability?.canRender) {
-      toast.error(img.render_availability?.message ?? "Sincronizza la foto prima di generare il rendering");
+      toast.error(
+        img.render_availability?.message ?? "Sincronizza la foto prima di generare il rendering",
+      );
       return;
     }
     setRenderingId(img.id);
@@ -423,8 +425,8 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
         mode === "main"
           ? "Rendering pubblicato come foto principale (originale conservata)"
           : mode === "emotional"
-          ? "Rendering usato come Prima/Dopo"
-          : "Rendering non pubblicato",
+            ? "Rendering usato come Prima/Dopo"
+            : "Rendering non pubblicato",
       );
       await load();
     } catch (err) {
