@@ -12,6 +12,7 @@ import {
   type StatusAction,
 } from "@/lib/admin/property-status";
 import { ConfirmDialog } from "@/components/admin/confirm-dialog";
+import { PreviewPublishDialog } from "@/components/admin/preview-publish-dialog";
 
 type Row = {
   id: string;
@@ -99,6 +100,7 @@ function AdminPropertiesPage() {
   const [sortBy, setSortBy] = useState<SortBy>("newest");
   const [pending, setPending] = useState<{ id: string; action: StatusAction } | null>(null);
   const [busy, setBusy] = useState(false);
+  const [previewId, setPreviewId] = useState<string | null>(null);
 
   const load = async () => {
     setLoading(true);
@@ -417,17 +419,17 @@ function AdminPropertiesPage() {
 
               {/* Action buttons */}
               <div className="flex flex-wrap gap-1 sm:flex-col sm:items-end">
-                <Link
-                  to={r.status === "published" ? "/immobili/$id" : "/admin/immobili/$id/anteprima"}
-                  params={{ id: r.id }}
-                  target={r.status === "published" ? "_blank" : undefined}
+                <button
+                  type="button"
                   onClick={(e) => {
+                    e.preventDefault();
                     e.stopPropagation();
+                    setPreviewId(r.id);
                   }}
                   className="inline-flex shrink-0 items-center justify-center rounded-sm border border-sky-200 px-2 py-1 text-[10px] uppercase tracking-wider text-sky-700 transition hover:border-sky-400 hover:bg-sky-50"
                 >
                   <Eye size={10} className="mr-1" /> Anteprima
-                </Link>
+                </button>
                 {availableActions(r.status).map((act) => (
                   <button
                     key={act}
