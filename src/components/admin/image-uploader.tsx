@@ -611,65 +611,6 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
                   {img.render_error && (
                     <div className="text-[10px] text-destructive">{img.render_error}</div>
                   )}
-                  {img.rendered_storage_path && (
-                    <div className="space-y-1.5 rounded-sm border border-primary/30 bg-primary/5 p-2">
-                      <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
-                        Cosa fare di questo rendering?
-                      </div>
-                      <div className="flex flex-wrap gap-1">
-                        <button
-                          type="button"
-                          onClick={() => setPublishMode(img, "main")}
-                          disabled={img.render_publish_mode === "main"}
-                          title="Il rendering sostituisce la foto originale nella gallery. L'originale resta come backup."
-                          className="inline-flex items-center gap-1 rounded-sm border border-border bg-background px-2 py-1 text-[10px] uppercase tracking-wider hover:border-primary/50 disabled:opacity-40"
-                        >
-                          {img.render_publish_mode === "main" && <Check size={11} className="text-primary" />}
-                          <Sparkles size={11} />
-                          Sostituisci originale
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setPublishMode(img, "emotional")}
-                          disabled={img.render_publish_mode === "emotional"}
-                          title="Il rendering compare solo nella sezione pubblica 'Rendering emozionale'."
-                          className="inline-flex items-center gap-1 rounded-sm border border-border bg-background px-2 py-1 text-[10px] uppercase tracking-wider hover:border-primary/50 disabled:opacity-40"
-                        >
-                          {img.render_publish_mode === "emotional" && <Check size={11} className="text-primary" />}
-                          <Heart size={11} />
-                          Rendering emozionale
-                        </button>
-                        {img.render_publish_mode === "main" && (
-                          <button
-                            type="button"
-                            onClick={() => setPublishMode(img, "none")}
-                            title="Torna a mostrare la foto originale nella gallery."
-                            className="inline-flex items-center gap-1 rounded-sm border border-border bg-background px-2 py-1 text-[10px] uppercase tracking-wider hover:border-primary/50"
-                          >
-                            <Undo2 size={11} />
-                            Ripristina originale
-                          </button>
-                        )}
-                        <button
-                          type="button"
-                          onClick={() => discard(img)}
-                          title="Elimina il rendering generato. La foto originale resta intatta."
-                          className="inline-flex items-center gap-1 rounded-sm border border-border bg-background px-2 py-1 text-[10px] uppercase tracking-wider text-destructive hover:border-destructive/50"
-                        >
-                          <X size={11} />
-                          Scarta rendering
-                        </button>
-                      </div>
-                      <div className="text-[9px] uppercase tracking-wider text-muted-foreground">
-                        Stato pubblicazione:{" "}
-                        <span className="text-foreground">
-                          {img.render_publish_mode === "main" && "Sostituisce la foto originale"}
-                          {img.render_publish_mode === "emotional" && "Visibile come Rendering emozionale"}
-                          {(!img.render_publish_mode || img.render_publish_mode === "none") && "Non pubblicato (solo anteprima admin)"}
-                        </span>
-                      </div>
-                    </div>
-                  )}
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="flex gap-1">
