@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, Search, Loader2, ImageOff, Star, Sparkles } from "lucide-react";
+import { Plus, Search, Loader2, ImageOff, Star, Sparkles, Eye } from "lucide-react";
 import { toast } from "sonner";
 import { STATUS_LABELS, STATUS_BADGE_CLASSES, type PropertyStatus } from "@/lib/admin/property-constants";
 import {
@@ -417,6 +417,17 @@ function AdminPropertiesPage() {
 
               {/* Action buttons */}
               <div className="flex flex-wrap gap-1 sm:flex-col sm:items-end">
+                <Link
+                  to={r.status === "published" ? "/immobili/$id" : "/admin/immobili/$id/anteprima"}
+                  params={{ id: r.id }}
+                  target={r.status === "published" ? "_blank" : undefined}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                  }}
+                  className="inline-flex shrink-0 items-center justify-center rounded-sm border border-sky-200 px-2 py-1 text-[10px] uppercase tracking-wider text-sky-700 transition hover:border-sky-400 hover:bg-sky-50"
+                >
+                  <Eye size={10} className="mr-1" /> Anteprima
+                </Link>
                 {availableActions(r.status).map((act) => (
                   <button
                     key={act}
