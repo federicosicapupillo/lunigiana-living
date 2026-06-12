@@ -748,8 +748,8 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
                         img.enhancement_status === "error"
                           ? "text-destructive"
                           : img.enhancement_status === "processing"
-                          ? "text-primary"
-                          : ""
+                            ? "text-primary"
+                            : ""
                       }
                     >
                       {img.enhancement_status === "not_enhanced" && "non ancora eseguito"}
@@ -777,11 +777,15 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
                       <div className="font-semibold uppercase tracking-wider">
                         {img.render_availability.statusLabel}
                       </div>
-                      <p className="mt-1 text-muted-foreground">{img.render_availability.message}</p>
+                      <p className="mt-1 text-muted-foreground">
+                        {img.render_availability.message}
+                      </p>
                       <button
                         type="button"
                         onClick={() => syncImage(img)}
-                        disabled={syncingId === img.id || img.render_availability.state === "sync_error"}
+                        disabled={
+                          syncingId === img.id || img.render_availability.state === "sync_error"
+                        }
                         className="mt-2 inline-flex items-center gap-1 rounded-sm bg-primary px-2 py-1 text-[10px] uppercase tracking-wider text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
                       >
                         {syncingId === img.id ? (
