@@ -928,6 +928,7 @@ function VersionCard({
   downloadUrl,
   downloadName,
   statusPill,
+  onClick,
 }: {
   label: string;
   inUse: boolean;
@@ -936,6 +937,7 @@ function VersionCard({
   downloadUrl: string;
   downloadName: string;
   statusPill?: string;
+  onClick?: () => void;
 }) {
   return (
     <div
@@ -944,7 +946,13 @@ function VersionCard({
       }`}
     >
       <div className="relative aspect-[4/3]">
-        <img src={src} alt={alt} className="h-full w-full object-cover" loading="lazy" />
+        <img
+          src={src}
+          alt={alt}
+          className={`h-full w-full object-cover ${onClick ? "cursor-zoom-in" : ""}`}
+          loading="lazy"
+          onClick={onClick}
+        />
         <span className="absolute left-1.5 top-1.5 rounded-sm bg-background/85 px-1.5 py-0.5 text-[9px] uppercase tracking-wider text-foreground">
           {label}
           {inUse && <span className="ml-1 text-primary">· in uso</span>}
