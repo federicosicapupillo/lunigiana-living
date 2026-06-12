@@ -55,14 +55,9 @@ type FlyerImage = {
 
 type Lang = "it" | "en";
 
-const LAYOUTS = [
-  "hero-left",
-  "split-trio",
-  "mosaic-quad",
-  "portrait-hero",
-  "filmstrip",
-] as const;
-type Layout = (typeof LAYOUTS)[number];
+// Layout fixato come da reference (logo | città | codice / hero + 2 thumbs + info / descrizione).
+// "Rigenera layout" inverte solo le due foto secondarie.
+type Layout = "fixed";
 
 const STR = {
   it: {
@@ -128,6 +123,14 @@ const HIGHLIGHT_WORDS = [
   "indipendente", "centro storico", "abitabile", "rifinito", "rifinita",
   "borgo", "campagna", "collina", "tramonti", "apuane",
   "investimento", "b&b", "agriturismo", "seconda casa",
+  // Keywords richiesti per il cartello vetrina (reference)
+  "secondo piano", "primo piano", "terzo piano", "piano terra", "ultimo piano",
+  "comoda", "comodo", "ben servita", "ben servito",
+  "ampio soggiorno", "cucina abitabile",
+  "due camere matrimoniali", "tre camere matrimoniali", "camera matrimoniale",
+  "bagno finestrato", "doppia esposizione", "luce naturale",
+  "riscaldamento autonomo", "infissi doppio vetro", "spazi ampi",
+  "buone condizioni", "zona servita", "balcone",
 ];
 
 function condenseDescription(text: string, maxChars = 520): string {
@@ -192,7 +195,8 @@ export function WindowFlyerDialog({
   const [selected, setSelected] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [lang, setLang] = useState<Lang>("it");
-  const [layout, setLayout] = useState<Layout>("hero-left");
+  const [layout, setLayout] = useState<Layout>("fixed");
+  const [thumbSwap, setThumbSwap] = useState(false);
   const [exporting, setExporting] = useState(false);
   const [longDescription, setLongDescription] = useState<string | null>(null);
   const flyerRef = useRef<HTMLDivElement>(null);
@@ -258,8 +262,8 @@ export function WindowFlyerDialog({
   };
 
   const regenerate = () => {
-    const others = LAYOUTS.filter((l) => l !== layout);
-    setLayout(others[Math.floor(Math.random() * others.length)]);
+    // Layout strutturale fisso (come reference). Inverto solo le due foto secondarie.
+    setThumbSwap((v) => !v);
   };
 
   const captureCanvas = async () => {
@@ -369,26 +373,15 @@ export function WindowFlyerDialog({
             </div>
 
             <div>
-              <label className="mb-2 block text-xs uppercase tracking-wider text-muted-foreground">
-                {t.layout}
-              </label>
-              <select
-                value={layout}
-                onChange={(e) => setLayout(e.target.value as Layout)}
-                className="w-full rounded-sm border border-border bg-background px-3 py-2 text-sm"
-              >
-                <option value="hero-left">Hero a sinistra</option>
-                <option value="split-trio">Hero + 2 thumbnails</option>
-                <option value="mosaic-quad">Mosaico 4 foto</option>
-                <option value="portrait-hero">Singola foto grande</option>
-                <option value="filmstrip">Strip orizzontale</option>
-              </select>
               <button
                 onClick={regenerate}
                 className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-sm border border-border px-3 py-2 text-xs uppercase tracking-wider hover:border-primary/50"
               >
                 <Shuffle size={13} /> {t.regenerate}
               </button>
+              <p className="mt-2 text-[10px] leading-snug text-muted-foreground">
+                Layout fisso come da modello vetrina. La rigenerazione cambia solo le foto.
+              </p>
             </div>
 
             <div>
@@ -482,6 +475,7 @@ export function WindowFlyerDialog({
                 layout={layout}
                 lang={lang}
                 longDescription={longDescription}
+                thumbSwap={thumbSwap}
               />
             </div>
           </div>
