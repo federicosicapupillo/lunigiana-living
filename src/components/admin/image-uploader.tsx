@@ -246,8 +246,11 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
         }
         const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
         const path = `${propertyId}/${crypto.randomUUID()}.${ext}`;
+        const logDetails = { bucket: STORAGE_BUCKET, path, filename: file.name, property_id: propertyId };
+        logUploadStep("UPLOAD START", logDetails);
+        logUploadStep("OBJECT PATH", logDetails);
         const { error: upErr } = await supabase.storage
-          .from("property-images")
+          .from(STORAGE_BUCKET)
           .upload(path, file, { cacheControl: "31536000", upsert: false });
         if (upErr) {
           const msg = `Upload fallito (${file.name}): ${upErr.message}`;
@@ -255,15 +258,29 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
           errors.push(msg);
           continue;
         }
-        const { data: signed, error: signErr } = await supabase.storage
-          .from("property-images")
-          .createSignedUrl(path, SIGNED_URL_TTL_SECONDS);
-        if (signErr || !signed) {
-          const msg = `URL firmato fallito (${file.name}): ${signErr?.message ?? "n/d"}`;
+        logUploadStep("UPLOAD SUCCESS", logDetails);
+
+        const existsCheck = await verifyStorageObjectExists(path);
+        if (!existsCheck.exists) {
+          const msg = `File non trovato nello storage dopo upload (${file.name}). Bucket: ${STORAGE_BUCKET} · Path: ${path} · Dettaglio: ${existsCheck.error ?? "n/d"}`;
+          logUploadStep("SIGNED URL FAILED", { ...logDetails, error: msg });
           toast.error(msg);
           errors.push(msg);
           continue;
         }
+
+        logUploadStep("SIGNED URL REQUEST", logDetails);
+        const { data: signed, error: signErr } = await supabase.storage
+          .from(STORAGE_BUCKET)
+          .createSignedUrl(path, SIGNED_URL_TTL_SECONDS);
+        if (signErr || !signed) {
+          const msg = `URL firmato fallito (${file.name}). Bucket: ${STORAGE_BUCKET} · Path: ${path} · Dettaglio: ${signErr?.message ?? "n/d"}`;
+          logUploadStep("SIGNED URL FAILED", { ...logDetails, error: signErr?.message ?? "n/d" });
+          toast.error(msg);
+          errors.push(msg);
+          continue;
+        }
+        logUploadStep("SIGNED URL SUCCESS", logDetails);
         const { error: insErr } = await supabase.from("property_images").insert({
           property_id: propertyId,
           image_url: signed.signedUrl,
