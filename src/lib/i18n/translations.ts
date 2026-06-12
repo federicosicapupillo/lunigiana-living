@@ -419,6 +419,7 @@ const en: Dict = {
   "cta.discoverProperties": "Discover our properties",
   "cta.searchYourHome": "Find your home",
   "cta.allProperties": "All properties",
+  "cta.viewAllProperties": "View all properties",
   "cta.contactUs": "Contact us",
   "cta.talkToElena": "Talk to Elena",
   "cta.talkToElenaWA": "Message Elena on WhatsApp",
