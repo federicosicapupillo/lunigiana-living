@@ -119,6 +119,9 @@ export function BeforeAfterSlider({
         <span className="pointer-events-none absolute right-2 top-2 inline-flex items-center gap-1 rounded-sm bg-primary/90 px-2 py-1 text-[10px] uppercase tracking-wider text-primary-foreground backdrop-blur">
           <Sparkles size={11} /> {aiBadge} · {afterLabel}
         </span>
+        <span className="pointer-events-none absolute bottom-2 left-2 inline-flex items-center rounded-sm bg-ink/70 px-2 py-1 text-[10px] italic tracking-wide text-cream backdrop-blur">
+          {illustrativeNote}
+        </span>
 
         {/* Divider + handle */}
         <div
