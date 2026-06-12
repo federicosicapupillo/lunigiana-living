@@ -14,6 +14,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { generateDescription } from "@/lib/ai-description.functions";
 import { ImageUploader } from "@/components/admin/image-uploader";
 import { LocationFields } from "@/components/admin/location-fields";
+import { WindowFlyerDialog } from "@/components/admin/window-flyer-dialog";
 import {
   PROPERTY_TYPES,
   CONTRACT_TYPES,
@@ -160,6 +161,7 @@ function PropertyEditor() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [generating, setGenerating] = useState(false);
+  const [flyerOpen, setFlyerOpen] = useState(false);
 
   // Description controls
   const [genLength, setGenLength] = useState<"breve" | "media" | "editoriale">("media");
