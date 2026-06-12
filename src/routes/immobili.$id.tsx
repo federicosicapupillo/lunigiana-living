@@ -98,6 +98,69 @@ function PropertyDetail() {
   useEffect(() => {
     setMainLoaded(false);
   }, [main]);
+  const notify = useServerFn(sendLeadNotification);
+  const [submitState, setSubmitState] = useState<"idle" | "submitting" | "ok" | "error">("idle");
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
+  async function onSubmitLead(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setSubmitError(null);
+    const form = e.currentTarget;
+    const fd = new FormData(form);
+    const full_name = String(fd.get("nome") ?? "").trim().slice(0, 200);
+    const email = String(fd.get("email") ?? "").trim().slice(0, 320);
+    const phone = String(fd.get("telefono") ?? "").trim().slice(0, 50);
+    const message = String(fd.get("messaggio") ?? "").trim().slice(0, 3000);
+
+    if (!full_name || !email || !phone) {
+      setSubmitError(t("form.err.required"));
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setSubmitError(t("form.err.email"));
+      return;
+    }
+    if (phone.length < 3) {
+      setSubmitError(t("form.err.required"));
+      return;
+    }
+
+    setSubmitState("submitting");
+    const source_page = typeof window !== "undefined" ? window.location.pathname : `/immobili/${base.id}`;
+    const composedMessage = `[${p.reference}] ${p.title} — ${p.location}${message ? `\n\n${message}` : ""}`;
+
+    const { error } = await supabase.from("leads").insert({
+      full_name,
+      email,
+      phone,
+      message: composedMessage,
+      source_page,
+      privacy_accepted: true,
+    });
+    if (error) {
+      setSubmitState("error");
+      setSubmitError(t("form.err.generic"));
+      return;
+    }
+
+    try {
+      await notify({
+        data: {
+          full_name,
+          email,
+          phone,
+          message: message || null,
+          property_reference: p.reference,
+          source_page,
+        },
+      });
+    } catch (err) {
+      console.error("[lead notify] failed", err);
+    }
+
+    form.reset();
+    setSubmitState("ok");
+  }
   // Preload neighbor images so prev/next feels instant.
   useEffect(() => {
     if (typeof window === "undefined" || galleryCount <= 1) return;
