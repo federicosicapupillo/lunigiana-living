@@ -305,16 +305,6 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
     }
   };
 
-  const togglePublished = async (img: Image, useRendered: boolean) => {
-    try {
-      await runSetPublished({ data: { imageId: img.id, useRendered } });
-      toast.success(useRendered ? "Rendering pubblicato" : "Originale pubblicato");
-      await load();
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Errore");
-    }
-  };
-
   const setPublishMode = async (img: Image, mode: "main" | "emotional" | "none") => {
     try {
       await runSetPublishMode({ data: { imageId: img.id, mode } });
