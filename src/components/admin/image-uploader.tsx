@@ -195,6 +195,11 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
   const runSetEnhancedPublished = useServerFn(setPropertyImageEnhancedPublished);
   const [lastError, setLastError] = useState<string | null>(null);
   const [dragOver, setDragOver] = useState(false);
+  const [compareState, setCompareState] = useState<{
+    image: Image;
+    mode: "enhanced" | "rendered";
+    afterMissing?: boolean;
+  } | null>(null);
 
   const syncAllForProperty = async () => {
     setBulkSyncing(true);
