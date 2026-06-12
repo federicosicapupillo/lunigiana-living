@@ -27,6 +27,7 @@ const it: Dict = {
   "cta.discoverProperties": "Scopri gli immobili",
   "cta.searchYourHome": "Cerca la tua casa",
   "cta.allProperties": "Tutti gli immobili",
+  "cta.viewAllProperties": "Guarda tutti gli immobili",
   "cta.contactUs": "Contattaci",
   "cta.talkToElena": "Parla con Elena",
   "cta.talkToElenaWA": "Parla con Elena su WhatsApp",
