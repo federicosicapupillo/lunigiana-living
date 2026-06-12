@@ -67,7 +67,8 @@ const it: Dict = {
   "home.brand.p2":
     "Accompagniamo chi cerca casa con uno sguardo onesto: ti aiutiamo a scegliere non solo l'immobile, ma il contesto di vita giusto.",
   "home.featured.eyebrow": "Scelti per voi",
-  "home.featured.title": "Immobili del momento",
+  "home.featured.title": "Immobili in vetrina",
+  "home.featured.subtitle": "Una selezione di proposte scelte da Furia Immobiliare. Scopri tutti gli immobili disponibili nella pagina dedicata.",
   "home.lead.eyebrow": "Cerchi casa",
   "home.lead.title1": "Cerchi una casa",
   "home.lead.title2": "in Lunigiana?",
