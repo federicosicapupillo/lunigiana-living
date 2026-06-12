@@ -10,6 +10,7 @@ import {
   rotateIdealistaFeedToken,
   getIdealistaAccount,
   setIdealistaAccount,
+  verifyIdealistaFeed,
   type IdealistaStatus,
 } from "@/lib/idealista.functions";
 import { toast } from "sonner";
@@ -24,6 +25,8 @@ import {
   Save,
   Info,
   X,
+  ShieldCheck,
+  Mail,
 } from "lucide-react";
 
 export const Route = createFileRoute("/_admin/admin/idealista")({
@@ -54,6 +57,7 @@ function IdealistaAdminPage() {
   const rotateToken = useServerFn(rotateIdealistaFeedToken);
   const fetchAccount = useServerFn(getIdealistaAccount);
   const saveAccount = useServerFn(setIdealistaAccount);
+  const verifyFeed = useServerFn(verifyIdealistaFeed);
 
   const { data, isLoading, refetch, isFetching } = useQuery({
     queryKey: ["idealista-overview"],
@@ -76,6 +80,8 @@ function IdealistaAdminPage() {
   }, [accountQuery.data, emailDirty]);
 
   const [photoForProperty, setPhotoForProperty] = useState<string | null>(null);
+  const [verifying, setVerifying] = useState(false);
+  const [verifyResult, setVerifyResult] = useState<Awaited<ReturnType<typeof verifyIdealistaFeed>> | null>(null);
 
   const properties = data?.properties ?? [];
   const feed = data?.feed;
@@ -118,6 +124,31 @@ function IdealistaAdminPage() {
     await rotateToken();
     toast.success("Token rigenerato");
     refetch();
+  };
+
+  const onVerify = async () => {
+    setVerifying(true);
+    try {
+      const r = await verifyFeed();
+      setVerifyResult(r);
+      if (r.ok) toast.success("Feed valido");
+      else toast.error("Feed con errori");
+    } catch (e: any) {
+      toast.error(e?.message ?? "Errore verifica feed");
+    } finally {
+      setVerifying(false);
+    }
+  };
+
+  const onCopyEmail = async () => {
+    if (!feedUrl) {
+      toast.error("URL feed non disponibile");
+      return;
+    }
+    const account = accountQuery.data?.account.email ?? "furiaimmobiliare@libero.it";
+    const body = `Buongiorno,\n\nvi invio il feed XML per l'import automatico degli annunci dell'agenzia Furia Immobiliare.\n\nURL feed:\n${feedUrl}\n\nAccount agenzia:\n${account}\n\nResto a disposizione per eventuali verifiche tecniche o adeguamenti richiesti dal vostro sistema.\n\nCordiali saluti`;
+    await navigator.clipboard.writeText(body);
+    toast.success("Testo email copiato");
   };
 
   const onSaveEmail = async () => {
@@ -263,6 +294,91 @@ function IdealistaAdminPage() {
             automatico degli annunci.
           </span>
         </div>
+
+        <div className="mb-3 flex flex-wrap items-center gap-2">
+          <button
+            onClick={onVerify}
+            disabled={!feedUrl || verifying}
+            className="inline-flex items-center gap-1.5 rounded-sm border border-primary/40 bg-primary/5 px-3 py-1.5 text-xs font-medium text-primary hover:border-primary disabled:opacity-50"
+          >
+            {verifying ? <Loader2 size={12} className="animate-spin" /> : <ShieldCheck size={12} />}
+            Verifica feed
+          </button>
+          <button
+            onClick={onCopyEmail}
+            disabled={!feedUrl}
+            className="inline-flex items-center gap-1.5 rounded-sm border border-border px-3 py-1.5 text-xs hover:border-primary/50 disabled:opacity-50"
+          >
+            <Mail size={12} /> Copia email per Idealista
+          </button>
+        </div>
+
+        {verifyResult && (
+          <div
+            className={`mb-3 rounded-sm border p-3 text-xs ${
+              verifyResult.ok
+                ? "border-emerald-200 bg-emerald-50 text-emerald-900"
+                : "border-red-200 bg-red-50 text-red-900"
+            }`}
+          >
+            <div className="mb-2 flex items-center gap-2 text-sm font-semibold">
+              {verifyResult.ok ? <CheckCircle2 size={16} /> : <AlertTriangle size={16} />}
+              {verifyResult.ok ? "Feed valido" : "Feed con errori"}
+            </div>
+            <div className="grid gap-1 sm:grid-cols-2">
+              <div>Immobili nel feed: <strong>{verifyResult.propertyCount}</strong></div>
+              <div>Foto totali: <strong>{verifyResult.photoCount}</strong></div>
+              <div>Immobili esclusi: <strong>{verifyResult.excluded.length}</strong></div>
+              <div>Dimensione XML: <strong>{(verifyResult.xmlBytes / 1024).toFixed(1)} KB</strong></div>
+            </div>
+            {verifyResult.errors.length > 0 && (
+              <div className="mt-2">
+                <div className="font-semibold">Errori:</div>
+                <ul className="ml-4 list-disc">
+                  {verifyResult.errors.map((e, i) => <li key={i}>{e}</li>)}
+                </ul>
+              </div>
+            )}
+            {verifyResult.warnings.length > 0 && (
+              <div className="mt-2">
+                <div className="font-semibold">Avvisi:</div>
+                <ul className="ml-4 list-disc">
+                  {verifyResult.warnings.map((w, i) => <li key={i}>{w}</li>)}
+                </ul>
+              </div>
+            )}
+            {verifyResult.excluded.length > 0 && (
+              <details className="mt-2">
+                <summary className="cursor-pointer font-semibold">Dettaglio immobili esclusi ({verifyResult.excluded.length})</summary>
+                <ul className="ml-4 mt-1 list-disc">
+                  {verifyResult.excluded.map((e, i) => (
+                    <li key={i}><strong>{e.reference}</strong>: {e.reason}</li>
+                  ))}
+                </ul>
+              </details>
+            )}
+            {verifyResult.renderIncluded.length > 0 && (
+              <details className="mt-2">
+                <summary className="cursor-pointer font-semibold">Rendering AI inclusi ({verifyResult.renderIncluded.length})</summary>
+                <ul className="ml-4 mt-1 list-disc">
+                  {verifyResult.renderIncluded.map((r, i) => (
+                    <li key={i}><strong>{r.reference}</strong>: {r.count} rendering</li>
+                  ))}
+                </ul>
+              </details>
+            )}
+            {verifyResult.unreachablePhotos.length > 0 && (
+              <details className="mt-2">
+                <summary className="cursor-pointer font-semibold">Foto non raggiungibili ({verifyResult.unreachablePhotos.length})</summary>
+                <ul className="ml-4 mt-1 list-disc break-all">
+                  {verifyResult.unreachablePhotos.map((u, i) => (
+                    <li key={i}><strong>{u.reference}</strong> [{u.status}]: {u.url}</li>
+                  ))}
+                </ul>
+              </details>
+            )}
+          </div>
+        )}
 
         <p className="text-xs text-muted-foreground">
           Ultima generazione:{" "}
