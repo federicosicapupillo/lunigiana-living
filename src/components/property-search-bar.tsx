@@ -208,17 +208,17 @@ export function PropertySearchBar({
   const priceMaxLabel = isRent ? t("search.label.rentMax") : t("search.label.priceMax");
 
   const setContract = (id: SearchValues["contract"]) => {
-    setState((s) => {
-      const switchingToRent = id === "affitto" && s.contract !== "affitto";
-      const switchingFromRent = id !== "affitto" && s.contract === "affitto";
-      const resetPrice = switchingToRent || switchingFromRent;
-      return {
-        ...s,
-        contract: id,
-        price_min: resetPrice ? "" : s.price_min,
-        price_max: resetPrice ? "" : s.price_max,
-      };
-    });
+    const switchingToRent = id === "affitto" && state.contract !== "affitto";
+    const switchingFromRent = id !== "affitto" && state.contract === "affitto";
+    const resetPrice = switchingToRent || switchingFromRent;
+    const next = {
+      ...state,
+      contract: id,
+      price_min: resetPrice ? "" : state.price_min,
+      price_max: resetPrice ? "" : state.price_max,
+    };
+    setState(next);
+    doSubmit(next);
   };
 
   const toggleFeature = (f: string) =>
@@ -255,15 +255,17 @@ export function PropertySearchBar({
     return out;
   };
 
-  const submit = () => {
-    const err = validate(state);
+  const doSubmit = (s: SearchValues) => {
+    const err = validate(s);
     setError(err);
     if (err) return;
-    const search = buildSearch(state);
+    const search = buildSearch(s);
     if (navigateOnSubmit) navigate({ to: "/immobili", search });
-    onSubmit?.(state);
+    onSubmit?.(s);
     setMobileOpen(false);
   };
+
+  const submit = () => doSubmit(state);
 
   const reset = () => {
     setState(EMPTY);
