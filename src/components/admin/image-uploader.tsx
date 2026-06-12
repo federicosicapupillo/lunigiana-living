@@ -62,10 +62,38 @@ type Image = {
   };
 };
 
+const STORAGE_BUCKET = "property-images";
 const SIGNED_URL_TTL_SECONDS = 60 * 60 * 24 * 365 * 5; // ~5 anni
 
 const IMPORTED_NOT_SYNCED_MESSAGE =
   "Questa foto è stata importata da una fonte esterna. Prima di generare il rendering, sincronizzala nello storage.";
+
+function logUploadStep(
+  step: "UPLOAD START" | "UPLOAD SUCCESS" | "OBJECT PATH" | "SIGNED URL REQUEST" | "SIGNED URL SUCCESS" | "SIGNED URL FAILED",
+  details: { bucket: string; path: string; filename: string; property_id: string; error?: string },
+) {
+  const method = step === "SIGNED URL FAILED" ? console.error : console.info;
+  method(`[Foto admin] ${step}`, details);
+}
+
+async function verifyStorageObjectExists(path: string) {
+  const lastSlash = path.lastIndexOf("/");
+  const folder = lastSlash >= 0 ? path.slice(0, lastSlash) : "";
+  const filename = lastSlash >= 0 ? path.slice(lastSlash + 1) : path;
+
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const { data, error } = await supabase.storage
+      .from(STORAGE_BUCKET)
+      .list(folder, { search: filename, limit: 20 });
+    if (error) return { exists: false, error: error.message, filename };
+    if ((data ?? []).some((object) => object.name === filename)) {
+      return { exists: true, error: null, filename };
+    }
+    if (attempt < 2) await new Promise((resolve) => window.setTimeout(resolve, 250 * (attempt + 1)));
+  }
+
+  return { exists: false, error: "Object not found dopo upload completato", filename };
+}
 
 function computeAvailability(row: {
   id: string;
