@@ -16,6 +16,7 @@ type Props = {
   className?: string;
   aspectClassName?: string;
   hideCaption?: boolean;
+  objectFit?: "cover" | "contain";
 };
 
 export function BeforeAfterSlider({
@@ -31,6 +32,7 @@ export function BeforeAfterSlider({
   className,
   aspectClassName = "aspect-[4/3]",
   hideCaption = false,
+  objectFit = "cover",
 }: Props) {
   const [position, setPosition] = useState(50);
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -93,7 +95,7 @@ export function BeforeAfterSlider({
           loading="lazy"
           sizes="(max-width: 768px) 100vw, 50vw"
           watermark={false}
-          className="absolute inset-0 h-full w-full object-cover"
+          className={cn("absolute inset-0 h-full w-full", objectFit === "contain" ? "object-contain" : "object-cover")}
           containerClassName="absolute inset-0"
         />
         {/* AFTER — clipped overlay */}
@@ -107,7 +109,7 @@ export function BeforeAfterSlider({
             loading="lazy"
             sizes="(max-width: 768px) 100vw, 50vw"
             watermark={false}
-            className="absolute inset-0 h-full w-full object-cover"
+            className={cn("absolute inset-0 h-full w-full", objectFit === "contain" ? "object-contain" : "object-cover")}
             containerClassName="absolute inset-0"
           />
         </div>
