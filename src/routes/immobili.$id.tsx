@@ -124,8 +124,8 @@ function PropertyDetail() {
 
       {/* Gallery */}
       <section className="container-editorial mt-8 sm:mt-10">
-        <div className="group relative overflow-hidden rounded-sm bg-muted">
-          <div className="mx-auto w-full max-h-[450px] sm:max-h-[550px] md:max-h-[600px] lg:max-h-[650px] aspect-[4/3] sm:aspect-[16/10] md:aspect-[16/9]">
+        <div className="group relative overflow-hidden rounded-sm bg-cream">
+          <div className="mx-auto flex w-full items-center justify-center h-[60vw] max-h-[450px] sm:h-[55vw] sm:max-h-[550px] md:h-[60vh] md:max-h-[650px]">
             {renderFor ? (
               <BeforeAfterSlider
                 key={main}
@@ -141,6 +141,7 @@ function PropertyDetail() {
                 className="h-full w-full border-0 rounded-sm"
                 aspectClassName=""
                 hideCaption
+                objectFit="contain"
               />
             ) : (
               <WatermarkedImage
@@ -149,7 +150,7 @@ function PropertyDetail() {
                 fetchPriority="high"
                 sizes="(max-width: 1024px) 100vw, 70vw"
                 watermarkSize="lg"
-                className="h-full w-full object-cover transition-opacity duration-300"
+                className="h-full w-full object-contain transition-opacity duration-300"
               />
             )}
           </div>
