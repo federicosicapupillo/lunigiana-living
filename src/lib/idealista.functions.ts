@@ -361,3 +361,128 @@ export async function getIdealistaFeedToken(): Promise<string | null> {
     .maybeSingle();
   return parseFeedSettings(data?.value).token;
 }
+
+// --- Feed verification ---
+
+export const verifyIdealistaFeed = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context.userId);
+
+    const token = await getIdealistaFeedToken();
+    if (!token) {
+      return {
+        ok: false,
+        errors: ["Token feed mancante. Rigenera il token."],
+        warnings: [],
+        propertyCount: 0,
+        photoCount: 0,
+        excluded: [] as { reference: string; reason: string }[],
+        renderIncluded: [] as { reference: string; count: number }[],
+        unreachablePhotos: [] as { reference: string; url: string; status: number | string }[],
+        xmlBytes: 0,
+      };
+    }
+
+    const errors: string[] = [];
+    const warnings: string[] = [];
+    const excluded: { reference: string; reason: string }[] = [];
+    const renderIncluded: { reference: string; count: number }[] = [];
+    const unreachablePhotos: { reference: string; url: string; status: number | string }[] = [];
+
+    // Re-run the same query as buildIdealistaFeedXml to know who's in/out and why
+    const { data: props } = await supabaseAdmin
+      .from("properties")
+      .select("*")
+      .eq("status", "published")
+      .in("idealista_status", ["to_publish", "published"])
+      .is("deleted_at", null);
+
+    let propertyCount = 0;
+    let photoCount = 0;
+    const photoUrls: { reference: string; url: string }[] = [];
+
+    for (const p of (props as any[]) ?? []) {
+      const { data: desc } = await supabaseAdmin
+        .from("property_descriptions")
+        .select("generated_description, edited_description")
+        .eq("property_id", p.id)
+        .maybeSingle();
+      const missing = missingFields(p, desc);
+      if (missing.length > 0) {
+        excluded.push({ reference: p.reference_code, reason: `Campi mancanti: ${missing.join(", ")}` });
+        continue;
+      }
+
+      const { data: imgs } = await supabaseAdmin
+        .from("property_images")
+        .select("image_url, rendered_image_url, enhanced_image_url, use_rendered, use_enhanced, render_status, idealista_included")
+        .eq("property_id", p.id)
+        .eq("idealista_included", true);
+
+      const list = imgs ?? [];
+      if (list.length === 0) {
+        excluded.push({ reference: p.reference_code, reason: "Nessuna foto inclusa" });
+        continue;
+      }
+
+      const aiRenders = list.filter((i: any) => i.use_rendered || (i.render_status === "completed" && i.rendered_image_url));
+      if (aiRenders.length > 0) {
+        renderIncluded.push({ reference: p.reference_code, count: aiRenders.length });
+      }
+
+      propertyCount += 1;
+      photoCount += list.length;
+      for (const img of list as any[]) {
+        const url = img.use_enhanced && img.enhanced_image_url ? img.enhanced_image_url : img.image_url;
+        if (url) photoUrls.push({ reference: p.reference_code, url });
+      }
+    }
+
+    if (propertyCount === 0) {
+      errors.push("Il feed è vuoto: nessun immobile pronto per Idealista.");
+    }
+
+    // Sample-check first N photos to keep this fast
+    const sample = photoUrls.slice(0, 20);
+    await Promise.all(
+      sample.map(async ({ reference, url }) => {
+        try {
+          const res = await fetch(url, { method: "HEAD" });
+          if (!res.ok) unreachablePhotos.push({ reference, url, status: res.status });
+        } catch (e: any) {
+          unreachablePhotos.push({ reference, url, status: e?.message ?? "fetch error" });
+        }
+      }),
+    );
+
+    // Validate XML builds without throwing
+    let xmlBytes = 0;
+    try {
+      const { xml } = await buildIdealistaFeedXml();
+      xmlBytes = new TextEncoder().encode(xml).length;
+    } catch (e: any) {
+      errors.push(`Errore generazione XML: ${e?.message ?? "sconosciuto"}`);
+    }
+
+    if (renderIncluded.length > 0) {
+      warnings.push(
+        `Rendering AI inclusi in ${renderIncluded.length} immobili. Verifica che siano autorizzati.`,
+      );
+    }
+    if (unreachablePhotos.length > 0) {
+      errors.push(`${unreachablePhotos.length} foto non raggiungibili su ${sample.length} verificate.`);
+    }
+
+    return {
+      ok: errors.length === 0,
+      errors,
+      warnings,
+      propertyCount,
+      photoCount,
+      excluded,
+      renderIncluded,
+      unreachablePhotos,
+      xmlBytes,
+    };
+  });
