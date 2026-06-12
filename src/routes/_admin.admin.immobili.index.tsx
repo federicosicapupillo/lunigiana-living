@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, Search, Loader2, ImageOff, Star, Sparkles } from "lucide-react";
+import { Plus, Search, Loader2, ImageOff, Star, Sparkles, Eye } from "lucide-react";
 import { toast } from "sonner";
 import { STATUS_LABELS, STATUS_BADGE_CLASSES, type PropertyStatus } from "@/lib/admin/property-constants";
 import {
