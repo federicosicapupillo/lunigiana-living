@@ -14,7 +14,6 @@ import {
 import { toast } from "sonner";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
-import QRCode from "qrcode";
 import logoAsset from "@/assets/furia-logo.png.asset.json";
 
 type PropertyData = {
@@ -32,6 +31,7 @@ type PropertyData = {
   size_sqm: number | null;
   bedrooms: number | null;
   bathrooms: number | null;
+  floor?: string | null;
   energy_class: string | null;
   energy_performance_index_value: number | null;
   short_notes: string | null;
@@ -76,32 +76,14 @@ const STR = {
     print: "Stampa",
     close: "Chiudi",
     rendering: "Rendering AI",
-    renderingNote: "Immagine illustrativa non rappresentante lo stato attuale.",
+    renderingNote: "Immagine illustrativa, non rappresenta lo stato attuale dell'immobile.",
     onRequest: "Prezzo su richiesta",
     sqm: "mq",
     rooms: "camere",
     baths: "bagni",
-    energy: "Classe energetica",
-    ipe: "IPE",
-    contact: "Contatta l'agenzia",
-    phone: "Tel",
-    whatsapp: "WhatsApp",
-    scan: "Scansiona per la scheda online",
-    ref: "Rif.",
-    features: "Caratteristiche",
-    techData: "Dati tecnici",
-    description: "Descrizione",
-    feat: {
-      panoramic_view: "Vista panoramica",
-      historic_property: "Immobile storico",
-      garden: "Giardino",
-      terrace: "Terrazza",
-      balcony: "Balcone",
-      garage: "Garage",
-      cellar: "Cantina",
-      elevator: "Ascensore",
-      furnished: "Arredato",
-    },
+    floor: "piano",
+    energy: "Classe en.",
+    code: "Cod. annuncio",
   },
   en: {
     title: "Generate A3 window flyer",
@@ -114,42 +96,16 @@ const STR = {
     print: "Print",
     close: "Close",
     rendering: "AI Rendering",
-    renderingNote: "Illustrative image, does not represent the current state.",
+    renderingNote: "Illustrative image, does not represent the current state of the property.",
     onRequest: "Price on request",
     sqm: "sqm",
     rooms: "bedrooms",
     baths: "bathrooms",
-    energy: "Energy class",
-    ipe: "EPI",
-    contact: "Contact the agency",
-    phone: "Tel",
-    whatsapp: "WhatsApp",
-    scan: "Scan for the online listing",
-    ref: "Ref.",
-    features: "Features",
-    techData: "Technical data",
-    description: "Description",
-    feat: {
-      panoramic_view: "Panoramic view",
-      historic_property: "Historic property",
-      garden: "Garden",
-      terrace: "Terrace",
-      balcony: "Balcony",
-      garage: "Garage",
-      cellar: "Cellar",
-      elevator: "Elevator",
-      furnished: "Furnished",
-    },
+    floor: "floor",
+    energy: "Energy",
+    code: "Listing code",
   },
 } as const;
-
-const AGENCY = {
-  name: "Furia Immobiliare",
-  phone: "0187 830229",
-  mobile: "320 7019985",
-  email: "furiaimmobiliare@libero.it",
-  city: "Pontremoli (MS)",
-};
 
 function formatPrice(p: PropertyData, lang: Lang) {
   if (p.price_on_request || !p.price) return STR[lang].onRequest;
@@ -160,14 +116,67 @@ function formatPrice(p: PropertyData, lang: Lang) {
   }).format(p.price);
 }
 
-function splitParagraphs(text: string | null | undefined, max = 1200): string[] {
-  if (!text) return [];
-  const cleaned = text.trim().replace(/\r\n/g, "\n");
-  const truncated = cleaned.length > max ? cleaned.slice(0, max - 1).replace(/[\s,.;]\S*$/, "") + "…" : cleaned;
-  return truncated
-    .split(/\n\s*\n|\n/)
-    .map((s) => s.trim())
-    .filter(Boolean);
+// Keywords to highlight in the description (terracotta + bold)
+const HIGHLIGHT_WORDS = [
+  "vista panoramica", "vista mare", "vista mozzafiato", "vista aperta",
+  "panoramica", "panoramico", "panoramic", "sea view", "mountain view",
+  "ristrutturato", "ristrutturata", "renovated", "nuovo", "nuova",
+  "piscina", "pool", "giardino", "garden", "terrazza", "terrace",
+  "garage", "cantina", "uliveto", "oliveto", "vigneto", "bosco",
+  "storico", "storica", "historic", "in pietra", "stone",
+  "ampia", "ampio", "luminoso", "luminosa", "esclusivo", "esclusiva",
+  "indipendente", "centro storico", "abitabile", "rifinito", "rifinita",
+  "borgo", "campagna", "collina", "tramonti", "apuane",
+  "investimento", "b&b", "agriturismo", "seconda casa",
+];
+
+function condenseDescription(text: string, maxChars = 520): string {
+  const cleaned = text.replace(/\s+/g, " ").trim();
+  if (cleaned.length <= maxChars) return cleaned;
+  // Split into sentences; keep first ones until budget filled
+  const sentences = cleaned.split(/(?<=[.!?])\s+/);
+  let out = "";
+  for (const s of sentences) {
+    if ((out + " " + s).trim().length > maxChars) break;
+    out = (out + " " + s).trim();
+  }
+  if (!out) out = cleaned.slice(0, maxChars - 1).replace(/[\s,.;]\S*$/, "") + "…";
+  return out;
+}
+
+function splitParagraphs(text: string): string[] {
+  return text
+    .split(/(?<=[.!?])\s+(?=[A-ZÀ-Ý])/)
+    .reduce<string[]>((acc, sentence) => {
+      // Pair sentences into 1-2 sentence blocks for readability
+      const last = acc[acc.length - 1];
+      if (!last || last.length > 160) acc.push(sentence);
+      else acc[acc.length - 1] = last + " " + sentence;
+      return acc;
+    }, [])
+    .slice(0, 4);
+}
+
+function HighlightedText({ text }: { text: string }) {
+  // Build a regex that matches any highlight word (case insensitive, word-ish boundary)
+  const escaped = HIGHLIGHT_WORDS.map((w) => w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).sort(
+    (a, b) => b.length - a.length,
+  );
+  const re = new RegExp(`(${escaped.join("|")})`, "gi");
+  const parts = text.split(re);
+  return (
+    <>
+      {parts.map((p, i) =>
+        re.test(p) ? (
+          <strong key={i} style={{ color: "#B76A4C", fontWeight: 700 }}>
+            {p}
+          </strong>
+        ) : (
+          <span key={i}>{p}</span>
+        ),
+      )}
+    </>
+  );
 }
 
 export function WindowFlyerDialog({
@@ -184,7 +193,6 @@ export function WindowFlyerDialog({
   const [loading, setLoading] = useState(true);
   const [lang, setLang] = useState<Lang>("it");
   const [layout, setLayout] = useState<Layout>("hero-left");
-  const [qrData, setQrData] = useState<string | null>(null);
   const [exporting, setExporting] = useState(false);
   const [longDescription, setLongDescription] = useState<string | null>(null);
   const flyerRef = useRef<HTMLDivElement>(null);
@@ -234,17 +242,6 @@ export function WindowFlyerDialog({
     };
   }, [open, property.id]);
 
-  useEffect(() => {
-    if (!open) return;
-    const slug = property.slug || property.id;
-    const origin =
-      typeof window !== "undefined" ? window.location.origin : "https://furia.cap-ann-one.life";
-    const url = `${origin}/immobili/${slug}`;
-    QRCode.toDataURL(url, { width: 320, margin: 1, color: { dark: "#241711", light: "#ECE1D3" } })
-      .then(setQrData)
-      .catch(() => setQrData(null));
-  }, [open, property.id, property.slug]);
-
   const selectedImages = useMemo(
     () => images.filter((i) => selected.includes(i.id)).slice(0, 4),
     [images, selected],
@@ -281,7 +278,6 @@ export function WindowFlyerDialog({
       const canvas = await captureCanvas();
       if (!canvas) return;
       const img = canvas.toDataURL("image/jpeg", 0.92);
-      // A3 landscape: 420mm x 297mm
       const pdf = new jsPDF({ unit: "mm", format: "a3", orientation: "landscape" });
       pdf.addImage(img, "JPEG", 0, 0, 420, 297);
       pdf.save(`cartello-${property.reference_code || property.id}.pdf`);
@@ -485,7 +481,6 @@ export function WindowFlyerDialog({
                 images={selectedImages}
                 layout={layout}
                 lang={lang}
-                qrData={qrData}
                 longDescription={longDescription}
               />
             </div>
@@ -511,48 +506,34 @@ const FlyerSheet = forwardRef<
     images: FlyerImage[];
     layout: Layout;
     lang: Lang;
-    qrData: string | null;
     longDescription: string | null;
   }
->(function FlyerSheet({ property, images, layout, lang, qrData, longDescription }, ref) {
+>(function FlyerSheet({ property, images, layout, lang, longDescription }, ref) {
   const t = STR[lang];
 
   const price = formatPrice(property, lang);
-  // Generic location only — NO street/civic number
-  const location = [property.area_zone, property.municipality, property.province]
-    .filter(Boolean)
-    .join(" · ");
 
-  const descriptionSource = longDescription || property.short_notes;
-  const paragraphs = splitParagraphs(descriptionSource, 900);
+  // Dominant city line — NO street or civic number
+  const cityMain = (property.municipality || property.area_zone || "").toUpperCase();
+  const cityProv = property.province ? `(${property.province.toUpperCase()})` : "";
+  const cityZone =
+    property.area_zone && property.municipality && property.area_zone !== property.municipality
+      ? property.area_zone
+      : "";
 
-  const featuresList = (
-    [
-      ["panoramic_view", property.panoramic_view],
-      ["historic_property", property.historic_property],
-      ["garden", property.garden],
-      ["terrace", property.terrace],
-      ["balcony", property.balcony],
-      ["garage", property.garage],
-      ["cellar", property.cellar],
-      ["elevator", property.elevator],
-      ["furnished", property.furnished],
-    ] as const
-  )
-    .filter(([, v]) => v)
-    .map(([k]) => t.feat[k as keyof typeof t.feat]);
+  const rawDescription = (longDescription || property.short_notes || "").trim();
+  const condensed = rawDescription ? condenseDescription(rawDescription, 560) : "";
+  const paragraphs = condensed ? splitParagraphs(condensed) : [];
 
   const techData: { label: string; value: string }[] = [];
   if (property.size_sqm) techData.push({ label: t.sqm.toUpperCase(), value: String(property.size_sqm) });
   if (property.bedrooms != null) techData.push({ label: t.rooms, value: String(property.bedrooms) });
   if (property.bathrooms != null) techData.push({ label: t.baths, value: String(property.bathrooms) });
+  if (property.floor) techData.push({ label: t.floor, value: property.floor });
   if (property.energy_class) techData.push({ label: t.energy, value: property.energy_class });
-  if (property.energy_performance_index_value != null)
-    techData.push({ label: t.ipe, value: `${property.energy_performance_index_value} kWh/m²` });
 
   const hasRender = images.some((i) => i.isRender);
 
-  // Sheet is split: left visual zone, right info column
   return (
     <div
       ref={ref}
@@ -567,13 +548,13 @@ const FlyerSheet = forwardRef<
         padding: PAD,
         boxSizing: "border-box",
         display: "grid",
-        gridTemplateColumns: "1.35fr 1fr",
-        gridTemplateRows: "auto 1fr auto",
-        columnGap: 40,
-        rowGap: 22,
+        gridTemplateColumns: "1.25fr 1fr",
+        gridTemplateRows: "auto 1fr",
+        columnGap: 44,
+        rowGap: 24,
       }}
     >
-      {/* Header spans both columns */}
+      {/* Header spans both columns: logo + listing code */}
       <header
         style={{
           gridColumn: "1 / -1",
@@ -581,19 +562,39 @@ const FlyerSheet = forwardRef<
           alignItems: "center",
           justifyContent: "space-between",
           paddingBottom: 18,
-          borderBottom: "1px solid #B76A4C",
+          borderBottom: "2px solid #B76A4C",
         }}
       >
         <img
           src={logoAsset.url}
           alt="Furia"
           crossOrigin="anonymous"
-          style={{ height: 72, width: "auto", objectFit: "contain" }}
+          style={{ height: 80, width: "auto", objectFit: "contain" }}
         />
-        <div style={{ textAlign: "right", fontSize: 13, color: "#4A3A30", letterSpacing: 1.6 }}>
-          <div style={{ textTransform: "uppercase", fontWeight: 600 }}>{AGENCY.name}</div>
-          <div style={{ marginTop: 3 }}>
-            {t.ref} {property.reference_code || "—"}
+        <div style={{ textAlign: "right" }}>
+          <div
+            style={{
+              fontSize: 13,
+              letterSpacing: 2.6,
+              textTransform: "uppercase",
+              color: "#4A3A30",
+              fontFamily: "Helvetica, Arial, sans-serif",
+              fontWeight: 600,
+            }}
+          >
+            {t.code}
+          </div>
+          <div
+            style={{
+              fontSize: 38,
+              fontWeight: 800,
+              color: "#B76A4C",
+              fontFamily: "Helvetica, Arial, sans-serif",
+              letterSpacing: 1.5,
+              marginTop: 2,
+            }}
+          >
+            {property.reference_code || "—"}
           </div>
         </div>
       </header>
@@ -609,15 +610,16 @@ const FlyerSheet = forwardRef<
           minHeight: 0,
           display: "flex",
           flexDirection: "column",
-          gap: 16,
+          gap: 18,
           overflow: "hidden",
         }}
       >
+        {/* City dominant */}
         <div>
           <div
             style={{
               fontSize: 12,
-              letterSpacing: 2.4,
+              letterSpacing: 2.6,
               textTransform: "uppercase",
               color: "#B76A4C",
               fontFamily: "Helvetica, Arial, sans-serif",
@@ -628,44 +630,48 @@ const FlyerSheet = forwardRef<
           </div>
           <h1
             style={{
-              margin: "8px 0 6px",
-              fontSize: 42,
-              lineHeight: 1.08,
-              fontWeight: 400,
-              letterSpacing: -0.5,
+              margin: "6px 0 4px",
+              fontSize: 58,
+              lineHeight: 1,
+              fontWeight: 700,
+              letterSpacing: -1,
+              color: "#241711",
             }}
           >
-            {property.title}
+            {cityMain} {cityProv && (
+              <span style={{ color: "#B76A4C", fontWeight: 600 }}>{cityProv}</span>
+            )}
           </h1>
-          {location && (
+          {cityZone && (
             <div
               style={{
-                fontSize: 15,
+                fontSize: 18,
                 color: "#4A3A30",
                 fontFamily: "Helvetica, Arial, sans-serif",
-                letterSpacing: 0.3,
+                letterSpacing: 0.4,
+                marginTop: 4,
               }}
             >
-              {location}
+              {cityZone}
             </div>
           )}
         </div>
 
+        {/* Price */}
         <div
           style={{
             display: "flex",
             alignItems: "baseline",
-            justifyContent: "space-between",
             gap: 12,
-            padding: "10px 0",
+            padding: "12px 0",
             borderTop: "1px solid #D1BCA6",
             borderBottom: "1px solid #D1BCA6",
           }}
         >
           <div
             style={{
-              fontSize: 38,
-              fontWeight: 700,
+              fontSize: 46,
+              fontWeight: 800,
               color: "#B76A4C",
               fontFamily: "Helvetica, Arial, sans-serif",
               letterSpacing: -0.5,
@@ -675,94 +681,67 @@ const FlyerSheet = forwardRef<
           </div>
         </div>
 
-        {paragraphs.length > 0 && (
-          <div style={{ minHeight: 0, overflow: "hidden" }}>
-            <SectionHeading>{t.description}</SectionHeading>
-            <div
-              style={{
-                marginTop: 6,
-                fontSize: 13.5,
-                lineHeight: 1.55,
-                color: "#3A2A22",
-                fontFamily: "Helvetica, Arial, sans-serif",
-              }}
-            >
-              {paragraphs.slice(0, 3).map((p, i) => (
-                <p key={i} style={{ margin: "0 0 8px 0" }}>
-                  {p}
-                </p>
-              ))}
-            </div>
-          </div>
-        )}
-
+        {/* Tech data row */}
         {techData.length > 0 && (
-          <div>
-            <SectionHeading>{t.techData}</SectionHeading>
-            <div
-              style={{
-                marginTop: 6,
-                display: "grid",
-                gridTemplateColumns: "repeat(3, 1fr)",
-                gap: 8,
-                fontFamily: "Helvetica, Arial, sans-serif",
-              }}
-            >
-              {techData.map((d) => (
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: `repeat(${techData.length}, 1fr)`,
+              gap: 10,
+              fontFamily: "Helvetica, Arial, sans-serif",
+            }}
+          >
+            {techData.map((d) => (
+              <div
+                key={d.label}
+                style={{
+                  border: "1px solid #B76A4C",
+                  padding: "10px 8px",
+                  background: "#F3E8DB",
+                  textAlign: "center",
+                }}
+              >
                 <div
-                  key={d.label}
                   style={{
-                    border: "1px solid #D1BCA6",
-                    padding: "8px 10px",
-                    background: "#F3E8DB",
+                    fontSize: 22,
+                    fontWeight: 800,
+                    color: "#241711",
+                    lineHeight: 1,
                   }}
                 >
-                  <div
-                    style={{
-                      fontSize: 9,
-                      letterSpacing: 1.5,
-                      textTransform: "uppercase",
-                      color: "#4A3A30",
-                    }}
-                  >
-                    {d.label}
-                  </div>
-                  <div style={{ fontSize: 16, fontWeight: 600, color: "#241711", marginTop: 2 }}>
-                    {d.value}
-                  </div>
+                  {d.value}
                 </div>
-              ))}
-            </div>
+                <div
+                  style={{
+                    fontSize: 10,
+                    letterSpacing: 1.6,
+                    textTransform: "uppercase",
+                    color: "#4A3A30",
+                    marginTop: 4,
+                  }}
+                >
+                  {d.label}
+                </div>
+              </div>
+            ))}
           </div>
         )}
 
-        {featuresList.length > 0 && (
-          <div>
-            <SectionHeading>{t.features}</SectionHeading>
+        {/* Large readable description */}
+        {paragraphs.length > 0 && (
+          <div style={{ flex: 1, minHeight: 0, overflow: "hidden" }}>
             <div
               style={{
-                marginTop: 6,
-                display: "flex",
-                flexWrap: "wrap",
-                gap: 6,
-                fontFamily: "Helvetica, Arial, sans-serif",
+                fontSize: 22,
+                lineHeight: 1.45,
+                color: "#241711",
+                fontFamily: "Georgia, 'Times New Roman', serif",
               }}
             >
-              {featuresList.slice(0, 10).map((f) => (
-                <span
-                  key={f}
-                  style={{
-                    fontSize: 11,
-                    padding: "5px 12px",
-                    border: "1px solid #B76A4C",
-                    color: "#B76A4C",
-                    borderRadius: 999,
-                    textTransform: "uppercase",
-                    letterSpacing: 0.6,
-                  }}
-                >
-                  {f}
-                </span>
+              {paragraphs.map((p, i) => (
+                <p key={i} style={{ margin: i === 0 ? "0 0 14px 0" : "0 0 14px 0" }}>
+                  <HighlightedText text={p} />
+                </p>
               ))}
             </div>
           </div>
@@ -771,85 +750,21 @@ const FlyerSheet = forwardRef<
         {hasRender && (
           <div
             style={{
-              fontSize: 10,
+              fontSize: 11,
               color: "#4A3A30",
               fontStyle: "italic",
               fontFamily: "Helvetica, Arial, sans-serif",
+              borderTop: "1px solid #D1BCA6",
+              paddingTop: 8,
             }}
           >
             * {t.renderingNote}
           </div>
         )}
       </section>
-
-      {/* Footer spans both columns */}
-      <footer
-        style={{
-          gridColumn: "1 / -1",
-          paddingTop: 18,
-          borderTop: "1px solid #B76A4C",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: 24,
-          fontFamily: "Helvetica, Arial, sans-serif",
-        }}
-      >
-        <div style={{ fontSize: 13, lineHeight: 1.55, color: "#241711" }}>
-          <div
-            style={{
-              fontSize: 10,
-              letterSpacing: 2.2,
-              textTransform: "uppercase",
-              color: "#B76A4C",
-              marginBottom: 4,
-              fontWeight: 600,
-            }}
-          >
-            {t.contact}
-          </div>
-          <div>
-            <strong>{t.phone}.</strong> {AGENCY.phone} &nbsp;·&nbsp; <strong>{t.whatsapp}</strong>{" "}
-            {AGENCY.mobile}
-          </div>
-          <div>{AGENCY.email}</div>
-          <div style={{ color: "#4A3A30" }}>{AGENCY.city}</div>
-        </div>
-        {qrData && (
-          <div style={{ textAlign: "center" }}>
-            <img
-              src={qrData}
-              alt="QR"
-              style={{ width: 120, height: 120, display: "block", background: "#ECE1D3" }}
-            />
-            <div style={{ fontSize: 10, marginTop: 4, color: "#4A3A30", maxWidth: 130 }}>
-              {t.scan}
-            </div>
-          </div>
-        )}
-      </footer>
     </div>
   );
 });
-
-function SectionHeading({ children }: { children: React.ReactNode }) {
-  return (
-    <div
-      style={{
-        fontSize: 10,
-        letterSpacing: 2.2,
-        textTransform: "uppercase",
-        color: "#B76A4C",
-        fontFamily: "Helvetica, Arial, sans-serif",
-        fontWeight: 600,
-        paddingBottom: 4,
-        borderBottom: "1px solid #D1BCA6",
-      }}
-    >
-      {children}
-    </div>
-  );
-}
 
 // ---------------- Layouts (left visual column) ----------------
 
@@ -862,9 +777,9 @@ function RenderBadge({ lang }: { lang: Lang }) {
         left: 12,
         background: "#B76A4C",
         color: "#ECE1D3",
-        fontSize: 11,
+        fontSize: 12,
         letterSpacing: 1.8,
-        padding: "5px 10px",
+        padding: "6px 12px",
         textTransform: "uppercase",
         fontFamily: "Helvetica, Arial, sans-serif",
         fontWeight: 700,
