@@ -57,7 +57,7 @@ export function RenderSettingsPanel({
   const save = useServerFn(saveRenderSettings);
 
   useEffect(() => {
-    setState(initial);
+    setState({ ...initial, preserve_structure: true });
     setOpen(false);
   }, [imageId]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -65,6 +65,8 @@ export function RenderSettingsPanel({
     setState((s) => {
       const next: RenderSettings = { ...s, [k]: v };
       if (k === "photo_type") next.photo_category = null;
+      // Real-estate constraint: structure must always be preserved.
+      next.preserve_structure = true;
       return next;
     });
   };
@@ -243,13 +245,14 @@ export function RenderSettingsPanel({
               </select>
             </Field>
           </div>
-          <label className="flex items-center gap-2 text-[11px] text-ink">
+          <label className="flex items-center gap-2 text-[11px] text-ink opacity-90">
             <input
               type="checkbox"
-              checked={state.preserve_structure}
-              onChange={(e) => update("preserve_structure", e.target.checked)}
+              checked
+              disabled
+              readOnly
             />
-            Mantieni struttura originale (geometrie, aperture, prospettiva)
+            Mantieni struttura originale (sempre attivo: muri, porte, finestre e prospettiva non vengono mai modificati)
           </label>
           <Field label="Note libere">
             <textarea

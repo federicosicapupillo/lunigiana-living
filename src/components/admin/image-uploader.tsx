@@ -306,7 +306,7 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
         mode === "main"
           ? "Rendering pubblicato come foto principale (originale conservata)"
           : mode === "emotional"
-          ? "Rendering aggiunto alla sezione 'Rendering emozionale'"
+          ? "Rendering usato come Prima/Dopo"
           : "Rendering non pubblicato",
       );
       await load();
@@ -476,14 +476,60 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
                   )}
                   {/* Rendering */}
                   {img.rendered_signed_url ? (
-                    <VersionCard
-                      label="Rendering"
-                      inUse={img.use_rendered}
-                      src={img.rendered_signed_url}
-                      alt="Rendering"
-                      downloadUrl={img.rendered_signed_url}
-                      downloadName={`rendering-${img.id}.jpg`}
-                    />
+                    <div className="flex flex-col gap-1.5">
+                      <VersionCard
+                        label="Rendering"
+                        inUse={img.use_rendered}
+                        src={img.rendered_signed_url}
+                        alt="Rendering"
+                        downloadUrl={img.rendered_signed_url}
+                        downloadName={`rendering-${img.id}.jpg`}
+                        statusPill={
+                          img.render_publish_mode === "main"
+                            ? "Sostituisce originale"
+                            : img.render_publish_mode === "emotional"
+                            ? "Prima/Dopo"
+                            : "Generato · non pubblicato"
+                        }
+                      />
+                      <div className="flex flex-wrap gap-1">
+                        <CompactBtn
+                          onClick={() => setPublishMode(img, "main")}
+                          disabled={img.render_publish_mode === "main"}
+                          title="Sostituisce la foto originale nella gallery. L'originale resta come backup."
+                          icon={<Sparkles size={10} />}
+                          active={img.render_publish_mode === "main"}
+                        >
+                          Sostituisci originale
+                        </CompactBtn>
+                        <CompactBtn
+                          onClick={() => setPublishMode(img, "emotional")}
+                          disabled={img.render_publish_mode === "emotional"}
+                          title="Mostra il rendering nella sezione pubblica Prima/Dopo."
+                          icon={<Heart size={10} />}
+                          active={img.render_publish_mode === "emotional"}
+                        >
+                          Usa come Prima/Dopo
+                        </CompactBtn>
+                        {img.render_publish_mode === "main" && (
+                          <CompactBtn
+                            onClick={() => setPublishMode(img, "none")}
+                            title="Torna a mostrare la foto originale nella gallery."
+                            icon={<Undo2 size={10} />}
+                          >
+                            Ripristina originale
+                          </CompactBtn>
+                        )}
+                        <CompactBtn
+                          onClick={() => discard(img)}
+                          title="Elimina il rendering generato. La foto originale resta intatta."
+                          icon={<X size={10} />}
+                          danger
+                        >
+                          Scarta
+                        </CompactBtn>
+                      </div>
+                    </div>
                   ) : (
                     <EmptyVersion
                       icon={<Sparkles size={14} />}
@@ -611,65 +657,6 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
                   {img.render_error && (
                     <div className="text-[10px] text-destructive">{img.render_error}</div>
                   )}
-                  {img.rendered_storage_path && (
-                    <div className="space-y-1.5 rounded-sm border border-primary/30 bg-primary/5 p-2">
-                      <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
-                        Cosa fare di questo rendering?
-                      </div>
-                      <div className="flex flex-wrap gap-1">
-                        <button
-                          type="button"
-                          onClick={() => setPublishMode(img, "main")}
-                          disabled={img.render_publish_mode === "main"}
-                          title="Il rendering sostituisce la foto originale nella gallery. L'originale resta come backup."
-                          className="inline-flex items-center gap-1 rounded-sm border border-border bg-background px-2 py-1 text-[10px] uppercase tracking-wider hover:border-primary/50 disabled:opacity-40"
-                        >
-                          {img.render_publish_mode === "main" && <Check size={11} className="text-primary" />}
-                          <Sparkles size={11} />
-                          Sostituisci originale
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setPublishMode(img, "emotional")}
-                          disabled={img.render_publish_mode === "emotional"}
-                          title="Il rendering compare solo nella sezione pubblica 'Rendering emozionale'."
-                          className="inline-flex items-center gap-1 rounded-sm border border-border bg-background px-2 py-1 text-[10px] uppercase tracking-wider hover:border-primary/50 disabled:opacity-40"
-                        >
-                          {img.render_publish_mode === "emotional" && <Check size={11} className="text-primary" />}
-                          <Heart size={11} />
-                          Rendering emozionale
-                        </button>
-                        {img.render_publish_mode === "main" && (
-                          <button
-                            type="button"
-                            onClick={() => setPublishMode(img, "none")}
-                            title="Torna a mostrare la foto originale nella gallery."
-                            className="inline-flex items-center gap-1 rounded-sm border border-border bg-background px-2 py-1 text-[10px] uppercase tracking-wider hover:border-primary/50"
-                          >
-                            <Undo2 size={11} />
-                            Ripristina originale
-                          </button>
-                        )}
-                        <button
-                          type="button"
-                          onClick={() => discard(img)}
-                          title="Elimina il rendering generato. La foto originale resta intatta."
-                          className="inline-flex items-center gap-1 rounded-sm border border-border bg-background px-2 py-1 text-[10px] uppercase tracking-wider text-destructive hover:border-destructive/50"
-                        >
-                          <X size={11} />
-                          Scarta rendering
-                        </button>
-                      </div>
-                      <div className="text-[9px] uppercase tracking-wider text-muted-foreground">
-                        Stato pubblicazione:{" "}
-                        <span className="text-foreground">
-                          {img.render_publish_mode === "main" && "Sostituisce la foto originale"}
-                          {img.render_publish_mode === "emotional" && "Visibile come Rendering emozionale"}
-                          {(!img.render_publish_mode || img.render_publish_mode === "none") && "Non pubblicato (solo anteprima admin)"}
-                        </span>
-                      </div>
-                    </div>
-                  )}
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="flex gap-1">
@@ -743,6 +730,7 @@ function VersionCard({
   alt,
   downloadUrl,
   downloadName,
+  statusPill,
 }: {
   label: string;
   inUse: boolean;
@@ -750,6 +738,7 @@ function VersionCard({
   alt: string;
   downloadUrl: string;
   downloadName: string;
+  statusPill?: string;
 }) {
   return (
     <div
@@ -763,6 +752,11 @@ function VersionCard({
           {label}
           {inUse && <span className="ml-1 text-primary">· in uso</span>}
         </span>
+        {statusPill && (
+          <span className="absolute bottom-1.5 left-1.5 right-1.5 truncate rounded-sm bg-background/85 px-1.5 py-0.5 text-[9px] uppercase tracking-wider text-foreground">
+            {statusPill}
+          </span>
+        )}
         <a
           href={downloadUrl}
           download={downloadName}
@@ -775,6 +769,44 @@ function VersionCard({
         </a>
       </div>
     </div>
+  );
+}
+
+function CompactBtn({
+  children,
+  onClick,
+  disabled,
+  title,
+  icon,
+  active,
+  danger,
+}: {
+  children: React.ReactNode;
+  onClick?: () => void;
+  disabled?: boolean;
+  title?: string;
+  icon?: React.ReactNode;
+  active?: boolean;
+  danger?: boolean;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      title={title}
+      className={`inline-flex items-center gap-1 rounded-sm border px-1.5 py-0.5 text-[9px] uppercase tracking-wider transition disabled:opacity-40 ${
+        active
+          ? "border-primary bg-primary/10 text-primary"
+          : danger
+          ? "border-border bg-background text-destructive hover:border-destructive/50"
+          : "border-border bg-background text-foreground hover:border-primary/50"
+      }`}
+    >
+      {active && <Check size={10} className="text-primary" />}
+      {icon}
+      {children}
+    </button>
   );
 }
 

@@ -16,7 +16,7 @@ import {
 } from "@/lib/render-options";
 
 const STRUCTURE_STRICT =
-  "STRUCTURAL FIDELITY (mandatory): keep the original photograph's architecture, perspective, camera angle, focal length, framing and proportions IDENTICAL. Do not move, add or remove walls, ceilings, floors, windows, doors, stairs, columns, beams or openings. Do not change the function/typology of the space. Preserve the view beyond windows and the structural materials of walls, floor and ceiling.";
+  "STRUCTURAL FIDELITY (ABSOLUTE, NON-NEGOTIABLE): preserve the original photograph's geometry EXACTLY. Walls, doors, windows, openings, perspective, camera angle, focal length, framing, proportions, scale and architectural layout MUST stay in the exact same position as the original photo. Do NOT add, remove, move, resize, duplicate or invent any wall, window, door, opening, staircase, column, beam, balcony or skylight. Do NOT change the number of windows or doors. Do NOT change the shape of the room. Preserve real visible light sources, the view beyond windows, ceiling height and structural materials of walls, floor and ceiling. Improve ONLY furniture, finishes, textiles, decor, materials, colors, lighting mood and overall styling. If in doubt, leave the architecture untouched. Italian rule for the agent: 'Preserva rigorosamente la geometria originale dell'ambiente: muri, porte, finestre, aperture, prospettiva e proporzioni devono rimanere nella stessa posizione della foto originale. Non aggiungere, rimuovere o spostare finestre, porte o aperture. Valorizza solo arredi, materiali, luci, colori e stile.'";
 
 const STRUCTURE_LOOSE =
   "Keep the camera angle and overall layout of the room recognizable; small adjustments to fixtures and finishes are allowed but do not invent new rooms or openings.";
@@ -406,7 +406,8 @@ export const renderPropertyImage = createServerFn({ method: "POST" })
       render_goal: img.render_goal,
       room_condition: img.room_condition,
       intervention_level: img.intervention_level,
-      preserve_structure: img.preserve_structure,
+      // Real-estate rendering must ALWAYS preserve the original architecture.
+      preserve_structure: true,
       desired_lighting: img.desired_lighting,
       visual_target: img.visual_target,
       render_notes: img.render_notes,
