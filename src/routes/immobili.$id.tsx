@@ -2,7 +2,7 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { getPublishedProperty, type PublicProperty } from "@/lib/public-properties.functions";
 import { getLocalizedProperty } from "@/lib/property-i18n.functions";
 import { ArrowLeft, ChevronLeft, ChevronRight, MapPin, Maximize2, BedDouble, Bath, Building2, Sparkles } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { WatermarkedImage } from "@/components/watermarked-image";
@@ -10,6 +10,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { BeforeAfterSlider } from "@/components/before-after-slider";
 import { whatsappUrl } from "@/components/whatsapp-float";
 import { useLanguage, useT } from "@/lib/i18n/LanguageContext";
+import { supabase } from "@/integrations/supabase/client";
+import { sendLeadNotification } from "@/lib/lead-notify.functions";
+import { Loader2, CheckCircle2 } from "lucide-react";
 import {
   localizeType,
   localizePrice,
