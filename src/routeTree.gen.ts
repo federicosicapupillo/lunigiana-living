@@ -24,7 +24,9 @@ import { Route as AdminAdminRouteImport } from './routes/_admin.admin'
 import { Route as AdminAdminIndexRouteImport } from './routes/_admin.admin.index'
 import { Route as AdminAdminRichiesteRouteImport } from './routes/_admin.admin.richieste'
 import { Route as AdminAdminImpostazioniRouteImport } from './routes/_admin.admin.impostazioni'
+import { Route as AdminAdminIdealistaRouteImport } from './routes/_admin.admin.idealista'
 import { Route as AdminAdminImmobiliIndexRouteImport } from './routes/_admin.admin.immobili.index'
+import { Route as ApiPublicIdealistaFeedDotxmlRouteImport } from './routes/api/public/idealista/feed[.]xml'
 import { Route as AdminAdminImmobiliNuovoRouteImport } from './routes/_admin.admin.immobili.nuovo'
 import { Route as AdminAdminImmobiliAssistenteRouteImport } from './routes/_admin.admin.immobili.assistente'
 import { Route as AdminAdminImmobiliIdRouteImport } from './routes/_admin.admin.immobili.$id'
@@ -104,11 +106,22 @@ const AdminAdminImpostazioniRoute = AdminAdminImpostazioniRouteImport.update({
   path: '/impostazioni',
   getParentRoute: () => AdminAdminRoute,
 } as any)
+const AdminAdminIdealistaRoute = AdminAdminIdealistaRouteImport.update({
+  id: '/idealista',
+  path: '/idealista',
+  getParentRoute: () => AdminAdminRoute,
+} as any)
 const AdminAdminImmobiliIndexRoute = AdminAdminImmobiliIndexRouteImport.update({
   id: '/immobili/',
   path: '/immobili/',
   getParentRoute: () => AdminAdminRoute,
 } as any)
+const ApiPublicIdealistaFeedDotxmlRoute =
+  ApiPublicIdealistaFeedDotxmlRouteImport.update({
+    id: '/api/public/idealista/feed.xml',
+    path: '/api/public/idealista/feed.xml',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AdminAdminImmobiliNuovoRoute = AdminAdminImmobiliNuovoRouteImport.update({
   id: '/immobili/nuovo',
   path: '/immobili/nuovo',
@@ -144,12 +157,14 @@ export interface FileRoutesByFullPath {
   '/admin/login': typeof AdminLoginRoute
   '/immobili/$id': typeof ImmobiliIdRoute
   '/immobili/': typeof ImmobiliIndexRoute
+  '/admin/idealista': typeof AdminAdminIdealistaRoute
   '/admin/impostazioni': typeof AdminAdminImpostazioniRoute
   '/admin/richieste': typeof AdminAdminRichiesteRoute
   '/admin/': typeof AdminAdminIndexRoute
   '/admin/immobili/$id': typeof AdminAdminImmobiliIdRouteWithChildren
   '/admin/immobili/assistente': typeof AdminAdminImmobiliAssistenteRoute
   '/admin/immobili/nuovo': typeof AdminAdminImmobiliNuovoRoute
+  '/api/public/idealista/feed.xml': typeof ApiPublicIdealistaFeedDotxmlRoute
   '/admin/immobili/': typeof AdminAdminImmobiliIndexRoute
   '/admin/immobili/$id/anteprima': typeof AdminAdminImmobiliIdAnteprimaRoute
 }
@@ -163,12 +178,14 @@ export interface FileRoutesByTo {
   '/admin/login': typeof AdminLoginRoute
   '/immobili/$id': typeof ImmobiliIdRoute
   '/immobili': typeof ImmobiliIndexRoute
+  '/admin/idealista': typeof AdminAdminIdealistaRoute
   '/admin/impostazioni': typeof AdminAdminImpostazioniRoute
   '/admin/richieste': typeof AdminAdminRichiesteRoute
   '/admin': typeof AdminAdminIndexRoute
   '/admin/immobili/$id': typeof AdminAdminImmobiliIdRouteWithChildren
   '/admin/immobili/assistente': typeof AdminAdminImmobiliAssistenteRoute
   '/admin/immobili/nuovo': typeof AdminAdminImmobiliNuovoRoute
+  '/api/public/idealista/feed.xml': typeof ApiPublicIdealistaFeedDotxmlRoute
   '/admin/immobili': typeof AdminAdminImmobiliIndexRoute
   '/admin/immobili/$id/anteprima': typeof AdminAdminImmobiliIdAnteprimaRoute
 }
@@ -186,12 +203,14 @@ export interface FileRoutesById {
   '/admin/login': typeof AdminLoginRoute
   '/immobili/$id': typeof ImmobiliIdRoute
   '/immobili/': typeof ImmobiliIndexRoute
+  '/_admin/admin/idealista': typeof AdminAdminIdealistaRoute
   '/_admin/admin/impostazioni': typeof AdminAdminImpostazioniRoute
   '/_admin/admin/richieste': typeof AdminAdminRichiesteRoute
   '/_admin/admin/': typeof AdminAdminIndexRoute
   '/_admin/admin/immobili/$id': typeof AdminAdminImmobiliIdRouteWithChildren
   '/_admin/admin/immobili/assistente': typeof AdminAdminImmobiliAssistenteRoute
   '/_admin/admin/immobili/nuovo': typeof AdminAdminImmobiliNuovoRoute
+  '/api/public/idealista/feed.xml': typeof ApiPublicIdealistaFeedDotxmlRoute
   '/_admin/admin/immobili/': typeof AdminAdminImmobiliIndexRoute
   '/_admin/admin/immobili/$id/anteprima': typeof AdminAdminImmobiliIdAnteprimaRoute
 }
@@ -209,12 +228,14 @@ export interface FileRouteTypes {
     | '/admin/login'
     | '/immobili/$id'
     | '/immobili/'
+    | '/admin/idealista'
     | '/admin/impostazioni'
     | '/admin/richieste'
     | '/admin/'
     | '/admin/immobili/$id'
     | '/admin/immobili/assistente'
     | '/admin/immobili/nuovo'
+    | '/api/public/idealista/feed.xml'
     | '/admin/immobili/'
     | '/admin/immobili/$id/anteprima'
   fileRoutesByTo: FileRoutesByTo
@@ -228,12 +249,14 @@ export interface FileRouteTypes {
     | '/admin/login'
     | '/immobili/$id'
     | '/immobili'
+    | '/admin/idealista'
     | '/admin/impostazioni'
     | '/admin/richieste'
     | '/admin'
     | '/admin/immobili/$id'
     | '/admin/immobili/assistente'
     | '/admin/immobili/nuovo'
+    | '/api/public/idealista/feed.xml'
     | '/admin/immobili'
     | '/admin/immobili/$id/anteprima'
   id:
@@ -250,12 +273,14 @@ export interface FileRouteTypes {
     | '/admin/login'
     | '/immobili/$id'
     | '/immobili/'
+    | '/_admin/admin/idealista'
     | '/_admin/admin/impostazioni'
     | '/_admin/admin/richieste'
     | '/_admin/admin/'
     | '/_admin/admin/immobili/$id'
     | '/_admin/admin/immobili/assistente'
     | '/_admin/admin/immobili/nuovo'
+    | '/api/public/idealista/feed.xml'
     | '/_admin/admin/immobili/'
     | '/_admin/admin/immobili/$id/anteprima'
   fileRoutesById: FileRoutesById
@@ -270,6 +295,7 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TerritoriRoute: typeof TerritoriRoute
   AdminLoginRoute: typeof AdminLoginRoute
+  ApiPublicIdealistaFeedDotxmlRoute: typeof ApiPublicIdealistaFeedDotxmlRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -379,12 +405,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAdminImpostazioniRouteImport
       parentRoute: typeof AdminAdminRoute
     }
+    '/_admin/admin/idealista': {
+      id: '/_admin/admin/idealista'
+      path: '/idealista'
+      fullPath: '/admin/idealista'
+      preLoaderRoute: typeof AdminAdminIdealistaRouteImport
+      parentRoute: typeof AdminAdminRoute
+    }
     '/_admin/admin/immobili/': {
       id: '/_admin/admin/immobili/'
       path: '/immobili'
       fullPath: '/admin/immobili/'
       preLoaderRoute: typeof AdminAdminImmobiliIndexRouteImport
       parentRoute: typeof AdminAdminRoute
+    }
+    '/api/public/idealista/feed.xml': {
+      id: '/api/public/idealista/feed.xml'
+      path: '/api/public/idealista/feed.xml'
+      fullPath: '/api/public/idealista/feed.xml'
+      preLoaderRoute: typeof ApiPublicIdealistaFeedDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_admin/admin/immobili/nuovo': {
       id: '/_admin/admin/immobili/nuovo'
@@ -429,6 +469,7 @@ const AdminAdminImmobiliIdRouteWithChildren =
   AdminAdminImmobiliIdRoute._addFileChildren(AdminAdminImmobiliIdRouteChildren)
 
 interface AdminAdminRouteChildren {
+  AdminAdminIdealistaRoute: typeof AdminAdminIdealistaRoute
   AdminAdminImpostazioniRoute: typeof AdminAdminImpostazioniRoute
   AdminAdminRichiesteRoute: typeof AdminAdminRichiesteRoute
   AdminAdminIndexRoute: typeof AdminAdminIndexRoute
@@ -439,6 +480,7 @@ interface AdminAdminRouteChildren {
 }
 
 const AdminAdminRouteChildren: AdminAdminRouteChildren = {
+  AdminAdminIdealistaRoute: AdminAdminIdealistaRoute,
   AdminAdminImpostazioniRoute: AdminAdminImpostazioniRoute,
   AdminAdminRichiesteRoute: AdminAdminRichiesteRoute,
   AdminAdminIndexRoute: AdminAdminIndexRoute,
@@ -486,6 +528,7 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TerritoriRoute: TerritoriRoute,
   AdminLoginRoute: AdminLoginRoute,
+  ApiPublicIdealistaFeedDotxmlRoute: ApiPublicIdealistaFeedDotxmlRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
