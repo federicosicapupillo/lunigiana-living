@@ -269,20 +269,14 @@ function Index() {
       {/* FEATURED PROPERTIES */}
       <section className="section-sand py-16 sm:py-20 md:py-32">
         <div className="container-editorial">
-          <div className="flex flex-wrap items-end justify-between gap-6">
-            <div>
-              <span className="eyebrow">{t("home.featured.eyebrow")}</span>
-              <h2 className="mt-3 font-serif text-3xl text-ink sm:text-4xl md:text-5xl">
-                {t("home.featured.title")}
-              </h2>
-            </div>
-            <Link
-              to="/immobili"
-              className="group inline-flex items-center gap-2 text-sm uppercase tracking-[0.2em] text-primary underline decoration-primary/40 decoration-1 underline-offset-[6px] transition-colors hover:text-[color:var(--terracotta-hover)] hover:decoration-[color:var(--terracotta-hover)]"
-            >
-              {t("cta.allProperties")}
-              <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
-            </Link>
+          <div className="text-center">
+            <span className="eyebrow">{t("home.featured.eyebrow")}</span>
+            <h2 className="mt-3 font-serif text-3xl text-ink sm:text-4xl md:text-5xl">
+              {t("home.featured.title")}
+            </h2>
+            <p className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-foreground/70">
+              {t("home.featured.subtitle")}
+            </p>
           </div>
 
           <div className="mt-10">
@@ -293,6 +287,15 @@ function Index() {
             {featuredProperties.map((p) => (
               <PropertyCard key={p.id} p={localizedById.get(p.id) ?? localizePropertyDynamic(p, language)} />
             ))}
+          </div>
+
+          <div className="mt-12 flex justify-center sm:mt-16">
+            <Link
+              to="/immobili"
+              className="inline-flex items-center gap-3 rounded-sm bg-terracotta px-8 py-4 text-xs uppercase tracking-[0.2em] text-cream transition hover:bg-[color:var(--terracotta-hover)] sm:px-10 sm:py-5 sm:text-sm"
+            >
+              {t("cta.viewAllProperties")} <ArrowRight size={16} />
+            </Link>
           </div>
         </div>
       </section>
