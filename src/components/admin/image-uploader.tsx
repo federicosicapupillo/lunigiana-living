@@ -609,6 +609,13 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
                     alt={img.alt_text ?? "Originale"}
                     downloadUrl={img.image_url}
                     downloadName={`originale-${img.id}.jpg`}
+                    onClick={() =>
+                      setCompareState({
+                        image: img,
+                        mode: img.enhanced_image_url ? "enhanced" : "rendered",
+                        afterMissing: !img.enhanced_image_url && !img.rendered_signed_url,
+                      })
+                    }
                   />
                   {/* Migliorata */}
                   {img.enhanced_image_url ? (
@@ -619,6 +626,9 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
                       alt="Migliorata"
                       downloadUrl={img.enhanced_image_url}
                       downloadName={`migliorata-${img.id}.jpg`}
+                      onClick={() =>
+                        setCompareState({ image: img, mode: "enhanced" })
+                      }
                     />
                   ) : (
                     <EmptyVersion
@@ -649,6 +659,9 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
                             : img.render_publish_mode === "emotional"
                               ? "Prima/Dopo"
                               : "Generato · non pubblicato"
+                        }
+                        onClick={() =>
+                          setCompareState({ image: img, mode: "rendered" })
                         }
                       />
                       <div className="flex flex-wrap gap-1">
