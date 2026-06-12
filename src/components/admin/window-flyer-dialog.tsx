@@ -517,7 +517,6 @@ const FlyerSheet = forwardRef<
 
   const cityMain = (property.municipality || property.area_zone || "").toUpperCase();
   const cityProv = property.province ? `(${property.province.toUpperCase()})` : "";
-  const subRegion = "LUNIGIANA - TOSCANA";
 
   const rawDescription = (longDescription || property.short_notes || "").trim();
   const condensed = rawDescription ? condenseDescription(rawDescription, 720) : "";
@@ -552,8 +551,9 @@ const FlyerSheet = forwardRef<
   const hasRender = images.some((i) => i.isRender);
 
   const hero = images[0];
-  const thumbsRaw = images.slice(1, 3);
+  const thumbsRaw = images.slice(1, 3).filter(Boolean);
   const thumbs = thumbSwap ? [...thumbsRaw].reverse() : thumbsRaw;
+  const hasThumbs = thumbs.length > 0;
 
   // Checklist principale (max 8 voci, 2 colonne). Usa attributi reali quando presenti,
   // poi completa con un set standard di pregi sempre validi per il cartello vetrina.
@@ -633,31 +633,21 @@ const FlyerSheet = forwardRef<
           style={{ height: 170, width: "auto", objectFit: "contain" }}
         />
         <div style={{ width: 2, height: 130, background: "#1A1A1A", justifySelf: "center" }} />
-        <div style={{ textAlign: "center", minWidth: 0 }}>
+        <div style={{ textAlign: "center", minWidth: 0, display: "flex", flexDirection: "column", justifyContent: "center" }}>
           <div
             style={{
-              fontSize: 96,
+              fontSize: 92,
               fontWeight: 900,
-              lineHeight: 1,
+              lineHeight: 1.05,
               letterSpacing: -1,
               color: "#0F0F0F",
               fontFamily: "Helvetica, Arial, sans-serif",
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
             }}
           >
             {cityMain} {cityProv}
-          </div>
-          <div
-            style={{
-              marginTop: 10,
-              fontSize: 26,
-              letterSpacing: 8,
-              textTransform: "uppercase",
-              color: "#B23D2A",
-              fontFamily: "Helvetica, Arial, sans-serif",
-              fontWeight: 700,
-            }}
-          >
-            {subRegion}
           </div>
         </div>
         <div
@@ -666,7 +656,8 @@ const FlyerSheet = forwardRef<
             border: "3px solid #B23D2A",
             background: "transparent",
             padding: "14px 28px",
-            minWidth: 280,
+            minWidth: 300,
+            maxWidth: 360,
           }}
         >
           <div
@@ -677,19 +668,23 @@ const FlyerSheet = forwardRef<
               color: "#1A1A1A",
               fontFamily: "Helvetica, Arial, sans-serif",
               fontWeight: 700,
+              whiteSpace: "nowrap",
             }}
           >
             {t.code}
           </div>
           <div
             style={{
-              fontSize: 64,
+              fontSize: 52,
               fontWeight: 900,
               color: "#B23D2A",
               fontFamily: "Helvetica, Arial, sans-serif",
-              letterSpacing: 1,
-              marginTop: 2,
-              lineHeight: 1,
+              letterSpacing: 0.5,
+              marginTop: 4,
+              lineHeight: 1.05,
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
             }}
           >
             {property.reference_code || "—"}
@@ -702,7 +697,7 @@ const FlyerSheet = forwardRef<
         style={{
           minHeight: 0,
           display: "grid",
-          gridTemplateColumns: "1.55fr 0.6fr 1fr",
+          gridTemplateColumns: hasThumbs ? "1.55fr 0.6fr 1fr" : "2.15fr 1fr",
           gap: 14,
           overflow: "hidden",
         }}
@@ -715,26 +710,20 @@ const FlyerSheet = forwardRef<
           )}
         </div>
 
-        <div
-          style={{
-            display: "grid",
-            gridTemplateRows: "1fr 1fr",
-            gap: 14,
-            minHeight: 0,
-          }}
-        >
-          {[0, 1].map((idx) => {
-            const ti = thumbs[idx];
-            return ti ? (
+        {hasThumbs && (
+          <div
+            style={{
+              display: "grid",
+              gridTemplateRows: thumbs.length === 2 ? "1fr 1fr" : "1fr",
+              gap: 14,
+              minHeight: 0,
+            }}
+          >
+            {thumbs.map((ti) => (
               <Img key={ti.id} img={ti} lang={lang} style={{ width: "100%", height: "100%" }} />
-            ) : (
-              <div
-                key={`empty-${idx}`}
-                style={{ background: "#E8DCC8", border: "1px dashed #B23D2A" }}
-              />
-            );
-          })}
-        </div>
+            ))}
+          </div>
+        )}
 
         <aside
           style={{
