@@ -401,7 +401,7 @@ export const listPublishedPropertiesSummary = createServerFn({ method: "GET" }).
       .in("property_id", ids)
       .order("is_cover", { ascending: false })
       .order("sort_order", { ascending: true })
-      .limit(propRows.length * 2),
+      ,
     supabaseAdmin
       .from("property_features")
       .select("property_id, feature_name, feature_value")
