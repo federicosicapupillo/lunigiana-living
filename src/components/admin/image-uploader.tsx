@@ -161,7 +161,6 @@ function computeAvailability(row: {
   };
 }
 
-
 function extractSettings(img: Image): RenderSettings {
   return {
     photo_type: img.photo_type,
@@ -176,6 +175,7 @@ function extractSettings(img: Image): RenderSettings {
     render_notes: img.render_notes,
   };
 }
+
 
 export function ImageUploader({ propertyId }: { propertyId: string }) {
   const [images, setImages] = useState<Image[]>([]);
