@@ -41,6 +41,7 @@ export type PublicProperty = {
   tag?: string;
   isRent: boolean;
   galleryPairs: Record<string, string>;
+  createdAt: string | null;
 };
 
 const PLACEHOLDER =
@@ -114,6 +115,7 @@ type PropertyRow = {
   energy_class: string | null;
   energy_performance_index_status: string | null;
   energy_performance_index_value: number | null;
+  created_at: string | null;
 };
 
 type ImageRow = {
