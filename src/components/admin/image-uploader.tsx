@@ -955,8 +955,8 @@ function CompactBtn({
         active
           ? "border-primary bg-primary/10 text-primary"
           : danger
-          ? "border-border bg-background text-destructive hover:border-destructive/50"
-          : "border-border bg-background text-foreground hover:border-primary/50"
+            ? "border-border bg-background text-destructive hover:border-destructive/50"
+            : "border-border bg-background text-foreground hover:border-primary/50"
       }`}
     >
       {active && <Check size={10} className="text-primary" />}
