@@ -663,18 +663,33 @@ const FlyerSheet = forwardRef<
           style={{ height: 170, width: "auto", objectFit: "contain" }}
         />
         <div style={{ width: 2, height: 130, background: "#1A1A1A", justifySelf: "center" }} />
-        <div style={{ textAlign: "center", minWidth: 0, display: "flex", flexDirection: "column", justifyContent: "center" }}>
+        <div
+          style={{
+            textAlign: "center",
+            minWidth: 0,
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            paddingBlock: 14,
+          }}
+        >
           <div
             style={{
-              fontSize: 92,
+              fontSize: (() => {
+                const len = `${cityMain} ${cityProv}`.trim().length;
+                if (len <= 10) return 92;
+                if (len <= 14) return 78;
+                if (len <= 18) return 66;
+                return 56;
+              })(),
               fontWeight: 900,
-              lineHeight: 1.05,
+              lineHeight: 1.25,
               letterSpacing: -1,
               color: "#0F0F0F",
               fontFamily: "Helvetica, Arial, sans-serif",
               whiteSpace: "nowrap",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
+              overflow: "visible",
+              paddingBlock: 6,
             }}
           >
             {cityMain} {cityProv}
@@ -685,9 +700,9 @@ const FlyerSheet = forwardRef<
             textAlign: "center",
             border: "3px solid #B23D2A",
             background: "transparent",
-            padding: "14px 28px",
-            minWidth: 300,
-            maxWidth: 360,
+            padding: "18px 28px 22px",
+            minWidth: 340,
+            maxWidth: 420,
           }}
         >
           <div
@@ -699,22 +714,23 @@ const FlyerSheet = forwardRef<
               fontFamily: "Helvetica, Arial, sans-serif",
               fontWeight: 700,
               whiteSpace: "nowrap",
+              lineHeight: 1.2,
             }}
           >
             {t.code}
           </div>
           <div
             style={{
-              fontSize: 52,
+              fontSize: (property.reference_code || "—").length > 12 ? 36 : 46,
               fontWeight: 900,
               color: "#B23D2A",
               fontFamily: "Helvetica, Arial, sans-serif",
               letterSpacing: 0.5,
-              marginTop: 4,
-              lineHeight: 1.05,
+              marginTop: 6,
+              lineHeight: 1.25,
               whiteSpace: "nowrap",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
+              overflow: "visible",
+              paddingBlock: 4,
             }}
           >
             {property.reference_code || "—"}
