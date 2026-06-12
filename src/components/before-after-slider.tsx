@@ -14,6 +14,8 @@ type Props = {
   aiBadge: string;
   illustrativeNote: string;
   className?: string;
+  aspectClassName?: string;
+  hideCaption?: boolean;
 };
 
 export function BeforeAfterSlider({
@@ -27,6 +29,8 @@ export function BeforeAfterSlider({
   aiBadge,
   illustrativeNote,
   className,
+  aspectClassName = "aspect-[4/3]",
+  hideCaption = false,
 }: Props) {
   const [position, setPosition] = useState(50);
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -76,7 +80,7 @@ export function BeforeAfterSlider({
     <figure className={cn("overflow-hidden rounded-sm border border-border bg-card", className)}>
       <div
         ref={containerRef}
-        className="relative aspect-[4/3] w-full select-none overflow-hidden bg-muted touch-none"
+        className={cn("relative w-full h-full select-none overflow-hidden bg-muted touch-none", aspectClassName)}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
@@ -138,6 +142,7 @@ export function BeforeAfterSlider({
           </svg>
         </button>
       </div>
+      {!hideCaption && (
       <figcaption className="flex flex-col gap-1 px-3 py-2 text-[11px] italic text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
         <span>
           <strong className="not-italic font-medium text-ink">{beforeLabel}:</strong>{" "}
@@ -148,6 +153,7 @@ export function BeforeAfterSlider({
           {afterCaption} · {illustrativeNote}
         </span>
       </figcaption>
+      )}
     </figure>
   );
 }
