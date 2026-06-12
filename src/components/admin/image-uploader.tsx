@@ -607,44 +607,11 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
                   <RenderSettingsPanel
                     imageId={img.id}
                     initial={extractSettings(img)}
+                    hasRender={!!img.rendered_storage_path}
+                    canRender={!!img.render_availability?.canRender}
+                    rendering={renderingId === img.id}
+                    onGenerate={() => generate(img)}
                   />
-                  <div className="flex flex-wrap items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() => generate(img)}
-                      disabled={
-                        renderingId === img.id ||
-                        !img.photo_type ||
-                        syncingId === img.id ||
-                        !img.render_availability?.canRender
-                      }
-                      className="inline-flex flex-1 items-center justify-center gap-1 rounded-sm bg-primary px-2 py-1.5 text-[10px] uppercase tracking-wider text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
-                    >
-                      {renderingId === img.id ? (
-                        <Loader2 size={12} className="animate-spin" />
-                      ) : (
-                        <Sparkles size={12} />
-                      )}
-                      {img.rendered_storage_path ? "Rigenera rendering" : "Genera rendering"}
-                    </button>
-                  </div>
-                  <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
-                    Stato:{" "}
-                    <span
-                      className={
-                        img.render_status === "error"
-                          ? "text-destructive"
-                          : img.render_status === "completed"
-                          ? "text-primary"
-                          : ""
-                      }
-                    >
-                      {(img.render_status === "not_generated" || img.render_status === "idle") && "Rendering non ancora generato"}
-                      {img.render_status === "processing" && "In elaborazione"}
-                      {(img.render_status === "completed" || img.render_status === "done") && "Rendering generato"}
-                      {img.render_status === "error" && "Errore"}
-                    </span>
-                  </div>
                   {img.render_error && (
                     <div className="text-[10px] text-destructive">{img.render_error}</div>
                   )}
