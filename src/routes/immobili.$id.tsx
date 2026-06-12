@@ -139,6 +139,8 @@ function PropertyDetail() {
                 aiBadge={t("detail.emotionalBadge")}
                 illustrativeNote={t("detail.illustrativeNote")}
                 className="h-full w-full border-0 rounded-sm"
+                aspectClassName=""
+                hideCaption
               />
             ) : (
               <WatermarkedImage
