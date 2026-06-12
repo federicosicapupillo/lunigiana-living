@@ -12,7 +12,6 @@ import {
 } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { generateDescription } from "@/lib/ai-description.functions";
-import { translatePropertyToEnglish } from "@/lib/property-translate.functions";
 import { ImageUploader } from "@/components/admin/image-uploader";
 import { LocationFields } from "@/components/admin/location-fields";
 import {
@@ -61,7 +60,6 @@ import {
   type StatusAction,
 } from "@/lib/admin/property-status";
 import { ConfirmDialog } from "@/components/admin/confirm-dialog";
-import { Languages } from "lucide-react";
 
 type Property = {
   id: string;
@@ -129,7 +127,6 @@ const TABS = [
   { id: "photos", label: "Foto" },
   { id: "narrative", label: "Parametri narrativi" },
   { id: "description", label: "Descrizione AI" },
-  { id: "english", label: "Versione inglese" },
 ] as const;
 type Tab = (typeof TABS)[number]["id"];
 
