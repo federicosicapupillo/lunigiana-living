@@ -729,3 +729,111 @@ export const verifyAndSyncAllPhotos = createServerFn({ method: "POST" })
       errors,
     };
   });
+
+/**
+ * Sincronizzazione forzata BATCHED: prende fino a `limit` foto NON ancora
+ * marcate `synced_to_storage` (eventualmente filtrate per immobile) e prova
+ * a portarle nello storage. Pensata per essere chiamata in loop dal client
+ * fino a quando `remaining === 0`, così non sbatte contro i limiti di
+ * tempo del Worker su archivi grandi.
+ * Riservata agli admin.
+ */
+export const forceSyncPhotosBatch = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(
+    (data: { limit?: number; propertyId?: string } | undefined) =>
+      z
+        .object({
+          limit: z.number().int().min(1).max(50).optional(),
+          propertyId: z.string().uuid().optional(),
+        })
+        .parse(data ?? {}),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { supabase, userId } = context;
+    const { data: roleRow } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userId)
+      .eq("role", "admin")
+      .maybeSingle();
+    if (!roleRow) throw new Error("Solo gli admin possono sincronizzare le foto");
+
+    const limit = data.limit ?? 15;
+
+    const buildQuery = () => {
+      let q = supabaseAdmin
+        .from("property_images")
+        .select(
+          "id, property_id, image_url, original_image_url, storage_path, imported_source_url, import_status, is_imported",
+          { count: "exact" },
+        )
+        .or("import_status.is.null,import_status.neq.synced_to_storage");
+      if (data.propertyId) q = q.eq("property_id", data.propertyId);
+      return q;
+    };
+
+    const { data: rows, count, error } = await buildQuery()
+      .order("created_at", { ascending: true })
+      .limit(limit);
+    if (error) throw new Error(error.message);
+
+    let synced = 0;
+    let alreadyOk = 0;
+    let failed = 0;
+    const errors: Array<{ imageId: string; propertyId: string; message: string }> = [];
+
+    // Process in parallel within the batch (small N, IO-bound)
+    await Promise.all(
+      (rows ?? []).map(async (img) => {
+        try {
+          const availability = await verifyInternalStorageImage(supabaseAdmin, img);
+          if (availability.canRender) {
+            alreadyOk++;
+            return;
+          }
+          const sourceUrl =
+            img.imported_source_url ??
+            (isExternalUrl(img.storage_path) ? img.storage_path : null) ??
+            (isExternalUrl(img.original_image_url) ? img.original_image_url : null) ??
+            (isExternalUrl(img.image_url) ? img.image_url : null);
+          if (!sourceUrl) {
+            failed++;
+            errors.push({
+              imageId: img.id,
+              propertyId: img.property_id,
+              message: availability.message ?? "Nessuna sorgente disponibile",
+            });
+            return;
+          }
+          await syncImportedImageToBucket(img.id, img.property_id, sourceUrl);
+          synced++;
+        } catch (err) {
+          failed++;
+          await supabaseAdmin
+            .from("property_images")
+            .update({ import_status: "sync_error", render_error: SYNC_ERROR_MESSAGE })
+            .eq("id", img.id);
+          errors.push({
+            imageId: img.id,
+            propertyId: img.property_id,
+            message: err instanceof Error ? err.message : SYNC_ERROR_MESSAGE,
+          });
+        }
+      }),
+    );
+
+    const processed = rows?.length ?? 0;
+    const remaining = Math.max(0, (count ?? processed) - processed);
+
+    return {
+      ok: true as const,
+      processed,
+      remaining,
+      synced,
+      alreadyOk,
+      failed,
+      errors,
+    };
+  });
