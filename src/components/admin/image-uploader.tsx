@@ -1,13 +1,15 @@
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { ImagePlus, Star, StarOff, Trash2, ArrowUp, ArrowDown, Loader2, Sparkles, Check, CloudDownload, Wand2, Download, Zap } from "lucide-react";
+import { ImagePlus, Star, StarOff, Trash2, ArrowUp, ArrowDown, Loader2, Sparkles, Check, CloudDownload, Wand2, Download, Zap, Heart, Undo2, X } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import {
   renderPropertyImage,
   setPropertyImagePublished,
   syncImportedImage,
   forceSyncPhotosBatch,
+  setRenderPublishMode,
+  discardRender,
 } from "@/lib/property-render.functions";
 import {
   enhancePropertyImage,
@@ -30,6 +32,7 @@ type Image = {
   render_status: string;
   render_error: string | null;
   use_rendered: boolean;
+  render_publish_mode?: string | null;
   enhanced_storage_path: string | null;
   enhanced_image_url: string | null;
   enhancement_status: string;
@@ -130,6 +133,8 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
   const fileRef = useRef<HTMLInputElement>(null);
   const runRender = useServerFn(renderPropertyImage);
   const runSetPublished = useServerFn(setPropertyImagePublished);
+  const runSetPublishMode = useServerFn(setRenderPublishMode);
+  const runDiscardRender = useServerFn(discardRender);
   const runSync = useServerFn(syncImportedImage);
   const runForceSync = useServerFn(forceSyncPhotosBatch);
   const [bulkSyncing, setBulkSyncing] = useState(false);
@@ -163,7 +168,7 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
     const { data, error } = await supabase
       .from("property_images")
       .select(
-        "id, image_url, original_image_url, rendered_image_url, published_image_url, storage_path, alt_text, sort_order, is_cover, rendered_storage_path, render_status, render_error, use_rendered, enhanced_storage_path, enhanced_image_url, enhancement_status, enhancement_error, enhancement_created_at, use_enhanced, is_imported, import_status, imported_source_url, photo_type, photo_category, render_style, render_goal, room_condition, intervention_level, preserve_structure, desired_lighting, visual_target, render_notes",
+        "id, image_url, original_image_url, rendered_image_url, published_image_url, storage_path, alt_text, sort_order, is_cover, rendered_storage_path, render_status, render_error, use_rendered, render_publish_mode, enhanced_storage_path, enhanced_image_url, enhancement_status, enhancement_error, enhancement_created_at, use_enhanced, is_imported, import_status, imported_source_url, photo_type, photo_category, render_style, render_goal, room_condition, intervention_level, preserve_structure, desired_lighting, visual_target, render_notes",
       )
       .eq("property_id", propertyId)
       .order("sort_order", { ascending: true });
