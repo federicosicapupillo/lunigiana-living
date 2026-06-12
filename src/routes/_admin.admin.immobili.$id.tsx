@@ -15,6 +15,7 @@ import { generateDescription } from "@/lib/ai-description.functions";
 import { ImageUploader } from "@/components/admin/image-uploader";
 import { LocationFields } from "@/components/admin/location-fields";
 import { WindowFlyerDialog } from "@/components/admin/window-flyer-dialog";
+import { IdealistaPublishDialog } from "@/components/admin/idealista-publish-dialog";
 import {
   PROPERTY_TYPES,
   CONTRACT_TYPES,
@@ -162,6 +163,7 @@ function PropertyEditor() {
   const [saving, setSaving] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [flyerOpen, setFlyerOpen] = useState(false);
+  const [idealistaOpen, setIdealistaOpen] = useState(false);
 
   // Description controls
   const [genLength, setGenLength] = useState<"breve" | "media" | "editoriale">("media");
@@ -361,6 +363,12 @@ function PropertyEditor() {
           >
             <FileText size={13} /> Genera cartello A4
           </button>
+          <button
+            onClick={() => setIdealistaOpen(true)}
+            className="inline-flex items-center gap-2 rounded-sm border border-border bg-background px-4 py-2 text-xs uppercase tracking-wider hover:border-primary/50"
+          >
+            <FileText size={13} /> Pubblica su Idealista
+          </button>
           <StatusActionsButton
             status={prop.status}
             open={statusMenu}
@@ -449,6 +457,13 @@ function PropertyEditor() {
         property={prop}
         open={flyerOpen}
         onClose={() => setFlyerOpen(false)}
+      />
+      <IdealistaPublishDialog
+        property={prop}
+        description={desc}
+        open={idealistaOpen}
+        onClose={() => setIdealistaOpen(false)}
+        onPublished={load}
       />
     </div>
   );
