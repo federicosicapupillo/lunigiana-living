@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Loader2, Save, CloudDownload, RefreshCw, Wand2, Upload } from "lucide-react";
+import { Loader2, Save, CloudDownload, RefreshCw, Wand2, Upload, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 import { useServerFn } from "@tanstack/react-start";
 import {
@@ -8,7 +8,7 @@ import {
   setHomeHeroVariant,
   type HomeHeroVariant,
 } from "@/lib/site-settings.functions";
-import { syncAllImportedImages } from "@/lib/property-render.functions";
+import { syncAllImportedImages, verifyAndSyncAllPhotos } from "@/lib/property-render.functions";
 import {
   enhanceAllImages,
   publishAllEnhancedImages,
@@ -52,6 +52,7 @@ function SettingsPage() {
   const get = useServerFn(getHomeHeroVariant);
   const set = useServerFn(setHomeHeroVariant);
   const syncAll = useServerFn(syncAllImportedImages);
+  const verifySyncAll = useServerFn(verifyAndSyncAllPhotos);
   const enhanceAll = useServerFn(enhanceAllImages);
   const publishAll = useServerFn(publishAllEnhancedImages);
   const [variant, setVariant] = useState<HomeHeroVariant>("lunigiana_emotional");
@@ -69,6 +70,19 @@ function SettingsPage() {
   >(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [publishing, setPublishing] = useState(false);
+  const [verifyConfirmOpen, setVerifyConfirmOpen] = useState(false);
+  const [verifying, setVerifying] = useState(false);
+  const [verifyResult, setVerifyResult] = useState<
+    | {
+        propertiesAnalyzed: number;
+        totalImages: number;
+        alreadyOk: number;
+        synced: number;
+        failed: number;
+        errors: Array<{ imageId: string; propertyId: string; message: string }>;
+      }
+    | null
+  >(null);
 
   useEffect(() => {
     get()
@@ -129,6 +143,29 @@ function SettingsPage() {
       toast.error(e instanceof Error ? e.message : "Errore pubblicazione");
     } finally {
       setPublishing(false);
+    }
+  };
+
+  const runVerifySyncAll = async () => {
+    setVerifyConfirmOpen(false);
+    setVerifying(true);
+    setVerifyResult(null);
+    try {
+      const res = await verifySyncAll();
+      setVerifyResult(res);
+      if (res.failed === 0) {
+        toast.success(
+          `Verifica completata · ${res.alreadyOk} ok · ${res.synced} sincronizzate`,
+        );
+      } else {
+        toast.warning(
+          `Verifica completata con ${res.failed} errori · ${res.synced} sincronizzate`,
+        );
+      }
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Errore verifica foto");
+    } finally {
+      setVerifying(false);
     }
   };
 
