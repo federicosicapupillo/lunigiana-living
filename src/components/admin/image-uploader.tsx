@@ -476,14 +476,60 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
                   )}
                   {/* Rendering */}
                   {img.rendered_signed_url ? (
-                    <VersionCard
-                      label="Rendering"
-                      inUse={img.use_rendered}
-                      src={img.rendered_signed_url}
-                      alt="Rendering"
-                      downloadUrl={img.rendered_signed_url}
-                      downloadName={`rendering-${img.id}.jpg`}
-                    />
+                    <div className="flex flex-col gap-1.5">
+                      <VersionCard
+                        label="Rendering"
+                        inUse={img.use_rendered}
+                        src={img.rendered_signed_url}
+                        alt="Rendering"
+                        downloadUrl={img.rendered_signed_url}
+                        downloadName={`rendering-${img.id}.jpg`}
+                        statusPill={
+                          img.render_publish_mode === "main"
+                            ? "Sostituisce originale"
+                            : img.render_publish_mode === "emotional"
+                            ? "Prima/Dopo"
+                            : "Generato · non pubblicato"
+                        }
+                      />
+                      <div className="flex flex-wrap gap-1">
+                        <CompactBtn
+                          onClick={() => setPublishMode(img, "main")}
+                          disabled={img.render_publish_mode === "main"}
+                          title="Sostituisce la foto originale nella gallery. L'originale resta come backup."
+                          icon={<Sparkles size={10} />}
+                          active={img.render_publish_mode === "main"}
+                        >
+                          Sostituisci originale
+                        </CompactBtn>
+                        <CompactBtn
+                          onClick={() => setPublishMode(img, "emotional")}
+                          disabled={img.render_publish_mode === "emotional"}
+                          title="Mostra il rendering nella sezione pubblica Prima/Dopo."
+                          icon={<Heart size={10} />}
+                          active={img.render_publish_mode === "emotional"}
+                        >
+                          Usa come Prima/Dopo
+                        </CompactBtn>
+                        {img.render_publish_mode === "main" && (
+                          <CompactBtn
+                            onClick={() => setPublishMode(img, "none")}
+                            title="Torna a mostrare la foto originale nella gallery."
+                            icon={<Undo2 size={10} />}
+                          >
+                            Ripristina originale
+                          </CompactBtn>
+                        )}
+                        <CompactBtn
+                          onClick={() => discard(img)}
+                          title="Elimina il rendering generato. La foto originale resta intatta."
+                          icon={<X size={10} />}
+                          danger
+                        >
+                          Scarta
+                        </CompactBtn>
+                      </div>
+                    </div>
                   ) : (
                     <EmptyVersion
                       icon={<Sparkles size={14} />}
