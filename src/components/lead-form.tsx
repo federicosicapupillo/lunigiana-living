@@ -2,6 +2,8 @@ import { useState, type FormEvent } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { ArrowRight, Loader2, CheckCircle2, MessageCircle } from "lucide-react";
 import { useT, useLanguage } from "@/lib/i18n/LanguageContext";
+import { useServerFn } from "@tanstack/react-start";
+import { sendLeadNotification } from "@/lib/lead-notify.functions";
 
 const PROPERTY_TYPES_IT = [
   "Appartamento","Casa indipendente","Villetta","Rustico / casale","Villa","Terreno","Immobile da ristrutturare","Non ho ancora deciso",
@@ -19,6 +21,7 @@ const BUDGETS_EN = [
 export function LeadForm() {
   const t = useT();
   const { language } = useLanguage();
+  const notify = useServerFn(sendLeadNotification);
   const [status, setStatus] = useState<"idle" | "submitting" | "ok" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [openedAt] = useState(() => Date.now());
@@ -77,6 +80,22 @@ export function LeadForm() {
       setStatus("error");
       setErrorMsg(t("form.err.generic"));
       return;
+    }
+    try {
+      await notify({
+        data: {
+          full_name: payload.full_name,
+          email: payload.email,
+          phone: payload.phone,
+          message: payload.message,
+          preferred_area: payload.preferred_area,
+          budget_range: payload.budget_range,
+          property_type: payload.property_type,
+          source_page: payload.source_page,
+        },
+      });
+    } catch (err) {
+      console.error("[lead notify] failed", err);
     }
     setStatus("ok");
     form.reset();
