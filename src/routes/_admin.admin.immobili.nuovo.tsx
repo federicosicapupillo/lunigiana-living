@@ -234,10 +234,6 @@ function NewPropertyPage() {
 
       const payload = {
         title: f.title.trim(),
-        title_en: f.title_en.trim() || null,
-        subtitle_en: f.subtitle_en.trim() || null,
-        summary_en: f.summary_en.trim() || null,
-        location_description_en: f.location_description_en.trim() || null,
         slug: slugify(
           [f.title, f.municipality].filter((v) => v && v.trim()).join(" ") ||
             "immobile",
@@ -322,17 +318,6 @@ function NewPropertyPage() {
       if (extraFeatures.length) {
         const { error: fErr } = await supabase.from("property_features").insert(extraFeatures);
         if (fErr) console.warn("[nuovo] features insert warn:", fErr.message);
-      }
-
-      // Save EN description if provided
-      if (f.description_en.trim()) {
-        const { error: dErr } = await supabase
-          .from("property_descriptions")
-          .upsert(
-            { property_id: data.id, description_en: f.description_en.trim() },
-            { onConflict: "property_id" },
-          );
-        if (dErr) console.warn("[nuovo] description_en upsert warn:", dErr.message);
       }
 
       toast.success("Immobile salvato", { id: t });
@@ -724,62 +709,6 @@ function NewPropertyPage() {
               onChange={(v) => upd("internal_notes", v)}
               rows={3}
               placeholder="Appunti interni non visibili al pubblico."
-            />
-          </Field>
-        </Section>
-
-        {/* SEZIONE 4-bis — Versione inglese (auto-gestita) */}
-        <Section title="5. Versione inglese (automatica)" subtitle="Non serve compilare nulla: la traduzione viene generata in automatico la prima volta che un visitatore apre la scheda in inglese, poi viene salvata in cache.">
-          <div className="md:col-span-2 flex flex-wrap items-center justify-between gap-3 rounded-sm border border-primary/30 bg-primary/5 p-3">
-            <p className="text-xs text-muted-foreground">
-              <strong className="text-ink">Nessuna azione richiesta.</strong> I campi qui sotto sono una cache tecnica opzionale: lasciali vuoti e il sito tradurrà tutto da solo. Compilali solo se vuoi forzare una traduzione manuale specifica. Puoi anche generarla subito con un clic.
-            </p>
-            <button
-              type="button"
-              onClick={onTranslateAi}
-              disabled={translating}
-              className="inline-flex items-center gap-2 rounded-sm bg-primary px-4 py-2 text-xs uppercase tracking-wider text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
-            >
-              {translating ? <Loader2 size={13} className="animate-spin" /> : <Languages size={13} />}
-              Traduci con AI
-            </button>
-          </div>
-          <Field label="Titolo (EN)" full>
-            <TextInput
-              value={f.title_en}
-              onChange={(v) => upd("title_en", v)}
-              placeholder="e.g. Stone farmhouse with views of the Apuan Alps"
-            />
-          </Field>
-          <Field label="Sottotitolo (EN)" full>
-            <TextInput
-              value={f.subtitle_en}
-              onChange={(v) => upd("subtitle_en", v)}
-              placeholder="Short tagline shown on the listing"
-            />
-          </Field>
-          <Field label="Riassunto (EN)" full>
-            <TextArea
-              value={f.summary_en}
-              onChange={(v) => upd("summary_en", v)}
-              rows={3}
-              placeholder="Short summary of the property in English."
-            />
-          </Field>
-          <Field label="Descrizione zona (EN)" full>
-            <TextArea
-              value={f.location_description_en}
-              onChange={(v) => upd("location_description_en", v)}
-              rows={3}
-              placeholder="English description of the area / neighbourhood."
-            />
-          </Field>
-          <Field label="Descrizione completa (EN)" full>
-            <TextArea
-              value={f.description_en}
-              onChange={(v) => upd("description_en", v)}
-              rows={6}
-              placeholder="Full English description shown on the property page."
             />
           </Field>
         </Section>
