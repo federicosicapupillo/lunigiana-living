@@ -3,7 +3,6 @@ import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useServerFn } from "@tanstack/react-start";
-import { translatePropertyToEnglish } from "@/lib/property-translate.functions";
 import {
   ArrowLeft,
   Save,
@@ -13,7 +12,6 @@ import {
   CheckCircle2,
   Info,
   Sparkles,
-  Languages,
 } from "lucide-react";
 import {
   PROPERTY_TYPES,
@@ -66,11 +64,6 @@ type Status = "draft" | "ready" | "published";
 type FormState = {
   // Sezione 1
   title: string;
-  title_en: string;
-  subtitle_en: string;
-  summary_en: string;
-  location_description_en: string;
-  description_en: string;
   property_type: string;
   descrizione_libera: string;
   contract_type: string;
@@ -113,11 +106,6 @@ type FormState = {
 
 const empty: FormState = {
   title: "",
-  title_en: "",
-  subtitle_en: "",
-  summary_en: "",
-  location_description_en: "",
-  description_en: "",
   property_type: "",
   descrizione_libera: "",
   contract_type: "",
