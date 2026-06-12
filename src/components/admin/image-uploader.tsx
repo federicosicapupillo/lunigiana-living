@@ -1,7 +1,24 @@
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { ImagePlus, Star, StarOff, Trash2, ArrowUp, ArrowDown, Loader2, Sparkles, Check, CloudDownload, Wand2, Download, Zap, Heart, Undo2, X } from "lucide-react";
+import {
+  ImagePlus,
+  Star,
+  StarOff,
+  Trash2,
+  ArrowUp,
+  ArrowDown,
+  Loader2,
+  Sparkles,
+  Check,
+  CloudDownload,
+  Wand2,
+  Download,
+  Zap,
+  Heart,
+  Undo2,
+  X,
+} from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import {
   renderPropertyImage,
@@ -62,10 +79,46 @@ type Image = {
   };
 };
 
+const STORAGE_BUCKET = "property-images";
 const SIGNED_URL_TTL_SECONDS = 60 * 60 * 24 * 365 * 5; // ~5 anni
 
 const IMPORTED_NOT_SYNCED_MESSAGE =
   "Questa foto è stata importata da una fonte esterna. Prima di generare il rendering, sincronizzala nello storage.";
+
+function logUploadStep(
+  step:
+    | "UPLOAD START"
+    | "UPLOAD SUCCESS"
+    | "OBJECT PATH"
+    | "SIGNED URL REQUEST"
+    | "SIGNED URL SUCCESS"
+    | "SIGNED URL FAILED",
+  details: { bucket: string; path: string; filename: string; property_id: string; error?: string },
+) {
+  const method = step === "SIGNED URL FAILED" ? console.error : console.info;
+  method(`[Foto admin] ${step}`, details);
+}
+
+async function verifyStorageObjectExists(path: string) {
+  const lastSlash = path.lastIndexOf("/");
+  const folder = lastSlash >= 0 ? path.slice(0, lastSlash) : "";
+  const filename = lastSlash >= 0 ? path.slice(lastSlash + 1) : path;
+
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const { data, error } = await supabase.storage
+      .from(STORAGE_BUCKET)
+      .list(folder, { search: filename, limit: 20 });
+    if (error) return { exists: false, error: error.message, filename };
+    if ((data ?? []).some((object) => object.name === filename)) {
+      return { exists: true, error: null, filename };
+    }
+    if (attempt < 2) {
+      await new Promise((resolve) => window.setTimeout(resolve, 250 * (attempt + 1)));
+    }
+  }
+
+  return { exists: false, error: "Object not found dopo upload completato", filename };
+}
 
 function computeAvailability(row: {
   id: string;
@@ -94,7 +147,8 @@ function computeAvailability(row: {
       canRender: false,
       state: "sync_error",
       statusLabel: "Errore sincronizzazione",
-      message: "Impossibile recuperare questa foto dalla fonte originale. Ricarica manualmente l’immagine.",
+      message:
+        "Impossibile recuperare questa foto dalla fonte originale. Ricarica manualmente l’immagine.",
     };
   }
   return {
@@ -176,10 +230,10 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
     const rows = (data ?? []) as Image[];
     // Sign rendered paths
     const paths = rows.map((r) => r.rendered_storage_path).filter((p): p is string => !!p);
-    let signedMap: Record<string, string> = {};
+    const signedMap: Record<string, string> = {};
     if (paths.length > 0) {
       const { data: signed } = await supabase.storage
-        .from("property-images")
+        .from(STORAGE_BUCKET)
         .createSignedUrls(paths, SIGNED_URL_TTL_SECONDS);
       if (signed) {
         for (const s of signed) {
@@ -191,7 +245,9 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
     setImages(
       rows.map((r, idx) => ({
         ...r,
-        rendered_signed_url: r.rendered_storage_path ? signedMap[r.rendered_storage_path] ?? null : null,
+        rendered_signed_url: r.rendered_storage_path
+          ? (signedMap[r.rendered_storage_path] ?? null)
+          : null,
         render_availability: availability[idx],
       })),
     );
@@ -218,8 +274,16 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
         }
         const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
         const path = `${propertyId}/${crypto.randomUUID()}.${ext}`;
+        const logDetails = {
+          bucket: STORAGE_BUCKET,
+          path,
+          filename: file.name,
+          property_id: propertyId,
+        };
+        logUploadStep("UPLOAD START", logDetails);
+        logUploadStep("OBJECT PATH", logDetails);
         const { error: upErr } = await supabase.storage
-          .from("property-images")
+          .from(STORAGE_BUCKET)
           .upload(path, file, { cacheControl: "31536000", upsert: false });
         if (upErr) {
           const msg = `Upload fallito (${file.name}): ${upErr.message}`;
@@ -227,15 +291,29 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
           errors.push(msg);
           continue;
         }
-        const { data: signed, error: signErr } = await supabase.storage
-          .from("property-images")
-          .createSignedUrl(path, SIGNED_URL_TTL_SECONDS);
-        if (signErr || !signed) {
-          const msg = `URL firmato fallito (${file.name}): ${signErr?.message ?? "n/d"}`;
+        logUploadStep("UPLOAD SUCCESS", logDetails);
+
+        const existsCheck = await verifyStorageObjectExists(path);
+        if (!existsCheck.exists) {
+          const msg = `File non trovato nello storage dopo upload (${file.name}). Bucket: ${STORAGE_BUCKET} · Path: ${path} · Dettaglio: ${existsCheck.error ?? "n/d"}`;
+          logUploadStep("SIGNED URL FAILED", { ...logDetails, error: msg });
           toast.error(msg);
           errors.push(msg);
           continue;
         }
+
+        logUploadStep("SIGNED URL REQUEST", logDetails);
+        const { data: signed, error: signErr } = await supabase.storage
+          .from(STORAGE_BUCKET)
+          .createSignedUrl(path, SIGNED_URL_TTL_SECONDS);
+        if (signErr || !signed) {
+          const msg = `URL firmato fallito (${file.name}). Bucket: ${STORAGE_BUCKET} · Path: ${path} · Dettaglio: ${signErr?.message ?? "n/d"}`;
+          logUploadStep("SIGNED URL FAILED", { ...logDetails, error: signErr?.message ?? "n/d" });
+          toast.error(msg);
+          errors.push(msg);
+          continue;
+        }
+        logUploadStep("SIGNED URL SUCCESS", logDetails);
         const { error: insErr } = await supabase.from("property_images").insert({
           property_id: propertyId,
           image_url: signed.signedUrl,
@@ -253,7 +331,7 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
           toast.error(msg);
           errors.push(msg);
           // best-effort cleanup of orphan storage object
-          await supabase.storage.from("property-images").remove([path]);
+          await supabase.storage.from(STORAGE_BUCKET).remove([path]);
           continue;
         }
         count++;
@@ -299,7 +377,7 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
 
   const remove = async (img: Image) => {
     if (!confirm("Eliminare questa immagine?")) return;
-    await supabase.storage.from("property-images").remove([img.storage_path]);
+    await supabase.storage.from(STORAGE_BUCKET).remove([img.storage_path]);
     const { error } = await supabase.from("property_images").delete().eq("id", img.id);
     if (error) return toast.error(error.message);
     toast.success("Immagine eliminata");
@@ -323,7 +401,9 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
 
   const generate = async (img: Image) => {
     if (!img.render_availability?.canRender) {
-      toast.error(img.render_availability?.message ?? "Sincronizza la foto prima di generare il rendering");
+      toast.error(
+        img.render_availability?.message ?? "Sincronizza la foto prima di generare il rendering",
+      );
       return;
     }
     setRenderingId(img.id);
@@ -346,8 +426,8 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
         mode === "main"
           ? "Rendering pubblicato come foto principale (originale conservata)"
           : mode === "emotional"
-          ? "Rendering usato come Prima/Dopo"
-          : "Rendering non pubblicato",
+            ? "Rendering usato come Prima/Dopo"
+            : "Rendering non pubblicato",
       );
       await load();
     } catch (err) {
@@ -542,8 +622,8 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
                         img.enhancement_status === "processing"
                           ? "In elaborazione…"
                           : img.enhancement_status === "error"
-                          ? "Errore: riprova"
-                          : undefined
+                            ? "Errore: riprova"
+                            : undefined
                       }
                     />
                   )}
@@ -561,8 +641,8 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
                           img.render_publish_mode === "main"
                             ? "Sostituisce originale"
                             : img.render_publish_mode === "emotional"
-                            ? "Prima/Dopo"
-                            : "Generato · non pubblicato"
+                              ? "Prima/Dopo"
+                              : "Generato · non pubblicato"
                         }
                       />
                       <div className="flex flex-wrap gap-1">
@@ -611,8 +691,8 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
                         img.render_status === "processing"
                           ? "In elaborazione…"
                           : img.render_status === "error"
-                          ? "Errore: riprova"
-                          : undefined
+                            ? "Errore: riprova"
+                            : undefined
                       }
                     />
                   )}
@@ -669,8 +749,8 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
                         img.enhancement_status === "error"
                           ? "text-destructive"
                           : img.enhancement_status === "processing"
-                          ? "text-primary"
-                          : ""
+                            ? "text-primary"
+                            : ""
                       }
                     >
                       {img.enhancement_status === "not_enhanced" && "non ancora eseguito"}
@@ -698,11 +778,15 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
                       <div className="font-semibold uppercase tracking-wider">
                         {img.render_availability.statusLabel}
                       </div>
-                      <p className="mt-1 text-muted-foreground">{img.render_availability.message}</p>
+                      <p className="mt-1 text-muted-foreground">
+                        {img.render_availability.message}
+                      </p>
                       <button
                         type="button"
                         onClick={() => syncImage(img)}
-                        disabled={syncingId === img.id || img.render_availability.state === "sync_error"}
+                        disabled={
+                          syncingId === img.id || img.render_availability.state === "sync_error"
+                        }
                         className="mt-2 inline-flex items-center gap-1 rounded-sm bg-primary px-2 py-1 text-[10px] uppercase tracking-wider text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
                       >
                         {syncingId === img.id ? (
@@ -845,6 +929,7 @@ function VersionCard({
   );
 }
 
+
 function CompactBtn({
   children,
   onClick,
@@ -872,8 +957,8 @@ function CompactBtn({
         active
           ? "border-primary bg-primary/10 text-primary"
           : danger
-          ? "border-border bg-background text-destructive hover:border-destructive/50"
-          : "border-border bg-background text-foreground hover:border-primary/50"
+            ? "border-border bg-background text-destructive hover:border-destructive/50"
+            : "border-border bg-background text-foreground hover:border-primary/50"
       }`}
     >
       {active && <Check size={10} className="text-primary" />}
