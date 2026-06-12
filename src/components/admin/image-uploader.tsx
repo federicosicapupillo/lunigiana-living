@@ -20,6 +20,7 @@ import {
   X,
 } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
+import { BeforeAfterDialog } from "@/components/admin/before-after-dialog";
 import {
   renderPropertyImage,
   syncImportedImage,
@@ -194,6 +195,11 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
   const runSetEnhancedPublished = useServerFn(setPropertyImageEnhancedPublished);
   const [lastError, setLastError] = useState<string | null>(null);
   const [dragOver, setDragOver] = useState(false);
+  const [compareState, setCompareState] = useState<{
+    image: Image;
+    mode: "enhanced" | "rendered";
+    afterMissing?: boolean;
+  } | null>(null);
 
   const syncAllForProperty = async () => {
     setBulkSyncing(true);
@@ -603,6 +609,13 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
                     alt={img.alt_text ?? "Originale"}
                     downloadUrl={img.image_url}
                     downloadName={`originale-${img.id}.jpg`}
+                    onClick={() =>
+                      setCompareState({
+                        image: img,
+                        mode: img.enhanced_image_url ? "enhanced" : "rendered",
+                        afterMissing: !img.enhanced_image_url && !img.rendered_signed_url,
+                      })
+                    }
                   />
                   {/* Migliorata */}
                   {img.enhanced_image_url ? (
@@ -613,6 +626,9 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
                       alt="Migliorata"
                       downloadUrl={img.enhanced_image_url}
                       downloadName={`migliorata-${img.id}.jpg`}
+                      onClick={() =>
+                        setCompareState({ image: img, mode: "enhanced" })
+                      }
                     />
                   ) : (
                     <EmptyVersion
@@ -643,6 +659,9 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
                             : img.render_publish_mode === "emotional"
                               ? "Prima/Dopo"
                               : "Generato · non pubblicato"
+                        }
+                        onClick={() =>
+                          setCompareState({ image: img, mode: "rendered" })
                         }
                       />
                       <div className="flex flex-wrap gap-1">
@@ -848,6 +867,27 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
           ))}
         </div>
       )}
+      {compareState && (
+        <BeforeAfterDialog
+          open={!!compareState}
+          onClose={() => setCompareState(null)}
+          originalUrl={compareState.image.image_url}
+          enhancedUrl={compareState.image.enhanced_image_url}
+          renderedUrl={compareState.image.rendered_signed_url}
+          initialMode={compareState.mode}
+          afterMissing={compareState.afterMissing}
+          onUseEnhanced={
+            compareState.image.enhanced_storage_path
+              ? () => toggleEnhancedPublished(compareState.image, true)
+              : undefined
+          }
+          onKeepOriginal={
+            compareState.image.enhanced_storage_path
+              ? () => toggleEnhancedPublished(compareState.image, false)
+              : undefined
+          }
+        />
+      )}
     </div>
   );
 }
@@ -888,6 +928,7 @@ function VersionCard({
   downloadUrl,
   downloadName,
   statusPill,
+  onClick,
 }: {
   label: string;
   inUse: boolean;
@@ -896,6 +937,7 @@ function VersionCard({
   downloadUrl: string;
   downloadName: string;
   statusPill?: string;
+  onClick?: () => void;
 }) {
   return (
     <div
@@ -904,7 +946,13 @@ function VersionCard({
       }`}
     >
       <div className="relative aspect-[4/3]">
-        <img src={src} alt={alt} className="h-full w-full object-cover" loading="lazy" />
+        <img
+          src={src}
+          alt={alt}
+          className={`h-full w-full object-cover ${onClick ? "cursor-zoom-in" : ""}`}
+          loading="lazy"
+          onClick={onClick}
+        />
         <span className="absolute left-1.5 top-1.5 rounded-sm bg-background/85 px-1.5 py-0.5 text-[9px] uppercase tracking-wider text-foreground">
           {label}
           {inUse && <span className="ml-1 text-primary">· in uso</span>}
