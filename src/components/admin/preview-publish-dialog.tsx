@@ -54,7 +54,7 @@ export function PreviewPublishDialog({ propertyId, onClose, onPublished }: Props
     (async () => {
       const [{ data: p }, { data: imgs }, { data: desc }] = await Promise.all([
         supabase.from("properties").select("id,title,reference_code,municipality,property_type,contract_type,price,price_on_request,size_sqm,bedrooms,bathrooms,status").eq("id", propertyId).maybeSingle(),
-        supabase.from("property_images").select("image_url,is_cover,sort_order,is_rendering").eq("property_id", propertyId),
+        supabase.from("property_images").select("*").eq("property_id", propertyId),
         supabase.from("property_descriptions").select("edited_description,generated_description").eq("property_id", propertyId).maybeSingle(),
       ]);
       if (!alive) return;
@@ -63,10 +63,13 @@ export function PreviewPublishDialog({ propertyId, onClose, onPublished }: Props
         setLoading(false);
         return;
       }
-      const visible = (imgs ?? []).filter((i) => !i.is_rendering);
+      const list = (imgs ?? []) as Array<Record<string, unknown>>;
+      const visible = list.filter((i) => !(i as { is_rendering?: boolean }).is_rendering);
       const cover =
-        visible.find((i) => i.is_cover)?.image_url ??
-        visible.slice().sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))[0]?.image_url ??
+        (visible.find((i) => (i as { is_cover?: boolean }).is_cover)?.image_url as string | undefined) ??
+        (visible.slice().sort(
+          (a, b) => ((a.sort_order as number | null) ?? 0) - ((b.sort_order as number | null) ?? 0),
+        )[0]?.image_url as string | undefined) ??
         null;
       const short = (desc?.edited_description || desc?.generated_description || "").trim();
       setData({
