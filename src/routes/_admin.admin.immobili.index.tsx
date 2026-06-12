@@ -16,6 +16,7 @@ import { ConfirmDialog } from "@/components/admin/confirm-dialog";
 type Row = {
   id: string;
   title: string;
+  reference_code: string | null;
   municipality: string | null;
   property_type: string | null;
   price: number | null;
@@ -93,7 +94,7 @@ function AdminPropertiesPage() {
     const { data, error } = await supabase
       .from("properties")
       .select(
-        `id, title, municipality, property_type, price, price_on_request, status, created_at, updated_at, featured, homepage_order,
+        `id, title, reference_code, municipality, property_type, price, price_on_request, status, created_at, updated_at, featured, homepage_order,
          property_images!left ( image_url, is_cover, sort_order )`,
       )
       .order("created_at", { ascending: false });
@@ -115,6 +116,7 @@ function AdminPropertiesPage() {
       return {
         id: p.id as string,
         title: p.title as string,
+        reference_code: (p.reference_code as string | null) ?? null,
         municipality: p.municipality as string | null,
         property_type: p.property_type as string | null,
         price: p.price as number | null,
@@ -146,11 +148,13 @@ function AdminPropertiesPage() {
         return false;
       }
       if (!q.trim()) return true;
-      const needle = q.toLowerCase();
+      const needle = q.toLowerCase().trim();
       return (
         r.title.toLowerCase().includes(needle) ||
         (r.municipality ?? "").toLowerCase().includes(needle) ||
-        (r.property_type ?? "").toLowerCase().includes(needle)
+        (r.property_type ?? "").toLowerCase().includes(needle) ||
+        (r.reference_code ?? "").toLowerCase().includes(needle) ||
+        (r.reference_code ?? "").toLowerCase().replace(/[-\s]/g, "").includes(needle.replace(/[-\s]/g, ""))
       );
     });
     if (sortBy === "home_first") {
@@ -259,7 +263,7 @@ function AdminPropertiesPage() {
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="Cerca per titolo, comune, tipologia..."
+            placeholder="Cerca per titolo, comune, tipologia o codice annuncio..."
             className="w-full rounded-sm border border-border bg-background py-2.5 pl-9 pr-3 text-base focus:border-primary focus:outline-none sm:py-2 sm:text-sm"
           />
         </div>
@@ -338,6 +342,11 @@ function AdminPropertiesPage() {
                   <p className="mt-1 truncate text-xs text-muted-foreground">
                     {[r.property_type, r.municipality].filter(Boolean).join(" · ") || "—"}
                   </p>
+                  {r.reference_code && (
+                    <p className="mt-0.5 truncate text-[11px] uppercase tracking-wider text-primary">
+                      Cod. annuncio: {r.reference_code}
+                    </p>
+                  )}
                   <div className="mt-1 text-sm text-ink sm:hidden">
                     {r.price_on_request
                       ? "Su richiesta"
