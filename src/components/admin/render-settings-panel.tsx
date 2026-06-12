@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ChevronDown, Loader2, Save } from "lucide-react";
+import { ChevronDown, Loader2, Sparkles, Settings2 } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { saveRenderSettings } from "@/lib/property-render.functions";
 import {
@@ -18,7 +18,10 @@ import { toast } from "sonner";
 type Props = {
   imageId: string;
   initial: RenderSettings;
-  onSaved?: (s: RenderSettings) => void;
+  hasRender: boolean;
+  canRender: boolean;
+  rendering: boolean;
+  onGenerate: (settings: RenderSettings) => Promise<void> | void;
 };
 
 const EMPTY = "";
@@ -40,18 +43,22 @@ function Field({
   );
 }
 
-export function RenderSettingsPanel({ imageId, initial, onSaved }: Props) {
-  const [open, setOpen] = useState(!initial.photo_type);
+export function RenderSettingsPanel({
+  imageId,
+  initial,
+  hasRender,
+  canRender,
+  rendering,
+  onGenerate,
+}: Props) {
+  const [open, setOpen] = useState(false);
   const [state, setState] = useState<RenderSettings>(initial);
-  const [saving, setSaving] = useState(false);
-  const [dirty, setDirty] = useState(false);
-  const [justSaved, setJustSaved] = useState(false);
-  const run = useServerFn(saveRenderSettings);
+  const [busy, setBusy] = useState(false);
+  const save = useServerFn(saveRenderSettings);
 
   useEffect(() => {
     setState(initial);
-    setDirty(false);
-    setJustSaved(false);
+    setOpen(false);
   }, [imageId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const update = <K extends keyof RenderSettings>(k: K, v: RenderSettings[K]) => {
@@ -60,23 +67,21 @@ export function RenderSettingsPanel({ imageId, initial, onSaved }: Props) {
       if (k === "photo_type") next.photo_category = null;
       return next;
     });
-    setDirty(true);
-    setJustSaved(false);
   };
 
-  const save = async () => {
-    setSaving(true);
+  const generate = async () => {
+    if (!state.photo_type) {
+      toast.error("Completa i campi obbligatori per generare il rendering");
+      return;
+    }
+    setBusy(true);
     try {
-      await run({ data: { imageId, settings: state } });
-      setDirty(false);
-      setJustSaved(true);
-      toast.success("Impostazioni rendering salvate");
-      onSaved?.(state);
-      setTimeout(() => setJustSaved(false), 2500);
+      await save({ data: { imageId, settings: state } });
+      await onGenerate(state);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Errore salvataggio");
+      toast.error(err instanceof Error ? err.message : "Errore");
     } finally {
-      setSaving(false);
+      setBusy(false);
     }
   };
 
@@ -85,29 +90,36 @@ export function RenderSettingsPanel({ imageId, initial, onSaved }: Props) {
 
   const cats = categoriesFor(state.photo_type);
 
+  const triggerLabel = hasRender
+    ? "Rigenera rendering"
+    : state.photo_type
+    ? "Configura rendering"
+    : "Crea rendering";
+
+  const statusLabel = open
+    ? "Configura e genera rendering"
+    : hasRender
+    ? "Rendering generato"
+    : "Rendering non configurato";
+
+  const busyNow = busy || rendering;
+
   return (
     <div className="rounded-sm border border-border bg-background">
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className="flex w-full items-center justify-between px-2 py-1.5 text-[10px] uppercase tracking-wider text-muted-foreground hover:text-ink"
+        disabled={!canRender}
+        className="flex w-full items-center justify-between gap-2 px-2 py-1.5 text-[10px] uppercase tracking-wider text-ink hover:text-primary disabled:opacity-50"
       >
-        <span>
-          Impostazioni rendering
-          {!state.photo_type && (
-            <span className="ml-1 text-destructive">· da configurare</span>
-          )}
-          {dirty && !saving && (
-            <span className="ml-1 text-primary">· modifiche non salvate</span>
-          )}
-          {!dirty && state.photo_type && (
-            <span className="ml-1 text-emerald-600">· salvate</span>
-          )}
+        <span className="inline-flex items-center gap-1.5">
+          {hasRender ? <Sparkles size={12} className="text-primary" /> : <Settings2 size={12} />}
+          {open ? "Chiudi pannello" : triggerLabel}
         </span>
-        <ChevronDown
-          size={12}
-          className={`transition ${open ? "rotate-180" : ""}`}
-        />
+        <span className="inline-flex items-center gap-1 text-muted-foreground">
+          <span className="hidden sm:inline">{statusLabel}</span>
+          <ChevronDown size={12} className={`transition ${open ? "rotate-180" : ""}`} />
+        </span>
       </button>
       {open && (
         <div className="space-y-2 border-t border-border p-2">
@@ -251,31 +263,20 @@ export function RenderSettingsPanel({ imageId, initial, onSaved }: Props) {
           </Field>
           <button
             type="button"
-            onClick={save}
-            disabled={saving || (!dirty && !justSaved)}
-            className={`inline-flex w-full items-center justify-center gap-1 rounded-sm border px-2 py-1.5 text-[10px] uppercase tracking-wider transition disabled:opacity-50 ${
-              dirty
-                ? "border-primary bg-primary text-primary-foreground hover:bg-primary/90"
-                : "border-border bg-background hover:border-primary/50"
-            }`}
+            onClick={generate}
+            disabled={busyNow || !canRender}
+            className="inline-flex w-full items-center justify-center gap-1.5 rounded-sm bg-primary px-2 py-2 text-[11px] uppercase tracking-wider text-primary-foreground transition hover:bg-primary/90 disabled:opacity-50"
           >
-            {saving ? <Loader2 size={12} className="animate-spin" /> : <Save size={12} />}
-            {saving
-              ? "Salvataggio…"
-              : dirty
-              ? "Salva impostazioni"
-              : justSaved
-              ? "Impostazioni salvate"
-              : "Impostazioni rendering salvate"}
+            {busyNow ? <Loader2 size={12} className="animate-spin" /> : <Sparkles size={12} />}
+            {busyNow
+              ? "Generazione in corso…"
+              : hasRender
+              ? "Rigenera rendering"
+              : "Genera rendering"}
           </button>
-          {!dirty && state.photo_type && (
-            <p className="text-center text-[10px] text-emerald-600">
-              Foto pronta per il rendering
-            </p>
-          )}
           {!state.photo_type && (
-            <p className="text-center text-[10px] text-muted-foreground">
-              Seleziona almeno il tipo foto per abilitare il rendering
+            <p className="text-center text-[10px] text-destructive">
+              Completa i campi obbligatori per generare il rendering
             </p>
           )}
         </div>
