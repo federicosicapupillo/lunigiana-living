@@ -294,6 +294,97 @@ function SettingsPage() {
       </section>
 
       <section className="mt-16 border-t border-border pt-10">
+        <h2 className="font-serif text-xl text-ink">Verifica e sincronizza foto nello Storage</h2>
+        <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
+          Controlla tutte le foto di tutti gli immobili: verifica che siano presenti nello storage
+          interno, che i path siano corretti e che gli URL rispondano. Le foto già sincronizzate
+          non vengono toccate. Quelle mancanti, ma con una sorgente esterna disponibile, vengono
+          scaricate e ricaricate nello storage. Nessuna foto viene mai eliminata.
+        </p>
+        <div className="mt-5 flex flex-wrap gap-3">
+          <button
+            type="button"
+            onClick={() => setVerifyConfirmOpen(true)}
+            disabled={verifying}
+            className="inline-flex items-center gap-2 rounded-sm bg-ink px-5 py-2.5 text-xs uppercase tracking-[0.2em] text-cream transition hover:bg-ink/90 disabled:opacity-60"
+          >
+            {verifying ? <Loader2 className="h-4 w-4 animate-spin" /> : <ShieldCheck size={14} />}
+            Sincronizza foto nello Storage
+          </button>
+        </div>
+        {verifying && (
+          <p className="mt-4 text-sm text-muted-foreground">
+            Verifica in corso… (può richiedere alcuni minuti su archivi grandi)
+          </p>
+        )}
+        {verifyResult && (
+          <div className="mt-6 rounded-sm border border-border bg-muted/30 p-4 text-sm">
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
+              <Stat label="Immobili analizzati" value={verifyResult.propertiesAnalyzed} />
+              <Stat label="Foto analizzate" value={verifyResult.totalImages} />
+              <Stat label="Già corrette" value={verifyResult.alreadyOk} />
+              <Stat label="Sincronizzate" value={verifyResult.synced} tone="ok" />
+              <Stat
+                label="Con errore"
+                value={verifyResult.failed}
+                tone={verifyResult.failed > 0 ? "error" : undefined}
+              />
+            </div>
+            {verifyResult.errors.length > 0 && (
+              <details className="mt-4" open>
+                <summary className="cursor-pointer text-xs uppercase tracking-wider text-muted-foreground">
+                  Foto problematiche ({verifyResult.errors.length})
+                </summary>
+                <ul className="mt-2 max-h-72 space-y-1 overflow-auto text-xs text-destructive">
+                  {verifyResult.errors.map((e) => (
+                    <li key={e.imageId} className="font-mono">
+                      immobile {e.propertyId.slice(0, 8)}… · foto {e.imageId.slice(0, 8)}… — {e.message}
+                    </li>
+                  ))}
+                </ul>
+              </details>
+            )}
+          </div>
+        )}
+
+        {verifyConfirmOpen && (
+          <div
+            role="dialog"
+            aria-modal="true"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-ink/60 px-4"
+            onClick={() => setVerifyConfirmOpen(false)}
+          >
+            <div
+              className="w-full max-w-md rounded-sm border border-border bg-background p-6 shadow-xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <h3 className="font-serif text-xl text-ink">Sincronizzare tutte le foto?</h3>
+              <p className="mt-3 text-sm text-muted-foreground">
+                Questa operazione controllerà tutte le foto degli immobili e tenterà di
+                sincronizzarle nello Storage senza cancellare nulla. Vuoi procedere?
+              </p>
+              <div className="mt-6 flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setVerifyConfirmOpen(false)}
+                  className="rounded-sm border border-border bg-background px-4 py-2 text-xs uppercase tracking-[0.18em] text-ink hover:border-primary/50"
+                >
+                  Annulla
+                </button>
+                <button
+                  type="button"
+                  onClick={runVerifySyncAll}
+                  className="inline-flex items-center gap-2 rounded-sm bg-ink px-4 py-2 text-xs uppercase tracking-[0.18em] text-cream hover:bg-ink/90"
+                >
+                  <ShieldCheck size={13} /> Avvia sincronizzazione
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </section>
+
+      <section className="mt-16 border-t border-border pt-10">
         <h2 className="font-serif text-xl text-ink">Miglioramento fotografico</h2>
         <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
           Crea una versione ottimizzata di tutte le foto degli immobili (luminosità, contrasto,
