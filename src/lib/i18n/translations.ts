@@ -667,6 +667,12 @@ const en: Dict = {
   "detail.submit": "Request information or viewing",
   "detail.orCall": "or call us",
   "detail.waBtn": "Message Elena on WhatsApp",
+  "detail.emotionalEyebrow": "Emotional rendering",
+  "detail.emotionalTitle": "How it could look",
+  "detail.emotionalIntro": "A vision of how this property could be enhanced. Images are AI-generated renderings for illustrative purposes only.",
+  "detail.emotionalBadge": "AI rendering",
+  "detail.emotionalCaption": "Illustrative image",
+  "detail.emotionalDisclaimer": "Images generated with AI rendering for illustrative purposes. They show a possible enhancement of the property and do not represent its current condition.",
 
   // SEO meta
   "seo.home.title": "Furia Immobiliare — Homes with character in Lunigiana",
