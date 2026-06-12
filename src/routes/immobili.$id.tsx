@@ -405,27 +405,36 @@ function PropertyDetail() {
               {t("detail.contactBody")}
             </p>
 
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                const form = e.currentTarget;
-                const data = new FormData(form);
-                const body = encodeURIComponent(
-                  `Richiesta informazioni per: ${p.reference} — ${p.title} (${p.location})\n\n` +
-                  `Nome: ${data.get("nome")}\nEmail: ${data.get("email")}\nTelefono: ${data.get("telefono")}\n\nMessaggio:\n${data.get("messaggio")}`,
-                );
-                window.location.href = `mailto:furiaimmobiliare@libero.it?subject=Richiesta ${p.reference}&body=${body}`;
-              }}
-              className="mt-6 space-y-3"
-            >
-              <input name="nome" required placeholder={t("detail.namePh")} className="w-full rounded-sm border border-border bg-background px-4 py-3 text-sm focus:border-primary focus:outline-none" />
-              <input name="email" type="email" required placeholder={t("detail.emailPh")} className="w-full rounded-sm border border-border bg-background px-4 py-3 text-sm focus:border-primary focus:outline-none" />
-              <input name="telefono" placeholder={t("detail.phonePh")} className="w-full rounded-sm border border-border bg-background px-4 py-3 text-sm focus:border-primary focus:outline-none" />
-              <textarea name="messaggio" rows={4} placeholder={t("detail.msgPh")} className="w-full rounded-sm border border-border bg-background px-4 py-3 text-sm focus:border-primary focus:outline-none" />
-              <button type="submit" className="w-full rounded-sm bg-primary px-6 py-4 text-xs uppercase tracking-[0.22em] text-primary-foreground transition hover:bg-primary/90">
-                {t("detail.submit")}
-              </button>
-            </form>
+            {submitState === "ok" ? (
+              <div className="mt-6 rounded-sm border border-border bg-cream p-6 text-center">
+                <CheckCircle2 className="mx-auto text-primary" size={28} />
+                <h4 className="mt-3 font-serif text-lg text-ink">{t("form.thanks")}</h4>
+                <p className="mt-2 text-sm leading-relaxed text-foreground/80">{t("form.thanksBody")}</p>
+              </div>
+            ) : (
+              <form onSubmit={onSubmitLead} className="mt-6 space-y-3" noValidate>
+                <input name="nome" required maxLength={200} autoComplete="name" placeholder={t("detail.namePh")} className="w-full rounded-sm border border-border bg-background px-4 py-3 text-sm focus:border-primary focus:outline-none" />
+                <input name="email" type="email" required maxLength={320} autoComplete="email" placeholder={t("detail.emailPh")} className="w-full rounded-sm border border-border bg-background px-4 py-3 text-sm focus:border-primary focus:outline-none" />
+                <input name="telefono" type="tel" required maxLength={50} autoComplete="tel" placeholder={t("detail.phonePh")} className="w-full rounded-sm border border-border bg-background px-4 py-3 text-sm focus:border-primary focus:outline-none" />
+                <textarea name="messaggio" rows={4} maxLength={3000} placeholder={t("detail.msgPh")} className="w-full rounded-sm border border-border bg-background px-4 py-3 text-sm focus:border-primary focus:outline-none" />
+                {submitError && (
+                  <p className="text-sm text-destructive">{submitError}</p>
+                )}
+                <button
+                  type="submit"
+                  disabled={submitState === "submitting"}
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-sm bg-primary px-6 py-4 text-xs uppercase tracking-[0.22em] text-primary-foreground transition hover:bg-primary/90 disabled:opacity-60"
+                >
+                  {submitState === "submitting" ? (
+                    <>
+                      <Loader2 size={14} className="animate-spin" /> {t("form.submitting")}
+                    </>
+                  ) : (
+                    t("detail.submit")
+                  )}
+                </button>
+              </form>
+            )}
 
             <div className="mt-6 border-t border-border pt-6 text-sm text-muted-foreground">
               <div>{t("detail.orCall")}</div>
