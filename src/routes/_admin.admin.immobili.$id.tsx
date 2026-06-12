@@ -12,6 +12,8 @@ import {
 } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { generateDescription } from "@/lib/ai-description.functions";
+import { generateTitle } from "@/lib/ai-title.functions";
+import { buildFallbackTitle, isDefaultTitle } from "@/lib/property-title";
 import { ImageUploader } from "@/components/admin/image-uploader";
 import { LocationFields } from "@/components/admin/location-fields";
 import { WindowFlyerDialog } from "@/components/admin/window-flyer-dialog";
@@ -164,6 +166,8 @@ function PropertyEditor() {
   const [generating, setGenerating] = useState(false);
   const [flyerOpen, setFlyerOpen] = useState(false);
   const [idealistaOpen, setIdealistaOpen] = useState(false);
+  const [titleManual, setTitleManual] = useState(false);
+  const [titleGenerating, setTitleGenerating] = useState(false);
 
   // Description controls
   const [genLength, setGenLength] = useState<"breve" | "media" | "editoriale">("media");
@@ -171,6 +175,7 @@ function PropertyEditor() {
   const [seoFocus, setSeoFocus] = useState("");
 
   const genDescFn = useServerFn(generateDescription);
+  const genTitleFn = useServerFn(generateTitle);
 
   const load = async () => {
     setLoading(true);
@@ -185,6 +190,8 @@ function PropertyEditor() {
       return;
     }
     setProp(p as Property);
+    // Considera "manuale" qualunque titolo non default già esistente
+    setTitleManual(!isDefaultTitle((p as Property).title));
     const fmap: Record<string, string> = {};
     (fs ?? []).forEach((f: { feature_name: string; feature_value: string | null }) => {
       fmap[f.feature_name] = f.feature_value ?? "";
@@ -204,6 +211,55 @@ function PropertyEditor() {
   }, [id]);
 
   const update = (patch: Partial<Property>) => setProp((p) => (p ? { ...p, ...patch } : p));
+
+  // Auto-proposta titolo (fallback senza IA) quando il titolo è ancora il default
+  // e l'admin non l'ha modificato manualmente. Aggiornato live al variare dei dati.
+  useEffect(() => {
+    if (!prop) return;
+    if (titleManual) return;
+    const proposed = buildFallbackTitle(prop);
+    if (!proposed) return;
+    if (proposed === prop.title) return;
+    // Aggiorna solo se il titolo corrente è ancora un default/generato.
+    if (!isDefaultTitle(prop.title)) return;
+    setProp((cur) => (cur ? { ...cur, title: proposed } : cur));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    prop?.property_type,
+    prop?.municipality,
+    prop?.area_zone,
+    prop?.bedrooms,
+    prop?.condition,
+    prop?.panoramic_view,
+    prop?.garden,
+    prop?.terrace,
+    prop?.balcony,
+    prop?.garage,
+    prop?.historic_property,
+    prop?.furnished,
+    titleManual,
+  ]);
+
+  const regenerateTitleAi = async () => {
+    if (!prop) return;
+    setTitleGenerating(true);
+    try {
+      // Salva i dati attuali in modo che il server fn legga lo stato aggiornato.
+      await save(true);
+      const res = await genTitleFn({ data: { propertyId: id } });
+      update({ title: res.title });
+      setTitleManual(false);
+      toast.success(res.source === "ai" ? "Titolo rigenerato con IA" : "Titolo rigenerato");
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : "Errore generazione titolo";
+      // Fallback locale
+      update({ title: buildFallbackTitle(prop) });
+      setTitleManual(false);
+      toast.error(msg);
+    } finally {
+      setTitleGenerating(false);
+    }
+  };
 
   const save = async (silent = false) => {
     if (!prop) return;
@@ -333,9 +389,33 @@ function PropertyEditor() {
           </Link>
           <input
             value={prop.title}
-            onChange={(e) => update({ title: e.target.value })}
+            onChange={(e) => {
+              setTitleManual(true);
+              update({ title: e.target.value });
+            }}
+            placeholder="Il titolo verrà generato automaticamente dai dati inseriti"
             className="mt-3 w-full bg-transparent font-serif text-2xl text-ink focus:outline-none sm:text-3xl"
           />
+          <div className="mt-1 flex items-center gap-3 text-[11px] text-muted-foreground">
+            <button
+              type="button"
+              onClick={regenerateTitleAi}
+              disabled={titleGenerating}
+              className="inline-flex items-center gap-1 rounded-sm border border-border bg-background px-2 py-1 uppercase tracking-wider hover:border-primary/50 disabled:opacity-50"
+            >
+              {titleGenerating ? (
+                <Loader2 size={11} className="animate-spin" />
+              ) : (
+                <Sparkles size={11} />
+              )}
+              Rigenera titolo
+            </button>
+            {titleManual ? (
+              <span>Titolo modificato manualmente · non verrà sovrascritto</span>
+            ) : (
+              <span>Titolo proposto automaticamente · modificalo per personalizzarlo</span>
+            )}
+          </div>
           <div className="mt-2 flex items-center gap-3 text-xs text-muted-foreground">
             <span
               className={`rounded-sm border px-2 py-0.5 text-[10px] uppercase tracking-wider ${
