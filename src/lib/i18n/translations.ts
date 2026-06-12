@@ -164,7 +164,7 @@ const it: Dict = {
   "list.title": "La nostra selezione di case in Lunigiana.",
   "list.intro": "immobili reali importati dal nostro archivio. Filtra per categoria o comune per trovare il tuo posto.",
   "list.count.available": "immobili disponibili",
-  "list.empty": "Nessun immobile corrisponde ai filtri selezionati.",
+  "list.empty": "Nessun immobile trovato per questa ricerca.",
   "list.notFound": "Non trovi quello che cerchi?",
 
   // Servizi
@@ -556,7 +556,7 @@ const en: Dict = {
   "list.title": "Our selection of homes in Lunigiana.",
   "list.intro": "real properties from our archive. Filter by category or location to find your place.",
   "list.count.available": "properties available",
-  "list.empty": "No properties match your selected filters.",
+  "list.empty": "No properties found for this search.",
   "list.notFound": "Can't find what you're looking for?",
 
   // Servizi
