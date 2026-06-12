@@ -189,6 +189,54 @@ export const rotateIdealistaFeedToken = createServerFn({ method: "POST" })
     return { token };
   });
 
+// --- Idealista account configuration (email only; never store passwords) ---
+
+function parseAccount(raw: string | null | undefined): { email: string | null } {
+  if (!raw) return { email: null };
+  try {
+    const j = JSON.parse(raw);
+    return { email: typeof j.email === "string" ? j.email : null };
+  } catch {
+    return { email: null };
+  }
+}
+
+export const getIdealistaAccount = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context.userId);
+    const { data } = await supabaseAdmin
+      .from("site_settings")
+      .select("value, updated_at")
+      .eq("key", "idealista_account")
+      .maybeSingle();
+    return { account: parseAccount(data?.value), updated_at: data?.updated_at ?? null };
+  });
+
+export const setIdealistaAccount = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: { email: string }) =>
+    z
+      .object({
+        email: z.string().trim().email("Email non valida").max(255),
+      })
+      .parse(data),
+  )
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context.userId);
+    const value = JSON.stringify({ email: data.email });
+    const { error } = await supabaseAdmin
+      .from("site_settings")
+      .upsert({
+        key: "idealista_account",
+        value,
+        updated_at: new Date().toISOString(),
+        updated_by: context.userId,
+      });
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
 // --- Server-only feed builder (used by /api/public/idealista/feed.xml) ---
 
 function escapeXml(s: string | number | null | undefined): string {

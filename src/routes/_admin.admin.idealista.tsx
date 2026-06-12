@@ -8,6 +8,8 @@ import {
   setIdealistaImageIncluded,
   getIdealistaPropertyImages,
   rotateIdealistaFeedToken,
+  getIdealistaAccount,
+  setIdealistaAccount,
   type IdealistaStatus,
 } from "@/lib/idealista.functions";
 import { toast } from "sonner";
@@ -19,6 +21,8 @@ import {
   Image as ImageIcon,
   Loader2,
   RefreshCw,
+  Save,
+  Info,
   X,
 } from "lucide-react";
 
@@ -48,11 +52,28 @@ function IdealistaAdminPage() {
   const fetchOverview = useServerFn(getIdealistaOverview);
   const updateStatus = useServerFn(setIdealistaStatus);
   const rotateToken = useServerFn(rotateIdealistaFeedToken);
+  const fetchAccount = useServerFn(getIdealistaAccount);
+  const saveAccount = useServerFn(setIdealistaAccount);
 
   const { data, isLoading, refetch, isFetching } = useQuery({
     queryKey: ["idealista-overview"],
     queryFn: () => fetchOverview(),
   });
+
+  const accountQuery = useQuery({
+    queryKey: ["idealista-account"],
+    queryFn: () => fetchAccount(),
+  });
+
+  const [emailDraft, setEmailDraft] = useState("");
+  const [emailDirty, setEmailDirty] = useState(false);
+  const [savingEmail, setSavingEmail] = useState(false);
+
+  useEffect(() => {
+    if (accountQuery.data && !emailDirty) {
+      setEmailDraft(accountQuery.data.account.email ?? "");
+    }
+  }, [accountQuery.data, emailDirty]);
 
   const [photoForProperty, setPhotoForProperty] = useState<string | null>(null);
 
@@ -99,6 +120,24 @@ function IdealistaAdminPage() {
     refetch();
   };
 
+  const onSaveEmail = async () => {
+    if (!emailDraft.trim()) {
+      toast.error("Inserisci una email valida");
+      return;
+    }
+    setSavingEmail(true);
+    try {
+      await saveAccount({ data: { email: emailDraft.trim() } });
+      toast.success("Email Idealista salvata");
+      setEmailDirty(false);
+      accountQuery.refetch();
+    } catch (e: any) {
+      toast.error(e?.message ?? "Errore salvataggio");
+    } finally {
+      setSavingEmail(false);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex h-[60vh] items-center justify-center">
@@ -106,6 +145,8 @@ function IdealistaAdminPage() {
       </div>
     );
   }
+
+  const configReady = !!accountQuery.data?.account.email && !!feed?.token;
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8">
@@ -127,9 +168,71 @@ function IdealistaAdminPage() {
 
       {/* Feed card */}
       <section className="mb-8 rounded-md border border-border bg-background p-5">
-        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-          Feed XML Idealista
-        </h2>
+        <div className="mb-3 flex items-center justify-between">
+          <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+            Configurazione Idealista
+          </h2>
+          <span
+            className={`rounded-sm border px-2 py-0.5 text-[10px] uppercase tracking-wider ${
+              configReady
+                ? "border-emerald-200 bg-emerald-50 text-emerald-800"
+                : "border-amber-200 bg-amber-50 text-amber-900"
+            }`}
+          >
+            {configReady ? "Pronto" : "Da completare"}
+          </span>
+        </div>
+
+        <div className="mb-4 grid gap-3 sm:grid-cols-2">
+          <label className="block text-xs">
+            <span className="mb-1 block text-muted-foreground">Email account Idealista</span>
+            <div className="flex gap-2">
+              <input
+                type="email"
+                value={emailDraft}
+                onChange={(e) => {
+                  setEmailDraft(e.target.value);
+                  setEmailDirty(true);
+                }}
+                placeholder="account@esempio.it"
+                className="flex-1 rounded-sm border border-border bg-background px-2 py-1.5 text-sm"
+              />
+              <button
+                onClick={onSaveEmail}
+                disabled={savingEmail || !emailDirty}
+                className="inline-flex items-center gap-1 rounded-sm border border-border bg-background px-3 py-1.5 text-xs hover:border-primary/50 disabled:opacity-50"
+              >
+                {savingEmail ? <Loader2 size={12} className="animate-spin" /> : <Save size={12} />}
+                Salva
+              </button>
+            </div>
+            <span className="mt-1 block text-[10px] text-muted-foreground">
+              Nessuna password viene salvata. La pubblicazione avviene tramite feed XML.
+            </span>
+          </label>
+
+          <div className="block text-xs">
+            <span className="mb-1 block text-muted-foreground">Token feed XML</span>
+            <div className="flex gap-2">
+              <input
+                readOnly
+                value={feed?.token ?? ""}
+                className="flex-1 rounded-sm border border-border bg-muted/30 px-2 py-1.5 font-mono text-xs"
+              />
+              <button
+                onClick={onRotate}
+                className="inline-flex items-center gap-1 rounded-sm border border-border bg-background px-3 py-1.5 text-xs hover:border-primary/50"
+              >
+                <RefreshCw size={12} /> Rigenera
+              </button>
+            </div>
+            <span className="mt-1 block text-[10px] text-muted-foreground">
+              Il token protegge il feed XML. Rigenerandolo, il vecchio URL non funzionerà più.
+            </span>
+          </div>
+        </div>
+
+        <div className="mb-2 text-xs text-muted-foreground">URL feed XML</div>
         <div className="mb-3 flex flex-wrap items-center gap-2">
           <input
             readOnly
@@ -141,7 +244,7 @@ function IdealistaAdminPage() {
             disabled={!feedUrl}
             className="inline-flex items-center gap-1.5 rounded-sm border border-border px-3 py-1.5 text-xs hover:border-primary/50 disabled:opacity-50"
           >
-            <Copy size={12} /> Copia
+            <Copy size={12} /> Copia URL feed
           </button>
           <a
             href={feedUrl || "#"}
@@ -151,13 +254,16 @@ function IdealistaAdminPage() {
           >
             <ExternalLink size={12} /> Apri feed
           </a>
-          <button
-            onClick={onRotate}
-            className="inline-flex items-center gap-1.5 rounded-sm border border-border px-3 py-1.5 text-xs hover:border-primary/50"
-          >
-            <RefreshCw size={12} /> Rigenera token
-          </button>
         </div>
+
+        <div className="mb-3 flex items-start gap-2 rounded-sm border border-blue-200 bg-blue-50 p-3 text-xs text-blue-900">
+          <Info size={14} className="mt-0.5 shrink-0" />
+          <span>
+            Comunica questo URL feed al supporto Idealista o al referente Idealista per l’import
+            automatico degli annunci.
+          </span>
+        </div>
+
         <p className="text-xs text-muted-foreground">
           Ultima generazione:{" "}
           {feed?.last_generated_at
@@ -165,10 +271,6 @@ function IdealistaAdminPage() {
             : "mai"}{" "}
           · Immobili inclusi nel feed:{" "}
           <strong className="text-ink">{buckets.ready.length + buckets.included.length}</strong>
-        </p>
-        <p className="mt-2 text-xs text-muted-foreground">
-          Le credenziali ufficiali Idealista non sono ancora configurate: nessuna pubblicazione
-          automatica viene inviata. Il feed è pronto per essere collegato.
         </p>
       </section>
 
