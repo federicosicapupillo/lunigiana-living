@@ -20,6 +20,7 @@ import {
   X,
 } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
+import { BeforeAfterDialog } from "@/components/admin/before-after-dialog";
 import {
   renderPropertyImage,
   syncImportedImage,
