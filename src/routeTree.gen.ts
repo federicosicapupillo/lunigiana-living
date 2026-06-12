@@ -25,6 +25,7 @@ import { Route as AdminAdminIndexRouteImport } from './routes/_admin.admin.index
 import { Route as AdminAdminRichiesteRouteImport } from './routes/_admin.admin.richieste'
 import { Route as AdminAdminImpostazioniRouteImport } from './routes/_admin.admin.impostazioni'
 import { Route as AdminAdminIdealistaRouteImport } from './routes/_admin.admin.idealista'
+import { Route as AdminAdminDatiLiveRouteImport } from './routes/_admin.admin.dati-live'
 import { Route as AdminAdminImmobiliIndexRouteImport } from './routes/_admin.admin.immobili.index'
 import { Route as ApiPublicIdealistaFeedDotxmlRouteImport } from './routes/api/public/idealista/feed[.]xml'
 import { Route as AdminAdminImmobiliNuovoRouteImport } from './routes/_admin.admin.immobili.nuovo'
@@ -111,6 +112,11 @@ const AdminAdminIdealistaRoute = AdminAdminIdealistaRouteImport.update({
   path: '/idealista',
   getParentRoute: () => AdminAdminRoute,
 } as any)
+const AdminAdminDatiLiveRoute = AdminAdminDatiLiveRouteImport.update({
+  id: '/dati-live',
+  path: '/dati-live',
+  getParentRoute: () => AdminAdminRoute,
+} as any)
 const AdminAdminImmobiliIndexRoute = AdminAdminImmobiliIndexRouteImport.update({
   id: '/immobili/',
   path: '/immobili/',
@@ -157,6 +163,7 @@ export interface FileRoutesByFullPath {
   '/admin/login': typeof AdminLoginRoute
   '/immobili/$id': typeof ImmobiliIdRoute
   '/immobili/': typeof ImmobiliIndexRoute
+  '/admin/dati-live': typeof AdminAdminDatiLiveRoute
   '/admin/idealista': typeof AdminAdminIdealistaRoute
   '/admin/impostazioni': typeof AdminAdminImpostazioniRoute
   '/admin/richieste': typeof AdminAdminRichiesteRoute
@@ -178,6 +185,7 @@ export interface FileRoutesByTo {
   '/admin/login': typeof AdminLoginRoute
   '/immobili/$id': typeof ImmobiliIdRoute
   '/immobili': typeof ImmobiliIndexRoute
+  '/admin/dati-live': typeof AdminAdminDatiLiveRoute
   '/admin/idealista': typeof AdminAdminIdealistaRoute
   '/admin/impostazioni': typeof AdminAdminImpostazioniRoute
   '/admin/richieste': typeof AdminAdminRichiesteRoute
@@ -203,6 +211,7 @@ export interface FileRoutesById {
   '/admin/login': typeof AdminLoginRoute
   '/immobili/$id': typeof ImmobiliIdRoute
   '/immobili/': typeof ImmobiliIndexRoute
+  '/_admin/admin/dati-live': typeof AdminAdminDatiLiveRoute
   '/_admin/admin/idealista': typeof AdminAdminIdealistaRoute
   '/_admin/admin/impostazioni': typeof AdminAdminImpostazioniRoute
   '/_admin/admin/richieste': typeof AdminAdminRichiesteRoute
@@ -228,6 +237,7 @@ export interface FileRouteTypes {
     | '/admin/login'
     | '/immobili/$id'
     | '/immobili/'
+    | '/admin/dati-live'
     | '/admin/idealista'
     | '/admin/impostazioni'
     | '/admin/richieste'
@@ -249,6 +259,7 @@ export interface FileRouteTypes {
     | '/admin/login'
     | '/immobili/$id'
     | '/immobili'
+    | '/admin/dati-live'
     | '/admin/idealista'
     | '/admin/impostazioni'
     | '/admin/richieste'
@@ -273,6 +284,7 @@ export interface FileRouteTypes {
     | '/admin/login'
     | '/immobili/$id'
     | '/immobili/'
+    | '/_admin/admin/dati-live'
     | '/_admin/admin/idealista'
     | '/_admin/admin/impostazioni'
     | '/_admin/admin/richieste'
@@ -412,6 +424,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAdminIdealistaRouteImport
       parentRoute: typeof AdminAdminRoute
     }
+    '/_admin/admin/dati-live': {
+      id: '/_admin/admin/dati-live'
+      path: '/dati-live'
+      fullPath: '/admin/dati-live'
+      preLoaderRoute: typeof AdminAdminDatiLiveRouteImport
+      parentRoute: typeof AdminAdminRoute
+    }
     '/_admin/admin/immobili/': {
       id: '/_admin/admin/immobili/'
       path: '/immobili'
@@ -469,6 +488,7 @@ const AdminAdminImmobiliIdRouteWithChildren =
   AdminAdminImmobiliIdRoute._addFileChildren(AdminAdminImmobiliIdRouteChildren)
 
 interface AdminAdminRouteChildren {
+  AdminAdminDatiLiveRoute: typeof AdminAdminDatiLiveRoute
   AdminAdminIdealistaRoute: typeof AdminAdminIdealistaRoute
   AdminAdminImpostazioniRoute: typeof AdminAdminImpostazioniRoute
   AdminAdminRichiesteRoute: typeof AdminAdminRichiesteRoute
@@ -480,6 +500,7 @@ interface AdminAdminRouteChildren {
 }
 
 const AdminAdminRouteChildren: AdminAdminRouteChildren = {
+  AdminAdminDatiLiveRoute: AdminAdminDatiLiveRoute,
   AdminAdminIdealistaRoute: AdminAdminIdealistaRoute,
   AdminAdminImpostazioniRoute: AdminAdminImpostazioniRoute,
   AdminAdminRichiesteRoute: AdminAdminRichiesteRoute,
