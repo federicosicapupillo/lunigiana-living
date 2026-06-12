@@ -232,7 +232,7 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
     const signedMap: Record<string, string> = {};
     if (paths.length > 0) {
       const { data: signed } = await supabase.storage
-        .from("property-images")
+        .from(STORAGE_BUCKET)
         .createSignedUrls(paths, SIGNED_URL_TTL_SECONDS);
       if (signed) {
         for (const s of signed) {
@@ -330,7 +330,7 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
           toast.error(msg);
           errors.push(msg);
           // best-effort cleanup of orphan storage object
-          await supabase.storage.from("property-images").remove([path]);
+          await supabase.storage.from(STORAGE_BUCKET).remove([path]);
           continue;
         }
         count++;
@@ -376,7 +376,7 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
 
   const remove = async (img: Image) => {
     if (!confirm("Eliminare questa immagine?")) return;
-    await supabase.storage.from("property-images").remove([img.storage_path]);
+    await supabase.storage.from(STORAGE_BUCKET).remove([img.storage_path]);
     const { error } = await supabase.from("property_images").delete().eq("id", img.id);
     if (error) return toast.error(error.message);
     toast.success("Immagine eliminata");
