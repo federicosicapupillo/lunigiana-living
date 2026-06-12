@@ -176,7 +176,6 @@ function extractSettings(img: Image): RenderSettings {
   };
 }
 
-
 export function ImageUploader({ propertyId }: { propertyId: string }) {
   const [images, setImages] = useState<Image[]>([]);
   const [loading, setLoading] = useState(true);
@@ -852,6 +851,7 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
     </div>
   );
 }
+
 
 function IconBtn({
   children,
