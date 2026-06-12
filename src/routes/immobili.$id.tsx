@@ -1,7 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { getPublishedProperty, type PublicProperty } from "@/lib/public-properties.functions";
 import { getLocalizedProperty } from "@/lib/property-i18n.functions";
-import { ArrowLeft, MapPin, Maximize2, BedDouble, Bath, Building2 } from "lucide-react";
+import { ArrowLeft, ChevronLeft, ChevronRight, MapPin, Maximize2, BedDouble, Bath, Building2 } from "lucide-react";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -87,6 +87,9 @@ function PropertyDetail() {
   const displayType = localizeType(p.type, language);
   const [active, setActive] = useState(0);
   const main = p.gallery[active] || p.image;
+  const galleryCount = p.gallery.length;
+  const goPrev = () => setActive((i) => (galleryCount ? (i - 1 + galleryCount) % galleryCount : 0));
+  const goNext = () => setActive((i) => (galleryCount ? (i + 1) % galleryCount : 0));
   const waMessage =
     `${t("wa.propertyMsgPrefix")} ` +
     `${p.reference} — ${title} (${p.location}).` +
@@ -119,27 +122,55 @@ function PropertyDetail() {
 
       {/* Gallery */}
       <section className="container-editorial mt-8 sm:mt-10">
-        <div className="overflow-hidden rounded-sm bg-muted">
-          <WatermarkedImage
-            src={main}
-            alt={title}
-            fetchPriority="high"
-            sizes="(max-width: 1024px) 100vw, 70vw"
-            watermarkSize="lg"
-            className="aspect-[4/3] w-full object-cover sm:aspect-[16/10]"
-          />
+        <div className="group relative overflow-hidden rounded-sm bg-muted">
+          <div className="mx-auto w-full max-h-[450px] sm:max-h-[550px] md:max-h-[600px] lg:max-h-[650px] aspect-[4/3] sm:aspect-[16/10] md:aspect-[16/9]">
+            <WatermarkedImage
+              src={main}
+              alt={title}
+              fetchPriority="high"
+              sizes="(max-width: 1024px) 100vw, 70vw"
+              watermarkSize="lg"
+              className="h-full w-full object-cover transition-opacity duration-300"
+            />
+          </div>
+          {galleryCount > 1 && (
+            <>
+              <button
+                type="button"
+                onClick={goPrev}
+                aria-label="Immagine precedente"
+                className="absolute left-3 top-1/2 hidden -translate-y-1/2 items-center justify-center rounded-full bg-background/80 p-2.5 text-ink shadow-sm backdrop-blur transition hover:bg-background md:flex"
+              >
+                <ChevronLeft size={20} />
+              </button>
+              <button
+                type="button"
+                onClick={goNext}
+                aria-label="Immagine successiva"
+                className="absolute right-3 top-1/2 hidden -translate-y-1/2 items-center justify-center rounded-full bg-background/80 p-2.5 text-ink shadow-sm backdrop-blur transition hover:bg-background md:flex"
+              >
+                <ChevronRight size={20} />
+              </button>
+              <div className="absolute bottom-3 right-3 rounded-sm bg-ink/70 px-2.5 py-1 text-[11px] font-medium tracking-wider text-cream backdrop-blur">
+                {active + 1} / {galleryCount}
+              </div>
+            </>
+          )}
         </div>
-        {p.gallery.length > 1 && (
-          <div className="mt-3 grid grid-cols-4 gap-2 sm:gap-3 md:grid-cols-8">
+        {galleryCount > 1 && (
+          <div className="mt-3 grid grid-cols-4 gap-2 sm:gap-3 md:grid-cols-6 lg:grid-cols-8">
             {p.gallery.map((g: string, i: number) => (
               <button
                 key={g + i}
                 onClick={() => setActive(i)}
-                className={`aspect-[4/3] overflow-hidden rounded-sm bg-muted transition ${
-                  i === active ? "ring-2 ring-primary" : "opacity-75 hover:opacity-100"
+                aria-label={`Vai all'immagine ${i + 1}`}
+                className={`aspect-[4/3] overflow-hidden rounded-sm bg-muted transition-all duration-200 ${
+                  i === active
+                    ? "ring-2 ring-primary ring-offset-2 ring-offset-background opacity-100"
+                    : "opacity-70 hover:opacity-100 hover:ring-1 hover:ring-primary/40"
                 }`}
               >
-                <WatermarkedImage src={g} alt="" loading="lazy" sizes="120px" watermark={false} className="h-full w-full object-cover" />
+                <WatermarkedImage src={g} alt="" loading="lazy" sizes="160px" watermark={false} className="h-full w-full object-cover transition-transform duration-300 hover:scale-105" />
               </button>
             ))}
           </div>
