@@ -69,6 +69,18 @@ const SORT_OPTIONS: Array<{ key: SortBy; label: string }> = [
   { key: "home_first", label: "In home prima" },
 ];
 
+const COMPACT_LABELS: Record<StatusAction, string> = {
+  publish: "Pubblica",
+  republish: "Ripubblica",
+  suspend: "Sospendi",
+  mark_sold: "Venduto",
+  mark_rented: "Affittato",
+  archive: "Archivia",
+  delete: "Elimina",
+  restore: "Ripristina",
+  hard_delete: "Elimina def.",
+};
+
 export const Route = createFileRoute("/_admin/admin/immobili/")({
   head: () => ({
     meta: [
