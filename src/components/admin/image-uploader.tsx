@@ -286,10 +286,6 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
       toast.error(img.render_availability?.message ?? "Sincronizza la foto prima di generare il rendering");
       return;
     }
-    if (!img.photo_type) {
-      toast.error("Configura prima le impostazioni rendering (Tipo foto)");
-      return;
-    }
     setRenderingId(img.id);
     try {
       await runRender({ data: { imageId: img.id } });
