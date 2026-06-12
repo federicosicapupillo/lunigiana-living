@@ -360,6 +360,7 @@ export type Database = {
           render_error: string | null
           render_goal: string | null
           render_notes: string | null
+          render_publish_mode: string
           render_status: string
           render_style: string | null
           rendered_image_url: string | null
@@ -397,6 +398,7 @@ export type Database = {
           render_error?: string | null
           render_goal?: string | null
           render_notes?: string | null
+          render_publish_mode?: string
           render_status?: string
           render_style?: string | null
           rendered_image_url?: string | null
@@ -434,6 +436,7 @@ export type Database = {
           render_error?: string | null
           render_goal?: string | null
           render_notes?: string | null
+          render_publish_mode?: string
           render_status?: string
           render_style?: string | null
           rendered_image_url?: string | null
