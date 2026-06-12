@@ -28,6 +28,7 @@ import { Route as AdminAdminImmobiliIndexRouteImport } from './routes/_admin.adm
 import { Route as AdminAdminImmobiliNuovoRouteImport } from './routes/_admin.admin.immobili.nuovo'
 import { Route as AdminAdminImmobiliAssistenteRouteImport } from './routes/_admin.admin.immobili.assistente'
 import { Route as AdminAdminImmobiliIdRouteImport } from './routes/_admin.admin.immobili.$id'
+import { Route as AdminAdminImmobiliIdAnteprimaRouteImport } from './routes/_admin.admin.immobili.$id.anteprima'
 
 const TerritoriRoute = TerritoriRouteImport.update({
   id: '/territori',
@@ -124,6 +125,12 @@ const AdminAdminImmobiliIdRoute = AdminAdminImmobiliIdRouteImport.update({
   path: '/immobili/$id',
   getParentRoute: () => AdminAdminRoute,
 } as any)
+const AdminAdminImmobiliIdAnteprimaRoute =
+  AdminAdminImmobiliIdAnteprimaRouteImport.update({
+    id: '/anteprima',
+    path: '/anteprima',
+    getParentRoute: () => AdminAdminImmobiliIdRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -140,10 +147,11 @@ export interface FileRoutesByFullPath {
   '/admin/impostazioni': typeof AdminAdminImpostazioniRoute
   '/admin/richieste': typeof AdminAdminRichiesteRoute
   '/admin/': typeof AdminAdminIndexRoute
-  '/admin/immobili/$id': typeof AdminAdminImmobiliIdRoute
+  '/admin/immobili/$id': typeof AdminAdminImmobiliIdRouteWithChildren
   '/admin/immobili/assistente': typeof AdminAdminImmobiliAssistenteRoute
   '/admin/immobili/nuovo': typeof AdminAdminImmobiliNuovoRoute
   '/admin/immobili/': typeof AdminAdminImmobiliIndexRoute
+  '/admin/immobili/$id/anteprima': typeof AdminAdminImmobiliIdAnteprimaRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -158,10 +166,11 @@ export interface FileRoutesByTo {
   '/admin/impostazioni': typeof AdminAdminImpostazioniRoute
   '/admin/richieste': typeof AdminAdminRichiesteRoute
   '/admin': typeof AdminAdminIndexRoute
-  '/admin/immobili/$id': typeof AdminAdminImmobiliIdRoute
+  '/admin/immobili/$id': typeof AdminAdminImmobiliIdRouteWithChildren
   '/admin/immobili/assistente': typeof AdminAdminImmobiliAssistenteRoute
   '/admin/immobili/nuovo': typeof AdminAdminImmobiliNuovoRoute
   '/admin/immobili': typeof AdminAdminImmobiliIndexRoute
+  '/admin/immobili/$id/anteprima': typeof AdminAdminImmobiliIdAnteprimaRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -180,10 +189,11 @@ export interface FileRoutesById {
   '/_admin/admin/impostazioni': typeof AdminAdminImpostazioniRoute
   '/_admin/admin/richieste': typeof AdminAdminRichiesteRoute
   '/_admin/admin/': typeof AdminAdminIndexRoute
-  '/_admin/admin/immobili/$id': typeof AdminAdminImmobiliIdRoute
+  '/_admin/admin/immobili/$id': typeof AdminAdminImmobiliIdRouteWithChildren
   '/_admin/admin/immobili/assistente': typeof AdminAdminImmobiliAssistenteRoute
   '/_admin/admin/immobili/nuovo': typeof AdminAdminImmobiliNuovoRoute
   '/_admin/admin/immobili/': typeof AdminAdminImmobiliIndexRoute
+  '/_admin/admin/immobili/$id/anteprima': typeof AdminAdminImmobiliIdAnteprimaRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -206,6 +216,7 @@ export interface FileRouteTypes {
     | '/admin/immobili/assistente'
     | '/admin/immobili/nuovo'
     | '/admin/immobili/'
+    | '/admin/immobili/$id/anteprima'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -224,6 +235,7 @@ export interface FileRouteTypes {
     | '/admin/immobili/assistente'
     | '/admin/immobili/nuovo'
     | '/admin/immobili'
+    | '/admin/immobili/$id/anteprima'
   id:
     | '__root__'
     | '/'
@@ -245,6 +257,7 @@ export interface FileRouteTypes {
     | '/_admin/admin/immobili/assistente'
     | '/_admin/admin/immobili/nuovo'
     | '/_admin/admin/immobili/'
+    | '/_admin/admin/immobili/$id/anteprima'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -394,14 +407,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAdminImmobiliIdRouteImport
       parentRoute: typeof AdminAdminRoute
     }
+    '/_admin/admin/immobili/$id/anteprima': {
+      id: '/_admin/admin/immobili/$id/anteprima'
+      path: '/anteprima'
+      fullPath: '/admin/immobili/$id/anteprima'
+      preLoaderRoute: typeof AdminAdminImmobiliIdAnteprimaRouteImport
+      parentRoute: typeof AdminAdminImmobiliIdRoute
+    }
   }
 }
+
+interface AdminAdminImmobiliIdRouteChildren {
+  AdminAdminImmobiliIdAnteprimaRoute: typeof AdminAdminImmobiliIdAnteprimaRoute
+}
+
+const AdminAdminImmobiliIdRouteChildren: AdminAdminImmobiliIdRouteChildren = {
+  AdminAdminImmobiliIdAnteprimaRoute: AdminAdminImmobiliIdAnteprimaRoute,
+}
+
+const AdminAdminImmobiliIdRouteWithChildren =
+  AdminAdminImmobiliIdRoute._addFileChildren(AdminAdminImmobiliIdRouteChildren)
 
 interface AdminAdminRouteChildren {
   AdminAdminImpostazioniRoute: typeof AdminAdminImpostazioniRoute
   AdminAdminRichiesteRoute: typeof AdminAdminRichiesteRoute
   AdminAdminIndexRoute: typeof AdminAdminIndexRoute
-  AdminAdminImmobiliIdRoute: typeof AdminAdminImmobiliIdRoute
+  AdminAdminImmobiliIdRoute: typeof AdminAdminImmobiliIdRouteWithChildren
   AdminAdminImmobiliAssistenteRoute: typeof AdminAdminImmobiliAssistenteRoute
   AdminAdminImmobiliNuovoRoute: typeof AdminAdminImmobiliNuovoRoute
   AdminAdminImmobiliIndexRoute: typeof AdminAdminImmobiliIndexRoute
@@ -411,7 +442,7 @@ const AdminAdminRouteChildren: AdminAdminRouteChildren = {
   AdminAdminImpostazioniRoute: AdminAdminImpostazioniRoute,
   AdminAdminRichiesteRoute: AdminAdminRichiesteRoute,
   AdminAdminIndexRoute: AdminAdminIndexRoute,
-  AdminAdminImmobiliIdRoute: AdminAdminImmobiliIdRoute,
+  AdminAdminImmobiliIdRoute: AdminAdminImmobiliIdRouteWithChildren,
   AdminAdminImmobiliAssistenteRoute: AdminAdminImmobiliAssistenteRoute,
   AdminAdminImmobiliNuovoRoute: AdminAdminImmobiliNuovoRoute,
   AdminAdminImmobiliIndexRoute: AdminAdminImmobiliIndexRoute,
