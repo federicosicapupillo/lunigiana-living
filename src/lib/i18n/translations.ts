@@ -459,7 +459,8 @@ const en: Dict = {
   "home.brand.p2":
     "We guide buyers with an honest eye: helping you choose not just the property, but the right context for your life.",
   "home.featured.eyebrow": "Featured",
-  "home.featured.title": "Properties of the moment",
+  "home.featured.title": "Featured properties",
+  "home.featured.subtitle": "A selection of properties curated by Furia Immobiliare. Discover all available properties on the dedicated page.",
   "home.lead.eyebrow": "Looking for a home",
   "home.lead.title1": "Looking for a home",
   "home.lead.title2": "in Lunigiana?",
