@@ -6,6 +6,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { WatermarkedImage } from "@/components/watermarked-image";
+import { BeforeAfterSlider } from "@/components/before-after-slider";
 import { whatsappUrl } from "@/components/whatsapp-float";
 import { useLanguage, useT } from "@/lib/i18n/LanguageContext";
 import {
@@ -178,7 +179,8 @@ function PropertyDetail() {
       </section>
 
       {/* Rendering emozionale — visibile solo se ci sono rendering AI pubblicati come emozionali */}
-      {p.emotionalRenders && p.emotionalRenders.length > 0 && (
+      {((p.emotionalPairs && p.emotionalPairs.length > 0) ||
+        (p.emotionalRenders && p.emotionalRenders.length > 0)) && (
         <section className="container-editorial mt-12 sm:mt-16">
           <div className="rounded-sm border border-primary/20 bg-primary/5 p-6 sm:p-8 md:p-10">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
@@ -197,28 +199,59 @@ function PropertyDetail() {
                 <Sparkles size={11} /> {t("detail.emotionalBadge")}
               </span>
             </div>
-            <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {p.emotionalRenders.map((src: string, i: number) => (
-                <figure key={src + i} className="group overflow-hidden rounded-sm border border-border bg-card">
-                  <div className="relative aspect-[4/3] overflow-hidden bg-muted">
-                    <WatermarkedImage
-                      src={src}
-                      alt={`${title} — ${t("detail.emotionalBadge")} ${i + 1}`}
-                      loading="lazy"
-                      sizes="(max-width: 768px) 100vw, 33vw"
-                      watermark={false}
-                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+            {p.emotionalPairs && p.emotionalPairs.length > 0 && (
+              <>
+                <p className="mt-4 text-xs uppercase tracking-[0.18em] text-muted-foreground">
+                  {t("detail.compareHint")}
+                </p>
+                <div className="mt-4 grid gap-6 sm:grid-cols-2">
+                  {p.emotionalPairs.map((pair, i) => (
+                    <BeforeAfterSlider
+                      key={pair.after + i}
+                      before={pair.before}
+                      after={pair.after}
+                      alt={title}
+                      beforeLabel={t("detail.beforeLabel")}
+                      afterLabel={t("detail.afterLabel")}
+                      beforeCaption={t("detail.beforeCaption")}
+                      afterCaption={t("detail.afterCaption")}
+                      aiBadge={t("detail.emotionalBadge")}
+                      illustrativeNote={t("detail.illustrativeNote")}
                     />
-                    <span className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-sm bg-background/90 px-2 py-1 text-[10px] uppercase tracking-wider text-primary backdrop-blur">
-                      <Sparkles size={11} /> {t("detail.emotionalBadge")}
-                    </span>
-                  </div>
-                  <figcaption className="px-3 py-2 text-[11px] italic text-muted-foreground">
-                    {t("detail.emotionalCaption")}
-                  </figcaption>
-                </figure>
-              ))}
-            </div>
+                  ))}
+                </div>
+              </>
+            )}
+            {/* Render-only fallback: renderings without a paired original */}
+            {(() => {
+              const pairedAfters = new Set((p.emotionalPairs ?? []).map((x) => x.after));
+              const orphans = (p.emotionalRenders ?? []).filter((src) => !pairedAfters.has(src));
+              if (orphans.length === 0) return null;
+              return (
+                <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                  {orphans.map((src: string, i: number) => (
+                    <figure key={src + i} className="group overflow-hidden rounded-sm border border-border bg-card">
+                      <div className="relative aspect-[4/3] overflow-hidden bg-muted">
+                        <WatermarkedImage
+                          src={src}
+                          alt={`${title} — ${t("detail.emotionalBadge")} ${i + 1}`}
+                          loading="lazy"
+                          sizes="(max-width: 768px) 100vw, 33vw"
+                          watermark={false}
+                          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                        />
+                        <span className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-sm bg-background/90 px-2 py-1 text-[10px] uppercase tracking-wider text-primary backdrop-blur">
+                          <Sparkles size={11} /> {t("detail.emotionalBadge")}
+                        </span>
+                      </div>
+                      <figcaption className="px-3 py-2 text-[11px] italic text-muted-foreground">
+                        {t("detail.emotionalCaption")}
+                      </figcaption>
+                    </figure>
+                  ))}
+                </div>
+              );
+            })()}
             <p className="mt-6 border-t border-primary/20 pt-4 text-xs italic leading-relaxed text-muted-foreground">
               {t("detail.emotionalDisclaimer")}
             </p>
