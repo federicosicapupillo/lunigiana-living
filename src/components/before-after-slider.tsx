@@ -14,6 +14,8 @@ type Props = {
   aiBadge: string;
   illustrativeNote: string;
   className?: string;
+  aspectClassName?: string;
+  hideCaption?: boolean;
 };
 
 export function BeforeAfterSlider({
@@ -27,6 +29,8 @@ export function BeforeAfterSlider({
   aiBadge,
   illustrativeNote,
   className,
+  aspectClassName = "aspect-[4/3]",
+  hideCaption = false,
 }: Props) {
   const [position, setPosition] = useState(50);
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -76,7 +80,7 @@ export function BeforeAfterSlider({
     <figure className={cn("overflow-hidden rounded-sm border border-border bg-card", className)}>
       <div
         ref={containerRef}
-        className="relative aspect-[4/3] w-full select-none overflow-hidden bg-muted touch-none"
+        className={cn("relative w-full h-full select-none overflow-hidden bg-muted touch-none", aspectClassName)}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
@@ -115,6 +119,9 @@ export function BeforeAfterSlider({
         <span className="pointer-events-none absolute right-2 top-2 inline-flex items-center gap-1 rounded-sm bg-primary/90 px-2 py-1 text-[10px] uppercase tracking-wider text-primary-foreground backdrop-blur">
           <Sparkles size={11} /> {aiBadge} · {afterLabel}
         </span>
+        <span className="pointer-events-none absolute bottom-2 left-2 inline-flex items-center rounded-sm bg-ink/70 px-2 py-1 text-[10px] italic tracking-wide text-cream backdrop-blur">
+          {illustrativeNote}
+        </span>
 
         {/* Divider + handle */}
         <div
@@ -138,6 +145,7 @@ export function BeforeAfterSlider({
           </svg>
         </button>
       </div>
+      {!hideCaption && (
       <figcaption className="flex flex-col gap-1 px-3 py-2 text-[11px] italic text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
         <span>
           <strong className="not-italic font-medium text-ink">{beforeLabel}:</strong>{" "}
@@ -148,6 +156,7 @@ export function BeforeAfterSlider({
           {afterCaption} · {illustrativeNote}
         </span>
       </figcaption>
+      )}
     </figure>
   );
 }

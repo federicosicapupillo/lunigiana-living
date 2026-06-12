@@ -40,8 +40,7 @@ export type PublicProperty = {
   featured: boolean;
   tag?: string;
   isRent: boolean;
-  emotionalRenders: string[];
-  emotionalPairs: Array<{ before: string; after: string }>;
+  galleryPairs: Record<string, string>;
 };
 
 const PLACEHOLDER =
@@ -153,32 +152,34 @@ function adapt(
     if (a.is_cover !== b.is_cover) return a.is_cover ? -1 : 1;
     return a.sort_order - b.sort_order;
   });
+  const resolveBefore = (i: ImageRow): string | undefined => {
+    if (i.published_image_url) return i.published_image_url;
+    if (i.use_enhanced && i.enhanced_storage_path) {
+      return i.enhanced_image_url ?? signedMap[i.enhanced_storage_path];
+    }
+    return signedMap[i.storage_path];
+  };
+  const resolveRender = (i: ImageRow): string | undefined => {
+    if (i.rendered_image_url) return i.rendered_image_url;
+    if (i.rendered_storage_path) return signedMap[i.rendered_storage_path];
+    return undefined;
+  };
+  const galleryPairs: Record<string, string> = {};
   const gallery = sortedImages
     .map((i) => {
-      if (i.published_image_url) return i.published_image_url;
-      if (i.use_enhanced && i.enhanced_storage_path) {
-        return i.enhanced_image_url ?? signedMap[i.enhanced_storage_path];
+      const before = resolveBefore(i);
+      const render = resolveRender(i);
+      // Emotional mode: keep original in gallery, attach render as Before/After overlay.
+      if (i.render_publish_mode === "emotional" && render && before) {
+        galleryPairs[before] = render;
+        return before;
       }
-      const path = i.use_rendered && i.rendered_storage_path ? i.rendered_storage_path : i.storage_path;
-      return signedMap[path];
+      // Main-replacement mode: render becomes the gallery image (legacy behavior).
+      if (i.use_rendered && render) return render;
+      return before;
     })
-    .filter(Boolean);
-  const cover = gallery[0] ?? PLACEHOLDER;
-  const emotionalRenders = sortedImages
-    .filter((i) => i.render_publish_mode === "emotional" && (i.rendered_image_url || i.rendered_storage_path))
-    .map((i) => i.rendered_image_url ?? (i.rendered_storage_path ? signedMap[i.rendered_storage_path] : null))
     .filter((v): v is string => !!v);
-  const emotionalPairs = sortedImages
-    .filter((i) => i.render_publish_mode === "emotional" && (i.rendered_image_url || i.rendered_storage_path))
-    .map((i) => {
-      const after = i.rendered_image_url ?? (i.rendered_storage_path ? signedMap[i.rendered_storage_path] : null);
-      const before =
-        (i.use_enhanced && i.enhanced_storage_path
-          ? i.enhanced_image_url ?? signedMap[i.enhanced_storage_path]
-          : signedMap[i.storage_path]) ?? i.published_image_url ?? null;
-      return after && before ? { before, after } : null;
-    })
-    .filter((v): v is { before: string; after: string } => !!v);
+  const cover = gallery[0] ?? PLACEHOLDER;
   const attrs: Record<string, string> = {};
   const amenities: string[] = [];
   let altre: string | null = null;
@@ -253,8 +254,7 @@ function adapt(
     featured: !!p.featured,
     tag: buildTag(p),
     isRent: p.contract_type === "affitto",
-    emotionalRenders,
-    emotionalPairs,
+    galleryPairs,
   };
 }
 
