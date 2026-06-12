@@ -14,6 +14,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { generateDescription } from "@/lib/ai-description.functions";
 import { ImageUploader } from "@/components/admin/image-uploader";
 import { LocationFields } from "@/components/admin/location-fields";
+import { WindowFlyerDialog } from "@/components/admin/window-flyer-dialog";
 import {
   PROPERTY_TYPES,
   CONTRACT_TYPES,
@@ -160,6 +161,7 @@ function PropertyEditor() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [generating, setGenerating] = useState(false);
+  const [flyerOpen, setFlyerOpen] = useState(false);
 
   // Description controls
   const [genLength, setGenLength] = useState<"breve" | "media" | "editoriale">("media");
@@ -353,6 +355,12 @@ function PropertyEditor() {
             {saving ? <Loader2 size={13} className="animate-spin" /> : <Save size={13} />}
             Salva bozza
           </button>
+          <button
+            onClick={() => setFlyerOpen(true)}
+            className="inline-flex items-center gap-2 rounded-sm border border-border bg-background px-4 py-2 text-xs uppercase tracking-wider hover:border-primary/50"
+          >
+            <FileText size={13} /> Genera cartello A4
+          </button>
           <StatusActionsButton
             status={prop.status}
             open={statusMenu}
@@ -436,6 +444,11 @@ function PropertyEditor() {
         danger={pendingAction ? CONFIRM_COPY[pendingAction]?.danger : false}
         onCancel={() => setPendingAction(null)}
         onConfirm={() => pendingAction && runAction(pendingAction)}
+      />
+      <WindowFlyerDialog
+        property={prop}
+        open={flyerOpen}
+        onClose={() => setFlyerOpen(false)}
       />
     </div>
   );
