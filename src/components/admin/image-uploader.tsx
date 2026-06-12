@@ -1,7 +1,24 @@
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { ImagePlus, Star, StarOff, Trash2, ArrowUp, ArrowDown, Loader2, Sparkles, Check, CloudDownload, Wand2, Download, Zap, Heart, Undo2, X } from "lucide-react";
+import {
+  ImagePlus,
+  Star,
+  StarOff,
+  Trash2,
+  ArrowUp,
+  ArrowDown,
+  Loader2,
+  Sparkles,
+  Check,
+  CloudDownload,
+  Wand2,
+  Download,
+  Zap,
+  Heart,
+  Undo2,
+  X,
+} from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import {
   renderPropertyImage,
@@ -69,7 +86,13 @@ const IMPORTED_NOT_SYNCED_MESSAGE =
   "Questa foto è stata importata da una fonte esterna. Prima di generare il rendering, sincronizzala nello storage.";
 
 function logUploadStep(
-  step: "UPLOAD START" | "UPLOAD SUCCESS" | "OBJECT PATH" | "SIGNED URL REQUEST" | "SIGNED URL SUCCESS" | "SIGNED URL FAILED",
+  step:
+    | "UPLOAD START"
+    | "UPLOAD SUCCESS"
+    | "OBJECT PATH"
+    | "SIGNED URL REQUEST"
+    | "SIGNED URL SUCCESS"
+    | "SIGNED URL FAILED",
   details: { bucket: string; path: string; filename: string; property_id: string; error?: string },
 ) {
   const method = step === "SIGNED URL FAILED" ? console.error : console.info;
@@ -89,7 +112,9 @@ async function verifyStorageObjectExists(path: string) {
     if ((data ?? []).some((object) => object.name === filename)) {
       return { exists: true, error: null, filename };
     }
-    if (attempt < 2) await new Promise((resolve) => window.setTimeout(resolve, 250 * (attempt + 1)));
+    if (attempt < 2) {
+      await new Promise((resolve) => window.setTimeout(resolve, 250 * (attempt + 1)));
+    }
   }
 
   return { exists: false, error: "Object not found dopo upload completato", filename };
