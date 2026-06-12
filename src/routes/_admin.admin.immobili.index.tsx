@@ -342,6 +342,11 @@ function AdminPropertiesPage() {
                   <p className="mt-1 truncate text-xs text-muted-foreground">
                     {[r.property_type, r.municipality].filter(Boolean).join(" · ") || "—"}
                   </p>
+                  {r.reference_code && (
+                    <p className="mt-0.5 truncate text-[11px] uppercase tracking-wider text-primary">
+                      Cod. annuncio: {r.reference_code}
+                    </p>
+                  )}
                   <div className="mt-1 text-sm text-ink sm:hidden">
                     {r.price_on_request
                       ? "Su richiesta"
