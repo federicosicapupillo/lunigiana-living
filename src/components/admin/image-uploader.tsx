@@ -1,13 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { ImagePlus, Star, StarOff, Trash2, ArrowUp, ArrowDown, Loader2, Sparkles, Check, CloudDownload, Wand2, Download, Zap } from "lucide-react";
+import { ImagePlus, Star, StarOff, Trash2, ArrowUp, ArrowDown, Loader2, Sparkles, Check, CloudDownload, Wand2, Download, Zap, Heart, Undo2, X } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import {
   renderPropertyImage,
-  setPropertyImagePublished,
   syncImportedImage,
   forceSyncPhotosBatch,
+  setRenderPublishMode,
+  discardRender,
 } from "@/lib/property-render.functions";
 import {
   enhancePropertyImage,
@@ -30,6 +31,7 @@ type Image = {
   render_status: string;
   render_error: string | null;
   use_rendered: boolean;
+  render_publish_mode?: string | null;
   enhanced_storage_path: string | null;
   enhanced_image_url: string | null;
   enhancement_status: string;
@@ -129,7 +131,8 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
   const [enhancingId, setEnhancingId] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const runRender = useServerFn(renderPropertyImage);
-  const runSetPublished = useServerFn(setPropertyImagePublished);
+  const runSetPublishMode = useServerFn(setRenderPublishMode);
+  const runDiscardRender = useServerFn(discardRender);
   const runSync = useServerFn(syncImportedImage);
   const runForceSync = useServerFn(forceSyncPhotosBatch);
   const [bulkSyncing, setBulkSyncing] = useState(false);
@@ -163,7 +166,7 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
     const { data, error } = await supabase
       .from("property_images")
       .select(
-        "id, image_url, original_image_url, rendered_image_url, published_image_url, storage_path, alt_text, sort_order, is_cover, rendered_storage_path, render_status, render_error, use_rendered, enhanced_storage_path, enhanced_image_url, enhancement_status, enhancement_error, enhancement_created_at, use_enhanced, is_imported, import_status, imported_source_url, photo_type, photo_category, render_style, render_goal, room_condition, intervention_level, preserve_structure, desired_lighting, visual_target, render_notes",
+        "id, image_url, original_image_url, rendered_image_url, published_image_url, storage_path, alt_text, sort_order, is_cover, rendered_storage_path, render_status, render_error, use_rendered, render_publish_mode, enhanced_storage_path, enhanced_image_url, enhancement_status, enhancement_error, enhancement_created_at, use_enhanced, is_imported, import_status, imported_source_url, photo_type, photo_category, render_style, render_goal, room_condition, intervention_level, preserve_structure, desired_lighting, visual_target, render_notes",
       )
       .eq("property_id", propertyId)
       .order("sort_order", { ascending: true });
@@ -300,10 +303,27 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
     }
   };
 
-  const togglePublished = async (img: Image, useRendered: boolean) => {
+  const setPublishMode = async (img: Image, mode: "main" | "emotional" | "none") => {
     try {
-      await runSetPublished({ data: { imageId: img.id, useRendered } });
-      toast.success(useRendered ? "Rendering pubblicato" : "Originale pubblicato");
+      await runSetPublishMode({ data: { imageId: img.id, mode } });
+      toast.success(
+        mode === "main"
+          ? "Rendering pubblicato come foto principale (originale conservata)"
+          : mode === "emotional"
+          ? "Rendering aggiunto alla sezione 'Rendering emozionale'"
+          : "Rendering non pubblicato",
+      );
+      await load();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Errore");
+    }
+  };
+
+  const discard = async (img: Image) => {
+    if (!confirm("Scartare il rendering generato? La foto originale resterà intatta.")) return;
+    try {
+      await runDiscardRender({ data: { imageId: img.id } });
+      toast.success("Rendering scartato. Foto originale ripristinata.");
       await load();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Errore");
@@ -629,25 +649,62 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
                     <div className="text-[10px] text-destructive">{img.render_error}</div>
                   )}
                   {img.rendered_storage_path && (
-                    <div className="flex flex-wrap gap-1">
-                      <button
-                        type="button"
-                        onClick={() => togglePublished(img, true)}
-                        disabled={img.use_rendered}
-                        className="inline-flex items-center gap-1 rounded-sm border border-border bg-background px-2 py-1 text-[10px] uppercase tracking-wider hover:border-primary/50 disabled:opacity-40"
-                      >
-                        {img.use_rendered && <Check size={11} className="text-primary" />}
-                        Usa rendering
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => togglePublished(img, false)}
-                        disabled={!img.use_rendered}
-                        className="inline-flex items-center gap-1 rounded-sm border border-border bg-background px-2 py-1 text-[10px] uppercase tracking-wider hover:border-primary/50 disabled:opacity-40"
-                      >
-                        {!img.use_rendered && <Check size={11} className="text-primary" />}
-                        Usa originale
-                      </button>
+                    <div className="space-y-1.5 rounded-sm border border-primary/30 bg-primary/5 p-2">
+                      <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                        Cosa fare di questo rendering?
+                      </div>
+                      <div className="flex flex-wrap gap-1">
+                        <button
+                          type="button"
+                          onClick={() => setPublishMode(img, "main")}
+                          disabled={img.render_publish_mode === "main"}
+                          title="Il rendering sostituisce la foto originale nella gallery. L'originale resta come backup."
+                          className="inline-flex items-center gap-1 rounded-sm border border-border bg-background px-2 py-1 text-[10px] uppercase tracking-wider hover:border-primary/50 disabled:opacity-40"
+                        >
+                          {img.render_publish_mode === "main" && <Check size={11} className="text-primary" />}
+                          <Sparkles size={11} />
+                          Sostituisci originale
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setPublishMode(img, "emotional")}
+                          disabled={img.render_publish_mode === "emotional"}
+                          title="Il rendering compare solo nella sezione pubblica 'Rendering emozionale'."
+                          className="inline-flex items-center gap-1 rounded-sm border border-border bg-background px-2 py-1 text-[10px] uppercase tracking-wider hover:border-primary/50 disabled:opacity-40"
+                        >
+                          {img.render_publish_mode === "emotional" && <Check size={11} className="text-primary" />}
+                          <Heart size={11} />
+                          Rendering emozionale
+                        </button>
+                        {img.render_publish_mode === "main" && (
+                          <button
+                            type="button"
+                            onClick={() => setPublishMode(img, "none")}
+                            title="Torna a mostrare la foto originale nella gallery."
+                            className="inline-flex items-center gap-1 rounded-sm border border-border bg-background px-2 py-1 text-[10px] uppercase tracking-wider hover:border-primary/50"
+                          >
+                            <Undo2 size={11} />
+                            Ripristina originale
+                          </button>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => discard(img)}
+                          title="Elimina il rendering generato. La foto originale resta intatta."
+                          className="inline-flex items-center gap-1 rounded-sm border border-border bg-background px-2 py-1 text-[10px] uppercase tracking-wider text-destructive hover:border-destructive/50"
+                        >
+                          <X size={11} />
+                          Scarta rendering
+                        </button>
+                      </div>
+                      <div className="text-[9px] uppercase tracking-wider text-muted-foreground">
+                        Stato pubblicazione:{" "}
+                        <span className="text-foreground">
+                          {img.render_publish_mode === "main" && "Sostituisce la foto originale"}
+                          {img.render_publish_mode === "emotional" && "Visibile come Rendering emozionale"}
+                          {(!img.render_publish_mode || img.render_publish_mode === "none") && "Non pubblicato (solo anteprima admin)"}
+                        </span>
+                      </div>
                     </div>
                   )}
                 </div>

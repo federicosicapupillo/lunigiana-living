@@ -283,6 +283,12 @@ const it: Dict = {
   "detail.submit": "Richiedi informazioni o visita",
   "detail.orCall": "oppure chiamaci",
   "detail.waBtn": "Chiedi informazioni a Elena su WhatsApp",
+ "detail.emotionalEyebrow": "Rendering emozionale",
+ "detail.emotionalTitle": "Come potrebbe diventare",
+ "detail.emotionalIntro": "Una visione di come questo immobile potrebbe essere valorizzato. Le immagini sono generate con rendering AI a scopo puramente illustrativo.",
+ "detail.emotionalBadge": "Rendering AI",
+ "detail.emotionalCaption": "Immagine a scopo illustrativo",
+ "detail.emotionalDisclaimer": "Immagini generate con rendering AI a scopo illustrativo. Mostrano una possibile valorizzazione dell'immobile e non rappresentano lo stato attuale.",
 
   // SEO meta
   "seo.home.title": "Furia Immobiliare — Case di carattere in Lunigiana",
@@ -661,6 +667,12 @@ const en: Dict = {
   "detail.submit": "Request information or viewing",
   "detail.orCall": "or call us",
   "detail.waBtn": "Message Elena on WhatsApp",
+  "detail.emotionalEyebrow": "Emotional rendering",
+  "detail.emotionalTitle": "How it could look",
+  "detail.emotionalIntro": "A vision of how this property could be enhanced. Images are AI-generated renderings for illustrative purposes only.",
+  "detail.emotionalBadge": "AI rendering",
+  "detail.emotionalCaption": "Illustrative image",
+  "detail.emotionalDisclaimer": "Images generated with AI rendering for illustrative purposes. They show a possible enhancement of the property and do not represent its current condition.",
 
   // SEO meta
   "seo.home.title": "Furia Immobiliare — Homes with character in Lunigiana",

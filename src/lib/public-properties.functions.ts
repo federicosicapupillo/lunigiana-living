@@ -40,6 +40,7 @@ export type PublicProperty = {
   featured: boolean;
   tag?: string;
   isRent: boolean;
+  emotionalRenders: string[];
 };
 
 const PLACEHOLDER =
@@ -127,6 +128,8 @@ type ImageRow = {
   alt_text: string | null;
   sort_order: number;
   is_cover: boolean;
+  render_publish_mode?: string | null;
+  rendered_image_url?: string | null;
 };
 
 type FeatureRow = { property_id: string; feature_name: string; feature_value: string | null };
@@ -160,6 +163,10 @@ function adapt(
     })
     .filter(Boolean);
   const cover = gallery[0] ?? PLACEHOLDER;
+  const emotionalRenders = sortedImages
+    .filter((i) => i.render_publish_mode === "emotional" && (i.rendered_image_url || i.rendered_storage_path))
+    .map((i) => i.rendered_image_url ?? (i.rendered_storage_path ? signedMap[i.rendered_storage_path] : null))
+    .filter((v): v is string => !!v);
   const attrs: Record<string, string> = {};
   const amenities: string[] = [];
   let altre: string | null = null;
@@ -234,6 +241,7 @@ function adapt(
     featured: !!p.featured,
     tag: buildTag(p),
     isRent: p.contract_type === "affitto",
+    emotionalRenders,
   };
 }
 
@@ -256,7 +264,7 @@ export const listPublishedProperties = createServerFn({ method: "GET" }).handler
   const [imgRes, featRes, descRes] = await Promise.all([
     supabaseAdmin
       .from("property_images")
-      .select("property_id, published_image_url, storage_path, rendered_storage_path, use_rendered, enhanced_storage_path, enhanced_image_url, use_enhanced, alt_text, sort_order, is_cover")
+      .select("property_id, published_image_url, storage_path, rendered_storage_path, rendered_image_url, render_publish_mode, use_rendered, enhanced_storage_path, enhanced_image_url, use_enhanced, alt_text, sort_order, is_cover")
       .in("property_id", ids),
     supabaseAdmin
       .from("property_features")
@@ -317,7 +325,7 @@ export const getPublishedProperty = createServerFn({ method: "GET" })
     const [imgRes, featRes, descRes] = await Promise.all([
       supabaseAdmin
         .from("property_images")
-        .select("property_id, published_image_url, storage_path, rendered_storage_path, use_rendered, enhanced_storage_path, enhanced_image_url, use_enhanced, alt_text, sort_order, is_cover")
+        .select("property_id, published_image_url, storage_path, rendered_storage_path, rendered_image_url, render_publish_mode, use_rendered, enhanced_storage_path, enhanced_image_url, use_enhanced, alt_text, sort_order, is_cover")
         .eq("property_id", propRow.id),
       supabaseAdmin
         .from("property_features")
