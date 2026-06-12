@@ -229,7 +229,7 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
     const rows = (data ?? []) as Image[];
     // Sign rendered paths
     const paths = rows.map((r) => r.rendered_storage_path).filter((p): p is string => !!p);
-    let signedMap: Record<string, string> = {};
+    const signedMap: Record<string, string> = {};
     if (paths.length > 0) {
       const { data: signed } = await supabase.storage
         .from("property-images")
@@ -244,7 +244,9 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
     setImages(
       rows.map((r, idx) => ({
         ...r,
-        rendered_signed_url: r.rendered_storage_path ? signedMap[r.rendered_storage_path] ?? null : null,
+        rendered_signed_url: r.rendered_storage_path
+          ? (signedMap[r.rendered_storage_path] ?? null)
+          : null,
         render_availability: availability[idx],
       })),
     );
@@ -271,7 +273,12 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
         }
         const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
         const path = `${propertyId}/${crypto.randomUUID()}.${ext}`;
-        const logDetails = { bucket: STORAGE_BUCKET, path, filename: file.name, property_id: propertyId };
+        const logDetails = {
+          bucket: STORAGE_BUCKET,
+          path,
+          filename: file.name,
+          property_id: propertyId,
+        };
         logUploadStep("UPLOAD START", logDetails);
         logUploadStep("OBJECT PATH", logDetails);
         const { error: upErr } = await supabase.storage
