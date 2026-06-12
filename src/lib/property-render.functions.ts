@@ -567,6 +567,124 @@ export const setPropertyImagePublished = createServerFn({ method: "POST" })
   });
 
 /**
+ * Imposta come il rendering AI deve essere pubblicato:
+ *  - 'main'      → il rendering sostituisce la foto originale nella gallery principale.
+ *                  L'originale resta conservata in storage (storage_path) come backup
+ *                  e può essere ripristinata in qualsiasi momento.
+ *  - 'emotional' → il rendering NON sostituisce la foto reale: viene mostrato solo
+ *                  nella sezione pubblica "Rendering emozionale" della scheda immobile.
+ *  - 'none'      → il rendering esiste ma non è pubblicato da nessuna parte.
+ * Riservata agli admin.
+ */
+export const setRenderPublishMode = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: { imageId: string; mode: "main" | "emotional" | "none" }) =>
+    z
+      .object({
+        imageId: z.string().uuid(),
+        mode: z.enum(["main", "emotional", "none"]),
+      })
+      .parse(data),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { supabase, userId } = context;
+    const { data: roleRow } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userId)
+      .eq("role", "admin")
+      .maybeSingle();
+    if (!roleRow) throw new Error("Solo gli admin");
+
+    const { data: img, error: imgErr } = await supabaseAdmin
+      .from("property_images")
+      .select(
+        "id, storage_path, rendered_storage_path, original_image_url, rendered_image_url",
+      )
+      .eq("id", data.imageId)
+      .maybeSingle();
+    if (imgErr || !img) throw new Error("Immagine non trovata");
+
+    if ((data.mode === "main" || data.mode === "emotional") && !img.rendered_storage_path) {
+      throw new Error("Nessun rendering generato per questa foto");
+    }
+
+    const useRendered = data.mode === "main";
+
+    // Calcola published_image_url coerente con la modalità scelta
+    let publishedUrl = useRendered ? img.rendered_image_url : img.original_image_url;
+    const fallbackPath = useRendered ? img.rendered_storage_path : img.storage_path;
+    if (!publishedUrl && fallbackPath) {
+      const { data: signed } = await supabaseAdmin.storage
+        .from(BUCKET)
+        .createSignedUrl(fallbackPath, SIGNED_URL_TTL_SECONDS);
+      publishedUrl = signed?.signedUrl ?? null;
+    }
+
+    const { error } = await supabaseAdmin
+      .from("property_images")
+      .update({
+        render_publish_mode: data.mode,
+        use_rendered: useRendered,
+        published_image_url: publishedUrl,
+      })
+      .eq("id", data.imageId);
+    if (error) throw new Error(error.message);
+    return { ok: true as const };
+  });
+
+/**
+ * Scarta il rendering generato: rimuove il file dallo storage, azzera i riferimenti
+ * al rendering e ripristina la foto originale come immagine pubblicata.
+ * NON tocca la foto originale (storage_path / original_image_url restano intatti).
+ * Riservata agli admin.
+ */
+export const discardRender = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: { imageId: string }) =>
+    z.object({ imageId: z.string().uuid() }).parse(data),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { supabase, userId } = context;
+    const { data: roleRow } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userId)
+      .eq("role", "admin")
+      .maybeSingle();
+    if (!roleRow) throw new Error("Solo gli admin");
+
+    const { data: img, error: imgErr } = await supabaseAdmin
+      .from("property_images")
+      .select("id, storage_path, rendered_storage_path, original_image_url")
+      .eq("id", data.imageId)
+      .maybeSingle();
+    if (imgErr || !img) throw new Error("Immagine non trovata");
+
+    if (img.rendered_storage_path) {
+      // Best-effort: non bloccare se la rimozione fallisce
+      await supabaseAdmin.storage.from(BUCKET).remove([img.rendered_storage_path]).catch(() => null);
+    }
+
+    const { error } = await supabaseAdmin
+      .from("property_images")
+      .update({
+        rendered_storage_path: null,
+        rendered_image_url: null,
+        render_status: "not_generated",
+        render_error: null,
+        render_publish_mode: "none",
+        use_rendered: false,
+        published_image_url: img.original_image_url,
+      })
+      .eq("id", data.imageId);
+    if (error) throw new Error(error.message);
+    return { ok: true as const };
+  });
+
+/**
  * Sincronizza in batch tutte le foto importate non ancora nello storage interno.
  * Per ogni immagine con import_status != 'synced_to_storage' tenta il download
  * dall'URL esterno e l'upload nel bucket privato. Non duplica foto già sincronizzate.
