@@ -643,3 +643,89 @@ export const syncAllImportedImages = createServerFn({ method: "POST" })
       errors,
     };
   });
+
+/**
+ * Verifica e sincronizza TUTTE le foto degli immobili.
+ * - Per ogni foto controlla che esista nello storage e che il signed URL risponda.
+ * - Se la foto è già corretta non viene toccata.
+ * - Se manca ma esiste un URL esterno (imported_source_url, storage_path o image_url),
+ *   prova a riscaricarla nello storage interno e aggiorna il riferimento.
+ * - Non cancella mai nulla; un errore su una foto non blocca le altre.
+ * Riservato agli admin autenticati.
+ */
+export const verifyAndSyncAllPhotos = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { supabase, userId } = context;
+    const { data: roleRow } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userId)
+      .eq("role", "admin")
+      .maybeSingle();
+    if (!roleRow) throw new Error("Solo gli admin possono sincronizzare le foto");
+
+    const { count: propertiesAnalyzed } = await supabaseAdmin
+      .from("properties")
+      .select("id", { head: true, count: "exact" });
+
+    const { data: rows, error } = await supabaseAdmin
+      .from("property_images")
+      .select(
+        "id, property_id, image_url, original_image_url, storage_path, imported_source_url, import_status, is_imported",
+      );
+    if (error) throw new Error(error.message);
+
+    let alreadyOk = 0;
+    let synced = 0;
+    let failed = 0;
+    const errors: Array<{ imageId: string; propertyId: string; message: string }> = [];
+
+    for (const img of rows ?? []) {
+      try {
+        const availability = await verifyInternalStorageImage(supabaseAdmin, img);
+        if (availability.canRender) {
+          alreadyOk++;
+          continue;
+        }
+        const sourceUrl =
+          img.imported_source_url ??
+          (isExternalUrl(img.storage_path) ? img.storage_path : null) ??
+          (isExternalUrl(img.original_image_url) ? img.original_image_url : null) ??
+          (isExternalUrl(img.image_url) ? img.image_url : null);
+        if (!sourceUrl) {
+          failed++;
+          errors.push({
+            imageId: img.id,
+            propertyId: img.property_id,
+            message: availability.message ?? "Foto non recuperabile",
+          });
+          continue;
+        }
+        await syncImportedImageToBucket(img.id, img.property_id, sourceUrl);
+        synced++;
+      } catch (err) {
+        failed++;
+        await supabaseAdmin
+          .from("property_images")
+          .update({ import_status: "sync_error", render_error: SYNC_ERROR_MESSAGE })
+          .eq("id", img.id);
+        errors.push({
+          imageId: img.id,
+          propertyId: img.property_id,
+          message: err instanceof Error ? err.message : SYNC_ERROR_MESSAGE,
+        });
+      }
+    }
+
+    return {
+      ok: true as const,
+      propertiesAnalyzed: propertiesAnalyzed ?? 0,
+      totalImages: rows?.length ?? 0,
+      alreadyOk,
+      synced,
+      failed,
+      errors,
+    };
+  });
