@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, Search, Loader2, ImageOff, MoreHorizontal, Star, Sparkles } from "lucide-react";
+import { Plus, Search, Loader2, ImageOff, Star, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { STATUS_LABELS, STATUS_BADGE_CLASSES, type PropertyStatus } from "@/lib/admin/property-constants";
 import {
@@ -69,6 +69,18 @@ const SORT_OPTIONS: Array<{ key: SortBy; label: string }> = [
   { key: "home_first", label: "In home prima" },
 ];
 
+const COMPACT_LABELS: Record<StatusAction, string> = {
+  publish: "Pubblica",
+  republish: "Ripubblica",
+  suspend: "Sospendi",
+  mark_sold: "Venduto",
+  mark_rented: "Affittato",
+  archive: "Archivia",
+  delete: "Elimina",
+  restore: "Ripristina",
+  hard_delete: "Elimina def.",
+};
+
 export const Route = createFileRoute("/_admin/admin/immobili/")({
   head: () => ({
     meta: [
@@ -85,7 +97,6 @@ function AdminPropertiesPage() {
   const [q, setQ] = useState("");
   const [statusFilter, setStatusFilter] = useState<Filter>("all");
   const [sortBy, setSortBy] = useState<SortBy>("newest");
-  const [openMenu, setOpenMenu] = useState<string | null>(null);
   const [pending, setPending] = useState<{ id: string; action: StatusAction } | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -205,7 +216,6 @@ function AdminPropertiesPage() {
   }, [rows]);
 
   const requestAction = (id: string, action: StatusAction) => {
-    setOpenMenu(null);
     if (!CONFIRM_COPY[action]) {
       void runAction(id, action);
       return;
@@ -313,68 +323,69 @@ function AdminPropertiesPage() {
           {filtered.map((r) => (
             <div
               key={r.id}
-              className="group relative flex items-center gap-3 rounded-sm border border-border bg-card p-3 transition hover:border-primary/50 hover:shadow-sm sm:gap-5 sm:p-4"
+              className="group relative flex flex-col gap-2 rounded-sm border border-border bg-card p-3 transition hover:border-primary/50 hover:shadow-sm sm:flex-row sm:items-center sm:gap-3 sm:p-4"
             >
-              <Link
-                to="/admin/immobili/$id"
-                params={{ id: r.id }}
-                className="flex min-w-0 flex-1 items-center gap-3 sm:gap-5"
-              >
-                <div className="h-16 w-20 shrink-0 overflow-hidden rounded-sm bg-muted sm:h-20 sm:w-28">
-                  {r.cover_url ? (
-                    <img src={r.cover_url} alt="" className="h-full w-full object-cover" />
-                  ) : (
-                    <div className="flex h-full w-full items-center justify-center text-muted-foreground">
-                      <ImageOff size={20} />
-                    </div>
-                  )}
-                </div>
-                <div className="min-w-0 flex-1">
-                  <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-                    <h3 className="min-w-0 flex-1 truncate font-serif text-base text-ink sm:text-lg">{r.title}</h3>
-                    {r.featured && (
-                      <span className="inline-flex items-center gap-1 rounded-sm border border-amber-300 bg-amber-50 px-2 py-0.5 text-[10px] uppercase tracking-wider text-amber-800">
-                        <Star size={10} className="fill-amber-500 text-amber-500" /> In home{r.homepage_order ? ` · ${r.homepage_order}` : ""}
-                      </span>
+              {/* Row 1: content + star */}
+              <div className="flex min-w-0 flex-1 items-center gap-3 sm:contents">
+                <Link
+                  to="/admin/immobili/$id"
+                  params={{ id: r.id }}
+                  className="flex min-w-0 flex-1 items-center gap-3 sm:gap-5"
+                >
+                  <div className="h-16 w-20 shrink-0 overflow-hidden rounded-sm bg-muted sm:h-20 sm:w-28">
+                    {r.cover_url ? (
+                      <img src={r.cover_url} alt="" className="h-full w-full object-cover" />
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center text-muted-foreground">
+                        <ImageOff size={20} />
+                      </div>
                     )}
-                    <StatusBadge status={r.status} />
                   </div>
-                  <p className="mt-1 truncate text-xs text-muted-foreground">
-                    {[r.property_type, r.municipality].filter(Boolean).join(" · ") || "—"}
-                  </p>
-                  {r.reference_code && (
-                    <p className="mt-0.5 truncate text-[11px] uppercase tracking-wider text-primary">
-                      Cod. annuncio: {r.reference_code}
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                      <h3 className="min-w-0 flex-1 truncate font-serif text-base text-ink sm:text-lg">{r.title}</h3>
+                      {r.featured && (
+                        <span className="inline-flex items-center gap-1 rounded-sm border border-amber-300 bg-amber-50 px-2 py-0.5 text-[10px] uppercase tracking-wider text-amber-800">
+                          <Star size={10} className="fill-amber-500 text-amber-500" /> In home{r.homepage_order ? ` · ${r.homepage_order}` : ""}
+                        </span>
+                      )}
+                      <StatusBadge status={r.status} />
+                    </div>
+                    <p className="mt-1 truncate text-xs text-muted-foreground">
+                      {[r.property_type, r.municipality].filter(Boolean).join(" · ") || "—"}
                     </p>
-                  )}
-                  <div className="mt-1 text-sm text-ink sm:hidden">
-                    {r.price_on_request
-                      ? "Su richiesta"
-                      : r.price
-                        ? `€ ${r.price.toLocaleString("it-IT")}`
-                        : "—"}
+                    {r.reference_code && (
+                      <p className="mt-0.5 truncate text-[11px] uppercase tracking-wider text-primary">
+                        Cod. annuncio: {r.reference_code}
+                      </p>
+                    )}
+                    <div className="mt-1 text-sm text-ink sm:hidden">
+                      {r.price_on_request
+                        ? "Su richiesta"
+                        : r.price
+                          ? `€ ${r.price.toLocaleString("it-IT")}`
+                          : "—"}
+                    </div>
+                    <div className="mt-1 text-[10px] text-muted-foreground sm:hidden">
+                      Caricato: {new Date(r.created_at).toLocaleDateString("it-IT")} · Aggiornato: {new Date(r.updated_at).toLocaleDateString("it-IT")}
+                    </div>
                   </div>
-                  <div className="mt-1 text-[10px] text-muted-foreground sm:hidden">
-                    Caricato: {new Date(r.created_at).toLocaleDateString("it-IT")} · Aggiornato: {new Date(r.updated_at).toLocaleDateString("it-IT")}
+                  <div className="hidden text-right text-sm sm:block">
+                    <div className="text-ink">
+                      {r.price_on_request
+                        ? "Su richiesta"
+                        : r.price
+                          ? `€ ${r.price.toLocaleString("it-IT")}`
+                          : "—"}
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      Caricato: {new Date(r.created_at).toLocaleDateString("it-IT")}
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      Aggiornato: {new Date(r.updated_at).toLocaleDateString("it-IT")}
+                    </div>
                   </div>
-                </div>
-                <div className="hidden text-right text-sm sm:block">
-                  <div className="text-ink">
-                    {r.price_on_request
-                      ? "Su richiesta"
-                      : r.price
-                        ? `€ ${r.price.toLocaleString("it-IT")}`
-                        : "—"}
-                  </div>
-                  <div className="text-xs text-muted-foreground">
-                    Caricato: {new Date(r.created_at).toLocaleDateString("it-IT")}
-                  </div>
-                  <div className="text-xs text-muted-foreground">
-                    Aggiornato: {new Date(r.updated_at).toLocaleDateString("it-IT")}
-                  </div>
-                </div>
-              </Link>
-              <div className="relative shrink-0">
+                </Link>
                 <button
                   type="button"
                   onClick={async (e) => {
@@ -394,7 +405,7 @@ function AdminPropertiesPage() {
                   }}
                   aria-label={r.featured ? "Rimuovi dalla home" : "Aggiungi alla home"}
                   title={r.featured ? "Rimuovi dalla home" : "Aggiungi alla home"}
-                  className={`mr-1 inline-flex h-9 w-9 items-center justify-center rounded-sm border transition ${
+                  className={`inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-sm border transition ${
                     r.featured
                       ? "border-amber-300 bg-amber-50 text-amber-700 hover:border-amber-400"
                       : "border-border text-muted-foreground hover:border-primary/50 hover:text-ink"
@@ -402,37 +413,30 @@ function AdminPropertiesPage() {
                 >
                   <Star size={15} className={r.featured ? "fill-amber-500 text-amber-500" : ""} />
                 </button>
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    setOpenMenu(openMenu === r.id ? null : r.id);
-                  }}
-                  aria-label="Azioni"
-                  className="inline-flex h-9 w-9 items-center justify-center rounded-sm border border-border text-muted-foreground hover:border-primary/50 hover:text-ink"
-                >
-                  <MoreHorizontal size={16} />
-                </button>
-                {openMenu === r.id && (
-                  <div
-                    className="absolute right-0 top-full z-20 mt-1 w-56 overflow-hidden rounded-sm border border-border bg-card shadow-lg"
-                    onClick={(e) => e.stopPropagation()}
+              </div>
+
+              {/* Action buttons */}
+              <div className="flex flex-wrap gap-1 sm:flex-col sm:items-end">
+                {availableActions(r.status).map((act) => (
+                  <button
+                    key={act}
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      requestAction(r.id, act);
+                    }}
+                    className={`inline-flex shrink-0 items-center justify-center rounded-sm border px-2 py-1 text-[10px] uppercase tracking-wider transition ${
+                      act === "delete" || act === "hard_delete"
+                        ? "border-red-200 text-red-700 hover:border-red-400 hover:bg-red-50"
+                        : act === "publish" || act === "republish"
+                          ? "border-emerald-200 text-emerald-700 hover:border-emerald-400 hover:bg-emerald-50"
+                          : "border-border text-muted-foreground hover:border-primary/50 hover:text-ink"
+                    }`}
                   >
-                    {availableActions(r.status).map((act) => (
-                      <button
-                        key={act}
-                        type="button"
-                        onClick={() => requestAction(r.id, act)}
-                        className={`block w-full px-3 py-2 text-left text-xs uppercase tracking-wider hover:bg-muted ${
-                          act === "delete" || act === "hard_delete" ? "text-red-700" : "text-ink"
-                        }`}
-                      >
-                        {ACTION_LABELS[act]}
-                      </button>
-                    ))}
-                  </div>
-                )}
+                    {COMPACT_LABELS[act]}
+                  </button>
+                ))}
               </div>
             </div>
           ))}
