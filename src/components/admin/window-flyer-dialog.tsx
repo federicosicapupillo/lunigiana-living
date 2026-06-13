@@ -680,11 +680,11 @@ const FlyerSheet = forwardRef<
       <header
         style={{
           display: "grid",
-          gridTemplateColumns: "auto 1px 1fr auto",
+          gridTemplateColumns: "auto 2px 1fr auto",
           alignItems: "center",
           gap: 26,
           paddingBottom: 12,
-          minHeight: 180,
+          height: 180,
         }}
       >
         <img
@@ -696,11 +696,12 @@ const FlyerSheet = forwardRef<
         <div style={{ width: 2, height: 130, background: "#1A1A1A", justifySelf: "center" }} />
         <div
           style={{
-            textAlign: "center",
             minWidth: 0,
-            display: "grid",
-            placeItems: "center",
             height: "100%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            textAlign: "center",
           }}
         >
           <div
@@ -721,7 +722,6 @@ const FlyerSheet = forwardRef<
               overflow: "visible",
               padding: 0,
               margin: 0,
-              transform: "translateY(-6px)",
             }}
           >
             {cityMain} {cityProv}
