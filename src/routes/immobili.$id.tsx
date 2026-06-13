@@ -214,7 +214,24 @@ function PropertyDetail() {
 
       {/* Gallery */}
       <section className="container-editorial mt-8 sm:mt-10">
-        <div className="group relative overflow-hidden rounded-sm bg-cream">
+        <div
+          className="group relative overflow-hidden rounded-sm bg-cream touch-pan-y select-none"
+          onTouchStart={(e) => {
+            (e.currentTarget as any)._tsx = e.touches[0].clientX;
+            (e.currentTarget as any)._tsy = e.touches[0].clientY;
+          }}
+          onTouchEnd={(e) => {
+            const el = e.currentTarget as any;
+            if (typeof el._tsx !== "number") return;
+            const dx = e.changedTouches[0].clientX - el._tsx;
+            const dy = e.changedTouches[0].clientY - el._tsy;
+            el._tsx = undefined;
+            if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) {
+              if (dx < 0) goNext();
+              else goPrev();
+            }
+          }}
+        >
           <div className="mx-auto flex w-full items-center justify-center h-[60vw] max-h-[450px] sm:h-[55vw] sm:max-h-[550px] md:h-[60vh] md:max-h-[650px]">
             {renderFor ? (
               <BeforeAfterSlider
@@ -258,7 +275,7 @@ function PropertyDetail() {
                 type="button"
                 onClick={goPrev}
                 aria-label="Immagine precedente"
-                className="absolute left-3 top-1/2 hidden -translate-y-1/2 items-center justify-center rounded-full bg-background/80 p-2.5 text-ink shadow-sm backdrop-blur transition hover:bg-background md:flex"
+                className="absolute left-2 top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-background/80 text-ink shadow-sm backdrop-blur transition hover:bg-background sm:left-3 sm:h-11 sm:w-11"
               >
                 <ChevronLeft size={20} />
               </button>
@@ -266,7 +283,7 @@ function PropertyDetail() {
                 type="button"
                 onClick={goNext}
                 aria-label="Immagine successiva"
-                className="absolute right-3 top-1/2 hidden -translate-y-1/2 items-center justify-center rounded-full bg-background/80 p-2.5 text-ink shadow-sm backdrop-blur transition hover:bg-background md:flex"
+                className="absolute right-2 top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-background/80 text-ink shadow-sm backdrop-blur transition hover:bg-background sm:right-3 sm:h-11 sm:w-11"
               >
                 <ChevronRight size={20} />
               </button>
