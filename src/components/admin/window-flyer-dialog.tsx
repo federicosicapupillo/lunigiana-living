@@ -205,6 +205,7 @@ export function WindowFlyerDialog({
   const [exporting, setExporting] = useState(false);
   const [longDescription, setLongDescription] = useState<string | null>(null);
   const flyerRef = useRef<HTMLDivElement>(null);
+  const exportRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!open) return;
@@ -272,10 +273,11 @@ export function WindowFlyerDialog({
   };
 
   const captureCanvas = async () => {
-    if (!flyerRef.current) return null;
-    const el = flyerRef.current;
-    // Lock export layout
-    el.classList.add("a3-export-mode");
+    // Always capture from the hidden, fixed-size export sheet (never from the
+    // on-screen preview wrapper). Guarantees that downloaded image and PDF use
+    // the same DOM at exact A3 dimensions, regardless of viewport / zoom.
+    const el = exportRef.current;
+    if (!el) return null;
     try {
       // Wait for fonts
       if (document.fonts && document.fonts.ready) {
@@ -306,8 +308,9 @@ export function WindowFlyerDialog({
         scrollX: 0,
         scrollY: 0,
       });
-    } finally {
-      el.classList.remove("a3-export-mode");
+    } catch (e) {
+      console.error("captureCanvas failed", e);
+      return null;
     }
   };
 
@@ -515,6 +518,33 @@ export function WindowFlyerDialog({
             </div>
           </div>
         </main>
+      </div>
+
+      {/* Hidden export sheet — always rendered at exact A3 px size so html2canvas
+          captures a stable layout identical to the preview, without depending on
+          viewport width, responsive classes, or transforms. */}
+      <div
+        aria-hidden
+        style={{
+          position: "fixed",
+          left: -100000,
+          top: 0,
+          width: SHEET_W,
+          height: SHEET_H,
+          pointerEvents: "none",
+          opacity: 0,
+          zIndex: -1,
+        }}
+      >
+        <FlyerSheet
+          ref={exportRef}
+          property={property}
+          images={selectedImages}
+          layout={layout}
+          lang={lang}
+          longDescription={longDescription}
+          thumbSwap={thumbSwap}
+        />
       </div>
     </div>,
     document.body,
