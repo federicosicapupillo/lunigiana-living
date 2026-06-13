@@ -205,6 +205,7 @@ export function WindowFlyerDialog({
   const [exporting, setExporting] = useState(false);
   const [longDescription, setLongDescription] = useState<string | null>(null);
   const flyerRef = useRef<HTMLDivElement>(null);
+  const exportRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!open) return;
@@ -272,10 +273,11 @@ export function WindowFlyerDialog({
   };
 
   const captureCanvas = async () => {
-    if (!flyerRef.current) return null;
-    const el = flyerRef.current;
-    // Lock export layout
-    el.classList.add("a3-export-mode");
+    // Always capture from the hidden, fixed-size export sheet (never from the
+    // on-screen preview wrapper). Guarantees that downloaded image and PDF use
+    // the same DOM at exact A3 dimensions, regardless of viewport / zoom.
+    const el = exportRef.current;
+    if (!el) return null;
     try {
       // Wait for fonts
       if (document.fonts && document.fonts.ready) {
@@ -306,8 +308,9 @@ export function WindowFlyerDialog({
         scrollX: 0,
         scrollY: 0,
       });
-    } finally {
-      el.classList.remove("a3-export-mode");
+    } catch (e) {
+      console.error("captureCanvas failed", e);
+      return null;
     }
   };
 
@@ -516,6 +519,33 @@ export function WindowFlyerDialog({
           </div>
         </main>
       </div>
+
+      {/* Hidden export sheet — always rendered at exact A3 px size so html2canvas
+          captures a stable layout identical to the preview, without depending on
+          viewport width, responsive classes, or transforms. */}
+      <div
+        aria-hidden
+        style={{
+          position: "fixed",
+          left: -100000,
+          top: 0,
+          width: SHEET_W,
+          height: SHEET_H,
+          pointerEvents: "none",
+          opacity: 0,
+          zIndex: -1,
+        }}
+      >
+        <FlyerSheet
+          ref={exportRef}
+          property={property}
+          images={selectedImages}
+          layout={layout}
+          lang={lang}
+          longDescription={longDescription}
+          thumbSwap={thumbSwap}
+        />
+      </div>
     </div>,
     document.body,
   );
@@ -650,11 +680,11 @@ const FlyerSheet = forwardRef<
       <header
         style={{
           display: "grid",
-          gridTemplateColumns: "auto 1px 1fr auto",
+          gridTemplateColumns: "auto 2px 1fr auto",
           alignItems: "center",
           gap: 26,
           paddingBottom: 12,
-          minHeight: 180,
+          height: 180,
         }}
       >
         <img
@@ -666,11 +696,12 @@ const FlyerSheet = forwardRef<
         <div style={{ width: 2, height: 130, background: "#1A1A1A", justifySelf: "center" }} />
         <div
           style={{
-            textAlign: "center",
             minWidth: 0,
-            display: "grid",
-            placeItems: "center",
             height: "100%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            textAlign: "center",
           }}
         >
           <div
@@ -691,7 +722,6 @@ const FlyerSheet = forwardRef<
               overflow: "visible",
               padding: 0,
               margin: 0,
-              transform: "translateY(-6px)",
             }}
           >
             {cityMain} {cityProv}
@@ -777,14 +807,15 @@ const FlyerSheet = forwardRef<
           style={{
             background: "transparent",
             border: "3px solid #B23D2A",
-            padding: "22px 26px",
-            display: "block",
+            padding: "24px 26px 22px",
+            display: "flex",
+            flexDirection: "column",
             minHeight: 0,
             overflow: "hidden",
           }}
         >
           {/* Price */}
-          <div style={{ marginBottom: 14 }}>
+          <div style={{ marginBottom: 22, flexShrink: 0 }}>
             <div
               style={{
                 fontSize: 22,
@@ -794,20 +825,21 @@ const FlyerSheet = forwardRef<
                 fontFamily: "Helvetica, Arial, sans-serif",
                 fontWeight: 700,
                 lineHeight: 1,
+                marginBottom: 14,
               }}
             >
               {lang === "it" ? "PREZZO" : "PRICE"}
             </div>
             <div
               style={{
-                marginTop: 10,
                 fontSize: 72,
                 fontWeight: 900,
-                lineHeight: 1,
+                lineHeight: 1.05,
                 color: "#B23D2A",
                 fontFamily: "Helvetica, Arial, sans-serif",
                 letterSpacing: -1,
                 wordBreak: "break-word",
+                paddingBottom: 6,
               }}
             >
               {price}
@@ -818,13 +850,14 @@ const FlyerSheet = forwardRef<
           <div
             style={{
               borderTop: "1px solid #B23D2A",
-              paddingTop: 14,
-              marginBottom: 14,
+              paddingTop: 18,
+              marginBottom: 18,
               display: "grid",
               gridTemplateColumns: "1fr 1fr",
-              rowGap: 14,
+              rowGap: 16,
               columnGap: 18,
               fontFamily: "Helvetica, Arial, sans-serif",
+              flexShrink: 0,
             }}
           >
             {techData.map((d) => (
