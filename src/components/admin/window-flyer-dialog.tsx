@@ -807,14 +807,15 @@ const FlyerSheet = forwardRef<
           style={{
             background: "transparent",
             border: "3px solid #B23D2A",
-            padding: "22px 26px",
-            display: "block",
+            padding: "24px 26px 22px",
+            display: "flex",
+            flexDirection: "column",
             minHeight: 0,
             overflow: "hidden",
           }}
         >
           {/* Price */}
-          <div style={{ marginBottom: 14 }}>
+          <div style={{ marginBottom: 22, flexShrink: 0 }}>
             <div
               style={{
                 fontSize: 22,
@@ -824,20 +825,21 @@ const FlyerSheet = forwardRef<
                 fontFamily: "Helvetica, Arial, sans-serif",
                 fontWeight: 700,
                 lineHeight: 1,
+                marginBottom: 14,
               }}
             >
               {lang === "it" ? "PREZZO" : "PRICE"}
             </div>
             <div
               style={{
-                marginTop: 10,
                 fontSize: 72,
                 fontWeight: 900,
-                lineHeight: 1,
+                lineHeight: 1.05,
                 color: "#B23D2A",
                 fontFamily: "Helvetica, Arial, sans-serif",
                 letterSpacing: -1,
                 wordBreak: "break-word",
+                paddingBottom: 6,
               }}
             >
               {price}
@@ -848,13 +850,14 @@ const FlyerSheet = forwardRef<
           <div
             style={{
               borderTop: "1px solid #B23D2A",
-              paddingTop: 14,
-              marginBottom: 14,
+              paddingTop: 18,
+              marginBottom: 18,
               display: "grid",
               gridTemplateColumns: "1fr 1fr",
-              rowGap: 14,
+              rowGap: 16,
               columnGap: 18,
               fontFamily: "Helvetica, Arial, sans-serif",
+              flexShrink: 0,
             }}
           >
             {techData.map((d) => (
