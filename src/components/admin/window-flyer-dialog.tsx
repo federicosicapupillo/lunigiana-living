@@ -654,6 +654,7 @@ const FlyerSheet = forwardRef<
           alignItems: "center",
           gap: 26,
           paddingBottom: 12,
+          minHeight: 180,
         }}
       >
         <img
@@ -667,10 +668,9 @@ const FlyerSheet = forwardRef<
           style={{
             textAlign: "center",
             minWidth: 0,
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-            paddingBlock: 14,
+            display: "grid",
+            placeItems: "center",
+            height: "100%",
           }}
         >
           <div
@@ -683,13 +683,15 @@ const FlyerSheet = forwardRef<
                 return 56;
               })(),
               fontWeight: 900,
-              lineHeight: 1.25,
+              lineHeight: 1,
               letterSpacing: -1,
               color: "#0F0F0F",
               fontFamily: "Helvetica, Arial, sans-serif",
               whiteSpace: "nowrap",
               overflow: "visible",
-              paddingBlock: 6,
+              padding: 0,
+              margin: 0,
+              transform: "translateY(-6px)",
             }}
           >
             {cityMain} {cityProv}
@@ -776,15 +778,13 @@ const FlyerSheet = forwardRef<
             background: "transparent",
             border: "3px solid #B23D2A",
             padding: "22px 26px",
-            display: "flex",
-            flexDirection: "column",
-            gap: 14,
+            display: "block",
             minHeight: 0,
             overflow: "hidden",
           }}
         >
           {/* Price */}
-          <div>
+          <div style={{ marginBottom: 14 }}>
             <div
               style={{
                 fontSize: 22,
@@ -793,13 +793,14 @@ const FlyerSheet = forwardRef<
                 color: "#B23D2A",
                 fontFamily: "Helvetica, Arial, sans-serif",
                 fontWeight: 700,
+                lineHeight: 1,
               }}
             >
               {lang === "it" ? "PREZZO" : "PRICE"}
             </div>
             <div
               style={{
-                marginTop: 4,
+                marginTop: 10,
                 fontSize: 72,
                 fontWeight: 900,
                 lineHeight: 1,
@@ -818,6 +819,7 @@ const FlyerSheet = forwardRef<
             style={{
               borderTop: "1px solid #B23D2A",
               paddingTop: 14,
+              marginBottom: 14,
               display: "grid",
               gridTemplateColumns: "1fr 1fr",
               rowGap: 14,
