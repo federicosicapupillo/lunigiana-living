@@ -85,10 +85,10 @@ export function PropertyCard({ p }: { p: PropertyCardData }) {
             </span>
           )}
           {occ && occ.style === "headline" && (
-            <span className="absolute inset-x-4 bottom-4 mx-auto inline-flex max-w-[calc(100%-2rem)] items-center justify-center gap-2 rounded-sm border border-cream/30 bg-terracotta/95 px-4 py-2 text-center font-serif text-sm italic tracking-wide text-cream shadow-lg backdrop-blur-sm sm:text-base">
-              <span aria-hidden className="inline-block h-1.5 w-1.5 rounded-full bg-cream/80" />
+            <span className="absolute inset-x-4 bottom-4 mx-auto inline-flex max-w-[calc(100%-2rem)] items-center justify-center gap-2 rounded-sm bg-terracotta px-4 py-2.5 text-center font-serif text-sm font-medium tracking-wide text-cream shadow-xl ring-1 ring-cream/40 sm:text-base">
+              <span aria-hidden className="inline-block h-1.5 w-1.5 rounded-full bg-cream/90" />
               {occLabel}
-              <span aria-hidden className="inline-block h-1.5 w-1.5 rounded-full bg-cream/80" />
+              <span aria-hidden className="inline-block h-1.5 w-1.5 rounded-full bg-cream/90" />
             </span>
           )}
           <span className="pointer-events-none absolute inset-x-0 bottom-0 flex items-center justify-end gap-2 bg-gradient-to-t from-ink/75 via-ink/25 to-transparent p-4 text-[0.65rem] uppercase tracking-[0.2em] text-cream opacity-0 transition-opacity duration-500 group-hover:opacity-100">
