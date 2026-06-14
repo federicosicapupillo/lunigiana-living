@@ -209,6 +209,18 @@ function PropertyDetail() {
             <div className="text-right">
               <div className="eyebrow text-muted-foreground">{p.category === "affitto" ? t("detail.rent") : t("detail.price")}</div>
               <div className="mt-2 font-serif text-2xl text-primary sm:text-3xl md:text-4xl">{priceLabel}</div>
+              {p.occasione && p.occasione.onDetail && (
+                p.occasione.style === "headline" ? (
+                  <div className="mt-3 font-serif text-xl italic tracking-wide text-terracotta sm:text-2xl">
+                    {t("detail.occasioneHeadline")}
+                  </div>
+                ) : (
+                  <span className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-terracotta/40 bg-cream px-3 py-1 text-[0.7rem] font-medium uppercase tracking-[0.2em] text-terracotta">
+                    <span className="inline-block h-1.5 w-1.5 rounded-full bg-terracotta" />
+                    {t("detail.occasioneBadge")}
+                  </span>
+                )
+              )}
             </div>
           </div>
         </div>
