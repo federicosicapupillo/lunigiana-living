@@ -600,8 +600,9 @@ const FlyerSheet = forwardRef<
     lang: Lang;
     longDescription: string | null;
     thumbSwap?: boolean;
+    occasione?: "badge" | "headline" | null;
   }
->(function FlyerSheet({ property, images, layout, lang, longDescription, thumbSwap }, ref) {
+>(function FlyerSheet({ property, images, layout, lang, longDescription, thumbSwap, occasione }, ref) {
   // `layout` kept for prop-compat; structure is fixed (header / body / desc)
   void layout;
   const t = STR[lang];
