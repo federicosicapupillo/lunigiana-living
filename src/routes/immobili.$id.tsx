@@ -713,13 +713,13 @@ function PropertyDetail() {
 
         {/* Contact card */}
         <aside className="md:col-span-5">
-          <div className="sticky top-28 rounded-sm border border-border bg-card p-8">
-            <div className="eyebrow">{t("detail.contactEyebrow")}</div>
-            <h3 className="mt-3 font-serif text-2xl text-ink">
-              {t("detail.contactTitle")} <em className="italic">{p.reference}</em>
+          <div ref={contactRef} className="sticky top-28 rounded-sm border border-terracotta/25 bg-card p-8 shadow-sm">
+            <div className="eyebrow text-terracotta">{t("detail.contactEyebrow")} · {p.reference}</div>
+            <h3 className="mt-3 font-serif text-2xl text-ink sm:text-[1.6rem]">
+              {t("detail.contactStrongTitle")}
             </h3>
-            <p className="mt-3 text-sm text-muted-foreground">
-              {t("detail.contactBody")}
+            <p className="mt-3 text-sm leading-relaxed text-foreground/80 sm:text-base">
+              {t("detail.contactStrongBody")}
             </p>
 
             {submitState === "ok" ? (
