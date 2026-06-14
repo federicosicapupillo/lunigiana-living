@@ -1,0 +1,1 @@
+ALTER TABLE public.properties ADD COLUMN IF NOT EXISTS commercial_highlights text[] NOT NULL DEFAULT '{}'::text[];
