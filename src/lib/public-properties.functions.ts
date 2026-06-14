@@ -36,6 +36,7 @@ export type PublicProperty = {
   amenities: string[];
   altreDotazioni: string | null;
   highlights: Array<{ key: string; label: string; items: string[]; note: string | null }>;
+  commercialHighlights: string[];
   category: "vendita" | "affitto" | "scelti-per-voi";
   featured: boolean;
   tag?: string;
@@ -115,6 +116,7 @@ type PropertyRow = {
   energy_class: string | null;
   energy_performance_index_status: string | null;
   energy_performance_index_value: number | null;
+  commercial_highlights: string[] | null;
   created_at: string | null;
 };
 
@@ -252,6 +254,7 @@ function adapt(
     amenities,
     altreDotazioni: altre,
     highlights,
+    commercialHighlights: Array.isArray(p.commercial_highlights) ? p.commercial_highlights : [],
     category: deriveCategory(p.contract_type),
     featured: !!p.featured,
     tag: buildTag(p),
