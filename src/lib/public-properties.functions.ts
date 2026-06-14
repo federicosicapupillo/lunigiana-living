@@ -426,13 +426,15 @@ export const listPublishedProperties = createServerFn({ method: "GET" }).handler
   const features = (featRes.data ?? []) as FeatureRow[];
   const descriptions = (descRes.data ?? []) as DescriptionRow[];
 
-  const signedMap = await signMany(
-    images.flatMap((i) => [
-      i.storage_path,
-      ...(i.rendered_storage_path ? [i.rendered_storage_path] : []),
-      ...(i.enhanced_storage_path ? [i.enhanced_storage_path] : []),
-    ]),
-  );
+  const allPaths = images.flatMap((i) => [
+    i.storage_path,
+    ...(i.rendered_storage_path ? [i.rendered_storage_path] : []),
+    ...(i.enhanced_storage_path ? [i.enhanced_storage_path] : []),
+  ]);
+  const [signedMap, variantMaps] = await Promise.all([
+    signMany(allPaths),
+    signVariants(allPaths, ["card", "thumb"]),
+  ]);
 
   const byProp = (arr: { property_id: string }[]) => {
     const m = new Map<string, any[]>();
@@ -448,7 +450,7 @@ export const listPublishedProperties = createServerFn({ method: "GET" }).handler
   const descMap = new Map(descriptions.map((d) => [d.property_id, d]));
 
   const result = propRows.map((p) =>
-    adapt(p, imgMap.get(p.id) ?? [], featMap.get(p.id) ?? [], descMap.get(p.id), signedMap),
+    adapt(p, imgMap.get(p.id) ?? [], featMap.get(p.id) ?? [], descMap.get(p.id), signedMap, variantMaps),
   );
   return { properties: result };
 });
@@ -487,15 +489,17 @@ export const getPublishedProperty = createServerFn({ method: "GET" })
     const images = (imgRes.data ?? []) as ImageRow[];
     const features = (featRes.data ?? []) as FeatureRow[];
     const description = (descRes.data ?? undefined) as DescriptionRow | undefined;
-    const signedMap = await signMany(
-      images.flatMap((i) => [
-        i.storage_path,
-        ...(i.rendered_storage_path ? [i.rendered_storage_path] : []),
-        ...(i.enhanced_storage_path ? [i.enhanced_storage_path] : []),
-      ]),
-    );
+    const allPaths = images.flatMap((i) => [
+      i.storage_path,
+      ...(i.rendered_storage_path ? [i.rendered_storage_path] : []),
+      ...(i.enhanced_storage_path ? [i.enhanced_storage_path] : []),
+    ]);
+    const [signedMap, variantMaps] = await Promise.all([
+      signMany(allPaths),
+      signVariants(allPaths, ["card", "hero", "thumb"]),
+    ]);
 
-    return { property: adapt(propRow, images, features, description, signedMap) };
+    return { property: adapt(propRow, images, features, description, signedMap, variantMaps) };
   });
 
 /**
@@ -564,7 +568,10 @@ export const listPublishedPropertiesSummary = createServerFn({ method: "GET" }).
     }
     pathsToSign.push(i.storage_path);
   }
-  const signedMap = await signMany(pathsToSign);
+  const [signedMap, variantMaps] = await Promise.all([
+    signMany(pathsToSign),
+    signVariants(pathsToSign, ["card", "thumb"]),
+  ]);
 
   const featMap = new Map<string, FeatureRow[]>();
   for (const f of features) {
@@ -575,7 +582,7 @@ export const listPublishedPropertiesSummary = createServerFn({ method: "GET" }).
 
   const result = propRows.map((p) => {
     const cover = coverByProp.get(p.id);
-    return adapt(p, cover ? [cover] : [], featMap.get(p.id) ?? [], undefined, signedMap);
+    return adapt(p, cover ? [cover] : [], featMap.get(p.id) ?? [], undefined, signedMap, variantMaps);
   });
   return { properties: result };
 });
