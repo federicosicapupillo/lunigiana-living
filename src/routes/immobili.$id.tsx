@@ -211,10 +211,10 @@ function PropertyDetail() {
               <div className="mt-2 font-serif text-2xl text-primary sm:text-3xl md:text-4xl">{priceLabel}</div>
               {p.occasione && p.occasione.onDetail && (
                 p.occasione.style === "headline" ? (
-                  <div className="mt-3 inline-flex items-center gap-2 rounded-sm border border-terracotta/40 bg-terracotta px-4 py-2 font-serif text-base italic tracking-wide text-cream shadow-sm sm:text-lg">
-                    <span aria-hidden className="inline-block h-1.5 w-1.5 rounded-full bg-cream/80" />
+                  <div className="mt-3 inline-flex items-center gap-2 rounded-sm bg-terracotta px-4 py-2.5 font-serif text-base font-medium tracking-wide text-cream shadow-lg ring-1 ring-cream/40 sm:text-lg">
+                    <span aria-hidden className="inline-block h-1.5 w-1.5 rounded-full bg-cream/90" />
                     {t("detail.occasioneHeadline")}
-                    <span aria-hidden className="inline-block h-1.5 w-1.5 rounded-full bg-cream/80" />
+                    <span aria-hidden className="inline-block h-1.5 w-1.5 rounded-full bg-cream/90" />
                   </div>
                 ) : (
                   <span className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-terracotta/40 bg-cream px-3 py-1 text-[0.7rem] font-medium uppercase tracking-[0.2em] text-terracotta">
