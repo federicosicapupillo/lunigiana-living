@@ -216,6 +216,8 @@ export function WindowFlyerDialog({
   const [thumbSwap, setThumbSwap] = useState(false);
   const [exporting, setExporting] = useState(false);
   const [longDescription, setLongDescription] = useState<string | null>(null);
+  const [occSettings, setOccSettings] = useState<OccasioneSettings>(null);
+  const [hasOccasione, setHasOccasione] = useState(false);
   const flyerRef = useRef<HTMLDivElement>(null);
   const exportRef = useRef<HTMLDivElement>(null);
 
@@ -224,7 +226,7 @@ export function WindowFlyerDialog({
     let cancelled = false;
     (async () => {
       setLoading(true);
-      const [imgRes, descRes] = await Promise.all([
+      const [imgRes, descRes, propRes] = await Promise.all([
         supabase
           .from("property_images")
           .select(
@@ -237,6 +239,11 @@ export function WindowFlyerDialog({
           .from("property_descriptions")
           .select("edited_description, generated_description")
           .eq("property_id", property.id)
+          .maybeSingle(),
+        supabase
+          .from("properties")
+          .select("commercial_highlights, occasione_settings")
+          .eq("id", property.id)
           .maybeSingle(),
       ]);
       if (cancelled) return;
@@ -257,6 +264,12 @@ export function WindowFlyerDialog({
       setSelected(mapped.slice(0, 4).map((i) => i.id));
       const d = descRes.data as { edited_description?: string | null; generated_description?: string | null } | null;
       setLongDescription(d?.edited_description || d?.generated_description || null);
+      const pr = propRes.data as
+        | { commercial_highlights?: string[] | null; occasione_settings?: OccasioneSettings }
+        | null;
+      const ch = Array.isArray(pr?.commercial_highlights) ? pr!.commercial_highlights! : [];
+      setHasOccasione(ch.includes("Occasione"));
+      setOccSettings(pr?.occasione_settings ?? null);
       setLoading(false);
     })();
     return () => {
