@@ -297,6 +297,12 @@ const it: Dict = {
  "detail.afterCaption": "Possibile valorizzazione",
  "detail.illustrativeNote": "Immagine illustrativa, non rappresenta lo stato attuale",
  "detail.compareHint": "Trascina il cursore per confrontare",
+ "detail.firstVisionEyebrow": "Visione",
+ "detail.firstVisionTitle": "La tua prima visione",
+ "detail.firstVisionSubtitle": "Immagina come questo spazio potrebbe trasformarsi.",
+ "detail.firstVisionBody": "Queste immagini sono rendering indicativi pensati per valorizzare il potenziale dell'immobile e aiutarti a immaginare nuove possibilità di arredo, atmosfera e utilizzo degli spazi.",
+ "detail.renderingBadge": "Rendering indicativo",
+ "detail.renderingBadgeShort": "Visione indicativa",
 
   // SEO meta
   "seo.home.title": "Furia Immobiliare — Case di carattere in Lunigiana",
