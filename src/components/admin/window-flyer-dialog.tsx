@@ -394,6 +394,12 @@ export function WindowFlyerDialog({
     }
   };
 
+  const showOcc =
+    hasOccasione &&
+    !!occSettings?.enabled &&
+    (occSettings?.on_flyer === undefined ? true : !!occSettings.on_flyer);
+  const occStyle: "badge" | "headline" = occSettings?.style === "headline" ? "headline" : "badge";
+
   if (!open) return null;
 
   return createPortal(
@@ -539,6 +545,7 @@ export function WindowFlyerDialog({
                 lang={lang}
                 longDescription={longDescription}
                 thumbSwap={thumbSwap}
+                occasione={showOcc ? occStyle : null}
               />
             </div>
           </div>
@@ -569,6 +576,7 @@ export function WindowFlyerDialog({
           lang={lang}
           longDescription={longDescription}
           thumbSwap={thumbSwap}
+          occasione={showOcc ? occStyle : null}
         />
       </div>
     </div>,
