@@ -846,21 +846,31 @@ const FlyerSheet = forwardRef<
               <div
                 style={{
                   position: "absolute",
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  background: "linear-gradient(to top, rgba(15,15,15,0.78), rgba(15,15,15,0.15) 70%, transparent)",
-                  padding: "26px 24px 18px",
-                  textAlign: "center",
-                  fontFamily: "Georgia, 'Times New Roman', serif",
-                  fontStyle: "italic",
-                  fontSize: 38,
-                  color: "#F5ECDD",
-                  letterSpacing: 0.5,
-                  lineHeight: 1.1,
+                  left: 24,
+                  right: 24,
+                  bottom: 24,
+                  display: "flex",
+                  justifyContent: "center",
                 }}
               >
-                {t.occasioneHeadline}
+                <div
+                  style={{
+                    background: "#B23D2A",
+                    color: "#F5ECDD",
+                    padding: "14px 28px",
+                    fontFamily: "Georgia, 'Times New Roman', serif",
+                    fontWeight: 600,
+                    fontSize: 32,
+                    letterSpacing: 0.5,
+                    lineHeight: 1.1,
+                    boxShadow: "0 6px 18px rgba(0,0,0,0.35)",
+                    border: "1px solid rgba(245,236,221,0.45)",
+                    textAlign: "center",
+                    maxWidth: "100%",
+                  }}
+                >
+                  {t.occasioneHeadline}
+                </div>
               </div>
             )}
           </div>
