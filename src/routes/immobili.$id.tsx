@@ -219,9 +219,17 @@ function PropertyDetail() {
   });
   const p: PublicProperty = (localized?.property as PublicProperty | null) ?? localizePropertyDynamic(base, language);
   const title = p.title;
-  const desc = p.description;
+  const desc = useMemo(() => sanitizeDescription(p.description), [p.description]);
   const priceLabel = localizePrice(p.price, language);
   const displayType = localizeType(p.type, language);
+  const lang: Lang = language === "en" ? "en" : "it";
+  const whyPoints = useMemo(() => buildWhyPoints(p, lang), [p, lang]);
+  const idealFor = useMemo(() => buildIdealFor(p, t), [p, t]);
+  const contextText = useMemo(() => contextFor(p.location, lang), [p.location, lang]);
+  const contactRef = useRef<HTMLDivElement | null>(null);
+  const scrollToContact = () => {
+    contactRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
   const [active, setActive] = useState(0);
   const main = p.gallery[active] || p.image;
   const galleryCount = p.gallery.length;
