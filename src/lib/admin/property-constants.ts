@@ -620,3 +620,133 @@ export const TONE_OPTIONS = [
   { value: "emozionale", label: "Emozionale raffinato", hint: "Evocativo, sensoriale, letterario" },
   { value: "commerciale", label: "Commerciale premium", hint: "Persuasivo ma elegante, focus valore" },
 ] as const;
+
+/* ---------- Valorizzazione commerciale (badge editoriali + frasi naturali) ---------- */
+
+/**
+ * Etichette di valorizzazione commerciale selezionabili dall'admin.
+ * - `label`: testo IT mostrato come badge in IT e usato come chiave salvata in DB.
+ * - `labelEn`: traduzione elegante mostrata sul sito EN.
+ * - `sentenceIt` / `sentenceEn`: frase naturale integrabile nel testo
+ *   dell'annuncio quando l'etichetta è selezionata.
+ */
+export const COMMERCIAL_HIGHLIGHTS = [
+  {
+    label: "Occasione",
+    labelEn: "Opportunity",
+    sentenceIt:
+      "Una proposta interessante per chi cerca un'opportunità immobiliare in Lunigiana, con caratteristiche difficili da ritrovare a queste condizioni.",
+    sentenceEn:
+      "An interesting opportunity for those looking for a property in Lunigiana with features rarely found at these terms.",
+  },
+  {
+    label: "Ottimo per investimento",
+    labelEn: "Excellent investment opportunity",
+    sentenceIt:
+      "Una soluzione interessante anche per chi desidera effettuare un investimento immobiliare in Lunigiana, in un contesto sempre più ricercato.",
+    sentenceEn:
+      "A compelling option for buyers considering a property investment in Lunigiana, an increasingly sought-after area.",
+  },
+  {
+    label: "Ideale per famiglie",
+    labelEn: "Ideal for families",
+    sentenceIt:
+      "Gli spazi e la distribuzione degli ambienti rendono questa proprietà adatta anche a una famiglia che desidera vivere in un contesto comodo e riservato.",
+    sentenceEn:
+      "The layout and the size of the rooms make this property well suited to a family looking for a comfortable, private setting.",
+  },
+  {
+    label: "Perfetto come casa vacanza",
+    labelEn: "Perfect as a holiday home",
+    sentenceIt:
+      "Le caratteristiche dell'immobile lo rendono particolarmente adatto anche come casa vacanza, per chi cerca un rifugio autentico tra borghi, natura e tranquillità.",
+    sentenceEn:
+      "The character of the property makes it especially suitable as a holiday home, for those seeking an authentic retreat between villages, nature and quiet.",
+  },
+  {
+    label: "Ideale per chi cerca tranquillità",
+    labelEn: "Ideal for those seeking peace and quiet",
+    sentenceIt:
+      "Il contesto e la posizione lo rendono ideale per chi cerca tranquillità e desidera ritrovare un ritmo di vita più lento.",
+    sentenceEn:
+      "The setting and location make it ideal for those seeking peace and quiet and a slower pace of life.",
+  },
+  {
+    label: "Ottima esposizione",
+    labelEn: "Excellent exposure",
+    sentenceIt:
+      "L'immobile gode di un'ottima esposizione, con una luminosità naturale che valorizza ogni ambiente nel corso della giornata.",
+    sentenceEn:
+      "The property enjoys excellent exposure, with natural light that enhances every room throughout the day.",
+  },
+  {
+    label: "Vicino ai servizi",
+    labelEn: "Close to amenities",
+    sentenceIt:
+      "La posizione consente di raggiungere comodamente i principali servizi quotidiani, mantenendo al tempo stesso una piacevole sensazione di riservatezza.",
+    sentenceEn:
+      "The location offers easy access to everyday amenities while keeping a pleasant sense of privacy.",
+  },
+  {
+    label: "Immobile raro",
+    labelEn: "A rare property",
+    sentenceIt:
+      "Si tratta di un immobile raro nel suo genere, con caratteristiche distintive che difficilmente si ritrovano in altre proposte del territorio.",
+    sentenceEn:
+      "This is a rare property of its kind, with distinctive features seldom found in other listings in the area.",
+  },
+  {
+    label: "Da vedere",
+    labelEn: "A property to view in person",
+    sentenceIt:
+      "È una soluzione che merita di essere visitata di persona, per coglierne appieno l'atmosfera e le potenzialità.",
+    sentenceEn:
+      "It is a property that deserves to be visited in person, to fully appreciate its atmosphere and potential.",
+  },
+  {
+    label: "Soluzione indipendente",
+    labelEn: "Independent property",
+    sentenceIt:
+      "La proprietà offre il vantaggio di una soluzione indipendente, ideale per chi desidera autonomia, privacy e libertà di vivere gli spazi.",
+    sentenceEn:
+      "The property offers the advantage of being fully independent, ideal for those who value privacy, autonomy and freedom in their living space.",
+  },
+  {
+    label: "Ideale per amanti della natura",
+    labelEn: "Ideal for nature lovers",
+    sentenceIt:
+      "Il contesto naturale circostante la rende particolarmente adatta a chi ama vivere a stretto contatto con la natura, tra paesaggi autentici della Lunigiana.",
+    sentenceEn:
+      "The surrounding natural setting makes it especially suited to those who love living close to nature, amid the authentic landscapes of Lunigiana.",
+  },
+  {
+    label: "Perfetto per seconda casa",
+    labelEn: "Perfect as a second home",
+    sentenceIt:
+      "Si presta in modo naturale all'utilizzo come seconda casa, per ritrovare un proprio rifugio in Lunigiana nei periodi di pausa dalla città.",
+    sentenceEn:
+      "It lends itself naturally to use as a second home, a private retreat in Lunigiana for breaks away from the city.",
+  },
+  {
+    label: "Ottimo rapporto qualità/prezzo",
+    labelEn: "Excellent value for money",
+    sentenceIt:
+      "Per le caratteristiche complessive offre un ottimo rapporto qualità-prezzo, elemento da considerare con attenzione in fase di valutazione.",
+    sentenceEn:
+      "Given its overall qualities, the property offers excellent value for money, an aspect worth careful consideration.",
+  },
+] as const;
+
+export type CommercialHighlightLabel = (typeof COMMERCIAL_HIGHLIGHTS)[number]["label"];
+
+export const COMMERCIAL_HIGHLIGHT_EN: Record<string, string> = Object.fromEntries(
+  COMMERCIAL_HIGHLIGHTS.map((h) => [h.label, h.labelEn]),
+);
+
+export const COMMERCIAL_HIGHLIGHT_SENTENCE_IT: Record<string, string> = Object.fromEntries(
+  COMMERCIAL_HIGHLIGHTS.map((h) => [h.label, h.sentenceIt]),
+);
+
+export const COMMERCIAL_HIGHLIGHT_SENTENCE_EN: Record<string, string> = Object.fromEntries(
+  COMMERCIAL_HIGHLIGHTS.map((h) => [h.label, h.sentenceEn]),
+);
