@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
+import { COMMERCIAL_HIGHLIGHT_SENTENCE_IT } from "@/lib/admin/property-constants";
 
 const Input = z.object({
   propertyId: z.string().uuid(),
@@ -35,6 +36,7 @@ type Property = {
   elevator: boolean;
   furnished: boolean;
   short_notes: string | null;
+  commercial_highlights: string[] | null;
 };
 
 function lengthInstruction(l: string) {
@@ -85,7 +87,11 @@ function buildFactList(p: Property, features: Array<{ feature_name: string; feat
     .filter((f) => f.feature_value && f.feature_value.trim().length > 0)
     .map((f) => `${f.feature_name.replace(/_/g, " ")}: ${f.feature_value}`);
 
-  return { facts, narrative };
+  const highlightSentences: string[] = (p.commercial_highlights ?? [])
+    .map((h) => COMMERCIAL_HIGHLIGHT_SENTENCE_IT[h])
+    .filter((s): s is string => !!s);
+
+  return { facts, narrative, highlightSentences };
 }
 
 export const generateDescription = createServerFn({ method: "POST" })
@@ -114,7 +120,7 @@ export const generateDescription = createServerFn({ method: "POST" })
       .select("feature_name, feature_value")
       .eq("property_id", data.propertyId);
 
-    const { facts, narrative } = buildFactList(prop as Property, feats ?? []);
+    const { facts, narrative, highlightSentences } = buildFactList(prop as Property, feats ?? []);
 
     const apiKey = process.env.LOVABLE_API_KEY;
     if (!apiKey) throw new Error("Configurazione AI mancante.");
@@ -129,6 +135,10 @@ export const generateDescription = createServerFn({ method: "POST" })
       "",
       narrative.length
         ? `INDICAZIONI NARRATIVE / COMMERCIALI:\n${narrative.map((n) => `- ${n}`).join("\n")}`
+        : "",
+      "",
+      highlightSentences.length
+        ? `FRASI DI VALORIZZAZIONE COMMERCIALE DA INTEGRARE CON NATURALEZZA NEL TESTO (riformulale leggermente, NON copiarle alla lettera, NON elencarle):\n${highlightSentences.map((s) => `- ${s}`).join("\n")}`
         : "",
       "",
       "ISTRUZIONI DI SCRITTURA:",

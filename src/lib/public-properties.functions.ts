@@ -36,6 +36,7 @@ export type PublicProperty = {
   amenities: string[];
   altreDotazioni: string | null;
   highlights: Array<{ key: string; label: string; items: string[]; note: string | null }>;
+  commercialHighlights: string[];
   category: "vendita" | "affitto" | "scelti-per-voi";
   featured: boolean;
   tag?: string;
@@ -115,6 +116,7 @@ type PropertyRow = {
   energy_class: string | null;
   energy_performance_index_status: string | null;
   energy_performance_index_value: number | null;
+  commercial_highlights: string[] | null;
   created_at: string | null;
 };
 
@@ -252,6 +254,7 @@ function adapt(
     amenities,
     altreDotazioni: altre,
     highlights,
+    commercialHighlights: Array.isArray(p.commercial_highlights) ? p.commercial_highlights : [],
     category: deriveCategory(p.contract_type),
     featured: !!p.featured,
     tag: buildTag(p),
@@ -265,7 +268,7 @@ export const listPublishedProperties = createServerFn({ method: "GET" }).handler
   const { data: props, error } = await supabaseAdmin
     .from("properties")
     .select(
-      "id, slug, reference_code, title, title_en, subtitle_en, summary_en, location_description_en, municipality, area_zone, price, price_on_request, property_type, contract_type, size_sqm, bedrooms, bathrooms, floors, short_notes, panoramic_view, historic_property, featured, homepage_order, featured_at, energy_class, energy_performance_index_status, energy_performance_index_value, created_at",
+      "id, slug, reference_code, title, title_en, subtitle_en, summary_en, location_description_en, municipality, area_zone, price, price_on_request, property_type, contract_type, size_sqm, bedrooms, bathrooms, floors, short_notes, panoramic_view, historic_property, featured, homepage_order, featured_at, energy_class, energy_performance_index_status, energy_performance_index_value, commercial_highlights, created_at",
     )
     .eq("status", "published")
     .order("homepage_order", { ascending: true, nullsFirst: false })
@@ -329,7 +332,7 @@ export const getPublishedProperty = createServerFn({ method: "GET" })
     const { data: p, error } = await supabaseAdmin
       .from("properties")
     .select(
-      "id, slug, reference_code, title, title_en, subtitle_en, summary_en, location_description_en, municipality, area_zone, price, price_on_request, property_type, contract_type, size_sqm, bedrooms, bathrooms, floors, short_notes, panoramic_view, historic_property, featured, energy_class, energy_performance_index_status, energy_performance_index_value, created_at",
+      "id, slug, reference_code, title, title_en, subtitle_en, summary_en, location_description_en, municipality, area_zone, price, price_on_request, property_type, contract_type, size_sqm, bedrooms, bathrooms, floors, short_notes, panoramic_view, historic_property, featured, energy_class, energy_performance_index_status, energy_performance_index_value, commercial_highlights, created_at",
     )
       .eq("status", "published")
       .or(`id.eq.${data.id},slug.eq.${data.id}`)
@@ -379,7 +382,7 @@ export const listPublishedPropertiesSummary = createServerFn({ method: "GET" }).
   const { data: props, error } = await supabaseAdmin
     .from("properties")
     .select(
-      "id, slug, reference_code, title, title_en, subtitle_en, summary_en, location_description_en, municipality, area_zone, price, price_on_request, property_type, contract_type, size_sqm, bedrooms, bathrooms, floors, short_notes, panoramic_view, historic_property, featured, homepage_order, featured_at, energy_class, energy_performance_index_status, energy_performance_index_value, created_at",
+      "id, slug, reference_code, title, title_en, subtitle_en, summary_en, location_description_en, municipality, area_zone, price, price_on_request, property_type, contract_type, size_sqm, bedrooms, bathrooms, floors, short_notes, panoramic_view, historic_property, featured, homepage_order, featured_at, energy_class, energy_performance_index_status, energy_performance_index_value, commercial_highlights, created_at",
     )
     .eq("status", "published")
     .order("homepage_order", { ascending: true, nullsFirst: false })

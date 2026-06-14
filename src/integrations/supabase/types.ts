@@ -122,6 +122,7 @@ export type Database = {
           bathrooms: number | null
           bedrooms: number | null
           cellar: boolean
+          commercial_highlights: string[]
           condition: string | null
           contract_type: string | null
           country: string | null
@@ -189,6 +190,7 @@ export type Database = {
           bathrooms?: number | null
           bedrooms?: number | null
           cellar?: boolean
+          commercial_highlights?: string[]
           condition?: string | null
           contract_type?: string | null
           country?: string | null
@@ -256,6 +258,7 @@ export type Database = {
           bathrooms?: number | null
           bedrooms?: number | null
           cellar?: boolean
+          commercial_highlights?: string[]
           condition?: string | null
           contract_type?: string | null
           country?: string | null

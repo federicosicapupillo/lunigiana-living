@@ -9,6 +9,7 @@ import {
   localizeAttrValue,
   localizePropertyDynamic,
 } from "@/lib/i18n/property-localize";
+import { COMMERCIAL_HIGHLIGHT_EN } from "@/lib/admin/property-constants";
 
 type PropertyCardData = {
   id: number | string;
@@ -24,6 +25,7 @@ type PropertyCardData = {
   epi?: string;
   tag?: string;
   isRent?: boolean;
+  commercialHighlights?: string[];
 };
 
 export function PropertyCard({ p }: { p: PropertyCardData }) {
@@ -88,6 +90,18 @@ export function PropertyCard({ p }: { p: PropertyCardData }) {
             <div className="mt-2 text-[0.7rem] uppercase tracking-wider text-muted-foreground">
               {t("card.epi")}: {displayEpi}
             </div>
+          )}
+          {p.commercialHighlights && p.commercialHighlights.length > 0 && (
+            <ul className="mt-3 flex flex-wrap gap-1.5">
+              {p.commercialHighlights.slice(0, 3).map((h) => (
+                <li
+                  key={h}
+                  className="rounded-full border border-primary/20 bg-primary/[0.06] px-2.5 py-0.5 text-[0.65rem] tracking-wide text-ink/80"
+                >
+                  {language === "en" ? COMMERCIAL_HIGHLIGHT_EN[h] ?? h : h}
+                </li>
+              ))}
+            </ul>
           )}
           <span className="mt-5 flex items-center justify-between rounded-md bg-ink px-5 py-3 text-[0.7rem] uppercase tracking-[0.2em] text-cream transition-colors group-hover:bg-terracotta">
             {t("cta.viewProperty")}

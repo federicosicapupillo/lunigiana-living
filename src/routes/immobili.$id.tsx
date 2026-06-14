@@ -23,6 +23,7 @@ import {
   localizeRoomsLabel,
   localizePropertyDynamic,
 } from "@/lib/i18n/property-localize";
+import { COMMERCIAL_HIGHLIGHT_EN } from "@/lib/admin/property-constants";
 
 export const Route = createFileRoute("/immobili/$id")({
   loader: async ({ params }) => {
@@ -326,6 +327,19 @@ function PropertyDetail() {
           <p className="mt-6 whitespace-pre-line text-base leading-relaxed text-foreground/85">
             {desc || t("detail.descFallback")}
           </p>
+
+          {p.commercialHighlights && p.commercialHighlights.length > 0 && (
+            <ul className="mt-6 flex flex-wrap gap-2">
+              {p.commercialHighlights.map((h) => (
+                <li
+                  key={h}
+                  className="rounded-full border border-primary/25 bg-primary/[0.06] px-3 py-1 text-[0.72rem] tracking-wide text-ink/85"
+                >
+                  {language === "en" ? COMMERCIAL_HIGHLIGHT_EN[h] ?? h : h}
+                </li>
+              ))}
+            </ul>
+          )}
 
           {/* Quick facts */}
           <div className="mt-12 grid grid-cols-2 gap-px overflow-hidden rounded-sm bg-border md:grid-cols-4">
