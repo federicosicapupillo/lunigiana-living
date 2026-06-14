@@ -568,21 +568,69 @@ function PropertyDetail() {
             );
           })()}
 
-          {/* Quick facts */}
-          <div className="mt-12 grid grid-cols-2 gap-px overflow-hidden rounded-sm bg-border md:grid-cols-4">
-            {[
-              { icon: Maximize2, label: t("detail.surface"), value: p.sqmLabel ?? (p.sqm ? `${p.sqm} m²` : "—") },
-              { icon: BedDouble, label: t("detail.rooms"), value: localizeRoomsLabel(p.roomsLabel ?? "", language) || "—" },
-              { icon: Bath, label: t("detail.bathrooms"), value: p.bathroomsLabel ?? "—" },
-              { icon: Building2, label: t("detail.floor"), value: localizeAttrValue(p.floor || "", language) || "—" },
-            ].map((f) => (
-              <div key={f.label} className="bg-card p-5">
-                <f.icon size={18} className="text-primary" />
-                <div className="mt-3 text-xs uppercase tracking-wider text-muted-foreground">{f.label}</div>
-                <div className="mt-1 font-serif text-xl text-ink">{f.value}</div>
-              </div>
-            ))}
+          {/* In sintesi — quick facts (hide empty rows) */}
+          <div className="mt-10">
+            <span className="eyebrow">{t("detail.summaryEyebrow")}</span>
+            {(() => {
+              const isYes = (v?: string | null) => !!v && !["no", "non indicato", "—", ""].includes(v.toLowerCase());
+              const items: Array<{ icon: typeof Maximize2; label: string; value: string }> = [];
+              if (p.sqm || p.sqmLabel) items.push({ icon: Maximize2, label: t("detail.surface"), value: p.sqmLabel ?? `${p.sqm} m²` });
+              const roomsTxt = localizeRoomsLabel(p.roomsLabel ?? "", language);
+              if (roomsTxt) items.push({ icon: BedDouble, label: t("detail.rooms"), value: roomsTxt });
+              if (p.bathroomsLabel) items.push({ icon: Bath, label: t("detail.bathrooms"), value: p.bathroomsLabel });
+              const floorTxt = localizeAttrValue(p.floor || "", language);
+              if (floorTxt) items.push({ icon: Building2, label: t("detail.floor"), value: floorTxt });
+              if (p.energyClass) items.push({ icon: Zap, label: t("detail.summaryEnergy"), value: p.energyClass });
+              if (p.epi) items.push({ icon: Zap, label: t("detail.summaryEpi"), value: localizeAttrValue(p.epi, language) });
+              if (isYes(p.attributes["Giardino"])) items.push({ icon: Leaf, label: t("detail.summaryGarden"), value: localizeAttrValue(p.attributes["Giardino"], language) });
+              if (isYes(p.attributes["Terrazzo"])) items.push({ icon: Leaf, label: t("detail.summaryTerrace"), value: localizeAttrValue(p.attributes["Terrazzo"], language) });
+              if (isYes(p.attributes["Balcone"])) items.push({ icon: Leaf, label: t("detail.summaryBalcony"), value: localizeAttrValue(p.attributes["Balcone"], language) });
+              if (items.length === 0) return null;
+              return (
+                <div className="mt-4 grid grid-cols-2 gap-px overflow-hidden rounded-sm bg-border md:grid-cols-4">
+                  {items.slice(0, 8).map((f) => (
+                    <div key={f.label} className="bg-card p-5">
+                      <f.icon size={18} className="text-primary" />
+                      <div className="mt-3 text-xs uppercase tracking-wider text-muted-foreground">{f.label}</div>
+                      <div className="mt-1 font-serif text-xl text-ink">{f.value}</div>
+                    </div>
+                  ))}
+                </div>
+              );
+            })()}
           </div>
+
+          {/* Perché è interessante */}
+          {whyPoints.length > 0 && (
+            <div className="mt-12 rounded-sm border border-warm-border/70 bg-cream/40 p-6 sm:p-8">
+              <SectionHead title={t("detail.whyTitle")} />
+              <ul className="mt-5 space-y-3">
+                {whyPoints.map((point) => (
+                  <li key={point} className="flex items-start gap-3 text-sm leading-relaxed text-foreground/85 sm:text-base">
+                    <Check size={18} className="mt-0.5 shrink-0 text-primary" />
+                    <span>{point}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Ideale per */}
+          {idealFor.length > 0 && (
+            <div className="mt-10">
+              <SectionHead title={t("detail.idealForTitle")} />
+              <ul className="mt-4 flex flex-wrap gap-2">
+                {idealFor.map((label) => (
+                  <li
+                    key={label}
+                    className="rounded-full border border-ink/15 bg-background px-3.5 py-1.5 text-xs tracking-wide text-ink/85"
+                  >
+                    {label}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
 
           {/* Full attributes */}
           <div className="mt-12">
