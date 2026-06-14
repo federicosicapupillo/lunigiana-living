@@ -1,4 +1,5 @@
 import type { Language } from "./translations";
+import { COMMERCIAL_HIGHLIGHT_EN } from "@/lib/admin/property-constants";
 
 /** Centralized localizer for every property text shown on the public site. */
 
@@ -174,6 +175,8 @@ const AMENITY_MAP: Record<string, string> = {
   "Infissi tradizionali": "Traditional window frames",
   "Elementi rustici": "Rustic features",
   "Elementi nobiliari": "Noble architectural details",
+  // Valorizzazione commerciale
+  ...COMMERCIAL_HIGHLIGHT_EN,
 };
 
 const ATTR_KEY_MAP: Record<string, string> = {
