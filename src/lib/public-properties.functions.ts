@@ -277,6 +277,8 @@ function adapt(
     tag: buildTag(p),
     isRent: p.contract_type === "affitto",
     galleryPairs,
+    renderings,
+    galleryRenderingFlags,
     createdAt: p.created_at,
   };
 }
