@@ -268,6 +268,12 @@ function PropertyDetail() {
                   onError={() => setMainLoaded(true)}
                   className={`h-full w-full object-contain transition-opacity duration-300 ${mainLoaded ? "opacity-100" : "opacity-0"}`}
                 />
+                {mainIsRendering && (
+                  <span className="pointer-events-none absolute left-3 top-3 z-10 inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-background/85 px-3 py-1 text-[10px] font-medium uppercase tracking-[0.18em] text-ink/80 shadow-sm backdrop-blur-sm">
+                    <Sparkles size={11} className="text-primary" />
+                    {t("detail.renderingBadge")}
+                  </span>
+                )}
               </>
             )}
           </div>
