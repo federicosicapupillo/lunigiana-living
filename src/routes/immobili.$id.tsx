@@ -364,6 +364,24 @@ function PropertyDetail() {
               )}
             </div>
           </div>
+          {/* Hero CTAs */}
+          <div className="mt-6 flex flex-wrap items-center gap-3">
+            <button
+              type="button"
+              onClick={scrollToContact}
+              className="inline-flex items-center gap-2 rounded-sm bg-primary px-5 py-3 text-xs uppercase tracking-[0.2em] text-primary-foreground transition hover:bg-primary/90"
+            >
+              <Mail size={14} /> {t("detail.heroRequestInfo")}
+            </button>
+            <a
+              href={waHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 rounded-sm border border-ink/15 bg-background px-5 py-3 text-xs uppercase tracking-[0.2em] text-ink transition hover:border-ink/40"
+            >
+              <MessageCircle size={14} className="text-[#1f8a4c]" /> {t("detail.heroWhatsapp")}
+            </a>
+          </div>
         </div>
       </header>
 
