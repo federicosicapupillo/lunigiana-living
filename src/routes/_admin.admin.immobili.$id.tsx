@@ -55,6 +55,7 @@ import {
   EMPTY_MULTI,
   type MultiSelectKey,
 } from "@/lib/admin/property-constants";
+import { COMMERCIAL_HIGHLIGHTS } from "@/lib/admin/property-constants";
 import { MultiSelectChips } from "@/components/admin/multi-select-chips";
 import {
   availableActions,
@@ -111,6 +112,7 @@ type Property = {
   subtitle_en: string | null;
   summary_en: string | null;
   location_description_en: string | null;
+  commercial_highlights: string[];
 };
 
 type Description = {
