@@ -815,11 +815,55 @@ const FlyerSheet = forwardRef<
         }}
       >
         <div style={{ minHeight: 0 }}>
-          {hero ? (
-            <Img img={hero} lang={lang} style={{ width: "100%", height: "100%" }} />
-          ) : (
-            <EmptyPhoto />
-          )}
+          <div style={{ position: "relative", width: "100%", height: "100%" }}>
+            {hero ? (
+              <Img img={hero} lang={lang} style={{ width: "100%", height: "100%" }} />
+            ) : (
+              <EmptyPhoto />
+            )}
+            {occasione === "badge" && (
+              <span
+                style={{
+                  position: "absolute",
+                  top: 16,
+                  right: 16,
+                  background: "#F5ECDD",
+                  color: "#B23D2A",
+                  border: "2px solid #B23D2A",
+                  fontFamily: "Helvetica, Arial, sans-serif",
+                  fontWeight: 800,
+                  fontSize: 22,
+                  letterSpacing: 4,
+                  padding: "8px 18px",
+                  textTransform: "uppercase",
+                  lineHeight: 1,
+                }}
+              >
+                {t.occasioneBadge}
+              </span>
+            )}
+            {occasione === "headline" && (
+              <div
+                style={{
+                  position: "absolute",
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  background: "linear-gradient(to top, rgba(15,15,15,0.78), rgba(15,15,15,0.15) 70%, transparent)",
+                  padding: "26px 24px 18px",
+                  textAlign: "center",
+                  fontFamily: "Georgia, 'Times New Roman', serif",
+                  fontStyle: "italic",
+                  fontSize: 38,
+                  color: "#F5ECDD",
+                  letterSpacing: 0.5,
+                  lineHeight: 1.1,
+                }}
+              >
+                {t.occasioneHeadline}
+              </div>
+            )}
+          </div>
         </div>
 
         {hasThumbs && (
