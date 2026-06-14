@@ -154,6 +154,7 @@ export type Database = {
           location_description_en: string | null
           longitude: number | null
           municipality: string | null
+          occasione_settings: Json
           panoramic_view: boolean
           postal_code: string | null
           price: number | null
@@ -222,6 +223,7 @@ export type Database = {
           location_description_en?: string | null
           longitude?: number | null
           municipality?: string | null
+          occasione_settings?: Json
           panoramic_view?: boolean
           postal_code?: string | null
           price?: number | null
@@ -290,6 +292,7 @@ export type Database = {
           location_description_en?: string | null
           longitude?: number | null
           municipality?: string | null
+          occasione_settings?: Json
           panoramic_view?: boolean
           postal_code?: string | null
           price?: number | null

@@ -303,6 +303,8 @@ const it: Dict = {
  "detail.firstVisionBody": "Queste immagini sono rendering indicativi pensati per valorizzare il potenziale dell'immobile e aiutarti a immaginare nuove possibilità di arredo, atmosfera e utilizzo degli spazi.",
  "detail.renderingBadge": "Rendering indicativo",
  "detail.renderingBadgeShort": "Visione indicativa",
+ "detail.occasioneBadge": "Occasione",
+ "detail.occasioneHeadline": "Occasione da non perdere",
 
   // SEO meta
   "seo.home.title": "Furia Immobiliare — Case di carattere in Lunigiana",
@@ -701,6 +703,8 @@ const en: Dict = {
   "detail.firstVisionBody": "These images are indicative renderings created to highlight the property's potential and help you imagine new possibilities of furnishing, atmosphere and use of the spaces.",
   "detail.renderingBadge": "Indicative rendering",
   "detail.renderingBadgeShort": "Indicative vision",
+ "detail.occasioneBadge": "Opportunity",
+ "detail.occasioneHeadline": "Not to be missed",
 
   // SEO meta
   "seo.home.title": "Furia Immobiliare — Homes with character in Lunigiana",

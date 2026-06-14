@@ -50,6 +50,14 @@ type PropertyData = {
   furnished: boolean;
 };
 
+type OccasioneSettings = {
+  enabled?: boolean;
+  style?: "badge" | "headline";
+  on_card?: boolean;
+  on_detail?: boolean;
+  on_flyer?: boolean;
+} | null;
+
 type FlyerImage = {
   id: string;
   url: string;
@@ -83,6 +91,8 @@ const STR = {
     floor: "piano",
     energy: "Classe en.",
     code: "Cod. annuncio",
+    occasioneBadge: "OCCASIONE",
+    occasioneHeadline: "Occasione da non perdere",
   },
   en: {
     title: "Generate A3 window flyer",
@@ -103,6 +113,8 @@ const STR = {
     floor: "floor",
     energy: "Energy",
     code: "Listing code",
+    occasioneBadge: "OPPORTUNITY",
+    occasioneHeadline: "Not to be missed",
   },
 } as const;
 
@@ -204,6 +216,8 @@ export function WindowFlyerDialog({
   const [thumbSwap, setThumbSwap] = useState(false);
   const [exporting, setExporting] = useState(false);
   const [longDescription, setLongDescription] = useState<string | null>(null);
+  const [occSettings, setOccSettings] = useState<OccasioneSettings>(null);
+  const [hasOccasione, setHasOccasione] = useState(false);
   const flyerRef = useRef<HTMLDivElement>(null);
   const exportRef = useRef<HTMLDivElement>(null);
 
@@ -212,7 +226,7 @@ export function WindowFlyerDialog({
     let cancelled = false;
     (async () => {
       setLoading(true);
-      const [imgRes, descRes] = await Promise.all([
+      const [imgRes, descRes, propRes] = await Promise.all([
         supabase
           .from("property_images")
           .select(
@@ -225,6 +239,11 @@ export function WindowFlyerDialog({
           .from("property_descriptions")
           .select("edited_description, generated_description")
           .eq("property_id", property.id)
+          .maybeSingle(),
+        supabase
+          .from("properties")
+          .select("commercial_highlights, occasione_settings")
+          .eq("id", property.id)
           .maybeSingle(),
       ]);
       if (cancelled) return;
@@ -245,6 +264,12 @@ export function WindowFlyerDialog({
       setSelected(mapped.slice(0, 4).map((i) => i.id));
       const d = descRes.data as { edited_description?: string | null; generated_description?: string | null } | null;
       setLongDescription(d?.edited_description || d?.generated_description || null);
+      const pr = propRes.data as
+        | { commercial_highlights?: string[] | null; occasione_settings?: OccasioneSettings }
+        | null;
+      const ch = Array.isArray(pr?.commercial_highlights) ? pr!.commercial_highlights! : [];
+      setHasOccasione(ch.includes("Occasione"));
+      setOccSettings(pr?.occasione_settings ?? null);
       setLoading(false);
     })();
     return () => {
@@ -368,6 +393,12 @@ export function WindowFlyerDialog({
       setExporting(false);
     }
   };
+
+  const showOcc =
+    hasOccasione &&
+    !!occSettings?.enabled &&
+    (occSettings?.on_flyer === undefined ? true : !!occSettings.on_flyer);
+  const occStyle: "badge" | "headline" = occSettings?.style === "headline" ? "headline" : "badge";
 
   if (!open) return null;
 
@@ -514,6 +545,7 @@ export function WindowFlyerDialog({
                 lang={lang}
                 longDescription={longDescription}
                 thumbSwap={thumbSwap}
+                occasione={showOcc ? occStyle : null}
               />
             </div>
           </div>
@@ -544,6 +576,7 @@ export function WindowFlyerDialog({
           lang={lang}
           longDescription={longDescription}
           thumbSwap={thumbSwap}
+          occasione={showOcc ? occStyle : null}
         />
       </div>
     </div>,
@@ -567,8 +600,9 @@ const FlyerSheet = forwardRef<
     lang: Lang;
     longDescription: string | null;
     thumbSwap?: boolean;
+    occasione?: "badge" | "headline" | null;
   }
->(function FlyerSheet({ property, images, layout, lang, longDescription, thumbSwap }, ref) {
+>(function FlyerSheet({ property, images, layout, lang, longDescription, thumbSwap, occasione }, ref) {
   // `layout` kept for prop-compat; structure is fixed (header / body / desc)
   void layout;
   const t = STR[lang];
@@ -781,11 +815,55 @@ const FlyerSheet = forwardRef<
         }}
       >
         <div style={{ minHeight: 0 }}>
-          {hero ? (
-            <Img img={hero} lang={lang} style={{ width: "100%", height: "100%" }} />
-          ) : (
-            <EmptyPhoto />
-          )}
+          <div style={{ position: "relative", width: "100%", height: "100%" }}>
+            {hero ? (
+              <Img img={hero} lang={lang} style={{ width: "100%", height: "100%" }} />
+            ) : (
+              <EmptyPhoto />
+            )}
+            {occasione === "badge" && (
+              <span
+                style={{
+                  position: "absolute",
+                  top: 16,
+                  right: 16,
+                  background: "#F5ECDD",
+                  color: "#B23D2A",
+                  border: "2px solid #B23D2A",
+                  fontFamily: "Helvetica, Arial, sans-serif",
+                  fontWeight: 800,
+                  fontSize: 22,
+                  letterSpacing: 4,
+                  padding: "8px 18px",
+                  textTransform: "uppercase",
+                  lineHeight: 1,
+                }}
+              >
+                {t.occasioneBadge}
+              </span>
+            )}
+            {occasione === "headline" && (
+              <div
+                style={{
+                  position: "absolute",
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  background: "linear-gradient(to top, rgba(15,15,15,0.78), rgba(15,15,15,0.15) 70%, transparent)",
+                  padding: "26px 24px 18px",
+                  textAlign: "center",
+                  fontFamily: "Georgia, 'Times New Roman', serif",
+                  fontStyle: "italic",
+                  fontSize: 38,
+                  color: "#F5ECDD",
+                  letterSpacing: 0.5,
+                  lineHeight: 1.1,
+                }}
+              >
+                {t.occasioneHeadline}
+              </div>
+            )}
+          </div>
         </div>
 
         {hasThumbs && (

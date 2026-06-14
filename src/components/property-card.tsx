@@ -26,6 +26,12 @@ type PropertyCardData = {
   tag?: string;
   isRent?: boolean;
   commercialHighlights?: string[];
+  occasione?: {
+    style: "badge" | "headline";
+    onCard: boolean;
+    onDetail: boolean;
+    onFlyer: boolean;
+  } | null;
 };
 
 export function PropertyCard({ p }: { p: PropertyCardData }) {
@@ -40,6 +46,15 @@ export function PropertyCard({ p }: { p: PropertyCardData }) {
   const roomsText = p.rooms != null ? localizeRoomsLabel(`${p.rooms} ${t("card.rooms")}`, language) : null;
   const waHref = whatsappUrl(
     `${t("wa.propertyMsgPrefix")} ${p.reference} — ${displayTitle} (${p.location}).`,
+  );
+  const occ = p.occasione && p.occasione.onCard ? p.occasione : null;
+  const occLabel =
+    occ?.style === "headline"
+      ? t("detail.occasioneHeadline")
+      : t("detail.occasioneBadge");
+  // Highlights minus "Occasione" when shown in evidence (avoid duplicate badge)
+  const highlightsForBadges = (p.commercialHighlights ?? []).filter(
+    (h) => !(occ && h === "Occasione"),
   );
   return (
     <div className="card-property group block overflow-hidden">
@@ -61,6 +76,17 @@ export function PropertyCard({ p }: { p: PropertyCardData }) {
           {displayTag && (
             <span className="absolute left-4 top-4 rounded-md bg-terracotta px-3 py-1 text-[0.65rem] uppercase tracking-[0.18em] text-cream shadow-sm">
               {displayTag}
+            </span>
+          )}
+          {occ && occ.style === "badge" && (
+            <span className="absolute right-4 top-4 inline-flex items-center gap-1.5 rounded-full border border-terracotta/40 bg-cream/95 px-3 py-1 text-[0.65rem] font-medium uppercase tracking-[0.2em] text-terracotta shadow-sm backdrop-blur">
+              <span className="inline-block h-1.5 w-1.5 rounded-full bg-terracotta" />
+              {occLabel}
+            </span>
+          )}
+          {occ && occ.style === "headline" && (
+            <span className="absolute inset-x-0 top-0 bg-gradient-to-b from-ink/55 via-ink/15 to-transparent px-4 pt-3 pb-6 text-center font-serif text-base italic tracking-wide text-cream sm:text-lg">
+              {occLabel}
             </span>
           )}
           <span className="pointer-events-none absolute inset-x-0 bottom-0 flex items-center justify-end gap-2 bg-gradient-to-t from-ink/75 via-ink/25 to-transparent p-4 text-[0.65rem] uppercase tracking-[0.2em] text-cream opacity-0 transition-opacity duration-500 group-hover:opacity-100">
@@ -91,9 +117,9 @@ export function PropertyCard({ p }: { p: PropertyCardData }) {
               {t("card.epi")}: {displayEpi}
             </div>
           )}
-          {p.commercialHighlights && p.commercialHighlights.length > 0 && (
+          {highlightsForBadges.length > 0 && (
             <ul className="mt-3 flex flex-wrap gap-1.5">
-              {p.commercialHighlights.slice(0, 3).map((h) => (
+              {highlightsForBadges.slice(0, 3).map((h) => (
                 <li
                   key={h}
                   className="rounded-full border border-primary/20 bg-primary/[0.06] px-2.5 py-0.5 text-[0.65rem] tracking-wide text-ink/80"

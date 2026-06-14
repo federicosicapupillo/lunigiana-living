@@ -37,6 +37,17 @@ export type PublicProperty = {
   altreDotazioni: string | null;
   highlights: Array<{ key: string; label: string; items: string[]; note: string | null }>;
   commercialHighlights: string[];
+  /**
+   * Configurazione dell'evidenza per la voce "Occasione". `null` quando
+   * l'etichetta non è selezionata o non deve essere messa in evidenza —
+   * in quel caso "Occasione" resta tra i badge normali della valorizzazione.
+   */
+  occasione: {
+    style: "badge" | "headline";
+    onCard: boolean;
+    onDetail: boolean;
+    onFlyer: boolean;
+  } | null;
   category: "vendita" | "affitto" | "scelti-per-voi";
   featured: boolean;
   tag?: string;
@@ -121,6 +132,7 @@ type PropertyRow = {
   energy_performance_index_status: string | null;
   energy_performance_index_value: number | null;
   commercial_highlights: string[] | null;
+  occasione_settings?: Record<string, unknown> | null;
   created_at: string | null;
 };
 
@@ -232,6 +244,17 @@ function adapt(
       note: null as string | null,
     };
   }).filter((h) => h.items.length > 0);
+  const ch = Array.isArray(p.commercial_highlights) ? p.commercial_highlights : [];
+  const occRaw = (p.occasione_settings ?? {}) as Record<string, unknown>;
+  const occEnabled = ch.includes("Occasione") && occRaw.enabled === true;
+  const occasione = occEnabled
+    ? {
+        style: (occRaw.style === "headline" ? "headline" : "badge") as "badge" | "headline",
+        onCard: occRaw.on_card !== false,
+        onDetail: occRaw.on_detail !== false,
+        onFlyer: occRaw.on_flyer !== false,
+      }
+    : null;
   const location = [p.municipality, p.area_zone].filter(Boolean).join(" · ") || "Lunigiana";
   const sqmLabel = attrs["size_range"] || (p.size_sqm != null ? `${p.size_sqm} m²` : null);
   const roomsLabel = attrs["bedrooms_label"] || (p.bedrooms != null ? String(p.bedrooms) : null);
@@ -271,7 +294,8 @@ function adapt(
     amenities,
     altreDotazioni: altre,
     highlights,
-    commercialHighlights: Array.isArray(p.commercial_highlights) ? p.commercial_highlights : [],
+    commercialHighlights: ch,
+    occasione,
     category: deriveCategory(p.contract_type),
     featured: !!p.featured,
     tag: buildTag(p),
@@ -287,7 +311,7 @@ export const listPublishedProperties = createServerFn({ method: "GET" }).handler
   const { data: props, error } = await supabaseAdmin
     .from("properties")
     .select(
-      "id, slug, reference_code, title, title_en, subtitle_en, summary_en, location_description_en, municipality, area_zone, price, price_on_request, property_type, contract_type, size_sqm, bedrooms, bathrooms, floors, short_notes, panoramic_view, historic_property, featured, homepage_order, featured_at, energy_class, energy_performance_index_status, energy_performance_index_value, commercial_highlights, created_at",
+      "id, slug, reference_code, title, title_en, subtitle_en, summary_en, location_description_en, municipality, area_zone, price, price_on_request, property_type, contract_type, size_sqm, bedrooms, bathrooms, floors, short_notes, panoramic_view, historic_property, featured, homepage_order, featured_at, energy_class, energy_performance_index_status, energy_performance_index_value, commercial_highlights, occasione_settings, created_at",
     )
     .eq("status", "published")
     .order("homepage_order", { ascending: true, nullsFirst: false })
@@ -351,7 +375,7 @@ export const getPublishedProperty = createServerFn({ method: "GET" })
     const { data: p, error } = await supabaseAdmin
       .from("properties")
     .select(
-      "id, slug, reference_code, title, title_en, subtitle_en, summary_en, location_description_en, municipality, area_zone, price, price_on_request, property_type, contract_type, size_sqm, bedrooms, bathrooms, floors, short_notes, panoramic_view, historic_property, featured, energy_class, energy_performance_index_status, energy_performance_index_value, commercial_highlights, created_at",
+      "id, slug, reference_code, title, title_en, subtitle_en, summary_en, location_description_en, municipality, area_zone, price, price_on_request, property_type, contract_type, size_sqm, bedrooms, bathrooms, floors, short_notes, panoramic_view, historic_property, featured, energy_class, energy_performance_index_status, energy_performance_index_value, commercial_highlights, occasione_settings, created_at",
     )
       .eq("status", "published")
       .or(`id.eq.${data.id},slug.eq.${data.id}`)
@@ -401,7 +425,7 @@ export const listPublishedPropertiesSummary = createServerFn({ method: "GET" }).
   const { data: props, error } = await supabaseAdmin
     .from("properties")
     .select(
-      "id, slug, reference_code, title, title_en, subtitle_en, summary_en, location_description_en, municipality, area_zone, price, price_on_request, property_type, contract_type, size_sqm, bedrooms, bathrooms, floors, short_notes, panoramic_view, historic_property, featured, homepage_order, featured_at, energy_class, energy_performance_index_status, energy_performance_index_value, commercial_highlights, created_at",
+      "id, slug, reference_code, title, title_en, subtitle_en, summary_en, location_description_en, municipality, area_zone, price, price_on_request, property_type, contract_type, size_sqm, bedrooms, bathrooms, floors, short_notes, panoramic_view, historic_property, featured, homepage_order, featured_at, energy_class, energy_performance_index_status, energy_performance_index_value, commercial_highlights, occasione_settings, created_at",
     )
     .eq("status", "published")
     .order("homepage_order", { ascending: true, nullsFirst: false })

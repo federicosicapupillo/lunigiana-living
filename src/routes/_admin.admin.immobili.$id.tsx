@@ -113,6 +113,13 @@ type Property = {
   summary_en: string | null;
   location_description_en: string | null;
   commercial_highlights: string[];
+  occasione_settings: {
+    enabled?: boolean;
+    style?: "badge" | "headline";
+    on_card?: boolean;
+    on_detail?: boolean;
+    on_flyer?: boolean;
+  } | null;
 };
 
 type Description = {
@@ -1253,6 +1260,13 @@ function NarrativeTab({
     else next.add(label);
     update({ commercial_highlights: Array.from(next) });
   };
+  const occ = prop.occasione_settings ?? {};
+  const occSelected = selected.has("Occasione");
+  const occEnabled = occSelected && occ.enabled === true;
+  const updateOcc = (patch: Partial<NonNullable<Property["occasione_settings"]>>) => {
+    const current = (prop.occasione_settings ?? {}) as NonNullable<Property["occasione_settings"]>;
+    update({ occasione_settings: { ...current, ...patch } });
+  };
   return (
     <div className="space-y-6">
       <div className="rounded-sm border border-border bg-card p-6">
@@ -1282,6 +1296,88 @@ function NarrativeTab({
             );
           })}
         </div>
+        {occSelected && (
+          <div className="mt-6 rounded-sm border border-terracotta/30 bg-terracotta/5 p-4">
+            <label className="flex items-start gap-3 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={!!occ.enabled}
+                onChange={(e) => updateOcc({ enabled: e.target.checked })}
+                className="mt-1 h-4 w-4 accent-terracotta"
+              />
+              <span>
+                <span className="block text-sm font-medium text-ink">
+                  Mostra “Occasione” in evidenza
+                </span>
+                <span className="mt-0.5 block text-xs text-muted-foreground">
+                  Se attivo, “Occasione” viene mostrata in modo distinto su scheda, dettaglio
+                  o cartello A3. Se disattivo, resta tra i badge normali.
+                </span>
+              </span>
+            </label>
+            <fieldset
+              disabled={!occEnabled}
+              className={`mt-4 grid gap-4 md:grid-cols-2 ${occEnabled ? "" : "opacity-50"}`}
+            >
+              <div>
+                <div className="mb-2 text-xs uppercase tracking-wider text-muted-foreground">
+                  Stile evidenza
+                </div>
+                <div className="flex flex-col gap-2">
+                  {[
+                    { id: "badge", label: "Badge elegante", hint: "Piccolo badge premium vicino al prezzo / foto." },
+                    { id: "headline", label: "Scritta ben visibile", hint: "Dicitura editoriale tipo “Occasione da non perdere”." },
+                  ].map((o) => {
+                    const checked = (occ.style ?? "badge") === o.id;
+                    return (
+                      <label key={o.id} className="flex items-start gap-2 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="occasione-style"
+                          checked={checked}
+                          onChange={() => updateOcc({ style: o.id as "badge" | "headline" })}
+                          className="mt-1 accent-terracotta"
+                        />
+                        <span>
+                          <span className="block text-sm text-ink">{o.label}</span>
+                          <span className="block text-[11px] text-muted-foreground">{o.hint}</span>
+                        </span>
+                      </label>
+                    );
+                  })}
+                </div>
+              </div>
+              <div>
+                <div className="mb-2 text-xs uppercase tracking-wider text-muted-foreground">
+                  Dove mostrare
+                </div>
+                <div className="flex flex-col gap-2 text-sm text-ink">
+                  {[
+                    { key: "on_card", label: "Mostra sulla scheda annuncio" },
+                    { key: "on_detail", label: "Mostra nella pagina dettaglio" },
+                    { key: "on_flyer", label: "Mostra sul cartello A3" },
+                  ].map((v) => {
+                    const current = (occ as Record<string, unknown>)[v.key];
+                    const checked = current === undefined ? true : !!current;
+                    return (
+                      <label key={v.key} className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={checked}
+                          onChange={(e) =>
+                            updateOcc({ [v.key]: e.target.checked } as Partial<NonNullable<Property["occasione_settings"]>>)
+                          }
+                          className="h-4 w-4 accent-terracotta"
+                        />
+                        {v.label}
+                      </label>
+                    );
+                  })}
+                </div>
+              </div>
+            </fieldset>
+          </div>
+        )}
       </div>
 
     <div className="rounded-sm border border-border bg-card p-6">
