@@ -315,7 +315,11 @@ function PropertyDetail() {
                 }`}
               >
                 <WatermarkedImage src={g} alt="" loading="lazy" sizes="160px" watermark={false} className="h-full w-full object-cover transition-transform duration-300 hover:scale-105" />
-                {p.galleryPairs?.[g] && (
+                {p.galleryRenderingFlags?.[g] ? (
+                  <span className="pointer-events-none absolute left-1 top-1 inline-flex items-center gap-1 rounded-sm border border-primary/25 bg-background/85 px-1.5 py-0.5 text-[9px] font-medium uppercase tracking-wider text-ink/80 backdrop-blur">
+                    <Sparkles size={9} className="text-primary" /> {t("detail.renderingBadgeShort")}
+                  </span>
+                ) : p.galleryPairs?.[g] && (
                   <span className="pointer-events-none absolute left-1 top-1 inline-flex items-center gap-1 rounded-sm bg-primary/90 px-1.5 py-0.5 text-[9px] font-medium uppercase tracking-wider text-primary-foreground backdrop-blur">
                     <Sparkles size={9} /> {t("detail.beforeLabel")}/{t("detail.afterLabel")}
                   </span>
@@ -325,6 +329,46 @@ function PropertyDetail() {
           </div>
         )}
       </section>
+
+      {/* First Vision — dedicated rendering section */}
+      {p.renderings && p.renderings.length > 0 && (
+        <section className="container-editorial mt-16 sm:mt-20">
+          <div className="mx-auto max-w-3xl text-center">
+            <span className="eyebrow">{t("detail.firstVisionEyebrow")}</span>
+            <h2 className="mt-3 font-serif text-3xl text-ink sm:text-4xl">
+              {t("detail.firstVisionTitle")}
+            </h2>
+            <p className="mt-4 font-serif text-lg italic text-ink/75 sm:text-xl">
+              {t("detail.firstVisionSubtitle")}
+            </p>
+            <p className="mt-5 text-sm leading-relaxed text-foreground/75 sm:text-base">
+              {t("detail.firstVisionBody")}
+            </p>
+          </div>
+          <div className="mt-10 grid gap-6 sm:gap-8 md:grid-cols-2">
+            {p.renderings.map((src, i) => (
+              <figure
+                key={src + i}
+                className="group relative overflow-hidden rounded-sm border border-border/60 bg-muted shadow-sm"
+              >
+                <div className="relative aspect-[4/3] w-full overflow-hidden">
+                  <WatermarkedImage
+                    src={src}
+                    alt={`${title} — ${t("detail.renderingBadge")} ${i + 1}`}
+                    loading="lazy"
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
+                  />
+                  <span className="pointer-events-none absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-background/85 px-3 py-1 text-[10px] font-medium uppercase tracking-[0.18em] text-ink/80 shadow-sm backdrop-blur-sm">
+                    <Sparkles size={11} className="text-primary" />
+                    {t("detail.renderingBadge")}
+                  </span>
+                </div>
+              </figure>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Body */}
       <section className="container-editorial mt-12 grid gap-12 sm:mt-16 sm:gap-16 md:grid-cols-12">
