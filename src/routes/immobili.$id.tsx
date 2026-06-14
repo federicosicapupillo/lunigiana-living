@@ -391,9 +391,13 @@ function PropertyDetail() {
             {desc || t("detail.descFallback")}
           </p>
 
-          {p.commercialHighlights && p.commercialHighlights.length > 0 && (
+          {(() => {
+            const hidden = p.occasione && p.occasione.onDetail ? "Occasione" : null;
+            const list = (p.commercialHighlights ?? []).filter((h) => h !== hidden);
+            if (list.length === 0) return null;
+            return (
             <ul className="mt-6 flex flex-wrap gap-2">
-              {p.commercialHighlights.map((h) => (
+              {list.map((h) => (
                 <li
                   key={h}
                   className="rounded-full border border-primary/25 bg-primary/[0.06] px-3 py-1 text-[0.72rem] tracking-wide text-ink/85"
@@ -402,7 +406,8 @@ function PropertyDetail() {
                 </li>
               ))}
             </ul>
-          )}
+            );
+          })()}
 
           {/* Quick facts */}
           <div className="mt-12 grid grid-cols-2 gap-px overflow-hidden rounded-sm bg-border md:grid-cols-4">
