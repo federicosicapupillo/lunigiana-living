@@ -42,6 +42,10 @@ export type PublicProperty = {
   tag?: string;
   isRent: boolean;
   galleryPairs: Record<string, string>;
+  /** URLs of images that are AI renderings (subset of gallery or extra). */
+  renderings: string[];
+  /** Map of gallery URL -> true when that gallery slot IS a rendering itself. */
+  galleryRenderingFlags: Record<string, true>;
   createdAt: string | null;
 };
 
