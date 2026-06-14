@@ -50,6 +50,14 @@ type PropertyData = {
   furnished: boolean;
 };
 
+type OccasioneSettings = {
+  enabled?: boolean;
+  style?: "badge" | "headline";
+  on_card?: boolean;
+  on_detail?: boolean;
+  on_flyer?: boolean;
+} | null;
+
 type FlyerImage = {
   id: string;
   url: string;
@@ -83,6 +91,8 @@ const STR = {
     floor: "piano",
     energy: "Classe en.",
     code: "Cod. annuncio",
+    occasioneBadge: "OCCASIONE",
+    occasioneHeadline: "Occasione da non perdere",
   },
   en: {
     title: "Generate A3 window flyer",
@@ -103,6 +113,8 @@ const STR = {
     floor: "floor",
     energy: "Energy",
     code: "Listing code",
+    occasioneBadge: "OPPORTUNITY",
+    occasioneHeadline: "Not to be missed",
   },
 } as const;
 
