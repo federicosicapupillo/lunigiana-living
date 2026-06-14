@@ -313,10 +313,10 @@ function PropertyDetail() {
     const imgs: HTMLImageElement[] = [];
     for (const src of neighbors) {
       if (!src) continue;
-      const img = new Image();
-      img.decoding = "async";
-      img.src = src;
-      imgs.push(img);
+      const el = new Image();
+      el.decoding = "async";
+      el.src = img.hero(src, p.imageVariants);
+      imgs.push(el);
     }
     return () => {
       imgs.forEach((i) => (i.src = ""));
