@@ -1,8 +1,11 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { getPublishedProperty, type PublicProperty } from "@/lib/public-properties.functions";
 import { getLocalizedProperty } from "@/lib/property-i18n.functions";
-import { ArrowLeft, ChevronLeft, ChevronRight, MapPin, Maximize2, BedDouble, Bath, Building2, Sparkles } from "lucide-react";
-import { useEffect, useState, type FormEvent } from "react";
+import {
+  ArrowLeft, ChevronLeft, ChevronRight, MapPin, Maximize2, BedDouble, Bath, Building2,
+  Sparkles, Zap, Leaf, MessageCircle, Mail, Check,
+} from "lucide-react";
+import { useEffect, useMemo, useState, useRef, type FormEvent } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { WatermarkedImage } from "@/components/watermarked-image";
@@ -74,6 +77,134 @@ const DETAIL_KEYS = [
   "IPE",
 ];
 
+/** Clean broken markdown the AI / import sometimes leaves in descriptions. */
+function sanitizeDescription(s: string | null | undefined): string {
+  if (!s) return "";
+  return s
+    // strip paired bold markers but keep inner text
+    .replace(/\*\*([\s\S]+?)\*\*/g, "$1")
+    // strip lonely / unbalanced markers
+    .replace(/\*\*+/g, "")
+    .replace(/__+/g, "")
+    // single * used for emphasis -> keep text
+    .replace(/(^|\s)\*([^*\n]+)\*(?=\s|$|[.,;:!?])/g, "$1$2")
+    // tidy spacing
+    .replace(/[ \t]+\n/g, "\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .replace(/[ \t]{2,}/g, " ")
+    .trim();
+}
+
+type Lang = "it" | "en";
+
+const LUNIGIANA_CONTEXTS: Record<string, { it: string; en: string }> = {
+  pontremoli: {
+    it: "Pontremoli è uno dei borghi principali della Lunigiana: centro storico medievale, servizi, stazione ferroviaria e collegamenti rapidi verso La Spezia, Parma e la costa toscana.",
+    en: "Pontremoli is one of the main villages of Lunigiana: medieval historic centre, full services, train station and fast connections to La Spezia, Parma and the Tuscan coast.",
+  },
+  bagnone: {
+    it: "Bagnone è un borgo elegante della Lunigiana, conosciuto per il torrente che attraversa il centro, le botteghe e la qualità della vita tranquilla a contatto con la natura.",
+    en: "Bagnone is an elegant Lunigiana village, known for the stream running through its centre, its shops and the quiet, nature-rich quality of life.",
+  },
+  filattiera: {
+    it: "Filattiera domina la valle dall'alto con la sua pieve romanica e il castello dei Malaspina: una zona panoramica, silenziosa e ben collegata a Pontremoli.",
+    en: "Filattiera overlooks the valley with its Romanesque church and Malaspina castle: a scenic, quiet area well connected to Pontremoli.",
+  },
+  mulazzo: {
+    it: "Mulazzo è un borgo di pietra immerso nella natura, legato alla famiglia Malaspina e a Dante. Ideale per chi cerca silenzio, storia e paesaggi autentici.",
+    en: "Mulazzo is a stone village immersed in nature, linked to the Malaspina family and to Dante. Ideal for those seeking quiet, history and authentic landscapes.",
+  },
+  villafranca: {
+    it: "Villafranca in Lunigiana è un crocevia comodo della valle: servizi, scuole, stazione e accesso veloce all'autostrada A15.",
+    en: "Villafranca in Lunigiana is a convenient hub of the valley: services, schools, train station and quick access to the A15 motorway.",
+  },
+  zeri: {
+    it: "Zeri è la Lunigiana più verde e selvaggia: pascoli, boschi e il celebre agnello di Zeri. Perfetto per chi cerca aria pulita e ritmi lenti.",
+    en: "Zeri is the greenest, wildest side of Lunigiana: pastures, woods and the famous Zeri lamb. Perfect for those after clean air and slow rhythms.",
+  },
+  aulla: {
+    it: "Aulla è il principale centro commerciale della bassa Lunigiana, con stazione, supermercati e accesso immediato all'autostrada verso La Spezia e Parma.",
+    en: "Aulla is the main commercial hub of lower Lunigiana, with train station, supermarkets and immediate motorway access toward La Spezia and Parma.",
+  },
+  fivizzano: {
+    it: "Fivizzano è un borgo storico ai piedi delle Alpi Apuane, con un bel centro storico e ampie zone collinari per chi cerca panorama e tranquillità.",
+    en: "Fivizzano is a historic village at the foot of the Apuan Alps, with a beautiful old centre and wide hillside areas for those seeking views and quiet.",
+  },
+};
+
+function contextFor(location: string, lang: Lang): string | null {
+  const key = (location || "").toLowerCase().split(/[(,/\-–]/)[0].trim();
+  for (const k of Object.keys(LUNIGIANA_CONTEXTS)) {
+    if (key.startsWith(k)) return LUNIGIANA_CONTEXTS[k][lang];
+  }
+  return null;
+}
+
+function buildWhyPoints(p: PublicProperty, lang: Lang): string[] {
+  const out: string[] = [];
+  const isIt = lang === "it";
+  const ch = (p.commercialHighlights ?? []).map((x) => x.toLowerCase());
+  const attrs = Object.entries(p.attributes ?? {}).reduce<Record<string, string>>((acc, [k, v]) => {
+    acc[k.toLowerCase()] = (v ?? "").toLowerCase();
+    return acc;
+  }, {});
+  const has = (k: string) => attrs[k] && attrs[k] !== "no" && attrs[k] !== "non indicato" && attrs[k] !== "—";
+  const loc = (p.location || "").toLowerCase();
+
+  if (ch.includes("vista") || ch.includes("panoramica") || ch.includes("panoramico")) {
+    out.push(isIt ? "Posizione panoramica con vista aperta sulla valle." : "Panoramic position with open views over the valley.");
+  }
+  if (has("giardino")) {
+    out.push(isIt ? "Spazio esterno privato: un valore raro che fa la differenza." : "Private outdoor space — a rare and meaningful value.");
+  } else if (has("terrazzo") || has("balcone")) {
+    out.push(isIt ? "Affaccio esterno vivibile per godere della luce del giorno." : "Liveable outdoor area to enjoy daylight.");
+  }
+  if (ch.includes("storico") || ch.includes("storica") || loc.includes("centro")) {
+    out.push(isIt ? "Nel cuore del centro storico, a due passi da servizi e botteghe." : "In the heart of the historic centre, steps from shops and services.");
+  }
+  if (ch.includes("occasione")) {
+    out.push(isIt ? "Rapporto qualità/prezzo interessante rispetto alla zona." : "Attractive value for money compared with the area.");
+  }
+  if (ch.includes("investimento")) {
+    out.push(isIt ? "Adatto come investimento: facilmente locabile o rivendibile." : "Suitable as an investment: easy to rent out or resell.");
+  }
+  if (ch.includes("ristrutturato") || ch.includes("nuovo")) {
+    out.push(isIt ? "Pronto da abitare, senza interventi importanti da prevedere." : "Move-in ready, no major works needed.");
+  }
+  // Dedup keeping max 4
+  return Array.from(new Set(out)).slice(0, 4);
+}
+
+function buildIdealFor(p: PublicProperty, t: (k: string) => string): string[] {
+  const out = new Set<string>();
+  const ch = (p.commercialHighlights ?? []).map((x) => x.toLowerCase());
+  const attrs = Object.entries(p.attributes ?? {}).reduce<Record<string, string>>((acc, [k, v]) => {
+    acc[k.toLowerCase()] = (v ?? "").toLowerCase();
+    return acc;
+  }, {});
+  const has = (k: string) => attrs[k] && attrs[k] !== "no" && attrs[k] !== "non indicato";
+  const sqm = p.sqm ?? 0;
+  const rooms = p.rooms ?? 0;
+
+  if (sqm >= 90 && rooms >= 3 && has("giardino")) out.add(t("detail.idealFamilies"));
+  if (ch.includes("seconda casa") || ch.includes("vacanza") || rooms <= 3) out.add(t("detail.idealSecondHome"));
+  if (ch.includes("vacanza") || ch.includes("turistico")) out.add(t("detail.idealVacation"));
+  if (ch.includes("investimento") || ch.includes("occasione")) out.add(t("detail.idealInvestment"));
+  if (ch.includes("verde") || ch.includes("natura") || has("giardino")) out.add(t("detail.idealNature"));
+  if (ch.includes("tranquill") || ch.includes("silenzio") || ch.includes("panoramic")) out.add(t("detail.idealQuiet"));
+  return Array.from(out).slice(0, 5);
+}
+
+/** Small section header used by the new editorial blocks. */
+function SectionHead({ eyebrow, title }: { eyebrow?: string; title: string }) {
+  return (
+    <div>
+      {eyebrow && <span className="eyebrow">{eyebrow}</span>}
+      <h2 className="mt-3 font-serif text-2xl text-ink sm:text-3xl">{title}</h2>
+    </div>
+  );
+}
+
 function PropertyDetail() {
   const { property: base } = Route.useLoaderData() as { property: PublicProperty };
   const t = useT();
@@ -88,9 +219,17 @@ function PropertyDetail() {
   });
   const p: PublicProperty = (localized?.property as PublicProperty | null) ?? localizePropertyDynamic(base, language);
   const title = p.title;
-  const desc = p.description;
+  const desc = useMemo(() => sanitizeDescription(p.description), [p.description]);
   const priceLabel = localizePrice(p.price, language);
   const displayType = localizeType(p.type, language);
+  const lang: Lang = language === "en" ? "en" : "it";
+  const whyPoints = useMemo(() => buildWhyPoints(p, lang), [p, lang]);
+  const idealFor = useMemo(() => buildIdealFor(p, t), [p, t]);
+  const contextText = useMemo(() => contextFor(p.location, lang), [p.location, lang]);
+  const contactRef = useRef<HTMLDivElement | null>(null);
+  const scrollToContact = () => {
+    contactRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
   const [active, setActive] = useState(0);
   const main = p.gallery[active] || p.image;
   const galleryCount = p.gallery.length;
@@ -191,7 +330,7 @@ function PropertyDetail() {
   const waHref = whatsappUrl(waMessage);
 
   return (
-    <article className="pb-24">
+    <article className="pb-32 md:pb-24">
       {/* Header */}
       <header className="border-b border-border bg-muted/40 pb-8 pt-24 sm:pb-10 sm:pt-28 md:pt-36">
         <div className="container-editorial">
@@ -224,6 +363,24 @@ function PropertyDetail() {
                 )
               )}
             </div>
+          </div>
+          {/* Hero CTAs */}
+          <div className="mt-6 flex flex-wrap items-center gap-3">
+            <button
+              type="button"
+              onClick={scrollToContact}
+              className="inline-flex items-center gap-2 rounded-sm bg-primary px-5 py-3 text-xs uppercase tracking-[0.2em] text-primary-foreground transition hover:bg-primary/90"
+            >
+              <Mail size={14} /> {t("detail.heroRequestInfo")}
+            </button>
+            <a
+              href={waHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 rounded-sm border border-ink/15 bg-background px-5 py-3 text-xs uppercase tracking-[0.2em] text-ink transition hover:border-ink/40"
+            >
+              <MessageCircle size={14} className="text-[#1f8a4c]" /> {t("detail.heroWhatsapp")}
+            </a>
           </div>
         </div>
       </header>
@@ -411,21 +568,69 @@ function PropertyDetail() {
             );
           })()}
 
-          {/* Quick facts */}
-          <div className="mt-12 grid grid-cols-2 gap-px overflow-hidden rounded-sm bg-border md:grid-cols-4">
-            {[
-              { icon: Maximize2, label: t("detail.surface"), value: p.sqmLabel ?? (p.sqm ? `${p.sqm} m²` : "—") },
-              { icon: BedDouble, label: t("detail.rooms"), value: localizeRoomsLabel(p.roomsLabel ?? "", language) || "—" },
-              { icon: Bath, label: t("detail.bathrooms"), value: p.bathroomsLabel ?? "—" },
-              { icon: Building2, label: t("detail.floor"), value: localizeAttrValue(p.floor || "", language) || "—" },
-            ].map((f) => (
-              <div key={f.label} className="bg-card p-5">
-                <f.icon size={18} className="text-primary" />
-                <div className="mt-3 text-xs uppercase tracking-wider text-muted-foreground">{f.label}</div>
-                <div className="mt-1 font-serif text-xl text-ink">{f.value}</div>
-              </div>
-            ))}
+          {/* In sintesi — quick facts (hide empty rows) */}
+          <div className="mt-10">
+            <span className="eyebrow">{t("detail.summaryEyebrow")}</span>
+            {(() => {
+              const isYes = (v?: string | null) => !!v && !["no", "non indicato", "—", ""].includes(v.toLowerCase());
+              const items: Array<{ icon: typeof Maximize2; label: string; value: string }> = [];
+              if (p.sqm || p.sqmLabel) items.push({ icon: Maximize2, label: t("detail.surface"), value: p.sqmLabel ?? `${p.sqm} m²` });
+              const roomsTxt = localizeRoomsLabel(p.roomsLabel ?? "", language);
+              if (roomsTxt) items.push({ icon: BedDouble, label: t("detail.rooms"), value: roomsTxt });
+              if (p.bathroomsLabel) items.push({ icon: Bath, label: t("detail.bathrooms"), value: p.bathroomsLabel });
+              const floorTxt = localizeAttrValue(p.floor || "", language);
+              if (floorTxt) items.push({ icon: Building2, label: t("detail.floor"), value: floorTxt });
+              if (p.energyClass) items.push({ icon: Zap, label: t("detail.summaryEnergy"), value: p.energyClass });
+              if (p.epi) items.push({ icon: Zap, label: t("detail.summaryEpi"), value: localizeAttrValue(p.epi, language) });
+              if (isYes(p.attributes["Giardino"])) items.push({ icon: Leaf, label: t("detail.summaryGarden"), value: localizeAttrValue(p.attributes["Giardino"], language) });
+              if (isYes(p.attributes["Terrazzo"])) items.push({ icon: Leaf, label: t("detail.summaryTerrace"), value: localizeAttrValue(p.attributes["Terrazzo"], language) });
+              if (isYes(p.attributes["Balcone"])) items.push({ icon: Leaf, label: t("detail.summaryBalcony"), value: localizeAttrValue(p.attributes["Balcone"], language) });
+              if (items.length === 0) return null;
+              return (
+                <div className="mt-4 grid grid-cols-2 gap-px overflow-hidden rounded-sm bg-border md:grid-cols-4">
+                  {items.slice(0, 8).map((f) => (
+                    <div key={f.label} className="bg-card p-5">
+                      <f.icon size={18} className="text-primary" />
+                      <div className="mt-3 text-xs uppercase tracking-wider text-muted-foreground">{f.label}</div>
+                      <div className="mt-1 font-serif text-xl text-ink">{f.value}</div>
+                    </div>
+                  ))}
+                </div>
+              );
+            })()}
           </div>
+
+          {/* Perché è interessante */}
+          {whyPoints.length > 0 && (
+            <div className="mt-12 rounded-sm border border-warm-border/70 bg-cream/40 p-6 sm:p-8">
+              <SectionHead title={t("detail.whyTitle")} />
+              <ul className="mt-5 space-y-3">
+                {whyPoints.map((point) => (
+                  <li key={point} className="flex items-start gap-3 text-sm leading-relaxed text-foreground/85 sm:text-base">
+                    <Check size={18} className="mt-0.5 shrink-0 text-primary" />
+                    <span>{point}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Ideale per */}
+          {idealFor.length > 0 && (
+            <div className="mt-10">
+              <SectionHead title={t("detail.idealForTitle")} />
+              <ul className="mt-4 flex flex-wrap gap-2">
+                {idealFor.map((label) => (
+                  <li
+                    key={label}
+                    className="rounded-full border border-ink/15 bg-background px-3.5 py-1.5 text-xs tracking-wide text-ink/85"
+                  >
+                    {label}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
 
           {/* Full attributes */}
           <div className="mt-12">
@@ -493,17 +698,28 @@ function PropertyDetail() {
               ))}
             </div>
           )}
+
+          {/* Il contesto */}
+          {contextText && (
+            <div className="mt-12">
+              <span className="eyebrow">{t("detail.contextEyebrow")}</span>
+              <h2 className="mt-3 font-serif text-2xl text-ink sm:text-3xl">{t("detail.contextTitle")}</h2>
+              <p className="mt-4 text-base leading-relaxed text-foreground/85 sm:text-lg">
+                {contextText}
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Contact card */}
         <aside className="md:col-span-5">
-          <div className="sticky top-28 rounded-sm border border-border bg-card p-8">
-            <div className="eyebrow">{t("detail.contactEyebrow")}</div>
-            <h3 className="mt-3 font-serif text-2xl text-ink">
-              {t("detail.contactTitle")} <em className="italic">{p.reference}</em>
+          <div ref={contactRef} className="sticky top-28 rounded-sm border border-terracotta/25 bg-card p-8 shadow-sm">
+            <div className="eyebrow text-terracotta">{t("detail.contactEyebrow")} · {p.reference}</div>
+            <h3 className="mt-3 font-serif text-2xl text-ink sm:text-[1.6rem]">
+              {t("detail.contactStrongTitle")}
             </h3>
-            <p className="mt-3 text-sm text-muted-foreground">
-              {t("detail.contactBody")}
+            <p className="mt-3 text-sm leading-relaxed text-foreground/80 sm:text-base">
+              {t("detail.contactStrongBody")}
             </p>
 
             {submitState === "ok" ? (
@@ -557,6 +773,27 @@ function PropertyDetail() {
           </div>
         </aside>
       </section>
+
+      {/* Sticky mobile CTA bar */}
+      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 px-3 py-2 backdrop-blur md:hidden">
+        <div className="mx-auto grid max-w-md grid-cols-2 gap-2">
+          <a
+            href={waHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-center gap-2 rounded-sm border border-[#25D366]/40 bg-[#25D366]/10 px-4 py-3 text-xs font-medium uppercase tracking-[0.18em] text-[#1f8a4c]"
+          >
+            <MessageCircle size={14} /> {t("detail.mobileWa")}
+          </a>
+          <button
+            type="button"
+            onClick={scrollToContact}
+            className="flex items-center justify-center gap-2 rounded-sm bg-primary px-4 py-3 text-xs font-medium uppercase tracking-[0.18em] text-primary-foreground"
+          >
+            <Mail size={14} /> {t("detail.mobileInfo")}
+          </button>
+        </div>
+      </div>
     </article>
   );
 }

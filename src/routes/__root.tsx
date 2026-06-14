@@ -132,6 +132,10 @@ function RootComponent() {
   // by the marketing layout.
   const isAdminArea =
     typeof window !== "undefined" && window.location.pathname.startsWith("/admin");
+  // Hide the floating WhatsApp button on mobile property-detail pages
+  // because the page renders a sticky CTA bar at the bottom there.
+  const isPropertyDetail =
+    typeof window !== "undefined" && /^\/immobili\/[^/]+$/.test(window.location.pathname);
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -142,7 +146,11 @@ function RootComponent() {
             <Outlet />
           </main>
           {!isAdminArea && <SiteFooter />}
-          {!isAdminArea && <WhatsAppFloat />}
+          {!isAdminArea && (
+            <div className={isPropertyDetail ? "hidden md:block" : ""}>
+              <WhatsAppFloat />
+            </div>
+          )}
         </div>
         <Toaster />
       </LanguageProvider>
