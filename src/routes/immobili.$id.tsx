@@ -27,6 +27,7 @@ import {
   localizePropertyDynamic,
 } from "@/lib/i18n/property-localize";
 import { COMMERCIAL_HIGHLIGHT_EN } from "@/lib/admin/property-constants";
+import { img, imgSrcSet } from "@/lib/image-url";
 
 export const Route = createFileRoute("/immobili/$id")({
   loader: async ({ params }) => {
