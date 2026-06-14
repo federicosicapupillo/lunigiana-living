@@ -695,6 +695,12 @@ const en: Dict = {
   "detail.afterCaption": "Potential transformation",
   "detail.illustrativeNote": "Illustrative image, not representing the current state",
   "detail.compareHint": "Drag the slider to compare",
+  "detail.firstVisionEyebrow": "Vision",
+  "detail.firstVisionTitle": "Your first vision",
+  "detail.firstVisionSubtitle": "Imagine how this space could be transformed.",
+  "detail.firstVisionBody": "These images are indicative renderings created to highlight the property's potential and help you imagine new possibilities of furnishing, atmosphere and use of the spaces.",
+  "detail.renderingBadge": "Indicative rendering",
+  "detail.renderingBadgeShort": "Indicative vision",
 
   // SEO meta
   "seo.home.title": "Furia Immobiliare — Homes with character in Lunigiana",
