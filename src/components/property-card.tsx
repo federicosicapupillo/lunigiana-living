@@ -10,6 +10,7 @@ import {
   localizePropertyDynamic,
 } from "@/lib/i18n/property-localize";
 import { COMMERCIAL_HIGHLIGHT_EN } from "@/lib/admin/property-constants";
+import { img, imgSrcSet, type VariantsMap } from "@/lib/image-url";
 
 type PropertyCardData = {
   id: number | string;
@@ -32,6 +33,7 @@ type PropertyCardData = {
     onDetail: boolean;
     onFlyer: boolean;
   } | null;
+  imageVariants?: VariantsMap;
 };
 
 export function PropertyCard({ p }: { p: PropertyCardData }) {
@@ -66,7 +68,8 @@ export function PropertyCard({ p }: { p: PropertyCardData }) {
       >
         <div className="relative aspect-[4/3] overflow-hidden bg-muted">
           <WatermarkedImage
-            src={p.image}
+            src={img.card(p.image, p.imageVariants)}
+            srcSet={imgSrcSet(p.image, ["thumb", "card"], p.imageVariants) || undefined}
             alt={displayTitle}
             loading="lazy"
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"

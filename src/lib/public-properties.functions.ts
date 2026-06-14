@@ -5,6 +5,22 @@ import { MULTI_SELECT_FIELDS, parseMultiSelect, formatEpi } from "@/lib/admin/pr
 
 const SIGNED_TTL = 60 * 60 * 24; // 24h
 
+/**
+ * Image variant presets backed by Supabase Image Transformations.
+ * Each variant is a separately-signed URL where the transform options
+ * are baked into the JWT token. The bucket stays private; originals
+ * remain untouched and are still used by A3 download, AI render and
+ * enhancement flows (which sign their own URLs).
+ */
+export type ImageVariants = { card?: string; hero?: string; thumb?: string };
+
+const VARIANT_OPTS = {
+  card:  { width:  800, quality: 75, resize: "cover"   as const },
+  hero:  { width: 1600, quality: 78, resize: "contain" as const },
+  thumb: { width:  320, quality: 65, resize: "cover"   as const },
+};
+type VariantKey = keyof typeof VARIANT_OPTS;
+
 export type PublicProperty = {
   id: string;
   slug: string | null;
@@ -57,6 +73,13 @@ export type PublicProperty = {
   renderings: string[];
   /** Map of gallery URL -> true when that gallery slot IS a rendering itself. */
   galleryRenderingFlags: Record<string, true>;
+  /**
+   * Variant URL map keyed by the original signed URL that appears in
+   * `image` / `gallery` / `renderings`. When a variant is missing
+   * (external URL, transform failed, publisher-supplied URL, etc.)
+   * consumers fall back to the original key.
+   */
+  imageVariants: Record<string, ImageVariants>;
   createdAt: string | null;
 };
 
@@ -103,6 +126,46 @@ async function signMany(paths: string[]): Promise<Record<string, string>> {
     if (item.path && item.signedUrl) map[item.path] = item.signedUrl;
   }
   return map;
+}
+
+/**
+ * Sign the given variant for each path in parallel. Returns a
+ * `path -> signedUrl` map. Any failure is swallowed and the path is
+ * simply omitted — callers fall back to the original URL.
+ */
+async function signVariant(
+  paths: string[],
+  variant: VariantKey,
+): Promise<Record<string, string>> {
+  if (paths.length === 0) return {};
+  const opts = VARIANT_OPTS[variant];
+  const results = await Promise.all(
+    paths.map(async (p) => {
+      try {
+        const { data, error } = await supabaseAdmin.storage
+          .from("property-images")
+          .createSignedUrl(p, SIGNED_TTL, { transform: opts });
+        if (error || !data?.signedUrl) return [p, null] as const;
+        return [p, data.signedUrl] as const;
+      } catch {
+        return [p, null] as const;
+      }
+    }),
+  );
+  const out: Record<string, string> = {};
+  for (const [p, u] of results) if (u) out[p] = u;
+  return out;
+}
+
+async function signVariants(
+  paths: string[],
+  variants: VariantKey[],
+): Promise<Record<VariantKey, Record<string, string>>> {
+  const transformable = paths.filter((p) => !isExternalUrl(p));
+  const entries = await Promise.all(
+    variants.map(async (v) => [v, await signVariant(transformable, v)] as const),
+  );
+  return Object.fromEntries(entries) as Record<VariantKey, Record<string, string>>;
 }
 
 type PropertyRow = {
@@ -167,6 +230,7 @@ function adapt(
   features: FeatureRow[],
   description: DescriptionRow | undefined,
   signedMap: Record<string, string>,
+  variantMaps: Partial<Record<VariantKey, Record<string, string>>> = {},
 ): PublicProperty {
   const sortedImages = [...images].sort((a, b) => {
     if (a.is_cover !== b.is_cover) return a.is_cover ? -1 : 1;
@@ -213,6 +277,25 @@ function adapt(
     }
   });
   const cover = gallery[0] ?? PLACEHOLDER;
+  // Build imageVariants keyed by the URL that consumers will pass.
+  // We walk every image row and, for each "original" path that was
+  // signed via signedMap, attach the matching variant URLs if present.
+  const imageVariants: Record<string, ImageVariants> = {};
+  const attach = (path: string | null | undefined) => {
+    if (!path || isExternalUrl(path)) return;
+    const origUrl = signedMap[path];
+    if (!origUrl) return;
+    const v: ImageVariants = {};
+    if (variantMaps.card?.[path])  v.card  = variantMaps.card[path];
+    if (variantMaps.hero?.[path])  v.hero  = variantMaps.hero[path];
+    if (variantMaps.thumb?.[path]) v.thumb = variantMaps.thumb[path];
+    if (v.card || v.hero || v.thumb) imageVariants[origUrl] = v;
+  };
+  for (const i of sortedImages) {
+    attach(i.storage_path);
+    attach(i.enhanced_storage_path);
+    attach(i.rendered_storage_path);
+  }
   const attrs: Record<string, string> = {};
   const amenities: string[] = [];
   let altre: string | null = null;
@@ -303,6 +386,7 @@ function adapt(
     galleryPairs,
     renderings,
     galleryRenderingFlags,
+    imageVariants,
     createdAt: p.created_at,
   };
 }
@@ -342,13 +426,15 @@ export const listPublishedProperties = createServerFn({ method: "GET" }).handler
   const features = (featRes.data ?? []) as FeatureRow[];
   const descriptions = (descRes.data ?? []) as DescriptionRow[];
 
-  const signedMap = await signMany(
-    images.flatMap((i) => [
-      i.storage_path,
-      ...(i.rendered_storage_path ? [i.rendered_storage_path] : []),
-      ...(i.enhanced_storage_path ? [i.enhanced_storage_path] : []),
-    ]),
-  );
+  const allPaths = images.flatMap((i) => [
+    i.storage_path,
+    ...(i.rendered_storage_path ? [i.rendered_storage_path] : []),
+    ...(i.enhanced_storage_path ? [i.enhanced_storage_path] : []),
+  ]);
+  const [signedMap, variantMaps] = await Promise.all([
+    signMany(allPaths),
+    signVariants(allPaths, ["card", "thumb"]),
+  ]);
 
   const byProp = (arr: { property_id: string }[]) => {
     const m = new Map<string, any[]>();
@@ -364,7 +450,7 @@ export const listPublishedProperties = createServerFn({ method: "GET" }).handler
   const descMap = new Map(descriptions.map((d) => [d.property_id, d]));
 
   const result = propRows.map((p) =>
-    adapt(p, imgMap.get(p.id) ?? [], featMap.get(p.id) ?? [], descMap.get(p.id), signedMap),
+    adapt(p, imgMap.get(p.id) ?? [], featMap.get(p.id) ?? [], descMap.get(p.id), signedMap, variantMaps),
   );
   return { properties: result };
 });
@@ -403,15 +489,17 @@ export const getPublishedProperty = createServerFn({ method: "GET" })
     const images = (imgRes.data ?? []) as ImageRow[];
     const features = (featRes.data ?? []) as FeatureRow[];
     const description = (descRes.data ?? undefined) as DescriptionRow | undefined;
-    const signedMap = await signMany(
-      images.flatMap((i) => [
-        i.storage_path,
-        ...(i.rendered_storage_path ? [i.rendered_storage_path] : []),
-        ...(i.enhanced_storage_path ? [i.enhanced_storage_path] : []),
-      ]),
-    );
+    const allPaths = images.flatMap((i) => [
+      i.storage_path,
+      ...(i.rendered_storage_path ? [i.rendered_storage_path] : []),
+      ...(i.enhanced_storage_path ? [i.enhanced_storage_path] : []),
+    ]);
+    const [signedMap, variantMaps] = await Promise.all([
+      signMany(allPaths),
+      signVariants(allPaths, ["card", "hero", "thumb"]),
+    ]);
 
-    return { property: adapt(propRow, images, features, description, signedMap) };
+    return { property: adapt(propRow, images, features, description, signedMap, variantMaps) };
   });
 
 /**
@@ -480,7 +568,10 @@ export const listPublishedPropertiesSummary = createServerFn({ method: "GET" }).
     }
     pathsToSign.push(i.storage_path);
   }
-  const signedMap = await signMany(pathsToSign);
+  const [signedMap, variantMaps] = await Promise.all([
+    signMany(pathsToSign),
+    signVariants(pathsToSign, ["card", "thumb"]),
+  ]);
 
   const featMap = new Map<string, FeatureRow[]>();
   for (const f of features) {
@@ -491,7 +582,7 @@ export const listPublishedPropertiesSummary = createServerFn({ method: "GET" }).
 
   const result = propRows.map((p) => {
     const cover = coverByProp.get(p.id);
-    return adapt(p, cover ? [cover] : [], featMap.get(p.id) ?? [], undefined, signedMap);
+    return adapt(p, cover ? [cover] : [], featMap.get(p.id) ?? [], undefined, signedMap, variantMaps);
   });
   return { properties: result };
 });

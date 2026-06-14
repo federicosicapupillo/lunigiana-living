@@ -27,6 +27,7 @@ import {
   localizePropertyDynamic,
 } from "@/lib/i18n/property-localize";
 import { COMMERCIAL_HIGHLIGHT_EN } from "@/lib/admin/property-constants";
+import { img, imgSrcSet } from "@/lib/image-url";
 
 export const Route = createFileRoute("/immobili/$id")({
   loader: async ({ params }) => {
@@ -312,10 +313,10 @@ function PropertyDetail() {
     const imgs: HTMLImageElement[] = [];
     for (const src of neighbors) {
       if (!src) continue;
-      const img = new Image();
-      img.decoding = "async";
-      img.src = src;
-      imgs.push(img);
+      const el = new Image();
+      el.decoding = "async";
+      el.src = img.hero(src, p.imageVariants);
+      imgs.push(el);
     }
     return () => {
       imgs.forEach((i) => (i.src = ""));
@@ -430,7 +431,8 @@ function PropertyDetail() {
                 )}
                 <WatermarkedImage
                   key={main}
-                  src={main}
+                  src={img.hero(main, p.imageVariants)}
+                  srcSet={imgSrcSet(main, ["card", "hero"], p.imageVariants) || undefined}
                   alt={title}
                   fetchPriority="high"
                   sizes="(max-width: 1024px) 100vw, 70vw"
@@ -485,7 +487,7 @@ function PropertyDetail() {
                     : "opacity-70 hover:opacity-100 hover:ring-1 hover:ring-primary/40"
                 }`}
               >
-                <WatermarkedImage src={g} alt="" loading="lazy" sizes="160px" watermark={false} className="h-full w-full object-cover transition-transform duration-300 hover:scale-105" />
+                <WatermarkedImage src={img.thumb(g, p.imageVariants)} alt="" loading="lazy" sizes="160px" watermark={false} className="h-full w-full object-cover transition-transform duration-300 hover:scale-105" />
                 {p.galleryRenderingFlags?.[g] ? (
                   <span className="pointer-events-none absolute left-1 top-1 inline-flex items-center gap-1 rounded-sm border border-primary/25 bg-background/85 px-1.5 py-0.5 text-[9px] font-medium uppercase tracking-wider text-ink/80 backdrop-blur">
                     <Sparkles size={9} className="text-primary" /> {t("detail.renderingBadgeShort")}
@@ -524,7 +526,8 @@ function PropertyDetail() {
               >
                 <div className="relative aspect-[4/3] w-full overflow-hidden">
                   <WatermarkedImage
-                    src={src}
+                    src={img.hero(src, p.imageVariants)}
+                    srcSet={imgSrcSet(src, ["card", "hero"], p.imageVariants) || undefined}
                     alt={`${title} — ${t("detail.renderingBadge")} ${i + 1}`}
                     loading="lazy"
                     sizes="(max-width: 768px) 100vw, 50vw"
