@@ -113,6 +113,13 @@ type Property = {
   summary_en: string | null;
   location_description_en: string | null;
   commercial_highlights: string[];
+  occasione_settings: {
+    enabled?: boolean;
+    style?: "badge" | "headline";
+    on_card?: boolean;
+    on_detail?: boolean;
+    on_flyer?: boolean;
+  } | null;
 };
 
 type Description = {
