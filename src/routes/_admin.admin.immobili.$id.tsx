@@ -472,7 +472,14 @@ function PropertyEditor() {
                 : "border-transparent text-muted-foreground hover:text-ink"
             }`}
           >
-            {t.label}
+            <span className="inline-flex items-center gap-2">
+              {t.label}
+              {t.id === "narrative" && (
+                <span className="rounded-full bg-primary/15 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wider text-primary">
+                  Nuovo
+                </span>
+              )}
+            </span>
           </button>
         ))}
       </div>
