@@ -1279,6 +1279,7 @@ function NarrativeTab({
         <div className="mt-5 flex flex-wrap gap-2">
           {COMMERCIAL_HIGHLIGHTS.map((h) => {
             const on = selected.has(h.label);
+            const isOcc = h.label === "Occasione";
             return (
               <button
                 key={h.label}
@@ -1286,18 +1287,47 @@ function NarrativeTab({
                 onClick={() => toggleHighlight(h.label)}
                 className={`rounded-full border px-3.5 py-1.5 text-xs tracking-wide transition ${
                   on
-                    ? "border-primary/60 bg-primary/10 text-ink shadow-sm"
-                    : "border-border bg-background text-muted-foreground hover:border-primary/40 hover:text-ink"
+                    ? isOcc
+                      ? "border-terracotta/70 bg-terracotta/15 text-ink shadow-sm"
+                      : "border-primary/60 bg-primary/10 text-ink shadow-sm"
+                    : isOcc
+                      ? "border-terracotta/40 bg-terracotta/5 text-ink hover:border-terracotta/70"
+                      : "border-border bg-background text-muted-foreground hover:border-primary/40 hover:text-ink"
                 }`}
                 aria-pressed={on}
               >
-                {h.label}
+                {isOcc ? "★ " : ""}{h.label}
               </button>
             );
           })}
         </div>
-        {occSelected && (
-          <div className="mt-6 rounded-sm border border-terracotta/30 bg-terracotta/5 p-4">
+        <p className="mt-3 text-[11px] text-muted-foreground">
+          Suggerimento: seleziona <strong>Occasione</strong> per attivare le opzioni di evidenza su scheda, dettaglio e cartello A3 (pannello qui sotto).
+        </p>
+
+        <div
+          className={`mt-6 rounded-sm border-2 p-5 transition ${
+            occSelected
+              ? "border-terracotta/50 bg-terracotta/5"
+              : "border-dashed border-border bg-muted/30"
+          }`}
+        >
+          <div className="flex items-center justify-between gap-3">
+            <h4 className="font-serif text-base text-ink">
+              ★ Occasione in evidenza
+            </h4>
+            {!occSelected && (
+              <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] uppercase tracking-wider text-muted-foreground">
+                Non attiva
+              </span>
+            )}
+          </div>
+          {!occSelected ? (
+            <p className="mt-2 text-xs text-muted-foreground">
+              Seleziona <strong>Occasione</strong> tra le valorizzazioni commerciali qui sopra per attivare queste opzioni.
+            </p>
+          ) : (
+            <>
             <label className="flex items-start gap-3 cursor-pointer">
               <input
                 type="checkbox"
@@ -1376,8 +1406,9 @@ function NarrativeTab({
                 </div>
               </div>
             </fieldset>
-          </div>
-        )}
+            </>
+          )}
+        </div>
       </div>
 
     <div className="rounded-sm border border-border bg-card p-6">
