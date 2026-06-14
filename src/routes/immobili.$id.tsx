@@ -330,7 +330,7 @@ function PropertyDetail() {
   const waHref = whatsappUrl(waMessage);
 
   return (
-    <article className="pb-24">
+    <article className="pb-32 md:pb-24">
       {/* Header */}
       <header className="border-b border-border bg-muted/40 pb-8 pt-24 sm:pb-10 sm:pt-28 md:pt-36">
         <div className="container-editorial">
