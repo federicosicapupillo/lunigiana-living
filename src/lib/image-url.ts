@@ -1,48 +1,62 @@
 /**
- * Image URL helpers.
+ * Image URL helpers wired to Supabase Image Transformations.
  *
- * Today images are signed Supabase storage URLs (or external https URLs).
- * Supabase Image Transformations require the signed token to be issued for
- * the render endpoint, which would mean a server-side change to how we sign
- * (in `public-properties.functions.ts`). This module is the single place to
- * add that swap when it becomes available, so call sites already use the
- * preset names below.
+ * The server (`public-properties.functions.ts`) signs each storage path
+ * with the transform options baked into the JWT, producing variant URLs
+ * served from `/storage/v1/render/image/sign/...`. Variants are returned
+ * to the client as `PublicProperty.imageVariants` — a map keyed by the
+ * original signed URL.
  *
- * For now these functions return the input URL unchanged. Callers should
- * continue to set proper `loading`, `decoding`, `fetchPriority` and `sizes`
- * attributes — those work regardless of transforms.
+ * These helpers accept that map and resolve the right variant, falling
+ * back to the original URL when:
+ *  - the property has no variants (e.g. external/imported source URL)
+ *  - the requested preset failed to sign
+ *  - the URL is not a Supabase storage URL
+ *
+ * No URL is ever broken: every helper is guaranteed to return a usable
+ * string. Callers should still set proper `loading`, `decoding`,
+ * `fetchPriority` and `sizes` — those work regardless of transforms.
  */
 
-export type ImgPreset = "card" | "thumb" | "hero" | "renderHero" | "original";
+export type ImgPreset = "card" | "thumb" | "hero" | "original";
+export type ImageVariants = { card?: string; hero?: string; thumb?: string };
+export type VariantsMap = Record<string, ImageVariants> | undefined;
 
-const PRESET_WIDTHS: Record<ImgPreset, number | null> = {
-  thumb: 240,
+export const PRESET_WIDTHS = {
+  thumb: 320,
   card: 800,
   hero: 1600,
-  renderHero: 1400,
   original: null,
-};
+} as const;
 
-/** Return a transformed URL for the given preset. Currently a passthrough. */
-export function imgVariant(url: string, _preset: ImgPreset): string {
-  return url;
+/** Resolve a single variant URL. Falls back to `url` on any miss. */
+export function imgVariant(url: string, preset: ImgPreset, variants?: VariantsMap): string {
+  if (!url || preset === "original") return url;
+  const v = variants?.[url];
+  return v?.[preset] || url;
 }
 
 /**
- * Build a `srcSet` string for an image. When transformations are unavailable
- * (current state) this returns the original URL once, so the browser still
- * gets a valid `srcSet` attribute without breaking anything.
+ * Build a srcSet from the available variants for a given original URL.
+ * Returns an empty string when no variant exists, so `<img src={...}>`
+ * stays fully responsible for the fallback.
  */
-export function imgSrcSet(url: string, widths: number[]): string {
-  if (!url) return "";
-  return widths.map((w) => `${url} ${w}w`).join(", ");
+export function imgSrcSet(url: string, presets: ImgPreset[], variants?: VariantsMap): string {
+  const v = variants?.[url];
+  if (!v) return "";
+  const parts: string[] = [];
+  for (const p of presets) {
+    const u = v[p as Exclude<ImgPreset, "original">];
+    const w = PRESET_WIDTHS[p];
+    if (u && w) parts.push(`${u} ${w}w`);
+  }
+  return parts.join(", ");
 }
 
 /** Convenience accessors used in JSX. */
 export const img = {
-  card: (u: string) => imgVariant(u, "card"),
-  thumb: (u: string) => imgVariant(u, "thumb"),
-  hero: (u: string) => imgVariant(u, "hero"),
-  renderHero: (u: string) => imgVariant(u, "renderHero"),
-  presetWidth: (p: ImgPreset) => PRESET_WIDTHS[p],
+  card: (u: string, v?: VariantsMap) => imgVariant(u, "card", v),
+  thumb: (u: string, v?: VariantsMap) => imgVariant(u, "thumb", v),
+  hero: (u: string, v?: VariantsMap) => imgVariant(u, "hero", v),
+  srcSet: imgSrcSet,
 };
