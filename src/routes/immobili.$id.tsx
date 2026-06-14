@@ -698,6 +698,17 @@ function PropertyDetail() {
               ))}
             </div>
           )}
+
+          {/* Il contesto */}
+          {contextText && (
+            <div className="mt-12">
+              <span className="eyebrow">{t("detail.contextEyebrow")}</span>
+              <h2 className="mt-3 font-serif text-2xl text-ink sm:text-3xl">{t("detail.contextTitle")}</h2>
+              <p className="mt-4 text-base leading-relaxed text-foreground/85 sm:text-lg">
+                {contextText}
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Contact card */}
