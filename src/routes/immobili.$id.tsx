@@ -95,6 +95,7 @@ function PropertyDetail() {
   const main = p.gallery[active] || p.image;
   const galleryCount = p.gallery.length;
   const renderFor = p.galleryPairs?.[main];
+  const mainIsRendering = !!p.galleryRenderingFlags?.[main];
   const [mainLoaded, setMainLoaded] = useState(false);
   useEffect(() => {
     setMainLoaded(false);
