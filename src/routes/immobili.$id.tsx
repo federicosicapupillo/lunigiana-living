@@ -77,6 +77,134 @@ const DETAIL_KEYS = [
   "IPE",
 ];
 
+/** Clean broken markdown the AI / import sometimes leaves in descriptions. */
+function sanitizeDescription(s: string | null | undefined): string {
+  if (!s) return "";
+  return s
+    // strip paired bold markers but keep inner text
+    .replace(/\*\*([\s\S]+?)\*\*/g, "$1")
+    // strip lonely / unbalanced markers
+    .replace(/\*\*+/g, "")
+    .replace(/__+/g, "")
+    // single * used for emphasis -> keep text
+    .replace(/(^|\s)\*([^*\n]+)\*(?=\s|$|[.,;:!?])/g, "$1$2")
+    // tidy spacing
+    .replace(/[ \t]+\n/g, "\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .replace(/[ \t]{2,}/g, " ")
+    .trim();
+}
+
+type Lang = "it" | "en";
+
+const LUNIGIANA_CONTEXTS: Record<string, { it: string; en: string }> = {
+  pontremoli: {
+    it: "Pontremoli è uno dei borghi principali della Lunigiana: centro storico medievale, servizi, stazione ferroviaria e collegamenti rapidi verso La Spezia, Parma e la costa toscana.",
+    en: "Pontremoli is one of the main villages of Lunigiana: medieval historic centre, full services, train station and fast connections to La Spezia, Parma and the Tuscan coast.",
+  },
+  bagnone: {
+    it: "Bagnone è un borgo elegante della Lunigiana, conosciuto per il torrente che attraversa il centro, le botteghe e la qualità della vita tranquilla a contatto con la natura.",
+    en: "Bagnone is an elegant Lunigiana village, known for the stream running through its centre, its shops and the quiet, nature-rich quality of life.",
+  },
+  filattiera: {
+    it: "Filattiera domina la valle dall'alto con la sua pieve romanica e il castello dei Malaspina: una zona panoramica, silenziosa e ben collegata a Pontremoli.",
+    en: "Filattiera overlooks the valley with its Romanesque church and Malaspina castle: a scenic, quiet area well connected to Pontremoli.",
+  },
+  mulazzo: {
+    it: "Mulazzo è un borgo di pietra immerso nella natura, legato alla famiglia Malaspina e a Dante. Ideale per chi cerca silenzio, storia e paesaggi autentici.",
+    en: "Mulazzo is a stone village immersed in nature, linked to the Malaspina family and to Dante. Ideal for those seeking quiet, history and authentic landscapes.",
+  },
+  villafranca: {
+    it: "Villafranca in Lunigiana è un crocevia comodo della valle: servizi, scuole, stazione e accesso veloce all'autostrada A15.",
+    en: "Villafranca in Lunigiana is a convenient hub of the valley: services, schools, train station and quick access to the A15 motorway.",
+  },
+  zeri: {
+    it: "Zeri è la Lunigiana più verde e selvaggia: pascoli, boschi e il celebre agnello di Zeri. Perfetto per chi cerca aria pulita e ritmi lenti.",
+    en: "Zeri is the greenest, wildest side of Lunigiana: pastures, woods and the famous Zeri lamb. Perfect for those after clean air and slow rhythms.",
+  },
+  aulla: {
+    it: "Aulla è il principale centro commerciale della bassa Lunigiana, con stazione, supermercati e accesso immediato all'autostrada verso La Spezia e Parma.",
+    en: "Aulla is the main commercial hub of lower Lunigiana, with train station, supermarkets and immediate motorway access toward La Spezia and Parma.",
+  },
+  fivizzano: {
+    it: "Fivizzano è un borgo storico ai piedi delle Alpi Apuane, con un bel centro storico e ampie zone collinari per chi cerca panorama e tranquillità.",
+    en: "Fivizzano is a historic village at the foot of the Apuan Alps, with a beautiful old centre and wide hillside areas for those seeking views and quiet.",
+  },
+};
+
+function contextFor(location: string, lang: Lang): string | null {
+  const key = (location || "").toLowerCase().split(/[(,/\-–]/)[0].trim();
+  for (const k of Object.keys(LUNIGIANA_CONTEXTS)) {
+    if (key.startsWith(k)) return LUNIGIANA_CONTEXTS[k][lang];
+  }
+  return null;
+}
+
+function buildWhyPoints(p: PublicProperty, lang: Lang): string[] {
+  const out: string[] = [];
+  const isIt = lang === "it";
+  const ch = (p.commercialHighlights ?? []).map((x) => x.toLowerCase());
+  const attrs = Object.entries(p.attributes ?? {}).reduce<Record<string, string>>((acc, [k, v]) => {
+    acc[k.toLowerCase()] = (v ?? "").toLowerCase();
+    return acc;
+  }, {});
+  const has = (k: string) => attrs[k] && attrs[k] !== "no" && attrs[k] !== "non indicato" && attrs[k] !== "—";
+  const loc = (p.location || "").toLowerCase();
+
+  if (ch.includes("vista") || ch.includes("panoramica") || ch.includes("panoramico")) {
+    out.push(isIt ? "Posizione panoramica con vista aperta sulla valle." : "Panoramic position with open views over the valley.");
+  }
+  if (has("giardino")) {
+    out.push(isIt ? "Spazio esterno privato: un valore raro che fa la differenza." : "Private outdoor space — a rare and meaningful value.");
+  } else if (has("terrazzo") || has("balcone")) {
+    out.push(isIt ? "Affaccio esterno vivibile per godere della luce del giorno." : "Liveable outdoor area to enjoy daylight.");
+  }
+  if (ch.includes("storico") || ch.includes("storica") || loc.includes("centro")) {
+    out.push(isIt ? "Nel cuore del centro storico, a due passi da servizi e botteghe." : "In the heart of the historic centre, steps from shops and services.");
+  }
+  if (ch.includes("occasione")) {
+    out.push(isIt ? "Rapporto qualità/prezzo interessante rispetto alla zona." : "Attractive value for money compared with the area.");
+  }
+  if (ch.includes("investimento")) {
+    out.push(isIt ? "Adatto come investimento: facilmente locabile o rivendibile." : "Suitable as an investment: easy to rent out or resell.");
+  }
+  if (ch.includes("ristrutturato") || ch.includes("nuovo")) {
+    out.push(isIt ? "Pronto da abitare, senza interventi importanti da prevedere." : "Move-in ready, no major works needed.");
+  }
+  // Dedup keeping max 4
+  return Array.from(new Set(out)).slice(0, 4);
+}
+
+function buildIdealFor(p: PublicProperty, t: (k: string) => string): string[] {
+  const out = new Set<string>();
+  const ch = (p.commercialHighlights ?? []).map((x) => x.toLowerCase());
+  const attrs = Object.entries(p.attributes ?? {}).reduce<Record<string, string>>((acc, [k, v]) => {
+    acc[k.toLowerCase()] = (v ?? "").toLowerCase();
+    return acc;
+  }, {});
+  const has = (k: string) => attrs[k] && attrs[k] !== "no" && attrs[k] !== "non indicato";
+  const sqm = p.sqm ?? 0;
+  const rooms = p.rooms ?? 0;
+
+  if (sqm >= 90 && rooms >= 3 && has("giardino")) out.add(t("detail.idealFamilies"));
+  if (ch.includes("seconda casa") || ch.includes("vacanza") || rooms <= 3) out.add(t("detail.idealSecondHome"));
+  if (ch.includes("vacanza") || ch.includes("turistico")) out.add(t("detail.idealVacation"));
+  if (ch.includes("investimento") || ch.includes("occasione")) out.add(t("detail.idealInvestment"));
+  if (ch.includes("verde") || ch.includes("natura") || has("giardino")) out.add(t("detail.idealNature"));
+  if (ch.includes("tranquill") || ch.includes("silenzio") || ch.includes("panoramic")) out.add(t("detail.idealQuiet"));
+  return Array.from(out).slice(0, 5);
+}
+
+/** Small section header used by the new editorial blocks. */
+function SectionHead({ eyebrow, title }: { eyebrow?: string; title: string }) {
+  return (
+    <div>
+      {eyebrow && <span className="eyebrow">{eyebrow}</span>}
+      <h2 className="mt-3 font-serif text-2xl text-ink sm:text-3xl">{title}</h2>
+    </div>
+  );
+}
+
 function PropertyDetail() {
   const { property: base } = Route.useLoaderData() as { property: PublicProperty };
   const t = useT();
