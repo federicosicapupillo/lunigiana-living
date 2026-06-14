@@ -773,6 +773,27 @@ function PropertyDetail() {
           </div>
         </aside>
       </section>
+
+      {/* Sticky mobile CTA bar */}
+      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 px-3 py-2 backdrop-blur md:hidden">
+        <div className="mx-auto grid max-w-md grid-cols-2 gap-2">
+          <a
+            href={waHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-center gap-2 rounded-sm border border-[#25D366]/40 bg-[#25D366]/10 px-4 py-3 text-xs font-medium uppercase tracking-[0.18em] text-[#1f8a4c]"
+          >
+            <MessageCircle size={14} /> {t("detail.mobileWa")}
+          </a>
+          <button
+            type="button"
+            onClick={scrollToContact}
+            className="flex items-center justify-center gap-2 rounded-sm bg-primary px-4 py-3 text-xs font-medium uppercase tracking-[0.18em] text-primary-foreground"
+          >
+            <Mail size={14} /> {t("detail.mobileInfo")}
+          </button>
+        </div>
+      </div>
     </article>
   );
 }
