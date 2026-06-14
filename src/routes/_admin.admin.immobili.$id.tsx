@@ -487,7 +487,14 @@ function PropertyEditor() {
           <AmenitiesTab prop={prop} update={update} features={features} setFeatures={setFeatures} />
         )}
         {tab === "photos" && <ImageUploader propertyId={id} />}
-        {tab === "narrative" && <NarrativeTab features={features} setFeatures={setFeatures} />}
+        {tab === "narrative" && (
+          <NarrativeTab
+            prop={prop}
+            update={update}
+            features={features}
+            setFeatures={setFeatures}
+          />
+        )}
         {tab === "description" && (
           <DescriptionTab
             desc={desc}
@@ -1222,13 +1229,54 @@ function AmenitiesTab({
 }
 
 function NarrativeTab({
+  prop,
+  update,
   features,
   setFeatures,
 }: {
+  prop: Property;
+  update: (patch: Partial<Property>) => void;
   features: Record<string, string>;
   setFeatures: (v: Record<string, string>) => void;
 }) {
+  const selected = new Set(prop.commercial_highlights ?? []);
+  const toggleHighlight = (label: string) => {
+    const next = new Set(selected);
+    if (next.has(label)) next.delete(label);
+    else next.add(label);
+    update({ commercial_highlights: Array.from(next) });
+  };
   return (
+    <div className="space-y-6">
+      <div className="rounded-sm border border-border bg-card p-6">
+        <h3 className="font-serif text-lg text-ink">Valorizzazione commerciale</h3>
+        <p className="mt-1 text-xs text-muted-foreground">
+          Seleziona le etichette editoriali che meglio rappresentano il valore di questo
+          immobile. Compariranno come badge eleganti nella scheda e nella pagina dettaglio,
+          e verranno integrate con naturalezza nella descrizione AI.
+        </p>
+        <div className="mt-5 flex flex-wrap gap-2">
+          {COMMERCIAL_HIGHLIGHTS.map((h) => {
+            const on = selected.has(h.label);
+            return (
+              <button
+                key={h.label}
+                type="button"
+                onClick={() => toggleHighlight(h.label)}
+                className={`rounded-full border px-3.5 py-1.5 text-xs tracking-wide transition ${
+                  on
+                    ? "border-primary/60 bg-primary/10 text-ink shadow-sm"
+                    : "border-border bg-background text-muted-foreground hover:border-primary/40 hover:text-ink"
+                }`}
+                aria-pressed={on}
+              >
+                {h.label}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
     <div className="rounded-sm border border-border bg-card p-6">
       <h3 className="font-serif text-lg text-ink">Parametri narrativi / commerciali</h3>
       <p className="mt-1 text-xs text-muted-foreground">
@@ -1252,6 +1300,7 @@ function NarrativeTab({
           );
         })}
       </div>
+    </div>
     </div>
   );
 }
