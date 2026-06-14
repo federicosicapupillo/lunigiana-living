@@ -173,6 +173,8 @@ function adapt(
     return undefined;
   };
   const galleryPairs: Record<string, string> = {};
+  const renderings: string[] = [];
+  const galleryRenderingFlags: Record<string, true> = {};
   const gallery = sortedImages
     .map((i) => {
       const before = resolveBefore(i);
@@ -180,6 +182,7 @@ function adapt(
       // Emotional mode: keep original in gallery, attach render as Before/After overlay.
       if (i.render_publish_mode === "emotional" && render && before) {
         galleryPairs[before] = render;
+        renderings.push(render);
         return before;
       }
       // Main-replacement mode: render becomes the gallery image (legacy behavior).
@@ -187,6 +190,16 @@ function adapt(
       return before;
     })
     .filter((v): v is string => !!v);
+  // Mark gallery slots that ARE rendering images (main-replacement mode).
+  sortedImages.forEach((i) => {
+    const render = resolveRender(i);
+    if (!render) return;
+    const isMainRender = i.use_rendered || i.render_publish_mode === "main";
+    if (isMainRender) {
+      galleryRenderingFlags[render] = true;
+      if (!renderings.includes(render)) renderings.push(render);
+    }
+  });
   const cover = gallery[0] ?? PLACEHOLDER;
   const attrs: Record<string, string> = {};
   const amenities: string[] = [];
