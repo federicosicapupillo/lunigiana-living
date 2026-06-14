@@ -132,7 +132,7 @@ type PropertyRow = {
   energy_performance_index_status: string | null;
   energy_performance_index_value: number | null;
   commercial_highlights: string[] | null;
-  occasione_settings: Record<string, unknown> | null;
+  occasione_settings?: Record<string, unknown> | null;
   created_at: string | null;
 };
 
