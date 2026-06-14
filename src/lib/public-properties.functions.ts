@@ -37,6 +37,17 @@ export type PublicProperty = {
   altreDotazioni: string | null;
   highlights: Array<{ key: string; label: string; items: string[]; note: string | null }>;
   commercialHighlights: string[];
+  /**
+   * Configurazione dell'evidenza per la voce "Occasione". `null` quando
+   * l'etichetta non è selezionata o non deve essere messa in evidenza —
+   * in quel caso "Occasione" resta tra i badge normali della valorizzazione.
+   */
+  occasione: {
+    style: "badge" | "headline";
+    onCard: boolean;
+    onDetail: boolean;
+    onFlyer: boolean;
+  } | null;
   category: "vendita" | "affitto" | "scelti-per-voi";
   featured: boolean;
   tag?: string;
@@ -121,6 +132,7 @@ type PropertyRow = {
   energy_performance_index_status: string | null;
   energy_performance_index_value: number | null;
   commercial_highlights: string[] | null;
+  occasione_settings: Record<string, unknown> | null;
   created_at: string | null;
 };
 
@@ -232,6 +244,17 @@ function adapt(
       note: null as string | null,
     };
   }).filter((h) => h.items.length > 0);
+  const ch = Array.isArray(p.commercial_highlights) ? p.commercial_highlights : [];
+  const occRaw = (p.occasione_settings ?? {}) as Record<string, unknown>;
+  const occEnabled = ch.includes("Occasione") && occRaw.enabled === true;
+  const occasione = occEnabled
+    ? {
+        style: (occRaw.style === "headline" ? "headline" : "badge") as "badge" | "headline",
+        onCard: occRaw.on_card !== false,
+        onDetail: occRaw.on_detail !== false,
+        onFlyer: occRaw.on_flyer !== false,
+      }
+    : null;
   const location = [p.municipality, p.area_zone].filter(Boolean).join(" · ") || "Lunigiana";
   const sqmLabel = attrs["size_range"] || (p.size_sqm != null ? `${p.size_sqm} m²` : null);
   const roomsLabel = attrs["bedrooms_label"] || (p.bedrooms != null ? String(p.bedrooms) : null);
@@ -271,7 +294,8 @@ function adapt(
     amenities,
     altreDotazioni: altre,
     highlights,
-    commercialHighlights: Array.isArray(p.commercial_highlights) ? p.commercial_highlights : [],
+    commercialHighlights: ch,
+    occasione,
     category: deriveCategory(p.contract_type),
     featured: !!p.featured,
     tag: buildTag(p),
