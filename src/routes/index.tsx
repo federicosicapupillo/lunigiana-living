@@ -267,6 +267,9 @@ function Index() {
       </div>
       </section>
 
+      {/* GUIDED CHOICE */}
+      <GuidedChoiceSection />
+
       {/* FEATURED PROPERTIES */}
       <section className="section-sand py-16 sm:py-20 md:py-32">
         <div className="container-editorial">
