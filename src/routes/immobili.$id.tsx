@@ -414,7 +414,16 @@ function PropertyDetail() {
           <div className="mt-6 flex flex-wrap items-center gap-3">
             <button
               type="button"
-              onClick={scrollToContact}
+              onClick={() => {
+                trackClick("property_detail_request_info_click", {
+                  source: "hero",
+                  property_id: String(p.id),
+                  property_code: p.reference,
+                  language,
+                });
+                scrollToContact();
+              }}
+              data-track="property_detail_request_info_click"
               className="inline-flex items-center gap-2 rounded-sm bg-primary px-5 py-3 text-xs uppercase tracking-[0.2em] text-primary-foreground transition hover:bg-primary/90"
             >
               <Mail size={14} /> {t("detail.heroRequestInfo")}
@@ -423,6 +432,15 @@ function PropertyDetail() {
               href={waHref}
               target="_blank"
               rel="noopener noreferrer"
+              data-track="property_detail_whatsapp_click"
+              onClick={() =>
+                trackClick("property_detail_whatsapp_click", {
+                  source: "hero",
+                  property_id: String(p.id),
+                  property_code: p.reference,
+                  language,
+                })
+              }
               className="inline-flex items-center gap-2 rounded-sm border border-ink/15 bg-background px-5 py-3 text-xs uppercase tracking-[0.2em] text-ink transition hover:border-ink/40"
             >
               <MessageCircle size={14} className="text-[#1f8a4c]" /> {t("detail.heroWhatsapp")}
@@ -524,7 +542,16 @@ function PropertyDetail() {
             {p.gallery.map((g: string, i: number) => (
               <button
                 key={g + i}
-                onClick={() => setActive(i)}
+                onClick={() => {
+                  setActive(i);
+                  trackClick("property_gallery_interaction", {
+                    action: "thumbnail_click",
+                    image_index: i,
+                    property_id: String(p.id),
+                    property_code: p.reference,
+                    language,
+                  });
+                }}
                 aria-label={`Vai all'immagine ${i + 1}`}
                 className={`relative aspect-[4/3] overflow-hidden rounded-sm bg-muted transition-all duration-200 ${
                   i === active
@@ -803,8 +830,22 @@ function PropertyDetail() {
 
             <div className="mt-6 border-t border-border pt-6 text-sm text-muted-foreground">
               <div>{t("detail.orCall")}</div>
-              <a href="tel:+390187830229" className="mt-1 block font-serif text-xl text-ink">0187 830229</a>
-              <a href="tel:+393207019985" className="block font-serif text-xl text-ink">320 7019985</a>
+              <a
+                href="tel:+390187830229"
+                data-track="phone_click"
+                onClick={() => trackClick("phone_click", { source: "property_detail", language })}
+                className="mt-1 block font-serif text-xl text-ink"
+              >
+                0187 830229
+              </a>
+              <a
+                href="tel:+393207019985"
+                data-track="phone_click"
+                onClick={() => trackClick("phone_click", { source: "property_detail", language })}
+                className="block font-serif text-xl text-ink"
+              >
+                320 7019985
+              </a>
             </div>
 
             <a
