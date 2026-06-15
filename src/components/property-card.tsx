@@ -11,6 +11,7 @@ import {
 } from "@/lib/i18n/property-localize";
 import { COMMERCIAL_HIGHLIGHT_EN } from "@/lib/admin/property-constants";
 import { img, imgSrcSet, type VariantsMap } from "@/lib/image-url";
+import { getPropertyDisplayTitle } from "@/lib/property-display-title";
 
 type PropertyCardData = {
   id: number | string;
@@ -40,7 +41,17 @@ export function PropertyCard({ p }: { p: PropertyCardData }) {
   const t = useT();
   const { language } = useLanguage();
   const localized = localizePropertyDynamic(p, language);
-  const displayTitle = localized.title || p.title;
+  const rawTitle = localized.title || p.title;
+  // Only run the IT-side cleaner. For EN, the localized title already went
+  // through localizeFreeText — keep it untouched to avoid double-rewrites.
+  const displayTitle =
+    language === "it"
+      ? getPropertyDisplayTitle({
+          title: rawTitle,
+          type: p.type,
+          location: p.location,
+        })
+      : rawTitle;
   const displayPrice = localized.price || p.price;
   const displayType = localized.type || p.type;
   const displayTag = localized.tag;
@@ -100,7 +111,10 @@ export function PropertyCard({ p }: { p: PropertyCardData }) {
         </div>
         <div className="px-5 pt-5 pb-3">
           <div className="eyebrow">{p.reference} · {displayType}</div>
-          <h3 className="mt-2 font-serif text-2xl leading-tight text-ink transition-colors group-hover:text-primary">
+          <h3
+            className="mt-2 font-serif text-2xl leading-tight text-ink transition-colors group-hover:text-primary line-clamp-2"
+            title={displayTitle}
+          >
             {displayTitle}
           </h3>
           <div className="mt-2 flex items-center gap-1.5 text-sm text-muted-foreground">
