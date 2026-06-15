@@ -7,8 +7,7 @@ import { COMUNE_SEO, getComuneSeo, municipalityMatches } from "@/lib/seo-comuni"
 import { trackClick } from "@/lib/analytics";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { localizePropertyDynamic } from "@/lib/i18n/property-localize";
-
-const SITE = "https://furia.cap-ann-one.life";
+import { siteUrl } from "@/lib/site-url";
 
 export const Route = createFileRoute("/case-in-vendita/$comune")({
   loader: async ({ params }) => {
@@ -27,7 +26,7 @@ export const Route = createFileRoute("/case-in-vendita/$comune")({
     if (!comune) {
       return { meta: [{ title: "Pagina non trovata — Furia Immobiliare" }] };
     }
-    const url = `${SITE}/case-in-vendita/${comune.slug}`;
+    const url = siteUrl(`/case-in-vendita/${comune.slug}`);
     const title = `Case in vendita a ${comune.fullName} | Furia Immobiliare`;
     const description = `Scopri case, appartamenti e immobili di carattere a ${comune.fullName} con Furia Immobiliare. Ti guidiamo nella scelta della casa giusta in Lunigiana.`;
     const items = loaderData?.properties ?? [];
@@ -35,8 +34,8 @@ export const Route = createFileRoute("/case-in-vendita/$comune")({
       "@context": "https://schema.org",
       "@type": "BreadcrumbList",
       itemListElement: [
-        { "@type": "ListItem", position: 1, name: "Home", item: `${SITE}/` },
-        { "@type": "ListItem", position: 2, name: "Case in vendita", item: `${SITE}/case-in-vendita` },
+        { "@type": "ListItem", position: 1, name: "Home", item: siteUrl("/") },
+        { "@type": "ListItem", position: 2, name: "Case in vendita", item: siteUrl("/case-in-vendita") },
         { "@type": "ListItem", position: 3, name: comune.fullName, item: url },
       ],
     };
@@ -46,7 +45,7 @@ export const Route = createFileRoute("/case-in-vendita/$comune")({
       itemListElement: items.slice(0, 25).map((p, i) => ({
         "@type": "ListItem",
         position: i + 1,
-        url: `${SITE}/immobili/${p.slug || p.id}`,
+        url: siteUrl(`/immobili/${p.slug || p.id}`),
         name: p.title,
       })),
     };

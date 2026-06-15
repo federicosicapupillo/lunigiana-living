@@ -2,13 +2,13 @@ import { createFileRoute } from "@tanstack/react-router";
 import type {} from "@tanstack/react-start";
 import { listPublishedProperties } from "@/lib/public-properties.functions";
 import { COMUNE_SEO } from "@/lib/seo-comuni";
-
-const BASE_URL = "";
+import { getSiteUrl } from "@/lib/site-url";
 
 export const Route = createFileRoute("/sitemap.xml")({
   server: {
     handlers: {
       GET: async () => {
+        const BASE_URL = getSiteUrl();
         const { properties } = await listPublishedProperties();
         const paths = [
           "/", "/immobili", "/territori", "/servizi", "/chi-siamo", "/contatti",

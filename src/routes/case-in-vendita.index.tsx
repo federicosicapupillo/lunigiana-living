@@ -1,12 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, MapPin } from "lucide-react";
 import { COMUNE_SEO } from "@/lib/seo-comuni";
-
-const SITE = "https://furia.cap-ann-one.life";
+import { siteUrl } from "@/lib/site-url";
 
 export const Route = createFileRoute("/case-in-vendita/")({
   head: () => {
-    const url = `${SITE}/case-in-vendita`;
+    const url = siteUrl("/case-in-vendita");
     const title = "Case in vendita in Lunigiana — comuni e zone | Furia Immobiliare";
     const description =
       "Esplora le case in vendita per comune in Lunigiana: Pontremoli, Bagnone, Mulazzo, Filattiera, Villafranca, Zeri, Aulla. Una guida locale per scegliere la zona giusta.";
