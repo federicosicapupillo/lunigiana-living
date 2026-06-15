@@ -74,6 +74,8 @@ function SettingsPage() {
     | null
   >(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [reprocessConfirmOpen, setReprocessConfirmOpen] = useState(false);
+  const [reprocessText, setReprocessText] = useState("");
   const [publishing, setPublishing] = useState(false);
   const [verifyConfirmOpen, setVerifyConfirmOpen] = useState(false);
   const [verifying, setVerifying] = useState(false);
@@ -135,12 +137,14 @@ function SettingsPage() {
     }
   };
 
-  const runEnhance = async (onlyErrors: boolean) => {
+  const runEnhance = async (opts: { onlyErrors?: boolean; reprocessAll?: boolean }) => {
     setEnhancing(true);
     setEnhanceResult(null);
     setConfirmOpen(false);
+    setReprocessConfirmOpen(false);
+    setReprocessText("");
     try {
-      const res = await enhanceAll({ data: { onlyErrors } });
+      const res = await enhanceAll({ data: opts });
       setEnhanceResult(res);
       if (res.failed === 0) toast.success(`Miglioramento completato · ${res.enhanced} foto`);
       else toast.warning(`Completato con ${res.failed} errori · ${res.enhanced} ok`);
@@ -536,12 +540,24 @@ function SettingsPage() {
             className="inline-flex items-center gap-2 rounded-sm bg-primary px-5 py-2.5 text-xs uppercase tracking-[0.2em] text-primary-foreground transition hover:bg-primary/90 disabled:opacity-60"
           >
             {enhancing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wand2 size={14} />}
-            Migliora tutte le foto esistenti
+            Migliora solo foto non ancora migliorate
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setReprocessText("");
+              setReprocessConfirmOpen(true);
+            }}
+            disabled={enhancing}
+            className="inline-flex items-center gap-2 rounded-sm border border-destructive/40 bg-background px-5 py-2.5 text-xs uppercase tracking-[0.2em] text-destructive transition hover:bg-destructive/5 disabled:opacity-60"
+          >
+            {enhancing ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw size={14} />}
+            Rielabora tutte le foto
           </button>
           {enhanceResult && enhanceResult.failed > 0 && (
             <button
               type="button"
-              onClick={() => runEnhance(true)}
+              onClick={() => runEnhance({ onlyErrors: true })}
               disabled={enhancing}
               className="inline-flex items-center gap-2 rounded-sm border border-border bg-background px-5 py-2.5 text-xs uppercase tracking-[0.2em] text-ink transition hover:border-primary/50 disabled:opacity-60"
             >
@@ -614,10 +630,59 @@ function SettingsPage() {
                 </button>
                 <button
                   type="button"
-                  onClick={() => runEnhance(false)}
+                  onClick={() => runEnhance({})}
                   className="inline-flex items-center gap-2 rounded-sm bg-primary px-4 py-2 text-xs uppercase tracking-[0.18em] text-primary-foreground hover:bg-primary/90"
                 >
                   <Wand2 size={13} /> Avvia miglioramento
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {reprocessConfirmOpen && (
+          <div
+            role="dialog"
+            aria-modal="true"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-ink/60 px-4"
+            onClick={() => setReprocessConfirmOpen(false)}
+          >
+            <div
+              className="w-full max-w-md rounded-sm border border-destructive/40 bg-background p-6 shadow-xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <h3 className="font-serif text-xl text-ink">Rielaborare TUTTE le foto?</h3>
+              <p className="mt-3 text-sm text-muted-foreground">
+                Questa operazione genererà una nuova versione migliorata anche per le foto
+                già migliorate in precedenza, sovrascrivendo la versione ottimizzata esistente
+                nello Storage. Gli originali NON vengono modificati. Operazione costosa: può
+                richiedere parecchi minuti su archivi grandi.
+              </p>
+              <label className="mt-4 block text-xs uppercase tracking-wider text-muted-foreground">
+                Per confermare, digita: <span className="font-mono text-ink">RIELABORA</span>
+              </label>
+              <input
+                type="text"
+                value={reprocessText}
+                onChange={(e) => setReprocessText(e.target.value)}
+                className="mt-2 w-full rounded-sm border border-border bg-background px-3 py-2 text-sm focus:border-primary focus:outline-none"
+                autoFocus
+              />
+              <div className="mt-6 flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setReprocessConfirmOpen(false)}
+                  className="rounded-sm border border-border bg-background px-4 py-2 text-xs uppercase tracking-[0.18em] text-ink hover:border-primary/50"
+                >
+                  Annulla
+                </button>
+                <button
+                  type="button"
+                  disabled={reprocessText.trim() !== "RIELABORA"}
+                  onClick={() => runEnhance({ reprocessAll: true })}
+                  className="inline-flex items-center gap-2 rounded-sm bg-destructive px-4 py-2 text-xs uppercase tracking-[0.18em] text-destructive-foreground hover:bg-destructive/90 disabled:opacity-50"
+                >
+                  <RefreshCw size={13} /> Avvia rielaborazione
                 </button>
               </div>
             </div>

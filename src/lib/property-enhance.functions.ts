@@ -181,9 +181,14 @@ export const setPropertyImageEnhancedPublished = createServerFn({ method: "POST"
 
 export const enhanceAllImages = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: { onlyErrors?: boolean; autoPublish?: boolean } | undefined) =>
+  .inputValidator((data: { onlyErrors?: boolean; autoPublish?: boolean; reprocessAll?: boolean; limit?: number } | undefined) =>
     z
-      .object({ onlyErrors: z.boolean().optional(), autoPublish: z.boolean().optional() })
+      .object({
+        onlyErrors: z.boolean().optional(),
+        autoPublish: z.boolean().optional(),
+        reprocessAll: z.boolean().optional(),
+        limit: z.number().int().positive().max(200).optional(),
+      })
       .parse(data ?? {}),
   )
   .handler(async ({ data, context }) => {
@@ -194,16 +199,19 @@ export const enhanceAllImages = createServerFn({ method: "POST" })
       .from("property_images")
       .select("id, enhancement_status, storage_path, import_status");
     if (data.onlyErrors) query = query.eq("enhancement_status", "error");
-    else query = query.in("enhancement_status", ["not_enhanced", "error"]);
+    else if (!data.reprocessAll)
+      query = query.in("enhancement_status", ["not_enhanced", "error"]);
+    // reprocessAll: no status filter → tutte le foto eleggibili
     const { data: rows, error } = await query;
     if (error) throw new Error(error.message);
 
-    const eligible = (rows ?? []).filter(
+    let eligible = (rows ?? []).filter(
       (r) =>
         r.storage_path &&
         !/^https?:\/\//i.test(r.storage_path) &&
         r.import_status !== "external_only",
     );
+    if (data.limit && eligible.length > data.limit) eligible = eligible.slice(0, data.limit);
 
     let enhanced = 0;
     let failed = 0;
