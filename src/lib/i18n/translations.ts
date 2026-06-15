@@ -626,6 +626,29 @@ const it: Dict = {
   "magnet.err.interest": "Seleziona il tuo interesse principale.",
   "magnet.thanks.title": "Grazie, abbiamo ricevuto la tua richiesta.",
   "magnet.thanks.body": "Elena ti invierà la guida o ti ricontatterà appena possibile.",
+
+  // Reviews / Trust block
+  "trust.eyebrow": "Fiducia ed esperienza",
+  "trust.title": "Le parole di chi ci ha scelto",
+  "trust.subtitle": "Ogni casa ha una storia. Qui trovi alcune esperienze di persone che hanno scelto Furia Immobiliare per comprare o vendere in Lunigiana.",
+  "trust.card1.t": "Accompagnamento umano",
+  "trust.card1.b": "Ogni richiesta viene seguita con attenzione, ascoltando non solo il budget ma anche il progetto di vita.",
+  "trust.card2.t": "Conoscenza del territorio",
+  "trust.card2.b": "La scelta di una casa in Lunigiana dipende anche da borgo, accessi, servizi, esposizione e contesto.",
+  "trust.card3.t": "Scelte più consapevoli",
+  "trust.card3.b": "Furia Immobiliare aiuta a valutare non solo la bellezza di un immobile, ma anche la sua coerenza con le esigenze reali.",
+  "trust.stories.eyebrow": "Storie",
+  "trust.stories.title": "Storie di case e persone",
+  "trust.stories.intro": "Tre situazioni ricorrenti che incontriamo, raccontate senza nomi e senza promesse: solo il modo in cui lavoriamo.",
+  "trust.stories.editorialNote": "Nota editoriale",
+  "trust.story1.t": "Chi cercava una seconda casa",
+  "trust.story1.b": "Spesso chi arriva da fuori zona ha bisogno prima di capire la Lunigiana: distanze, borghi, servizi e ritmo di vita. Il lavoro inizia da lì, non solo dalla visita.",
+  "trust.story2.t": "Chi vende una casa di famiglia",
+  "trust.story2.b": "Vendere una casa in Lunigiana significa spesso raccontare una storia: spazi, ricordi, posizione e potenziale devono essere presentati con cura.",
+  "trust.story3.t": "Chi vuole scegliere con calma",
+  "trust.story3.b": "Non tutte le case belle sono case giuste. Per questo il percorso migliore è quello che aiuta a confrontare, valutare e decidere senza pressione.",
+  "trust.google.body": "Le recensioni che leggi su Google sono verificate e scritte direttamente dai clienti di Furia Immobiliare.",
+  "trust.google.cta": "Leggi le recensioni su Google",
 };
 
 const en: Dict = {
@@ -1250,6 +1273,29 @@ const en: Dict = {
   "magnet.err.interest": "Please select your main interest.",
   "magnet.thanks.title": "Thank you, we've received your request.",
   "magnet.thanks.body": "Elena will send you the guide or get back to you as soon as possible.",
+
+  // Reviews / Trust block
+  "trust.eyebrow": "Trust and experience",
+  "trust.title": "Words from people who chose us",
+  "trust.subtitle": "Every home has a story. Here are some experiences of people who chose Furia Immobiliare to buy or sell in Lunigiana.",
+  "trust.card1.t": "Human guidance",
+  "trust.card1.b": "Every request is followed with care, listening not only to the budget but also to the life project behind it.",
+  "trust.card2.t": "Local knowledge",
+  "trust.card2.b": "Choosing a home in Lunigiana also depends on the village, access, services, exposure and surroundings.",
+  "trust.card3.t": "More informed choices",
+  "trust.card3.b": "Furia Immobiliare helps you weigh not just the beauty of a property, but how well it actually fits your real needs.",
+  "trust.stories.eyebrow": "Stories",
+  "trust.stories.title": "Stories of homes and people",
+  "trust.stories.intro": "Three recurring situations we meet, told without names and without promises — only the way we work.",
+  "trust.stories.editorialNote": "Editorial note",
+  "trust.story1.t": "Those looking for a second home",
+  "trust.story1.b": "People arriving from outside often need to understand Lunigiana first: distances, villages, services and pace of life. The work starts there, not only at the viewing.",
+  "trust.story2.t": "Those selling a family home",
+  "trust.story2.b": "Selling a home in Lunigiana often means telling a story: spaces, memories, location and potential need to be presented with care.",
+  "trust.story3.t": "Those who want to choose without pressure",
+  "trust.story3.b": "Not every beautiful home is the right home. The best path is one that lets you compare, evaluate and decide calmly.",
+  "trust.google.body": "The reviews you read on Google are verified and written directly by Furia Immobiliare clients.",
+  "trust.google.cta": "Read reviews on Google",
 };
 
 const DICTS: Record<Language, Dict> = { it, en };
