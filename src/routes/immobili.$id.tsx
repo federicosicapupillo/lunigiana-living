@@ -351,8 +351,24 @@ function PropertyDetail() {
       imgs.forEach((i) => (i.src = ""));
     };
   }, [active, galleryCount, p.gallery]);
-  const goPrev = () => setActive((i) => (galleryCount ? (i - 1 + galleryCount) % galleryCount : 0));
-  const goNext = () => setActive((i) => (galleryCount ? (i + 1) % galleryCount : 0));
+  const goPrev = () => {
+    setActive((i) => (galleryCount ? (i - 1 + galleryCount) % galleryCount : 0));
+    trackClick("property_gallery_interaction", {
+      action: "previous",
+      property_id: String(p.id),
+      property_code: p.reference,
+      language,
+    });
+  };
+  const goNext = () => {
+    setActive((i) => (galleryCount ? (i + 1) % galleryCount : 0));
+    trackClick("property_gallery_interaction", {
+      action: "next",
+      property_id: String(p.id),
+      property_code: p.reference,
+      language,
+    });
+  };
   const waMessage =
     `${t("wa.propertyMsgPrefix")} ` +
     `${p.reference} — ${title} (${p.location}).` +
