@@ -13,6 +13,7 @@ import { getLocalizedProperties } from "@/lib/property-i18n.functions";
 import { getHomeHeroVariant, type HomeHeroVariant } from "@/lib/site-settings.functions";
 import { LeadForm } from "@/components/lead-form";
 import { GuidedChoiceSection } from "@/components/guided-choice";
+import { LeadMagnetBlock } from "@/components/lead-magnet-block";
 import { ArrowRight, Compass, KeyRound, Sparkles, Star, ShieldCheck, MapPin, Home as HomeIcon } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
