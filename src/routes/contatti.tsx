@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Mail, MapPin, Phone } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import { whatsappUrl } from "@/components/whatsapp-float";
 import { LeadForm } from "@/components/lead-form";
 import { useT } from "@/lib/i18n/LanguageContext";
@@ -79,6 +80,16 @@ function ContattiPage() {
         <div className="md:col-span-7 md:col-start-6">
           <div className="rounded-md border border-warm-border/70 bg-warm-cream p-5 shadow-[0_1px_0_rgba(36,23,17,.04),0_18px_38px_-24px_rgba(36,23,17,.25)] sm:p-6">
             <LeadForm variant="generic" source="contatti" showPromise={false} />
+          </div>
+          <div className="mt-6 rounded-sm border border-warm-border/70 bg-warm-ivory/70 p-5 text-sm">
+            <div className="eyebrow text-[0.65rem]">{t("guided.altContact.title")}</div>
+            <p className="mt-2 text-foreground/80">{t("guided.altContact.body")}</p>
+            <Link
+              to="/trova-casa-lunigiana"
+              className="mt-3 inline-flex items-center gap-1.5 font-medium text-primary underline-offset-4 hover:underline"
+            >
+              {t("guided.linkBlock.cta")}
+            </Link>
           </div>
         </div>
       </div>
