@@ -11,6 +11,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useLanguage, useT } from "@/lib/i18n/LanguageContext";
 import { useLocalizedHead } from "@/hooks/use-localized-head";
 import { localizePropertyDynamic } from "@/lib/i18n/property-localize";
+import { TIPOLOGIE_SEO } from "@/lib/seo-tipologie";
 
 const searchSchema = z.object({
   contract: fallback(z.string(), "").default(""),
@@ -214,6 +215,38 @@ function ImmobiliPage() {
           >
             {t("list.tellUs")}
           </Link>
+        </div>
+      </section>
+
+      {/* Cerca per tipologia — link interni alle pagine SEO tipologia */}
+      <section className="border-t border-border bg-muted/30 py-16">
+        <div className="container-editorial">
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <span className="eyebrow">Cerca per tipologia</span>
+              <h2 className="mt-2 font-serif text-2xl text-ink md:text-3xl">
+                Esplora gli immobili per tipo di casa
+              </h2>
+            </div>
+            <Link
+              to="/case-in-vendita-lunigiana"
+              className="text-xs uppercase tracking-[0.22em] text-[var(--terracotta)] hover:underline"
+            >
+              Vedi tutte le tipologie
+            </Link>
+          </div>
+          <div className="mt-8 flex flex-wrap gap-3">
+            {TIPOLOGIE_SEO.map((t) => (
+              <Link
+                key={t.slug}
+                to="/case-in-vendita-lunigiana/$tipologia"
+                params={{ tipologia: t.slug }}
+                className="rounded-sm border border-border bg-background px-5 py-3 text-xs uppercase tracking-[0.18em] text-ink transition hover:border-[var(--terracotta)] hover:text-[var(--terracotta)]"
+              >
+                {t.fullName}
+              </Link>
+            ))}
+          </div>
         </div>
       </section>
     </>
