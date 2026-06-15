@@ -19,6 +19,7 @@ import { Route as AdminRouteImport } from './routes/_admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ImmobiliIndexRouteImport } from './routes/immobili.index'
 import { Route as CaseInVenditaIndexRouteImport } from './routes/case-in-vendita.index'
+import { Route as CaseInVenditaLunigianaIndexRouteImport } from './routes/case-in-vendita-lunigiana.index'
 import { Route as ImmobiliIdRouteImport } from './routes/immobili.$id'
 import { Route as CaseInVenditaComuneRouteImport } from './routes/case-in-vendita.$comune'
 import { Route as CaseInVenditaLunigianaTipologiaRouteImport } from './routes/case-in-vendita-lunigiana.$tipologia'
@@ -85,6 +86,12 @@ const CaseInVenditaIndexRoute = CaseInVenditaIndexRouteImport.update({
   path: '/case-in-vendita/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CaseInVenditaLunigianaIndexRoute =
+  CaseInVenditaLunigianaIndexRouteImport.update({
+    id: '/case-in-vendita-lunigiana/',
+    path: '/case-in-vendita-lunigiana/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ImmobiliIdRoute = ImmobiliIdRouteImport.update({
   id: '/$id',
   path: '/$id',
@@ -183,6 +190,7 @@ export interface FileRoutesByFullPath {
   '/case-in-vendita-lunigiana/$tipologia': typeof CaseInVenditaLunigianaTipologiaRoute
   '/case-in-vendita/$comune': typeof CaseInVenditaComuneRoute
   '/immobili/$id': typeof ImmobiliIdRoute
+  '/case-in-vendita-lunigiana/': typeof CaseInVenditaLunigianaIndexRoute
   '/case-in-vendita/': typeof CaseInVenditaIndexRoute
   '/immobili/': typeof ImmobiliIndexRoute
   '/admin/dati-live': typeof AdminAdminDatiLiveRoute
@@ -208,6 +216,7 @@ export interface FileRoutesByTo {
   '/case-in-vendita-lunigiana/$tipologia': typeof CaseInVenditaLunigianaTipologiaRoute
   '/case-in-vendita/$comune': typeof CaseInVenditaComuneRoute
   '/immobili/$id': typeof ImmobiliIdRoute
+  '/case-in-vendita-lunigiana': typeof CaseInVenditaLunigianaIndexRoute
   '/case-in-vendita': typeof CaseInVenditaIndexRoute
   '/immobili': typeof ImmobiliIndexRoute
   '/admin/dati-live': typeof AdminAdminDatiLiveRoute
@@ -237,6 +246,7 @@ export interface FileRoutesById {
   '/case-in-vendita-lunigiana/$tipologia': typeof CaseInVenditaLunigianaTipologiaRoute
   '/case-in-vendita/$comune': typeof CaseInVenditaComuneRoute
   '/immobili/$id': typeof ImmobiliIdRoute
+  '/case-in-vendita-lunigiana/': typeof CaseInVenditaLunigianaIndexRoute
   '/case-in-vendita/': typeof CaseInVenditaIndexRoute
   '/immobili/': typeof ImmobiliIndexRoute
   '/_admin/admin/dati-live': typeof AdminAdminDatiLiveRoute
@@ -266,6 +276,7 @@ export interface FileRouteTypes {
     | '/case-in-vendita-lunigiana/$tipologia'
     | '/case-in-vendita/$comune'
     | '/immobili/$id'
+    | '/case-in-vendita-lunigiana/'
     | '/case-in-vendita/'
     | '/immobili/'
     | '/admin/dati-live'
@@ -291,6 +302,7 @@ export interface FileRouteTypes {
     | '/case-in-vendita-lunigiana/$tipologia'
     | '/case-in-vendita/$comune'
     | '/immobili/$id'
+    | '/case-in-vendita-lunigiana'
     | '/case-in-vendita'
     | '/immobili'
     | '/admin/dati-live'
@@ -319,6 +331,7 @@ export interface FileRouteTypes {
     | '/case-in-vendita-lunigiana/$tipologia'
     | '/case-in-vendita/$comune'
     | '/immobili/$id'
+    | '/case-in-vendita-lunigiana/'
     | '/case-in-vendita/'
     | '/immobili/'
     | '/_admin/admin/dati-live'
@@ -346,6 +359,7 @@ export interface RootRouteChildren {
   AdminLoginRoute: typeof AdminLoginRoute
   CaseInVenditaLunigianaTipologiaRoute: typeof CaseInVenditaLunigianaTipologiaRoute
   CaseInVenditaComuneRoute: typeof CaseInVenditaComuneRoute
+  CaseInVenditaLunigianaIndexRoute: typeof CaseInVenditaLunigianaIndexRoute
   CaseInVenditaIndexRoute: typeof CaseInVenditaIndexRoute
   ApiPublicIdealistaFeedDotxmlRoute: typeof ApiPublicIdealistaFeedDotxmlRoute
 }
@@ -420,6 +434,13 @@ declare module '@tanstack/react-router' {
       path: '/case-in-vendita'
       fullPath: '/case-in-vendita/'
       preLoaderRoute: typeof CaseInVenditaIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/case-in-vendita-lunigiana/': {
+      id: '/case-in-vendita-lunigiana/'
+      path: '/case-in-vendita-lunigiana'
+      fullPath: '/case-in-vendita-lunigiana/'
+      preLoaderRoute: typeof CaseInVenditaLunigianaIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/immobili/$id': {
@@ -612,6 +633,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminLoginRoute: AdminLoginRoute,
   CaseInVenditaLunigianaTipologiaRoute: CaseInVenditaLunigianaTipologiaRoute,
   CaseInVenditaComuneRoute: CaseInVenditaComuneRoute,
+  CaseInVenditaLunigianaIndexRoute: CaseInVenditaLunigianaIndexRoute,
   CaseInVenditaIndexRoute: CaseInVenditaIndexRoute,
   ApiPublicIdealistaFeedDotxmlRoute: ApiPublicIdealistaFeedDotxmlRoute,
 }
