@@ -579,11 +579,11 @@ export const setPropertyImagePublished = createServerFn({ method: "POST" })
  */
 export const setRenderPublishMode = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: { imageId: string; mode: "main" | "emotional" | "none" }) =>
+  .inputValidator((data: { imageId: string; mode: "main" | "emotional" | "vision" | "none" }) =>
     z
       .object({
         imageId: z.string().uuid(),
-        mode: z.enum(["main", "emotional", "none"]),
+        mode: z.enum(["main", "emotional", "vision", "none"]),
       })
       .parse(data),
   )
@@ -607,7 +607,7 @@ export const setRenderPublishMode = createServerFn({ method: "POST" })
       .maybeSingle();
     if (imgErr || !img) throw new Error("Immagine non trovata");
 
-    if ((data.mode === "main" || data.mode === "emotional") && !img.rendered_storage_path) {
+    if ((data.mode === "main" || data.mode === "emotional" || data.mode === "vision") && !img.rendered_storage_path) {
       throw new Error("Nessun rendering generato per questa foto");
     }
 
