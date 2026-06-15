@@ -21,6 +21,7 @@ import {
 import { useT } from "@/lib/i18n/LanguageContext";
 import { useLocalizedHead } from "@/hooks/use-localized-head";
 import { trackClick } from "@/lib/analytics";
+import { LeadMagnetBlock } from "@/components/lead-magnet-block";
 
 const WA_URL =
   "https://wa.me/393207019985?text=Ciao%20Elena,%20vorrei%20ricevere%20un%20primo%20orientamento%20sui%20vostri%20servizi.";
