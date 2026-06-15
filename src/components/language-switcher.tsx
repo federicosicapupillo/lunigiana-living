@@ -1,5 +1,6 @@
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import type { Language } from "@/lib/i18n/translations";
+import { trackClick } from "@/lib/analytics";
 
 export function LanguageSwitcher({ className = "" }: { className?: string }) {
   const { language, setLanguage } = useLanguage();
@@ -10,7 +11,15 @@ export function LanguageSwitcher({ className = "" }: { className?: string }) {
       <button
         key={lang}
         type="button"
-        onClick={() => setLanguage(lang)}
+        onClick={() => {
+          if (lang !== language) {
+            trackClick("language_switch", {
+              from_language: language,
+              to_language: lang,
+            });
+          }
+          setLanguage(lang);
+        }}
         aria-pressed={active}
         aria-label={`Switch language to ${label}`}
         className={`px-1.5 text-[0.72rem] font-medium uppercase tracking-[0.18em] transition-colors ${

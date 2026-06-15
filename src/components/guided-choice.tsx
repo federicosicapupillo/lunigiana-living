@@ -1,11 +1,14 @@
 import { Link } from "@tanstack/react-router";
 import { useT } from "@/lib/i18n/LanguageContext";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
+import { trackClick } from "@/lib/analytics";
 import { Search, KeyRound, Home as HomeIcon, Globe, ArrowRight } from "lucide-react";
 
 const WA_URL = "https://wa.me/393207019985?text=Ciao%20Elena,%20vorrei%20ricevere%20informazioni%20sulla%20Lunigiana%20e%20gli%20immobili.";
 
 export function GuidedChoiceSection() {
   const t = useT();
+  const { language } = useLanguage();
 
   const cards = [
     {
@@ -74,6 +77,9 @@ export function GuidedChoiceSection() {
                 <Cta
                   {...ctaProps}
                   data-track={c.track}
+                  onClick={() =>
+                    trackClick(c.track, { language, destination: c.href })
+                  }
                   className="btn-ghost mt-5 w-full text-center"
                 >
                   {c.cta} <ArrowRight size={14} />

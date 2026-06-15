@@ -260,6 +260,25 @@ export function PropertySearchBar({
     setError(err);
     if (err) return;
     const search = buildSearch(s);
+    // Lightweight, privacy-safe filter event (no free text beyond categories).
+    try {
+      // Lazy import keeps this file's deps unchanged on bundlers that tree-shake.
+      void import("@/lib/analytics").then(({ trackEvent }) =>
+        trackEvent("property_filter_apply", {
+          contract: s.contract || undefined,
+          type: s.type || undefined,
+          comune: s.comune || undefined,
+          price_min: s.price_min || undefined,
+          price_max: s.price_max || undefined,
+          size: s.size || undefined,
+          rooms: s.rooms || undefined,
+          features: s.features.length ? s.features.join(",") : undefined,
+          sort: s.sort || undefined,
+        }),
+      );
+    } catch {
+      /* never break submit */
+    }
     if (navigateOnSubmit) navigate({ to: "/immobili", search });
     onSubmit?.(s);
     setMobileOpen(false);

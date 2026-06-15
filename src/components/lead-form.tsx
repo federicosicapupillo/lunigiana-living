@@ -4,6 +4,7 @@ import { ArrowRight, Loader2, CheckCircle2, MessageCircle } from "lucide-react";
 import { useT, useLanguage } from "@/lib/i18n/LanguageContext";
 import { useServerFn } from "@tanstack/react-start";
 import { sendLeadNotification } from "@/lib/lead-notify.functions";
+import { trackEvent } from "@/lib/analytics";
 
 const PROPERTY_TYPES_IT = [
   "Appartamento","Casa indipendente","Villetta","Rustico / casale","Villa","Terreno","Immobile da ristrutturare","Non ho ancora deciso",
@@ -79,6 +80,13 @@ export function LeadForm() {
     if (error) {
       setStatus("error");
       setErrorMsg(t("form.err.generic"));
+      trackEvent("lead_form_submit_error", {
+        source: "lead_form",
+        page_path: payload.source_page,
+        budget_range: payload.budget_range ?? undefined,
+        property_type: payload.property_type ?? undefined,
+        language,
+      });
       return;
     }
     try {
@@ -99,6 +107,13 @@ export function LeadForm() {
     }
     setStatus("ok");
     form.reset();
+    trackEvent("lead_form_submit_success", {
+      source: "lead_form",
+      page_path: payload.source_page,
+      budget_range: payload.budget_range ?? undefined,
+      property_type: payload.property_type ?? undefined,
+      language,
+    });
   }
 
   if (status === "ok") {

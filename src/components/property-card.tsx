@@ -12,6 +12,7 @@ import {
 import { COMMERCIAL_HIGHLIGHT_EN } from "@/lib/admin/property-constants";
 import { img, imgSrcSet, type VariantsMap } from "@/lib/image-url";
 import { getPropertyDisplayTitle } from "@/lib/property-display-title";
+import { trackClick } from "@/lib/analytics";
 
 type PropertyCardData = {
   id: number | string;
@@ -75,6 +76,14 @@ export function PropertyCard({ p }: { p: PropertyCardData }) {
         to="/immobili/$id"
         params={{ id: String(p.id) }}
         aria-label={`${t("cta.openListing")} ${p.reference} — ${displayTitle} (${p.location})`}
+        data-track="property_card_click"
+        onClick={() =>
+          trackClick("property_card_click", {
+            property_id: String(p.id),
+            property_code: p.reference,
+            language,
+          })
+        }
         className="block focus-visible:outline-none"
       >
         <div className="relative aspect-[4/3] overflow-hidden bg-muted">
@@ -159,6 +168,15 @@ export function PropertyCard({ p }: { p: PropertyCardData }) {
           href={waHref}
           target="_blank"
           rel="noopener noreferrer"
+          data-track="whatsapp_click"
+          onClick={() =>
+            trackClick("whatsapp_click", {
+              source: "property_card",
+              property_id: String(p.id),
+              property_code: p.reference,
+              language,
+            })
+          }
           className="mt-2 inline-flex items-center gap-2 rounded-full border border-[#25D366]/30 bg-[#25D366]/10 px-3.5 py-1.5 text-[0.7rem] uppercase tracking-[0.18em] text-[#1f8a4c] transition hover:border-[#25D366]/60 hover:bg-[#25D366]/15"
         >
           <span className="inline-block h-1.5 w-1.5 rounded-full bg-[#25D366]" />
