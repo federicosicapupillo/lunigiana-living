@@ -2,6 +2,9 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import elenaAsset from "@/assets/elena-furia.png.asset.json";
 import { useT } from "@/lib/i18n/LanguageContext";
 import { useLocalizedHead } from "@/hooks/use-localized-head";
+import { trackClick } from "@/lib/analytics";
+import { GOOGLE_REVIEWS_URL } from "@/components/reviews-trust-block";
+import { Star, ArrowRight } from "lucide-react";
 
 export const Route = createFileRoute("/chi-siamo")({
   head: () => ({
@@ -112,6 +115,27 @@ function ChiSiamoPage() {
           </p>
           <footer className="mt-6 eyebrow">{t("chi.quoteAuthor")}</footer>
         </blockquote>
+
+        <div className="mx-auto mt-14 flex max-w-2xl flex-col items-center gap-3 rounded-2xl border border-warm-border/70 bg-[var(--warm-ivory)] px-6 py-8 text-center">
+          <div className="flex items-center gap-1 text-[var(--terracotta)]" aria-hidden="true">
+            {[0, 1, 2, 3, 4].map((i) => (
+              <Star key={i} size={16} strokeWidth={1.5} />
+            ))}
+          </div>
+          <p className="text-[0.92rem] leading-relaxed text-foreground/75">
+            {t("trust.google.body")}
+          </p>
+          <a
+            href={GOOGLE_REVIEWS_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            data-track="reviews_google_click"
+            onClick={() => trackClick("reviews_google_click", { source: "chi-siamo", variant: "inline" })}
+            className="mt-2 inline-flex items-center gap-2 rounded-sm border border-ink/20 px-6 py-3 text-xs uppercase tracking-[0.2em] text-ink transition hover:border-[var(--terracotta)] hover:text-[var(--terracotta)]"
+          >
+            {t("trust.google.cta")} <ArrowRight size={14} />
+          </a>
+        </div>
 
         <div className="mt-16 border-t border-border pt-12 text-center">
           <h2 className="font-serif text-3xl text-ink md:text-5xl">
