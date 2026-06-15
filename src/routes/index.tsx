@@ -272,6 +272,27 @@ function Index() {
       {/* GUIDED CHOICE */}
       <GuidedChoiceSection />
 
+      {/* GUIDED SEARCH — discreet CTA to /trova-casa-lunigiana */}
+      <section className="section-cream py-10 sm:py-14">
+        <div className="container-editorial">
+          <div className="mx-auto flex max-w-3xl flex-col items-start gap-4 rounded-sm border border-warm-border/70 bg-warm-ivory/70 p-6 text-left sm:flex-row sm:items-center sm:justify-between sm:p-7">
+            <div>
+              <span className="eyebrow text-[0.65rem]">{t("guided.home.eyebrow")}</span>
+              <h3 className="mt-2 font-serif text-xl text-ink sm:text-2xl">{t("guided.home.title")}</h3>
+              <p className="mt-2 max-w-xl text-sm leading-relaxed text-foreground/75">
+                {t("guided.home.body")}
+              </p>
+            </div>
+            <Link
+              to="/trova-casa-lunigiana"
+              className="inline-flex shrink-0 items-center gap-2 rounded-sm bg-terracotta px-5 py-3 text-xs uppercase tracking-[0.22em] text-cream transition hover:bg-terracotta/90"
+            >
+              {t("guided.cta.start")} <ArrowRight size={14} />
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* LEAD MAGNET — Guida Lunigiana */}
       <section className="section-ivory py-14 sm:py-20">
         <div className="container-editorial">
