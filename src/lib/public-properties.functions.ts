@@ -396,7 +396,10 @@ function adapt(
     tag: buildTag(p),
     isRent: p.contract_type === "affitto",
     galleryPairs,
-    renderings,
+    renderings: [
+      ...renderings,
+      ...visionRenderings.filter((u) => !renderings.includes(u)),
+    ],
     galleryRenderingFlags,
     visionRenderings,
     imageVariants,
