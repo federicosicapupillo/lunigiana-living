@@ -74,6 +74,12 @@ export type PublicProperty = {
   /** Map of gallery URL -> true when that gallery slot IS a rendering itself. */
   galleryRenderingFlags: Record<string, true>;
   /**
+   * Renderings esplicitamente pubblicati nella sezione dedicata
+   * "Una possibile visione della casa" (publish mode = 'vision').
+   * NON sostituiscono le foto reali e NON entrano nella gallery principale.
+   */
+  visionRenderings: string[];
+  /**
    * Variant URL map keyed by the original signed URL that appears in
    * `image` / `gallery` / `renderings`. When a variant is missing
    * (external URL, transform failed, publisher-supplied URL, etc.)
@@ -250,11 +256,17 @@ function adapt(
   };
   const galleryPairs: Record<string, string> = {};
   const renderings: string[] = [];
+  const visionRenderings: string[] = [];
   const galleryRenderingFlags: Record<string, true> = {};
   const gallery = sortedImages
     .map((i) => {
       const before = resolveBefore(i);
       const render = resolveRender(i);
+      // Vision mode: rendering shown in a dedicated section, NOT in the gallery.
+      if (i.render_publish_mode === "vision" && render) {
+        if (!visionRenderings.includes(render)) visionRenderings.push(render);
+        return before;
+      }
       // Emotional mode: keep original in gallery, attach render as Before/After overlay.
       if (i.render_publish_mode === "emotional" && render && before) {
         galleryPairs[before] = render;
@@ -386,6 +398,7 @@ function adapt(
     galleryPairs,
     renderings,
     galleryRenderingFlags,
+    visionRenderings,
     imageVariants,
     createdAt: p.created_at,
   };
