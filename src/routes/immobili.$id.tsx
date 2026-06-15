@@ -852,6 +852,15 @@ function PropertyDetail() {
               href={waHref}
               target="_blank"
               rel="noopener noreferrer"
+              data-track="property_detail_whatsapp_click"
+              onClick={() =>
+                trackClick("property_detail_whatsapp_click", {
+                  source: "contact_card",
+                  property_id: String(p.id),
+                  property_code: p.reference,
+                  language,
+                })
+              }
               className="mt-6 flex w-full items-center justify-center gap-2 rounded-sm border border-ink bg-ink px-6 py-4 text-xs uppercase tracking-[0.22em] text-cream transition hover:bg-primary hover:border-primary"
             >
               <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#25D366]" aria-hidden>
@@ -870,13 +879,31 @@ function PropertyDetail() {
             href={waHref}
             target="_blank"
             rel="noopener noreferrer"
+            data-track="property_detail_mobile_sticky_click"
+            onClick={() =>
+              trackClick("property_detail_mobile_sticky_click", {
+                source: "mobile_sticky_wa",
+                property_id: String(p.id),
+                property_code: p.reference,
+                language,
+              })
+            }
             className="flex items-center justify-center gap-2 rounded-sm border border-[#25D366]/40 bg-[#25D366]/10 px-4 py-3 text-xs font-medium uppercase tracking-[0.18em] text-[#1f8a4c]"
           >
             <MessageCircle size={14} /> {t("detail.mobileWa")}
           </a>
           <button
             type="button"
-            onClick={scrollToContact}
+            onClick={() => {
+              trackClick("property_detail_mobile_sticky_click", {
+                source: "mobile_sticky_info",
+                property_id: String(p.id),
+                property_code: p.reference,
+                language,
+              });
+              scrollToContact();
+            }}
+            data-track="property_detail_mobile_sticky_click"
             className="flex items-center justify-center gap-2 rounded-sm bg-primary px-4 py-3 text-xs font-medium uppercase tracking-[0.18em] text-primary-foreground"
           >
             <Mail size={14} /> {t("detail.mobileInfo")}
