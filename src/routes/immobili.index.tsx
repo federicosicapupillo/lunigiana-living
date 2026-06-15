@@ -11,7 +11,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useLanguage, useT } from "@/lib/i18n/LanguageContext";
 import { useLocalizedHead } from "@/hooks/use-localized-head";
 import { localizePropertyDynamic } from "@/lib/i18n/property-localize";
-import { TIPOLOGIE_SEO } from "@/lib/seo-tipologie";
+import { TIPOLOGIE_SEO, localizeTipologiaSeo } from "@/lib/seo-tipologie";
 
 const searchSchema = z.object({
   contract: fallback(z.string(), "").default(""),
@@ -223,29 +223,32 @@ function ImmobiliPage() {
         <div className="container-editorial">
           <div className="flex flex-wrap items-end justify-between gap-3">
             <div>
-              <span className="eyebrow">Cerca per tipologia</span>
+              <span className="eyebrow">{t("immobili.byType.eyebrow")}</span>
               <h2 className="mt-2 font-serif text-2xl text-ink md:text-3xl">
-                Esplora gli immobili per tipo di casa
+                {t("immobili.byType.title")}
               </h2>
             </div>
             <Link
               to="/case-in-vendita-lunigiana"
               className="text-xs uppercase tracking-[0.22em] text-[var(--terracotta)] hover:underline"
             >
-              Vedi tutte le tipologie
+              {t("immobili.byType.viewAll")}
             </Link>
           </div>
           <div className="mt-8 flex flex-wrap gap-3">
-            {TIPOLOGIE_SEO.map((t) => (
-              <Link
-                key={t.slug}
-                to="/case-in-vendita-lunigiana/$tipologia"
-                params={{ tipologia: t.slug }}
-                className="rounded-sm border border-border bg-background px-5 py-3 text-xs uppercase tracking-[0.18em] text-ink transition hover:border-[var(--terracotta)] hover:text-[var(--terracotta)]"
-              >
-                {t.fullName}
-              </Link>
-            ))}
+            {TIPOLOGIE_SEO.map((tp) => {
+              const L = localizeTipologiaSeo(tp, language);
+              return (
+                <Link
+                  key={tp.slug}
+                  to="/case-in-vendita-lunigiana/$tipologia"
+                  params={{ tipologia: tp.slug }}
+                  className="rounded-sm border border-border bg-background px-5 py-3 text-xs uppercase tracking-[0.18em] text-ink transition hover:border-[var(--terracotta)] hover:text-[var(--terracotta)]"
+                >
+                  {L.fullName}
+                </Link>
+              );
+            })}
           </div>
         </div>
       </section>
