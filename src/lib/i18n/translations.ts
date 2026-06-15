@@ -1227,6 +1227,29 @@ const en: Dict = {
   "terr.linkBlock.byType": "Search by type",
   "terr.linkBlock.byComune": "Search by village",
   "footer.byType": "Search by property type",
+
+  // Lead magnet — Lunigiana guide
+  "magnet.eyebrow": "Free guide",
+  "magnet.title": "Practical guide to buying a home in Lunigiana",
+  "magnet.subtitle": "Areas, prices, common mistakes and what to check before falling in love with a property.",
+  "magnet.body": "A practical guide for anyone considering a home in Lunigiana and looking for clear orientation on villages, budgets, services, distances and key aspects to check before visiting a property.",
+  "magnet.b1": "The most suitable areas based on how you want to live",
+  "magnet.b2": "What to check before you buy",
+  "magnet.b3": "Common mistakes to avoid",
+  "magnet.b4": "Differences between villages, countryside and historic centres",
+  "magnet.b5": "When a property is truly suited as a second home",
+  "magnet.b6": "How to navigate the search if you live far away or abroad",
+  "magnet.cta": "Request the guide",
+  "magnet.ctaLong": "Request the free guide",
+  "magnet.f.name": "Full name *",
+  "magnet.f.email": "Email *",
+  "magnet.f.phone": "Phone / WhatsApp (optional)",
+  "magnet.f.phonePh": "Only if you'd prefer a call back",
+  "magnet.f.interest": "Main interest *",
+  "magnet.privacy": "I consent to the processing of my personal data to receive the guide and/or be contacted by Furia Immobiliare.",
+  "magnet.err.interest": "Please select your main interest.",
+  "magnet.thanks.title": "Thank you, we've received your request.",
+  "magnet.thanks.body": "Elena will send you the guide or get back to you as soon as possible.",
 };
 
 const DICTS: Record<Language, Dict> = { it, en };
