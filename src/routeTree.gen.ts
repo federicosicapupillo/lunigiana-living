@@ -18,6 +18,7 @@ import { Route as ChiSiamoRouteImport } from './routes/chi-siamo'
 import { Route as AdminRouteImport } from './routes/_admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ImmobiliIndexRouteImport } from './routes/immobili.index'
+import { Route as CaseInVenditaIndexRouteImport } from './routes/case-in-vendita.index'
 import { Route as ImmobiliIdRouteImport } from './routes/immobili.$id'
 import { Route as CaseInVenditaComuneRouteImport } from './routes/case-in-vendita.$comune'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
@@ -77,6 +78,11 @@ const ImmobiliIndexRoute = ImmobiliIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => ImmobiliRoute,
+} as any)
+const CaseInVenditaIndexRoute = CaseInVenditaIndexRouteImport.update({
+  id: '/case-in-vendita/',
+  path: '/case-in-vendita/',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ImmobiliIdRoute = ImmobiliIdRouteImport.update({
   id: '/$id',
@@ -169,6 +175,7 @@ export interface FileRoutesByFullPath {
   '/admin/login': typeof AdminLoginRoute
   '/case-in-vendita/$comune': typeof CaseInVenditaComuneRoute
   '/immobili/$id': typeof ImmobiliIdRoute
+  '/case-in-vendita/': typeof CaseInVenditaIndexRoute
   '/immobili/': typeof ImmobiliIndexRoute
   '/admin/dati-live': typeof AdminAdminDatiLiveRoute
   '/admin/idealista': typeof AdminAdminIdealistaRoute
@@ -192,6 +199,7 @@ export interface FileRoutesByTo {
   '/admin/login': typeof AdminLoginRoute
   '/case-in-vendita/$comune': typeof CaseInVenditaComuneRoute
   '/immobili/$id': typeof ImmobiliIdRoute
+  '/case-in-vendita': typeof CaseInVenditaIndexRoute
   '/immobili': typeof ImmobiliIndexRoute
   '/admin/dati-live': typeof AdminAdminDatiLiveRoute
   '/admin/idealista': typeof AdminAdminIdealistaRoute
@@ -219,6 +227,7 @@ export interface FileRoutesById {
   '/admin/login': typeof AdminLoginRoute
   '/case-in-vendita/$comune': typeof CaseInVenditaComuneRoute
   '/immobili/$id': typeof ImmobiliIdRoute
+  '/case-in-vendita/': typeof CaseInVenditaIndexRoute
   '/immobili/': typeof ImmobiliIndexRoute
   '/_admin/admin/dati-live': typeof AdminAdminDatiLiveRoute
   '/_admin/admin/idealista': typeof AdminAdminIdealistaRoute
@@ -246,6 +255,7 @@ export interface FileRouteTypes {
     | '/admin/login'
     | '/case-in-vendita/$comune'
     | '/immobili/$id'
+    | '/case-in-vendita/'
     | '/immobili/'
     | '/admin/dati-live'
     | '/admin/idealista'
@@ -269,6 +279,7 @@ export interface FileRouteTypes {
     | '/admin/login'
     | '/case-in-vendita/$comune'
     | '/immobili/$id'
+    | '/case-in-vendita'
     | '/immobili'
     | '/admin/dati-live'
     | '/admin/idealista'
@@ -295,6 +306,7 @@ export interface FileRouteTypes {
     | '/admin/login'
     | '/case-in-vendita/$comune'
     | '/immobili/$id'
+    | '/case-in-vendita/'
     | '/immobili/'
     | '/_admin/admin/dati-live'
     | '/_admin/admin/idealista'
@@ -320,6 +332,7 @@ export interface RootRouteChildren {
   TerritoriRoute: typeof TerritoriRoute
   AdminLoginRoute: typeof AdminLoginRoute
   CaseInVenditaComuneRoute: typeof CaseInVenditaComuneRoute
+  CaseInVenditaIndexRoute: typeof CaseInVenditaIndexRoute
   ApiPublicIdealistaFeedDotxmlRoute: typeof ApiPublicIdealistaFeedDotxmlRoute
 }
 
@@ -387,6 +400,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/immobili/'
       preLoaderRoute: typeof ImmobiliIndexRouteImport
       parentRoute: typeof ImmobiliRoute
+    }
+    '/case-in-vendita/': {
+      id: '/case-in-vendita/'
+      path: '/case-in-vendita'
+      fullPath: '/case-in-vendita/'
+      preLoaderRoute: typeof CaseInVenditaIndexRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/immobili/$id': {
       id: '/immobili/$id'
@@ -570,6 +590,7 @@ const rootRouteChildren: RootRouteChildren = {
   TerritoriRoute: TerritoriRoute,
   AdminLoginRoute: AdminLoginRoute,
   CaseInVenditaComuneRoute: CaseInVenditaComuneRoute,
+  CaseInVenditaIndexRoute: CaseInVenditaIndexRoute,
   ApiPublicIdealistaFeedDotxmlRoute: ApiPublicIdealistaFeedDotxmlRoute,
 }
 export const routeTree = rootRouteImport
