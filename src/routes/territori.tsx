@@ -169,6 +169,13 @@ function TerritoriPage() {
         </div>
       </section>
 
+      {/* LEAD MAGNET — Guida Lunigiana */}
+      <section className="bg-warm-cream py-16 md:py-20">
+        <div className="container-editorial">
+          <LeadMagnetBlock source="territori" />
+        </div>
+      </section>
+
       <section className="bg-ink py-20 text-cream md:py-24">
         <div className="container-editorial max-w-3xl text-center">
           <span className="eyebrow text-cream/70">{t("terr.cta.eyebrow")}</span>
