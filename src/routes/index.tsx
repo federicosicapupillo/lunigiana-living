@@ -271,6 +271,13 @@ function Index() {
       {/* GUIDED CHOICE */}
       <GuidedChoiceSection />
 
+      {/* LEAD MAGNET — Guida Lunigiana */}
+      <section className="section-ivory py-14 sm:py-20">
+        <div className="container-editorial">
+          <LeadMagnetBlock source="home" />
+        </div>
+      </section>
+
       {/* FEATURED PROPERTIES */}
       <section className="section-sand py-16 sm:py-20 md:py-32">
         <div className="container-editorial">
