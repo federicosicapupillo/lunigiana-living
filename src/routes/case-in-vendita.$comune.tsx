@@ -3,9 +3,10 @@ import { ArrowRight, CheckCircle2, ChevronRight, MapPin, MessageCircle } from "l
 import { PropertyCard } from "@/components/property-card";
 import { whatsappUrl } from "@/components/whatsapp-float";
 import { listPublishedPropertiesSummary, type PublicProperty } from "@/lib/public-properties.functions";
-import { COMUNE_SEO, getComuneSeo, municipalityMatches } from "@/lib/seo-comuni";
+import { COMUNE_SEO, getComuneSeo, localizeComuneSeo, municipalityMatches } from "@/lib/seo-comuni";
 import { trackClick } from "@/lib/analytics";
-import { useLanguage } from "@/lib/i18n/LanguageContext";
+import { useLanguage, useT } from "@/lib/i18n/LanguageContext";
+import { useDocHead } from "@/hooks/use-localized-head";
 import { localizePropertyDynamic } from "@/lib/i18n/property-localize";
 import { siteUrl } from "@/lib/site-url";
 
@@ -93,9 +94,20 @@ function ComuneSeoPage() {
     properties: PublicProperty[];
   };
   const { language } = useLanguage();
+  const t = useT();
+  const L = localizeComuneSeo(comune, language);
+  useDocHead(L.metaTitle, L.metaDescription);
   const related = COMUNE_SEO.filter((c) => c.slug !== comune.slug).slice(0, 4);
-  const waMsg = `Ciao Elena, sto cercando casa a ${comune.fullName}. Mi aiuti?`;
+  const waMsg =
+    language === "en"
+      ? `Hi Elena, I'm looking for a home in ${comune.fullName}. Could you help me?`
+      : `Ciao Elena, sto cercando casa a ${comune.fullName}. Mi aiuti?`;
   const waHref = whatsappUrl(waMsg);
+  const fmt = (key: string, vars: Record<string, string | number>): string => {
+    let out = t(key);
+    for (const [k, v] of Object.entries(vars)) out = out.replace(`{${k}}`, String(v));
+    return out;
+  };
 
   return (
     <>
@@ -106,10 +118,10 @@ function ComuneSeoPage() {
             aria-label="Breadcrumb"
             className="flex flex-wrap items-center gap-1 text-xs uppercase tracking-[0.18em] text-[var(--ink-soft)]"
           >
-            <Link to="/" className="hover:text-[var(--terracotta)]">Home</Link>
+            <Link to="/" className="hover:text-[var(--terracotta)]">{t("seoPage.crumb.home")}</Link>
             <ChevronRight size={12} className="opacity-50" />
             <Link to="/case-in-vendita" className="hover:text-[var(--terracotta)]">
-              Case in vendita
+              {t("seoPage.crumb.comuniHub")}
             </Link>
             <ChevronRight size={12} className="opacity-50" />
             <span className="text-ink">{comune.fullName}</span>
@@ -117,13 +129,13 @@ function ComuneSeoPage() {
 
           <div className="mt-8 flex items-center gap-2 text-[var(--terracotta)]">
             <MapPin size={18} strokeWidth={1.5} />
-            <span className="text-xs uppercase tracking-[0.24em]">Lunigiana</span>
+            <span className="text-xs uppercase tracking-[0.24em]">{t("seoPage.areaLabel")}</span>
           </div>
           <h1 className="mt-3 max-w-3xl font-serif text-4xl leading-tight text-ink md:text-6xl">
-            Case in vendita a {comune.fullName}
+            {fmt("seoComune.h1", { name: comune.fullName })}
           </h1>
           <p className="mt-6 max-w-2xl text-base leading-relaxed text-[var(--ink-soft)]">
-            {comune.subtitle}
+            {L.subtitle}
           </p>
         </div>
       </section>
@@ -133,16 +145,16 @@ function ComuneSeoPage() {
         <div className="container-editorial grid gap-10 md:grid-cols-12">
           <div className="md:col-span-5">
             <span className="text-xs uppercase tracking-[0.24em] text-[var(--terracotta)]">
-              Il territorio
+              {t("seoComune.section.eyebrow")}
             </span>
             <h2 className="mt-3 font-serif text-3xl text-ink md:text-4xl">
-              {comune.fullName}, in Lunigiana
+              {fmt("seoComune.section.title", { name: comune.fullName })}
             </h2>
             <div className="mt-6 h-px w-12 bg-[var(--terracotta)]/60" />
           </div>
           <div className="space-y-5 text-[1.02rem] leading-[1.8] text-[var(--ink-soft)] md:col-span-6 md:col-start-7">
-            <p>{comune.paragraphs[0]}</p>
-            <p>{comune.paragraphs[1]}</p>
+            <p>{L.paragraphs[0]}</p>
+            <p>{L.paragraphs[1]}</p>
           </div>
         </div>
       </section>
@@ -153,27 +165,26 @@ function ComuneSeoPage() {
           <div className="flex flex-wrap items-end justify-between gap-4 border-b border-[var(--terracotta)]/20 pb-5">
             <div>
               <span className="text-xs uppercase tracking-[0.24em] text-[var(--terracotta)]">
-                Immobili disponibili
+                {t("seoPage.availableProperties")}
               </span>
               <h2 className="mt-2 font-serif text-2xl text-ink md:text-3xl">
                 {properties.length > 0
-                  ? `${properties.length} immobile${properties.length === 1 ? "" : "i"} a ${comune.fullName}`
-                  : `Immobili a ${comune.fullName}`}
+                  ? fmt(properties.length === 1 ? "seoComune.props.count.one" : "seoComune.props.count.many", { n: properties.length, name: comune.fullName })
+                  : fmt("seoComune.props.fallback", { name: comune.fullName })}
               </h2>
             </div>
             <Link
               to="/immobili"
               className="text-xs uppercase tracking-[0.22em] text-[var(--terracotta)] hover:underline"
             >
-              Tutti gli immobili
+              {t("seoPage.allProperties")}
             </Link>
           </div>
 
           {properties.length === 0 ? (
             <div className="mt-12 rounded-2xl border border-[var(--terracotta)]/15 bg-[var(--warm-ivory)] px-8 py-14 text-center">
               <p className="mx-auto max-w-xl font-serif text-2xl leading-snug text-ink">
-                Al momento non ci sono immobili pubblicati in questa zona,
-                ma possiamo aiutarti a trovare una soluzione adatta.
+                {t("seoPage.empty.title")}
               </p>
               <Link
                 to="/contatti"
@@ -186,7 +197,7 @@ function ComuneSeoPage() {
                 }
                 className="mt-8 inline-block rounded-sm bg-ink px-8 py-4 text-xs uppercase tracking-[0.22em] text-cream transition hover:bg-[var(--terracotta)]"
               >
-                Raccontaci cosa cerchi
+                {t("seoPage.tellMeWhatYouSeek")}
               </Link>
             </div>
           ) : (
@@ -216,14 +227,14 @@ function ComuneSeoPage() {
         <div className="container-editorial">
           <div className="mx-auto max-w-2xl text-center">
             <span className="text-xs uppercase tracking-[0.24em] text-[var(--terracotta)]">
-              Per chi è adatto
+              {t("seoPage.audienceEyebrow")}
             </span>
             <h2 className="mt-3 font-serif text-3xl text-ink md:text-4xl">
-              {comune.fullName} è la scelta giusta se…
+              {fmt("seoComune.audience.title", { name: comune.fullName })}
             </h2>
           </div>
           <ul className="mx-auto mt-10 grid max-w-4xl grid-cols-1 gap-3 sm:grid-cols-2">
-            {comune.audience.map((point) => (
+            {L.audience.map((point) => (
               <li
                 key={point}
                 className="flex items-start gap-3 rounded-xl border border-[var(--terracotta)]/15 bg-[var(--cream)] p-5"
@@ -246,11 +257,10 @@ function ComuneSeoPage() {
       <section className="container-editorial py-20">
         <div className="rounded-sm bg-ink px-6 py-14 text-center text-cream md:px-16 md:py-20">
           <h2 className="mx-auto max-w-2xl font-serif text-3xl md:text-5xl">
-            Vuoi trovare casa a {comune.fullName}?
+            {fmt("seoComune.cta.title", { name: comune.fullName })}
           </h2>
           <p className="mx-auto mt-5 max-w-xl text-[0.95rem] leading-relaxed text-cream/80">
-            Scrivi a Elena: ti aiuterà a capire quali immobili sono davvero coerenti
-            con il tuo progetto.
+            {t("seoComune.cta.body")}
           </p>
           <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
             <a
@@ -267,13 +277,13 @@ function ComuneSeoPage() {
               className="inline-flex items-center gap-2 rounded-sm bg-[var(--terracotta)] px-8 py-4 text-xs uppercase tracking-[0.22em] text-cream transition hover:opacity-90"
             >
               <MessageCircle size={16} strokeWidth={1.8} />
-              Scrivi a Elena
+              {t("seoPage.writeToElena")}
             </a>
             <Link
               to="/immobili"
               className="inline-flex items-center gap-2 rounded-sm bg-cream px-8 py-4 text-xs uppercase tracking-[0.22em] text-ink transition hover:bg-[var(--warm-ivory)]"
             >
-              Vedi tutti gli immobili
+              {t("seoPage.viewAllProperties")}
               <ArrowRight size={14} />
             </Link>
           </div>
@@ -285,22 +295,23 @@ function ComuneSeoPage() {
         <div className="container-editorial">
           <div className="mx-auto max-w-2xl text-center">
             <span className="text-xs uppercase tracking-[0.24em] text-[var(--terracotta)]">
-              Altri comuni della Lunigiana
+              {t("seoPage.related.eyebrow")}
             </span>
             <h2 className="mt-3 font-serif text-3xl text-ink md:text-4xl">
-              Esplora le altre zone
+              {t("seoPage.related.title")}
             </h2>
             <p className="mt-4 text-[0.95rem] leading-relaxed text-[var(--ink-soft)]">
-              Ogni borgo ha la sua atmosfera. Vedi cosa offrono le altre aree o
-              scopri la Lunigiana nella nostra{" "}
+              {t("seoPage.related.body")}{" "}
               <Link to="/territori" className="underline hover:text-[var(--terracotta)]">
-                guida ai territori
+                {t("seoPage.related.guideLink")}
               </Link>
               .
             </p>
           </div>
           <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {related.map((c) => (
+            {related.map((c) => {
+              const cL = localizeComuneSeo(c, language);
+              return (
               <Link
                 key={c.slug}
                 to="/case-in-vendita/$comune"
@@ -316,17 +327,18 @@ function ComuneSeoPage() {
               >
                 <div className="flex items-center gap-2 text-[var(--terracotta)]">
                   <MapPin size={16} strokeWidth={1.5} />
-                  <span className="text-[0.7rem] uppercase tracking-[0.22em]">Comune</span>
+                  <span className="text-[0.7rem] uppercase tracking-[0.22em]">{t("seoPage.related.tileLabel")}</span>
                 </div>
                 <h3 className="mt-3 font-serif text-xl text-ink">{c.name}</h3>
                 <p className="mt-2 text-[0.9rem] leading-relaxed text-[var(--ink-soft)]">
-                  {c.blurb}
+                  {cL.blurb}
                 </p>
                 <span className="mt-4 inline-flex items-center gap-1 text-[0.7rem] uppercase tracking-[0.22em] text-[var(--terracotta)] group-hover:underline">
-                  Vedi case <ArrowRight size={12} />
+                  {t("seoPage.related.tileSee")} <ArrowRight size={12} />
                 </span>
               </Link>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
