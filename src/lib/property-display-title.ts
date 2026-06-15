@@ -20,7 +20,18 @@ export type DisplayTitleInput = {
   municipality?: string | null;
 };
 
-const MAX_LEN = 70;
+// Tooltip on the card shows the full title — line-clamp-2 handles visual
+// truncation, so we don't truncate in JS anymore.
+
+// Technical acronyms preserved as-is when normalizing SHOUTED words.
+const PRESERVE_ACRONYMS = new Set([
+  "IPE", "APE", "FIAIP", "B&B", "EU", "UE", "IVA", "TV", "DOC", "DOCG",
+  "USA", "UK", "ZTL",
+]);
+
+// Minimum "meaningful" word count for the residual after stripping the
+// trailing municipality. Below this, we keep the original title.
+const MIN_WORDS_AFTER_STRIP = 3;
 
 // Words/phrases that, when they appear as the WHOLE start of the title,
 // indicate the typology — used to detect "appartamento appartamento" style
