@@ -545,7 +545,7 @@ function SettingsPage() {
           {enhanceResult && enhanceResult.failed > 0 && (
             <button
               type="button"
-              onClick={() => runEnhance(true)}
+              onClick={() => runEnhance({ onlyErrors: true })}
               disabled={enhancing}
               className="inline-flex items-center gap-2 rounded-sm border border-border bg-background px-5 py-2.5 text-xs uppercase tracking-[0.2em] text-ink transition hover:border-primary/50 disabled:opacity-60"
             >
