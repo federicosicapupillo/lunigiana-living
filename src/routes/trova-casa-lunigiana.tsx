@@ -4,7 +4,8 @@ import { ArrowLeft, ArrowRight, Check, CheckCircle2, Compass, Loader2, MessageCi
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { sendLeadNotification } from "@/lib/lead-notify.functions";
-import { useT, useLanguage, type Language } from "@/lib/i18n/LanguageContext";
+import { useT, useLanguage } from "@/lib/i18n/LanguageContext";
+import type { Language } from "@/lib/i18n/translations";
 import { useLocalizedHead } from "@/hooks/use-localized-head";
 import { trackEvent } from "@/lib/analytics";
 import { siteUrl } from "@/lib/site-url";
