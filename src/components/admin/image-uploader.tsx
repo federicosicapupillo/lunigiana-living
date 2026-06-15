@@ -425,7 +425,10 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
     }
   };
 
-  const setPublishMode = async (img: Image, mode: "main" | "emotional" | "none") => {
+  const setPublishMode = async (
+    img: Image,
+    mode: "main" | "emotional" | "vision" | "none",
+  ) => {
     try {
       await runSetPublishMode({ data: { imageId: img.id, mode } });
       toast.success(
@@ -433,7 +436,9 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
           ? "Rendering pubblicato come foto principale (originale conservata)"
           : mode === "emotional"
             ? "Rendering usato come Prima/Dopo"
-            : "Rendering non pubblicato",
+            : mode === "vision"
+              ? "Rendering pubblicato nella sezione “Una possibile visione”"
+              : "Rendering nascosto dal sito",
       );
       await load();
     } catch (err) {
