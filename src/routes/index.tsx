@@ -14,6 +14,7 @@ import { getHomeHeroVariant, type HomeHeroVariant } from "@/lib/site-settings.fu
 import { LeadForm } from "@/components/lead-form";
 import { GuidedChoiceSection } from "@/components/guided-choice";
 import { LeadMagnetBlock } from "@/components/lead-magnet-block";
+import { ReviewsTrustBlock } from "@/components/reviews-trust-block";
 import { ArrowRight, Compass, KeyRound, Sparkles, Star, ShieldCheck, MapPin, Home as HomeIcon } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -425,32 +426,7 @@ function Index() {
 
       {/* OLD SERVICES PLACEHOLDER REMOVED */}
       {/* REVIEWS */}
-      <section className="section-sand py-16 sm:py-20 md:py-24">
-        <div className="container-editorial">
-          <div className="mx-auto max-w-3xl text-center">
-            <span className="eyebrow">{t("home.reviews.eyebrow")}</span>
-            <div className="mt-4 flex items-center justify-center gap-1 text-primary" aria-hidden="true">
-              {[0, 1, 2, 3, 4].map((i) => (
-                <Star key={i} size={22} fill="currentColor" strokeWidth={0} />
-              ))}
-            </div>
-            <h2 className="mt-5 font-serif text-3xl leading-tight text-ink sm:text-4xl md:text-5xl">
-              {t("home.reviews.title1")}<br />{t("home.reviews.title2")}
-            </h2>
-            <p className="mt-5 text-base leading-relaxed text-foreground/80">
-              {t("home.reviews.body")}
-            </p>
-            <a
-              href={AGENCY_FACTS.googleReviewsUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-8 inline-flex items-center gap-2 rounded-md bg-terracotta px-6 py-3.5 text-xs uppercase tracking-[0.2em] text-cream transition hover:bg-[color:var(--terracotta-hover)] sm:px-8 sm:py-4 sm:tracking-[0.22em]"
-            >
-              {t("home.reviews.cta")} <ArrowRight size={14} />
-            </a>
-          </div>
-        </div>
-      </section>
+      <ReviewsTrustBlock variant="full" source="home" className="section-sand py-16 sm:py-20 md:py-24" />
 
       {/* CTA */}
       <section className="container-editorial pb-20 sm:pb-32">

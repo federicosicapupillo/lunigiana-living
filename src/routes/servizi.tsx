@@ -22,6 +22,7 @@ import { useT } from "@/lib/i18n/LanguageContext";
 import { useLocalizedHead } from "@/hooks/use-localized-head";
 import { trackClick } from "@/lib/analytics";
 import { LeadMagnetBlock } from "@/components/lead-magnet-block";
+import { ReviewsTrustBlock } from "@/components/reviews-trust-block";
 
 const WA_URL =
   "https://wa.me/393207019985?text=Ciao%20Elena,%20vorrei%20ricevere%20un%20primo%20orientamento%20sui%20vostri%20servizi.";
@@ -260,6 +261,9 @@ function ServiziPage() {
 
       {/* FINAL CTA */}
       <section className="container-editorial pb-32 pt-8">
+        <div className="mb-12">
+          <ReviewsTrustBlock variant="compact" source="servizi" className="rounded-2xl bg-[var(--warm-ivory)] py-14 sm:py-16" />
+        </div>
         <div className="mb-12">
           <LeadMagnetBlock source="servizi" />
         </div>
