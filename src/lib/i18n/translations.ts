@@ -603,6 +603,29 @@ const it: Dict = {
   "terr.linkBlock.byType": "Cerca per tipologia",
   "terr.linkBlock.byComune": "Cerca per comune",
   "footer.byType": "Cerca casa per tipologia",
+
+  // Lead magnet — Guida Lunigiana
+  "magnet.eyebrow": "Guida gratuita",
+  "magnet.title": "Guida pratica per comprare casa in Lunigiana",
+  "magnet.subtitle": "Zone, prezzi, errori da evitare e cosa controllare prima di innamorarsi di una casa.",
+  "magnet.body": "Una guida pensata per chi sta valutando una casa in Lunigiana e vuole orientarsi tra borghi, budget, servizi, distanze e aspetti da controllare prima di visitare un immobile.",
+  "magnet.b1": "Le zone più adatte in base al tuo stile di vita",
+  "magnet.b2": "Cosa controllare prima di comprare",
+  "magnet.b3": "Errori comuni da evitare",
+  "magnet.b4": "Differenze tra borghi, campagna e centro storico",
+  "magnet.b5": "Quando una casa è davvero adatta come seconda casa",
+  "magnet.b6": "Come muoversi se vivi lontano o all'estero",
+  "magnet.cta": "Ricevi la guida",
+  "magnet.ctaLong": "Richiedi la guida gratuita",
+  "magnet.f.name": "Nome e cognome *",
+  "magnet.f.email": "Email *",
+  "magnet.f.phone": "Telefono / WhatsApp (opzionale)",
+  "magnet.f.phonePh": "Solo se preferisci essere ricontattata/o",
+  "magnet.f.interest": "Interesse principale *",
+  "magnet.privacy": "Acconsento al trattamento dei dati personali per ricevere la guida e/o essere ricontattato da Furia Immobiliare.",
+  "magnet.err.interest": "Seleziona il tuo interesse principale.",
+  "magnet.thanks.title": "Grazie, abbiamo ricevuto la tua richiesta.",
+  "magnet.thanks.body": "Elena ti invierà la guida o ti ricontatterà appena possibile.",
 };
 
 const en: Dict = {
