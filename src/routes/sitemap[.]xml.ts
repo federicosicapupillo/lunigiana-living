@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import type {} from "@tanstack/react-start";
 import { listPublishedProperties } from "@/lib/public-properties.functions";
 import { COMUNE_SEO } from "@/lib/seo-comuni";
+import { TIPOLOGIE_SEO } from "@/lib/seo-tipologie";
 import { getSiteUrl } from "@/lib/site-url";
 
 export const Route = createFileRoute("/sitemap.xml")({
@@ -14,6 +15,8 @@ export const Route = createFileRoute("/sitemap.xml")({
           "/", "/immobili", "/territori", "/servizi", "/chi-siamo", "/contatti",
           "/case-in-vendita",
           ...COMUNE_SEO.map((c) => `/case-in-vendita/${c.slug}`),
+          "/case-in-vendita-lunigiana",
+          ...TIPOLOGIE_SEO.map((t) => `/case-in-vendita-lunigiana/${t.slug}`),
           ...properties.map((p) => `/immobili/${p.slug || p.id}`),
         ];
         const urls = paths.map(
