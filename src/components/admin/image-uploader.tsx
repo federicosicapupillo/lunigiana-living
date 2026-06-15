@@ -663,7 +663,9 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
                             ? "Sostituisce originale"
                             : img.render_publish_mode === "emotional"
                               ? "Prima/Dopo"
-                              : "Generato · non pubblicato"
+                              : img.render_publish_mode === "vision"
+                                ? "Pubblicato · Visione"
+                                : "Generato · non pubblicato"
                         }
                         onClick={() =>
                           setCompareState({ image: img, mode: "rendered" })
@@ -688,6 +690,25 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
                         >
                           Usa come Prima/Dopo
                         </CompactBtn>
+                        <CompactBtn
+                          onClick={() => setPublishMode(img, "vision")}
+                          disabled={img.render_publish_mode === "vision"}
+                          title="Pubblica il rendering nella sezione dedicata 'Una possibile visione della casa'. Non sostituisce le foto reali."
+                          icon={<Sparkles size={10} />}
+                          active={img.render_publish_mode === "vision"}
+                        >
+                          Pubblica come Visione
+                        </CompactBtn>
+                        {(img.render_publish_mode === "vision" ||
+                          img.render_publish_mode === "emotional") && (
+                          <CompactBtn
+                            onClick={() => setPublishMode(img, "none")}
+                            title="Nascondi il rendering dal sito pubblico (resta salvato)."
+                            icon={<Undo2 size={10} />}
+                          >
+                            Nascondi dal sito
+                          </CompactBtn>
+                        )}
                         {img.render_publish_mode === "main" && (
                           <CompactBtn
                             onClick={() => setPublishMode(img, "none")}
