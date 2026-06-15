@@ -1,7 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, MapPin } from "lucide-react";
-import { COMUNE_SEO } from "@/lib/seo-comuni";
+import { COMUNE_SEO, localizeComuneSeo } from "@/lib/seo-comuni";
 import { siteUrl } from "@/lib/site-url";
+import { useLanguage, useT } from "@/lib/i18n/LanguageContext";
+import { useDocHead } from "@/hooks/use-localized-head";
 
 export const Route = createFileRoute("/case-in-vendita/")({
   head: () => {
@@ -24,21 +26,21 @@ export const Route = createFileRoute("/case-in-vendita/")({
 });
 
 function CaseInVenditaIndex() {
+  const { language } = useLanguage();
+  const t = useT();
+  useDocHead(t("seoComuni.meta.title"), t("seoComuni.meta.desc"));
   return (
     <>
       <section className="bg-[var(--cream)] pb-12 pt-28 md:pt-36">
         <div className="container-editorial">
           <span className="text-xs uppercase tracking-[0.24em] text-[var(--terracotta)]">
-            Case in vendita
+            {t("seoComuni.hub.eyebrow")}
           </span>
           <h1 className="mt-3 max-w-3xl font-serif text-4xl leading-tight text-ink md:text-6xl">
-            Case in vendita in Lunigiana, comune per comune
+            {t("seoComuni.hub.h1")}
           </h1>
           <p className="mt-6 max-w-2xl text-base leading-relaxed text-[var(--ink-soft)]">
-            Ogni borgo della Lunigiana ha la sua atmosfera, i suoi servizi e il
-            suo modo di vivere. Scegli il comune che ti interessa e scopri gli
-            immobili disponibili, con l'accompagnamento locale di Furia
-            Immobiliare.
+            {t("seoComuni.hub.lead")}
           </p>
         </div>
       </section>
@@ -46,7 +48,9 @@ function CaseInVenditaIndex() {
       <section className="bg-[var(--warm-ivory)] py-20">
         <div className="container-editorial">
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {COMUNE_SEO.map((c) => (
+            {COMUNE_SEO.map((c) => {
+              const L = localizeComuneSeo(c, language);
+              return (
               <Link
                 key={c.slug}
                 to="/case-in-vendita/$comune"
@@ -56,18 +60,19 @@ function CaseInVenditaIndex() {
                 <div className="flex items-center gap-2 text-[var(--terracotta)]">
                   <MapPin size={16} strokeWidth={1.5} />
                   <span className="text-[0.7rem] uppercase tracking-[0.22em]">
-                    Lunigiana
+                    {t("seoPage.areaLabel")}
                   </span>
                 </div>
                 <h2 className="mt-3 font-serif text-2xl text-ink">{c.fullName}</h2>
                 <p className="mt-3 text-[0.92rem] leading-relaxed text-[var(--ink-soft)]">
-                  {c.blurb}
+                  {L.blurb}
                 </p>
                 <span className="mt-5 inline-flex items-center gap-1 text-[0.7rem] uppercase tracking-[0.22em] text-[var(--terracotta)] group-hover:underline">
-                  Vedi case a {c.name} <ArrowRight size={12} />
+                  {t("seoComuni.hub.tileSee")} {c.name} <ArrowRight size={12} />
                 </span>
               </Link>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
