@@ -28,6 +28,7 @@ import {
 } from "@/lib/i18n/property-localize";
 import { COMMERCIAL_HIGHLIGHT_EN } from "@/lib/admin/property-constants";
 import { img, imgSrcSet } from "@/lib/image-url";
+import { trackEvent, trackClick } from "@/lib/analytics";
 
 export const Route = createFileRoute("/immobili/$id")({
   loader: async ({ params }) => {
@@ -240,6 +241,20 @@ function PropertyDetail() {
   useEffect(() => {
     setMainLoaded(false);
   }, [main]);
+
+  // Fire one detail-view event per property mount.
+  useEffect(() => {
+    trackEvent("property_detail_view", {
+      property_id: String(p.id),
+      property_code: p.reference,
+      property_type: p.type ?? undefined,
+      comune: p.location ?? undefined,
+      price: p.price ?? undefined,
+      language,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [p.id]);
+
   const notify = useServerFn(sendLeadNotification);
   const [submitState, setSubmitState] = useState<"idle" | "submitting" | "ok" | "error">("idle");
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -282,6 +297,13 @@ function PropertyDetail() {
     if (error) {
       setSubmitState("error");
       setSubmitError(t("form.err.generic"));
+      trackEvent("lead_form_submit_error", {
+        source: "property_detail",
+        page_path: source_page,
+        property_id: String(p.id),
+        property_code: p.reference,
+        language,
+      });
       return;
     }
 
@@ -302,6 +324,13 @@ function PropertyDetail() {
 
     form.reset();
     setSubmitState("ok");
+    trackEvent("lead_form_submit_success", {
+      source: "property_detail",
+      page_path: source_page,
+      property_id: String(p.id),
+      property_code: p.reference,
+      language,
+    });
   }
   // Preload neighbor images so prev/next feels instant.
   useEffect(() => {
@@ -322,8 +351,24 @@ function PropertyDetail() {
       imgs.forEach((i) => (i.src = ""));
     };
   }, [active, galleryCount, p.gallery]);
-  const goPrev = () => setActive((i) => (galleryCount ? (i - 1 + galleryCount) % galleryCount : 0));
-  const goNext = () => setActive((i) => (galleryCount ? (i + 1) % galleryCount : 0));
+  const goPrev = () => {
+    setActive((i) => (galleryCount ? (i - 1 + galleryCount) % galleryCount : 0));
+    trackClick("property_gallery_interaction", {
+      action: "previous",
+      property_id: String(p.id),
+      property_code: p.reference,
+      language,
+    });
+  };
+  const goNext = () => {
+    setActive((i) => (galleryCount ? (i + 1) % galleryCount : 0));
+    trackClick("property_gallery_interaction", {
+      action: "next",
+      property_id: String(p.id),
+      property_code: p.reference,
+      language,
+    });
+  };
   const waMessage =
     `${t("wa.propertyMsgPrefix")} ` +
     `${p.reference} — ${title} (${p.location}).` +
@@ -369,7 +414,16 @@ function PropertyDetail() {
           <div className="mt-6 flex flex-wrap items-center gap-3">
             <button
               type="button"
-              onClick={scrollToContact}
+              onClick={() => {
+                trackClick("property_detail_request_info_click", {
+                  source: "hero",
+                  property_id: String(p.id),
+                  property_code: p.reference,
+                  language,
+                });
+                scrollToContact();
+              }}
+              data-track="property_detail_request_info_click"
               className="inline-flex items-center gap-2 rounded-sm bg-primary px-5 py-3 text-xs uppercase tracking-[0.2em] text-primary-foreground transition hover:bg-primary/90"
             >
               <Mail size={14} /> {t("detail.heroRequestInfo")}
@@ -378,6 +432,15 @@ function PropertyDetail() {
               href={waHref}
               target="_blank"
               rel="noopener noreferrer"
+              data-track="property_detail_whatsapp_click"
+              onClick={() =>
+                trackClick("property_detail_whatsapp_click", {
+                  source: "hero",
+                  property_id: String(p.id),
+                  property_code: p.reference,
+                  language,
+                })
+              }
               className="inline-flex items-center gap-2 rounded-sm border border-ink/15 bg-background px-5 py-3 text-xs uppercase tracking-[0.2em] text-ink transition hover:border-ink/40"
             >
               <MessageCircle size={14} className="text-[#1f8a4c]" /> {t("detail.heroWhatsapp")}
@@ -479,7 +542,16 @@ function PropertyDetail() {
             {p.gallery.map((g: string, i: number) => (
               <button
                 key={g + i}
-                onClick={() => setActive(i)}
+                onClick={() => {
+                  setActive(i);
+                  trackClick("property_gallery_interaction", {
+                    action: "thumbnail_click",
+                    image_index: i,
+                    property_id: String(p.id),
+                    property_code: p.reference,
+                    language,
+                  });
+                }}
                 aria-label={`Vai all'immagine ${i + 1}`}
                 className={`relative aspect-[4/3] overflow-hidden rounded-sm bg-muted transition-all duration-200 ${
                   i === active
@@ -758,14 +830,37 @@ function PropertyDetail() {
 
             <div className="mt-6 border-t border-border pt-6 text-sm text-muted-foreground">
               <div>{t("detail.orCall")}</div>
-              <a href="tel:+390187830229" className="mt-1 block font-serif text-xl text-ink">0187 830229</a>
-              <a href="tel:+393207019985" className="block font-serif text-xl text-ink">320 7019985</a>
+              <a
+                href="tel:+390187830229"
+                data-track="phone_click"
+                onClick={() => trackClick("phone_click", { source: "property_detail", language })}
+                className="mt-1 block font-serif text-xl text-ink"
+              >
+                0187 830229
+              </a>
+              <a
+                href="tel:+393207019985"
+                data-track="phone_click"
+                onClick={() => trackClick("phone_click", { source: "property_detail", language })}
+                className="block font-serif text-xl text-ink"
+              >
+                320 7019985
+              </a>
             </div>
 
             <a
               href={waHref}
               target="_blank"
               rel="noopener noreferrer"
+              data-track="property_detail_whatsapp_click"
+              onClick={() =>
+                trackClick("property_detail_whatsapp_click", {
+                  source: "contact_card",
+                  property_id: String(p.id),
+                  property_code: p.reference,
+                  language,
+                })
+              }
               className="mt-6 flex w-full items-center justify-center gap-2 rounded-sm border border-ink bg-ink px-6 py-4 text-xs uppercase tracking-[0.22em] text-cream transition hover:bg-primary hover:border-primary"
             >
               <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#25D366]" aria-hidden>
@@ -784,13 +879,31 @@ function PropertyDetail() {
             href={waHref}
             target="_blank"
             rel="noopener noreferrer"
+            data-track="property_detail_mobile_sticky_click"
+            onClick={() =>
+              trackClick("property_detail_mobile_sticky_click", {
+                source: "mobile_sticky_wa",
+                property_id: String(p.id),
+                property_code: p.reference,
+                language,
+              })
+            }
             className="flex items-center justify-center gap-2 rounded-sm border border-[#25D366]/40 bg-[#25D366]/10 px-4 py-3 text-xs font-medium uppercase tracking-[0.18em] text-[#1f8a4c]"
           >
             <MessageCircle size={14} /> {t("detail.mobileWa")}
           </a>
           <button
             type="button"
-            onClick={scrollToContact}
+            onClick={() => {
+              trackClick("property_detail_mobile_sticky_click", {
+                source: "mobile_sticky_info",
+                property_id: String(p.id),
+                property_code: p.reference,
+                language,
+              });
+              scrollToContact();
+            }}
+            data-track="property_detail_mobile_sticky_click"
             className="flex items-center justify-center gap-2 rounded-sm bg-primary px-4 py-3 text-xs font-medium uppercase tracking-[0.18em] text-primary-foreground"
           >
             <Mail size={14} /> {t("detail.mobileInfo")}

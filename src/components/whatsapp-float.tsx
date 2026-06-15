@@ -1,8 +1,11 @@
 import { MessageCircle } from "lucide-react";
 import { useT } from "@/lib/i18n/LanguageContext";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
+import { trackClick } from "@/lib/analytics";
 
 export function WhatsAppFloat() {
   const t = useT();
+  const { language } = useLanguage();
   const href = `https://wa.me/393207019985?text=${encodeURIComponent(t("wa.defaultMsg"))}`;
   return (
     <a
@@ -10,6 +13,8 @@ export function WhatsAppFloat() {
       target="_blank"
       rel="noopener noreferrer"
       aria-label={t("wa.aria")}
+      data-track="whatsapp_click"
+      onClick={() => trackClick("whatsapp_click", { source: "floating", language })}
       className="fixed bottom-4 right-4 z-40 inline-flex items-center gap-2 rounded-full bg-ink p-2.5 text-cream shadow-lg shadow-ink/30 transition hover:bg-primary sm:bottom-5 sm:right-5 sm:p-2 sm:pr-4"
       style={{
         paddingBottom: "calc(0.625rem + env(safe-area-inset-bottom, 0px))",
