@@ -100,14 +100,39 @@ function dedupeLeadingType(title: string): string {
   return title;
 }
 
-/** Drop a trailing " a <municipality>" when the card already shows the city. */
+/**
+ * Normalize SHOUTED words ("RUSTICO" -> "Rustico") while preserving known
+ * technical acronyms (IPE, APE, FIAIP, ...) and tokens that mix letters
+ * with digits/punctuation (e.g. "A2").
+ */
+function normalizeShoutedWords(s: string): string {
+  return s.replace(/\p{Lu}{2,}/gu, (word) => {
+    if (PRESERVE_ACRONYMS.has(word)) return word;
+    return word.charAt(0) + word.slice(1).toLowerCase();
+  });
+}
+
+function countMeaningfulWords(s: string): number {
+  return s
+    .split(/\s+/)
+    .filter((w) => w.length > 0 && !/^(di|a|in|al|nel|la|il|lo|le|i|gli|e|con|da|per)$/i.test(w))
+    .length;
+}
+
+/**
+ * Drop a trailing " a <municipality>" when the card already shows the city —
+ * BUT keep the original when the residual would be too generic
+ * (e.g. "Villa a Pontremoli" must NOT collapse to "Villa").
+ */
 function stripTrailingMunicipality(title: string, municipality?: string | null): string {
   if (!municipality) return title;
   const muni = municipality.trim();
   if (!muni) return title;
-  // Only strip when it's at the very end (e.g. "Villa a Pontremoli").
   const re = new RegExp(`\\s+a\\s+${muni.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\.?$`, "i");
-  return title.replace(re, "");
+  if (!re.test(title)) return title;
+  const stripped = title.replace(re, "").trim();
+  if (countMeaningfulWords(stripped) < MIN_WORDS_AFTER_STRIP) return title;
+  return stripped;
 }
 
 function applyPhraseRewrites(s: string): string {
