@@ -633,6 +633,23 @@ const en: Dict = {
   "home.hero.viewProperties": "View properties",
   "home.hero.elenaCaption": "Elena and Cometa · Furia Immobiliare",
 
+  // Guided choice
+  "home.guided.eyebrow": "Let's start together",
+  "home.guided.title": "Where would you like to start?",
+  "home.guided.subtitle": "Whether you are looking for a home, considering selling, or imagining a new life in Lunigiana, we help you take the right first step.",
+  "home.guided.card1.title": "I'm looking for a home in Lunigiana",
+  "home.guided.card1.body": "Tell us what kind of home you have in mind: Elena will help you understand which properties truly fit your needs.",
+  "home.guided.card1.cta": "Tell us what you're looking for",
+  "home.guided.card2.title": "I want to sell my property",
+  "home.guided.card2.body": "We evaluate your home with a realistic view of the local market and help you present it in the right way.",
+  "home.guided.card2.cta": "Request a valuation",
+  "home.guided.card3.title": "I'm looking for a second home",
+  "home.guided.card3.body": "We guide you through villages, hills and character homes to find an authentic retreat in Lunigiana.",
+  "home.guided.card3.cta": "Discover the best areas",
+  "home.guided.card4.title": "I live far away or abroad",
+  "home.guided.card4.body": "If you don't know the area well, we help you understand context, distances, services and the real potential of each property.",
+  "home.guided.card4.cta": "Let Elena guide you",
+
   // Chi siamo extra
   "chi.intro.p1": "Furia Immobiliare was born from Elena, from her deep bond with Lunigiana and from a very personal way of thinking about home: not just square meters, rooms and addresses, but places full of history, silence, light and possibility.",
   "chi.intro.p2": "By her side is Cometa, faithful companion, official mascot and (more or less) quiet presence in the best moments of this journey. Because sometimes a house is chosen with the eyes, sometimes with the heart… and occasionally with the nose.",
