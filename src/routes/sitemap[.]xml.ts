@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import type {} from "@tanstack/react-start";
 import { listPublishedProperties } from "@/lib/public-properties.functions";
+import { COMUNE_SEO } from "@/lib/seo-comuni";
 
 const BASE_URL = "";
 
@@ -11,6 +12,8 @@ export const Route = createFileRoute("/sitemap.xml")({
         const { properties } = await listPublishedProperties();
         const paths = [
           "/", "/immobili", "/territori", "/servizi", "/chi-siamo", "/contatti",
+          "/case-in-vendita",
+          ...COMUNE_SEO.map((c) => `/case-in-vendita/${c.slug}`),
           ...properties.map((p) => `/immobili/${p.slug || p.id}`),
         ];
         const urls = paths.map(

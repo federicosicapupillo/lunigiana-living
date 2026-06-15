@@ -18,7 +18,9 @@ import { Route as ChiSiamoRouteImport } from './routes/chi-siamo'
 import { Route as AdminRouteImport } from './routes/_admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ImmobiliIndexRouteImport } from './routes/immobili.index'
+import { Route as CaseInVenditaIndexRouteImport } from './routes/case-in-vendita.index'
 import { Route as ImmobiliIdRouteImport } from './routes/immobili.$id'
+import { Route as CaseInVenditaComuneRouteImport } from './routes/case-in-vendita.$comune'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
 import { Route as AdminAdminRouteImport } from './routes/_admin.admin'
 import { Route as AdminAdminIndexRouteImport } from './routes/_admin.admin.index'
@@ -77,10 +79,20 @@ const ImmobiliIndexRoute = ImmobiliIndexRouteImport.update({
   path: '/',
   getParentRoute: () => ImmobiliRoute,
 } as any)
+const CaseInVenditaIndexRoute = CaseInVenditaIndexRouteImport.update({
+  id: '/case-in-vendita/',
+  path: '/case-in-vendita/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ImmobiliIdRoute = ImmobiliIdRouteImport.update({
   id: '/$id',
   path: '/$id',
   getParentRoute: () => ImmobiliRoute,
+} as any)
+const CaseInVenditaComuneRoute = CaseInVenditaComuneRouteImport.update({
+  id: '/case-in-vendita/$comune',
+  path: '/case-in-vendita/$comune',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AdminLoginRoute = AdminLoginRouteImport.update({
   id: '/admin/login',
@@ -161,7 +173,9 @@ export interface FileRoutesByFullPath {
   '/territori': typeof TerritoriRoute
   '/admin': typeof AdminAdminRouteWithChildren
   '/admin/login': typeof AdminLoginRoute
+  '/case-in-vendita/$comune': typeof CaseInVenditaComuneRoute
   '/immobili/$id': typeof ImmobiliIdRoute
+  '/case-in-vendita/': typeof CaseInVenditaIndexRoute
   '/immobili/': typeof ImmobiliIndexRoute
   '/admin/dati-live': typeof AdminAdminDatiLiveRoute
   '/admin/idealista': typeof AdminAdminIdealistaRoute
@@ -183,7 +197,9 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/territori': typeof TerritoriRoute
   '/admin/login': typeof AdminLoginRoute
+  '/case-in-vendita/$comune': typeof CaseInVenditaComuneRoute
   '/immobili/$id': typeof ImmobiliIdRoute
+  '/case-in-vendita': typeof CaseInVenditaIndexRoute
   '/immobili': typeof ImmobiliIndexRoute
   '/admin/dati-live': typeof AdminAdminDatiLiveRoute
   '/admin/idealista': typeof AdminAdminIdealistaRoute
@@ -209,7 +225,9 @@ export interface FileRoutesById {
   '/territori': typeof TerritoriRoute
   '/_admin/admin': typeof AdminAdminRouteWithChildren
   '/admin/login': typeof AdminLoginRoute
+  '/case-in-vendita/$comune': typeof CaseInVenditaComuneRoute
   '/immobili/$id': typeof ImmobiliIdRoute
+  '/case-in-vendita/': typeof CaseInVenditaIndexRoute
   '/immobili/': typeof ImmobiliIndexRoute
   '/_admin/admin/dati-live': typeof AdminAdminDatiLiveRoute
   '/_admin/admin/idealista': typeof AdminAdminIdealistaRoute
@@ -235,7 +253,9 @@ export interface FileRouteTypes {
     | '/territori'
     | '/admin'
     | '/admin/login'
+    | '/case-in-vendita/$comune'
     | '/immobili/$id'
+    | '/case-in-vendita/'
     | '/immobili/'
     | '/admin/dati-live'
     | '/admin/idealista'
@@ -257,7 +277,9 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/territori'
     | '/admin/login'
+    | '/case-in-vendita/$comune'
     | '/immobili/$id'
+    | '/case-in-vendita'
     | '/immobili'
     | '/admin/dati-live'
     | '/admin/idealista'
@@ -282,7 +304,9 @@ export interface FileRouteTypes {
     | '/territori'
     | '/_admin/admin'
     | '/admin/login'
+    | '/case-in-vendita/$comune'
     | '/immobili/$id'
+    | '/case-in-vendita/'
     | '/immobili/'
     | '/_admin/admin/dati-live'
     | '/_admin/admin/idealista'
@@ -307,6 +331,8 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TerritoriRoute: typeof TerritoriRoute
   AdminLoginRoute: typeof AdminLoginRoute
+  CaseInVenditaComuneRoute: typeof CaseInVenditaComuneRoute
+  CaseInVenditaIndexRoute: typeof CaseInVenditaIndexRoute
   ApiPublicIdealistaFeedDotxmlRoute: typeof ApiPublicIdealistaFeedDotxmlRoute
 }
 
@@ -375,12 +401,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ImmobiliIndexRouteImport
       parentRoute: typeof ImmobiliRoute
     }
+    '/case-in-vendita/': {
+      id: '/case-in-vendita/'
+      path: '/case-in-vendita'
+      fullPath: '/case-in-vendita/'
+      preLoaderRoute: typeof CaseInVenditaIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/immobili/$id': {
       id: '/immobili/$id'
       path: '/$id'
       fullPath: '/immobili/$id'
       preLoaderRoute: typeof ImmobiliIdRouteImport
       parentRoute: typeof ImmobiliRoute
+    }
+    '/case-in-vendita/$comune': {
+      id: '/case-in-vendita/$comune'
+      path: '/case-in-vendita/$comune'
+      fullPath: '/case-in-vendita/$comune'
+      preLoaderRoute: typeof CaseInVenditaComuneRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/admin/login': {
       id: '/admin/login'
@@ -549,6 +589,8 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TerritoriRoute: TerritoriRoute,
   AdminLoginRoute: AdminLoginRoute,
+  CaseInVenditaComuneRoute: CaseInVenditaComuneRoute,
+  CaseInVenditaIndexRoute: CaseInVenditaIndexRoute,
   ApiPublicIdealistaFeedDotxmlRoute: ApiPublicIdealistaFeedDotxmlRoute,
 }
 export const routeTree = rootRouteImport
