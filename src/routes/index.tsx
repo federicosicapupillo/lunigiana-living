@@ -15,7 +15,7 @@ import { LeadForm } from "@/components/lead-form";
 import { GuidedChoiceSection } from "@/components/guided-choice";
 import { LeadMagnetBlock } from "@/components/lead-magnet-block";
 import { ReviewsTrustBlock } from "@/components/reviews-trust-block";
-import { ArrowRight, Compass, KeyRound, Sparkles, Star, ShieldCheck, MapPin, Home as HomeIcon } from "lucide-react";
+import { ArrowRight, Compass, KeyRound, Sparkles, ShieldCheck, MapPin, Home as HomeIcon } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useLanguage, useT } from "@/lib/i18n/LanguageContext";
