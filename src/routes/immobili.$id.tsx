@@ -830,17 +830,39 @@ function PropertyDetail() {
             {submitState === "ok" ? (
               <div className="mt-6 rounded-sm border border-border bg-cream p-6 text-center">
                 <CheckCircle2 className="mx-auto text-primary" size={28} />
-                <h4 className="mt-3 font-serif text-lg text-ink">{t("form.thanks")}</h4>
-                <p className="mt-2 text-sm leading-relaxed text-foreground/80">{t("form.thanksBody")}</p>
+                <h4 className="mt-3 font-serif text-lg text-ink">{t("form.thanksTitle")}</h4>
+                <p className="mt-2 text-sm leading-relaxed text-foreground/80">{t("form.thanksBodyLong")}</p>
+                <p className="mt-2 text-sm leading-relaxed text-foreground/70">{t("form.thanksBodyProperty")}</p>
               </div>
             ) : (
               <form onSubmit={onSubmitLead} className="mt-6 space-y-3" noValidate>
                 <input name="nome" required maxLength={200} autoComplete="name" placeholder={t("detail.namePh")} className="w-full rounded-sm border border-border bg-background px-4 py-3 text-sm focus:border-primary focus:outline-none" />
                 <input name="email" type="email" required maxLength={320} autoComplete="email" placeholder={t("detail.emailPh")} className="w-full rounded-sm border border-border bg-background px-4 py-3 text-sm focus:border-primary focus:outline-none" />
                 <input name="telefono" type="tel" required maxLength={50} autoComplete="tel" placeholder={t("detail.phonePh")} className="w-full rounded-sm border border-border bg-background px-4 py-3 text-sm focus:border-primary focus:outline-none" />
+                <p className="-mt-1 text-[0.75rem] leading-relaxed text-foreground/55">{t("form.hint.phone")}</p>
                 <textarea name="messaggio" rows={4} maxLength={3000} placeholder={t("detail.msgPh")} className="w-full rounded-sm border border-border bg-background px-4 py-3 text-sm focus:border-primary focus:outline-none" />
+                <p className="-mt-1 text-[0.75rem] leading-relaxed text-foreground/55">{t("form.hint.message")}</p>
                 {submitError && (
-                  <p className="text-sm text-destructive">{submitError}</p>
+                  <div className="rounded-sm border border-destructive/30 bg-destructive/5 p-3 text-sm">
+                    <p className="text-destructive">{submitError}</p>
+                    <a
+                      href={whatsappUrl(`${t("wa.propertyMsgPrefix")} ${p.reference} — ${p.title}`)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() =>
+                        trackClick("contact_whatsapp_fallback_click", {
+                          source: "property_detail",
+                          variant: "property",
+                          property_id: String(p.id),
+                          property_code: p.reference,
+                          language,
+                        })
+                      }
+                      className="mt-2 inline-flex items-center gap-1.5 text-sm font-medium text-primary underline-offset-4 hover:underline"
+                    >
+                      <MessageCircle size={14} /> {t("form.alt.cta")}
+                    </a>
+                  </div>
                 )}
                 <button
                   type="submit"
@@ -852,9 +874,10 @@ function PropertyDetail() {
                       <Loader2 size={14} className="animate-spin" /> {t("form.submitting")}
                     </>
                   ) : (
-                    t("detail.submit")
+                    t("form.submit.property")
                   )}
                 </button>
+                <p className="text-[0.75rem] leading-relaxed text-foreground/60">{t("form.hint.submit")}</p>
               </form>
             )}
 
