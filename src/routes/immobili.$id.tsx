@@ -259,6 +259,20 @@ function PropertyDetail() {
   const [submitState, setSubmitState] = useState<"idle" | "submitting" | "ok" | "error">("idle");
   const [submitError, setSubmitError] = useState<string | null>(null);
 
+  // Fire one contact-form view event per property mount.
+  useEffect(() => {
+    const page_path = typeof window !== "undefined" ? window.location.pathname : `/immobili/${base.id}`;
+    trackEvent("contact_form_view", {
+      source: "property_detail",
+      variant: "property",
+      page_path,
+      property_id: String(p.id),
+      property_code: p.reference,
+      language,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [p.id]);
+
   async function onSubmitLead(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setSubmitError(null);
@@ -296,9 +310,17 @@ function PropertyDetail() {
     });
     if (error) {
       setSubmitState("error");
-      setSubmitError(t("form.err.generic"));
+      setSubmitError(t("form.err.generic2"));
       trackEvent("lead_form_submit_error", {
         source: "property_detail",
+        page_path: source_page,
+        property_id: String(p.id),
+        property_code: p.reference,
+        language,
+      });
+      trackEvent("contact_form_submit_error", {
+        source: "property_detail",
+        variant: "property",
         page_path: source_page,
         property_id: String(p.id),
         property_code: p.reference,
@@ -326,6 +348,14 @@ function PropertyDetail() {
     setSubmitState("ok");
     trackEvent("lead_form_submit_success", {
       source: "property_detail",
+      page_path: source_page,
+      property_id: String(p.id),
+      property_code: p.reference,
+      language,
+    });
+    trackEvent("contact_form_submit_success", {
+      source: "property_detail",
+      variant: "property",
       page_path: source_page,
       property_id: String(p.id),
       property_code: p.reference,
