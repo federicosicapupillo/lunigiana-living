@@ -12,6 +12,7 @@ import { listPublishedPropertiesSummary, type PublicProperty } from "@/lib/publi
 import { getLocalizedProperties } from "@/lib/property-i18n.functions";
 import { getHomeHeroVariant, type HomeHeroVariant } from "@/lib/site-settings.functions";
 import { LeadForm } from "@/components/lead-form";
+import { GuidedChoiceSection } from "@/components/guided-choice";
 import { ArrowRight, Compass, KeyRound, Sparkles, Star, ShieldCheck, MapPin, Home as HomeIcon } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -265,6 +266,9 @@ function Index() {
         </div>
       </div>
       </section>
+
+      {/* GUIDED CHOICE */}
+      <GuidedChoiceSection />
 
       {/* FEATURED PROPERTIES */}
       <section className="section-sand py-16 sm:py-20 md:py-32">
