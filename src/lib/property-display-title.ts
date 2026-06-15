@@ -143,14 +143,6 @@ function applyPhraseRewrites(s: string): string {
   return out;
 }
 
-function softTruncate(s: string, max = MAX_LEN): string {
-  if (s.length <= max) return s;
-  const cut = s.slice(0, max);
-  const lastSpace = cut.lastIndexOf(" ");
-  const safe = lastSpace > 40 ? cut.slice(0, lastSpace) : cut;
-  return safe.replace(/[\s,;:.\-]+$/, "") + "…";
-}
-
 /**
  * Public helper. Returns a cleaned, presentational title — never empty:
  * falls back to the original title (or to the type when title is missing).
@@ -168,19 +160,23 @@ export function getPropertyDisplayTitle(p: DisplayTitleInput): string {
   // 1. dedupe "appartamento appartamento ..." style.
   out = dedupeLeadingType(out);
 
-  // 2. if the whole string is lowercase, sentence-case it.
+  // 2a. tame SHOUTED words ("RUSTICO" -> "Rustico"), preserving acronyms.
+  out = normalizeShoutedWords(out);
+
+  // 2b. if the whole string is lowercase, sentence-case it.
   if (isAllLower(out)) out = capitalizeFirst(out);
 
   // 3. conservative editorial polish.
   out = applyPhraseRewrites(out);
 
-  // 4. drop redundant trailing " a <municipality>" (card already shows it).
+  // 4. drop redundant trailing " a <municipality>" only when residual stays
+  //    descriptive enough.
   out = stripTrailingMunicipality(out, p.municipality ?? deriveMuni(p.location));
 
-  // 5. final tidy.
+  // 5. final tidy — no JS truncation: line-clamp-2 handles visual overflow
+  //    and the card sets title={fullDisplayTitle} for the native tooltip.
   out = collapseWhitespace(out);
   out = capitalizeFirst(out);
-  out = softTruncate(out);
 
   return out;
 }
