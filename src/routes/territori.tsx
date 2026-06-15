@@ -10,6 +10,7 @@ import { territories } from "@/lib/properties";
 import { ArrowRight, MapPin, Mountain, Sparkles } from "lucide-react";
 import { useT } from "@/lib/i18n/LanguageContext";
 import { useLocalizedHead } from "@/hooks/use-localized-head";
+import { LeadMagnetBlock } from "@/components/lead-magnet-block";
 
 const imageBySlug: Record<string, string> = {
   pontremoli: pontremoliAsset.url,
