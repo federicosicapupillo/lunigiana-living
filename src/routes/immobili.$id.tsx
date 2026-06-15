@@ -28,6 +28,7 @@ import {
 } from "@/lib/i18n/property-localize";
 import { COMMERCIAL_HIGHLIGHT_EN } from "@/lib/admin/property-constants";
 import { img, imgSrcSet } from "@/lib/image-url";
+import { trackEvent, trackClick } from "@/lib/analytics";
 
 export const Route = createFileRoute("/immobili/$id")({
   loader: async ({ params }) => {
@@ -240,6 +241,20 @@ function PropertyDetail() {
   useEffect(() => {
     setMainLoaded(false);
   }, [main]);
+
+  // Fire one detail-view event per property mount.
+  useEffect(() => {
+    trackEvent("property_detail_view", {
+      property_id: String(p.id),
+      property_code: p.reference,
+      property_type: p.type ?? undefined,
+      comune: p.location ?? undefined,
+      price: p.price ?? undefined,
+      language,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [p.id]);
+
   const notify = useServerFn(sendLeadNotification);
   const [submitState, setSubmitState] = useState<"idle" | "submitting" | "ok" | "error">("idle");
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -282,6 +297,13 @@ function PropertyDetail() {
     if (error) {
       setSubmitState("error");
       setSubmitError(t("form.err.generic"));
+      trackEvent("lead_form_submit_error", {
+        source: "property_detail",
+        page_path: source_page,
+        property_id: String(p.id),
+        property_code: p.reference,
+        language,
+      });
       return;
     }
 
@@ -302,6 +324,13 @@ function PropertyDetail() {
 
     form.reset();
     setSubmitState("ok");
+    trackEvent("lead_form_submit_success", {
+      source: "property_detail",
+      page_path: source_page,
+      property_id: String(p.id),
+      property_code: p.reference,
+      language,
+    });
   }
   // Preload neighbor images so prev/next feels instant.
   useEffect(() => {
