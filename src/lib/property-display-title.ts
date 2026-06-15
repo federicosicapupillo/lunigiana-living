@@ -53,13 +53,12 @@ const TYPE_TOKENS = [
 ];
 
 // Conservative phrase rewrites that improve flow without inventing facts.
-const PHRASE_REWRITES: Array<[RegExp, string]> = [
+type Rewrite = { pattern: RegExp; replace: (full: string, pre: string) => string };
+const PHRASE_REWRITES: Rewrite[] = [
   // "appartamento centro storico" -> "appartamento nel centro storico"
-  [/(^|\s)(centro storico)\b/gi, (m, pre: string) => `${pre}nel centro storico`] as unknown as [RegExp, string],
-  // "nuova costruzione" -> "di nuova costruzione" (only when not preceded by "di")
-  [/(^|[^i]\s)(nuova costruzione)\b/gi, (m, pre: string) => `${pre}di nuova costruzione`] as unknown as [RegExp, string],
-  // normalize "casetta" -> "casa" only when not "casetta di..." style poetic — keep
-  // it light: do nothing here.
+  { pattern: /(^|\s)(centro storico)\b/gi, replace: (_full, pre) => `${pre}nel centro storico` },
+  // "nuova costruzione" -> "di nuova costruzione" (only when not preceded by "di ")
+  { pattern: /(^|[^i]\s)(nuova costruzione)\b/gi, replace: (_full, pre) => `${pre}di nuova costruzione` },
 ];
 
 function collapseWhitespace(s: string): string {
@@ -102,9 +101,8 @@ function stripTrailingMunicipality(title: string, municipality?: string | null):
 
 function applyPhraseRewrites(s: string): string {
   let out = s;
-  for (const [pattern, replacement] of PHRASE_REWRITES) {
-    // Each replacement is actually a fn — TS-friendly cast.
-    out = out.replace(pattern, replacement as unknown as string);
+  for (const { pattern, replace } of PHRASE_REWRITES) {
+    out = out.replace(pattern, replace as unknown as string);
   }
   return out;
 }
