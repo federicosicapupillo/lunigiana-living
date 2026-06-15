@@ -779,6 +779,31 @@ const en: Dict = {
   "form.err.privacy": "You must accept the privacy policy.",
   "form.err.tooFast": "Submitted too quickly, please try again.",
   "form.err.generic": "Something went wrong. Please try again or write to us on WhatsApp.",
+  // Lead form — promise & microcopy
+  "form.promise.eyebrow": "A human reply",
+  "form.promise.title": "Tell us what kind of home you are looking for",
+  "form.promise.subtitle":
+    "Elena will reply personally with clear initial guidance within 24 working hours. No automated replies, no pressure.",
+  "form.promise.titleProperty": "Want to understand if this home is right for you?",
+  "form.promise.subtitleProperty":
+    "Write to Elena: she'll help you evaluate the property, the surroundings and the real possibilities, with no pressure.",
+  "form.hint.phone": "Optional — useful if you prefer a direct call.",
+  "form.hint.message": "Feel free to mention area, budget, timing and the kind of home you imagine.",
+  "form.hint.privacy": "Your details will only be used to reply to your request.",
+  "form.hint.submit": "We reply personally, usually within the working day.",
+  "form.submit.generic": "Send your request to Elena",
+  "form.submit.search": "Tell us what you're looking for",
+  "form.submit.property": "Request information about this property",
+  "form.submit.valuation": "Request a valuation",
+  "form.thanksTitle": "Request sent",
+  "form.thanksBodyLong":
+    "Thank you, we've received your message. Elena will reply personally as soon as possible, usually within 24 working hours.",
+  "form.thanksBodyProperty":
+    "If you asked about a specific property, Elena will check availability and share clear next steps.",
+  "form.err.generic2":
+    "We couldn't send your request. Please try again in a moment, or write to Elena directly on WhatsApp.",
+  "form.alt.title": "Would you rather ask a quick question first?",
+  "form.alt.cta": "Write on WhatsApp",
 
   // Search bar
   "search.tab.all": "All",
