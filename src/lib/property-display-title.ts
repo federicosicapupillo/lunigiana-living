@@ -20,7 +20,18 @@ export type DisplayTitleInput = {
   municipality?: string | null;
 };
 
-const MAX_LEN = 70;
+// Tooltip on the card shows the full title — line-clamp-2 handles visual
+// truncation, so we don't truncate in JS anymore.
+
+// Technical acronyms preserved as-is when normalizing SHOUTED words.
+const PRESERVE_ACRONYMS = new Set([
+  "IPE", "APE", "FIAIP", "B&B", "EU", "UE", "IVA", "TV", "DOC", "DOCG",
+  "USA", "UK", "ZTL",
+]);
+
+// Minimum "meaningful" word count for the residual after stripping the
+// trailing municipality. Below this, we keep the original title.
+const MIN_WORDS_AFTER_STRIP = 3;
 
 // Words/phrases that, when they appear as the WHOLE start of the title,
 // indicate the typology — used to detect "appartamento appartamento" style
@@ -89,14 +100,39 @@ function dedupeLeadingType(title: string): string {
   return title;
 }
 
-/** Drop a trailing " a <municipality>" when the card already shows the city. */
+/**
+ * Normalize SHOUTED words ("RUSTICO" -> "Rustico") while preserving known
+ * technical acronyms (IPE, APE, FIAIP, ...) and tokens that mix letters
+ * with digits/punctuation (e.g. "A2").
+ */
+function normalizeShoutedWords(s: string): string {
+  return s.replace(/\p{Lu}{2,}/gu, (word) => {
+    if (PRESERVE_ACRONYMS.has(word)) return word;
+    return word.charAt(0) + word.slice(1).toLowerCase();
+  });
+}
+
+function countMeaningfulWords(s: string): number {
+  return s
+    .split(/\s+/)
+    .filter((w) => w.length > 0 && !/^(di|a|in|al|nel|la|il|lo|le|i|gli|e|con|da|per)$/i.test(w))
+    .length;
+}
+
+/**
+ * Drop a trailing " a <municipality>" when the card already shows the city —
+ * BUT keep the original when the residual would be too generic
+ * (e.g. "Villa a Pontremoli" must NOT collapse to "Villa").
+ */
 function stripTrailingMunicipality(title: string, municipality?: string | null): string {
   if (!municipality) return title;
   const muni = municipality.trim();
   if (!muni) return title;
-  // Only strip when it's at the very end (e.g. "Villa a Pontremoli").
   const re = new RegExp(`\\s+a\\s+${muni.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\.?$`, "i");
-  return title.replace(re, "");
+  if (!re.test(title)) return title;
+  const stripped = title.replace(re, "").trim();
+  if (countMeaningfulWords(stripped) < MIN_WORDS_AFTER_STRIP) return title;
+  return stripped;
 }
 
 function applyPhraseRewrites(s: string): string {
@@ -105,14 +141,6 @@ function applyPhraseRewrites(s: string): string {
     out = out.replace(pattern, replace as unknown as string);
   }
   return out;
-}
-
-function softTruncate(s: string, max = MAX_LEN): string {
-  if (s.length <= max) return s;
-  const cut = s.slice(0, max);
-  const lastSpace = cut.lastIndexOf(" ");
-  const safe = lastSpace > 40 ? cut.slice(0, lastSpace) : cut;
-  return safe.replace(/[\s,;:.\-]+$/, "") + "…";
 }
 
 /**
@@ -132,19 +160,23 @@ export function getPropertyDisplayTitle(p: DisplayTitleInput): string {
   // 1. dedupe "appartamento appartamento ..." style.
   out = dedupeLeadingType(out);
 
-  // 2. if the whole string is lowercase, sentence-case it.
+  // 2a. tame SHOUTED words ("RUSTICO" -> "Rustico"), preserving acronyms.
+  out = normalizeShoutedWords(out);
+
+  // 2b. if the whole string is lowercase, sentence-case it.
   if (isAllLower(out)) out = capitalizeFirst(out);
 
   // 3. conservative editorial polish.
   out = applyPhraseRewrites(out);
 
-  // 4. drop redundant trailing " a <municipality>" (card already shows it).
+  // 4. drop redundant trailing " a <municipality>" only when residual stays
+  //    descriptive enough.
   out = stripTrailingMunicipality(out, p.municipality ?? deriveMuni(p.location));
 
-  // 5. final tidy.
+  // 5. final tidy — no JS truncation: line-clamp-2 handles visual overflow
+  //    and the card sets title={fullDisplayTitle} for the native tooltip.
   out = collapseWhitespace(out);
   out = capitalizeFirst(out);
-  out = softTruncate(out);
 
   return out;
 }
