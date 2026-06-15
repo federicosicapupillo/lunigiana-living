@@ -107,6 +107,31 @@ const it: Dict = {
   "form.err.privacy": "Devi accettare l'informativa privacy.",
   "form.err.tooFast": "Invio troppo rapido, riprova.",
   "form.err.generic": "Si è verificato un problema. Riprova o scrivici su WhatsApp.",
+  // Lead form — promise & microcopy
+  "form.promise.eyebrow": "Risposta umana",
+  "form.promise.title": "Raccontaci che casa stai cercando",
+  "form.promise.subtitle":
+    "Ti risponde Elena personalmente, con un primo orientamento concreto entro 24 ore lavorative. Nessuna risposta automatica, nessuna pressione.",
+  "form.promise.titleProperty": "Vuoi capire se questa casa fa per te?",
+  "form.promise.subtitleProperty":
+    "Scrivi a Elena: ti aiuterà a valutare l'immobile, il contesto e le reali possibilità, senza pressione.",
+  "form.hint.phone": "Facoltativo, utile se preferisci un contatto diretto.",
+  "form.hint.message": "Puoi indicarci zona, budget, tempi e tipo di casa che immagini.",
+  "form.hint.privacy": "I tuoi dati saranno usati solo per rispondere alla tua richiesta.",
+  "form.hint.submit": "Rispondiamo personalmente, di solito entro la giornata lavorativa.",
+  "form.submit.generic": "Invia la richiesta a Elena",
+  "form.submit.search": "Racconta cosa cerchi",
+  "form.submit.property": "Richiedi informazioni su questo immobile",
+  "form.submit.valuation": "Richiedi una valutazione",
+  "form.thanksTitle": "Richiesta inviata",
+  "form.thanksBodyLong":
+    "Grazie, abbiamo ricevuto il tuo messaggio. Elena ti risponderà personalmente appena possibile, di solito entro 24 ore lavorative.",
+  "form.thanksBodyProperty":
+    "Se hai richiesto informazioni su un immobile, Elena controllerà la disponibilità e ti darà indicazioni utili per il prossimo passo.",
+  "form.err.generic2":
+    "Non siamo riusciti a inviare la richiesta. Puoi riprovare tra poco oppure scrivere direttamente a Elena su WhatsApp.",
+  "form.alt.title": "Preferisci fare prima una domanda veloce?",
+  "form.alt.cta": "Scrivi su WhatsApp",
 
   // Search bar
   "search.tab.all": "Tutti",
