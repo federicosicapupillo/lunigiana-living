@@ -74,6 +74,8 @@ function SettingsPage() {
     | null
   >(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [reprocessConfirmOpen, setReprocessConfirmOpen] = useState(false);
+  const [reprocessText, setReprocessText] = useState("");
   const [publishing, setPublishing] = useState(false);
   const [verifyConfirmOpen, setVerifyConfirmOpen] = useState(false);
   const [verifying, setVerifying] = useState(false);
@@ -135,12 +137,14 @@ function SettingsPage() {
     }
   };
 
-  const runEnhance = async (onlyErrors: boolean) => {
+  const runEnhance = async (opts: { onlyErrors?: boolean; reprocessAll?: boolean }) => {
     setEnhancing(true);
     setEnhanceResult(null);
     setConfirmOpen(false);
+    setReprocessConfirmOpen(false);
+    setReprocessText("");
     try {
-      const res = await enhanceAll({ data: { onlyErrors } });
+      const res = await enhanceAll({ data: opts });
       setEnhanceResult(res);
       if (res.failed === 0) toast.success(`Miglioramento completato · ${res.enhanced} foto`);
       else toast.warning(`Completato con ${res.failed} errori · ${res.enhanced} ok`);
