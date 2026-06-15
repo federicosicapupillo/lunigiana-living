@@ -24,3 +24,25 @@ export function useLocalizedHead(titleKey: string, descriptionKey?: string) {
     document.documentElement.lang = language;
   }, [language, titleKey, descriptionKey, t]);
 }
+
+/**
+ * Same as useLocalizedHead but accepts already-resolved strings (e.g. when
+ * the title/description depend on dynamic route/loader data).
+ */
+export function useDocHead(title: string, description?: string) {
+  const { language } = useLanguage();
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    if (title) document.title = title;
+    if (description) {
+      let tag = document.querySelector('meta[name="description"]');
+      if (!tag) {
+        tag = document.createElement("meta");
+        tag.setAttribute("name", "description");
+        document.head.appendChild(tag);
+      }
+      tag.setAttribute("content", description);
+    }
+    document.documentElement.lang = language;
+  }, [language, title, description]);
+}
