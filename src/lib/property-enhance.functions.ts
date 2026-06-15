@@ -243,12 +243,18 @@ export const publishAllEnhancedImages = createServerFn({ method: "POST" })
   .handler(async ({ context }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     await ensureAdmin(context.supabase, context.userId);
+    // Conteggio totale per il riepilogo (tutte le foto immobili)
+    const { count: checked } = await supabaseAdmin
+      .from("property_images")
+      .select("id", { count: "exact", head: true });
     const { data: rows, error } = await supabaseAdmin
       .from("property_images")
-      .select("id, enhanced_storage_path, enhanced_image_url")
-      .eq("enhancement_status", "enhanced");
+      .select("id, enhanced_storage_path, enhanced_image_url, use_enhanced, published_image_url")
+      .not("enhanced_storage_path", "is", null);
     if (error) throw new Error(error.message);
     let published = 0;
+    let alreadyPublished = 0;
+    const errors: Array<{ imageId: string; message: string }> = [];
     for (const r of rows ?? []) {
       if (!r.enhanced_storage_path) continue;
       let url = r.enhanced_image_url;
@@ -258,11 +264,27 @@ export const publishAllEnhancedImages = createServerFn({ method: "POST" })
           .createSignedUrl(r.enhanced_storage_path, SIGNED_URL_TTL_SECONDS);
         url = signed?.signedUrl ?? null;
       }
+      if (r.use_enhanced && r.published_image_url === url) {
+        alreadyPublished++;
+        continue;
+      }
       const { error: updErr } = await supabaseAdmin
         .from("property_images")
         .update({ use_enhanced: true, published_image_url: url })
         .eq("id", r.id);
       if (!updErr) published++;
+      else errors.push({ imageId: r.id, message: updErr.message });
     }
-    return { ok: true as const, published };
+    const totalChecked = checked ?? 0;
+    const withEnhanced = rows?.length ?? 0;
+    return {
+      ok: true as const,
+      checked: totalChecked,
+      withEnhanced,
+      published,
+      alreadyPublished,
+      skippedNoEnhanced: Math.max(0, totalChecked - withEnhanced),
+      renderingsIgnored: true,
+      errors,
+    };
   });

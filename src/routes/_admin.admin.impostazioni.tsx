@@ -77,6 +77,18 @@ function SettingsPage() {
   const [reprocessConfirmOpen, setReprocessConfirmOpen] = useState(false);
   const [reprocessText, setReprocessText] = useState("");
   const [publishing, setPublishing] = useState(false);
+  const [publishConfirmOpen, setPublishConfirmOpen] = useState(false);
+  const [publishResult, setPublishResult] = useState<
+    | {
+        checked: number;
+        withEnhanced: number;
+        published: number;
+        alreadyPublished: number;
+        skippedNoEnhanced: number;
+        errors: Array<{ imageId: string; message: string }>;
+      }
+    | null
+  >(null);
   const [verifyConfirmOpen, setVerifyConfirmOpen] = useState(false);
   const [verifying, setVerifying] = useState(false);
   const [verifyResult, setVerifyResult] = useState<
@@ -156,11 +168,26 @@ function SettingsPage() {
   };
 
   const runPublishAll = async () => {
-    if (!confirm("Pubblicare tutte le versioni migliorate disponibili come foto pubbliche?")) return;
+    setPublishConfirmOpen(false);
     setPublishing(true);
+    setPublishResult(null);
     try {
       const res = await publishAll();
-      toast.success(`${res.published} foto migliorate pubblicate`);
+      setPublishResult({
+        checked: res.checked,
+        withEnhanced: res.withEnhanced,
+        published: res.published,
+        alreadyPublished: res.alreadyPublished,
+        skippedNoEnhanced: res.skippedNoEnhanced,
+        errors: res.errors,
+      });
+      if (res.errors.length === 0) {
+        toast.success(
+          `${res.published} foto impostate · ${res.alreadyPublished} già pubblicate · ${res.skippedNoEnhanced} senza migliorata`,
+        );
+      } else {
+        toast.warning(`${res.published} pubblicate · ${res.errors.length} errori`);
+      }
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Errore pubblicazione");
     } finally {
@@ -566,14 +593,47 @@ function SettingsPage() {
           )}
           <button
             type="button"
-            onClick={runPublishAll}
+            onClick={() => setPublishConfirmOpen(true)}
             disabled={publishing}
-            className="inline-flex items-center gap-2 rounded-sm border border-border bg-background px-5 py-2.5 text-xs uppercase tracking-[0.2em] text-ink transition hover:border-primary/50 disabled:opacity-60"
+            className="inline-flex items-center gap-2 rounded-sm bg-ink px-5 py-2.5 text-xs uppercase tracking-[0.2em] text-background transition hover:bg-ink/90 disabled:opacity-60"
           >
             {publishing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload size={14} />}
-            Pubblica tutte le versioni migliorate
+            Usa tutte le foto migliorate sul sito
           </button>
         </div>
+        {publishing && (
+          <p className="mt-4 text-sm text-muted-foreground">
+            Pubblicazione in corso… le foto originali restano salvate, i rendering AI non vengono toccati.
+          </p>
+        )}
+        {publishResult && (
+          <div className="mt-6 rounded-sm border border-border bg-muted/30 p-4 text-sm">
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
+              <Stat label="Controllate" value={publishResult.checked} />
+              <Stat label="Con migliorata" value={publishResult.withEnhanced} />
+              <Stat label="Aggiornate" value={publishResult.published} tone="ok" />
+              <Stat label="Già pubblicate" value={publishResult.alreadyPublished} />
+              <Stat label="Senza migliorata" value={publishResult.skippedNoEnhanced} />
+            </div>
+            <p className="mt-3 text-xs text-muted-foreground">
+              Originali NON cancellati · Rendering AI ignorati.
+            </p>
+            {publishResult.errors.length > 0 && (
+              <details className="mt-3">
+                <summary className="cursor-pointer text-xs uppercase tracking-wider text-destructive">
+                  Errori ({publishResult.errors.length})
+                </summary>
+                <ul className="mt-2 max-h-60 space-y-1 overflow-auto text-xs text-destructive">
+                  {publishResult.errors.map((e) => (
+                    <li key={e.imageId} className="font-mono">
+                      {e.imageId.slice(0, 8)}… — {e.message}
+                    </li>
+                  ))}
+                </ul>
+              </details>
+            )}
+          </div>
+        )}
         {enhancing && (
           <p className="mt-4 text-sm text-muted-foreground">
             Miglioramento in corso… (può richiedere alcuni minuti)
