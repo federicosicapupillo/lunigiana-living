@@ -202,20 +202,20 @@ function TerritoriPage() {
       <section className="bg-warm-cream py-14">
         <div className="container-editorial text-center">
           <p className="mx-auto max-w-2xl font-serif text-xl italic leading-relaxed text-foreground/80 md:text-2xl">
-            Scopri le case in vendita in Lunigiana per zona o tipologia.
+            {t("terr.linkBlock.lead")}
           </p>
           <div className="mt-6 flex flex-wrap items-center justify-center gap-4">
             <Link
               to="/case-in-vendita-lunigiana"
               className="inline-flex items-center gap-2 rounded-sm bg-ink px-7 py-3 text-xs uppercase tracking-[0.22em] text-cream transition hover:bg-[var(--terracotta)]"
             >
-              Cerca per tipologia <ArrowRight size={14} />
+              {t("terr.linkBlock.byType")} <ArrowRight size={14} />
             </Link>
             <Link
               to="/case-in-vendita"
               className="text-xs uppercase tracking-[0.22em] text-ink/70 hover:text-[var(--terracotta)]"
             >
-              Cerca per comune
+              {t("terr.linkBlock.byComune")}
             </Link>
           </div>
         </div>

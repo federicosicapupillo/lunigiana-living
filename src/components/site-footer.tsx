@@ -36,7 +36,7 @@ export function SiteFooter() {
           <ul className="mt-4 space-y-2 text-sm text-cream/85">
             <li><Link to="/" className="hover:text-cream">{t("nav.home")}</Link></li>
             <li><Link to="/immobili" className="hover:text-cream">{t("nav.immobili")}</Link></li>
-            <li><Link to="/case-in-vendita-lunigiana" className="hover:text-cream">Cerca casa per tipologia</Link></li>
+            <li><Link to="/case-in-vendita-lunigiana" className="hover:text-cream">{t("footer.byType")}</Link></li>
             <li><Link to="/territori" className="hover:text-cream">{t("nav.territori")}</Link></li>
             <li><Link to="/servizi" className="hover:text-cream">{t("nav.servizi")}</Link></li>
             <li><Link to="/chi-siamo" className="hover:text-cream">{t("nav.chiSiamo")}</Link></li>
