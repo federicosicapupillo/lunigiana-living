@@ -10,6 +10,7 @@ import { territories } from "@/lib/properties";
 import { ArrowRight, MapPin, Mountain, Sparkles } from "lucide-react";
 import { useT } from "@/lib/i18n/LanguageContext";
 import { useLocalizedHead } from "@/hooks/use-localized-head";
+import { LeadMagnetBlock } from "@/components/lead-magnet-block";
 
 const imageBySlug: Record<string, string> = {
   pontremoli: pontremoliAsset.url,
@@ -165,6 +166,13 @@ function TerritoriPage() {
           <p>{t("terr.market.p1")}</p>
           <p>{t("terr.market.p2")}</p>
           </div>
+        </div>
+      </section>
+
+      {/* LEAD MAGNET — Guida Lunigiana */}
+      <section className="bg-warm-cream py-16 md:py-20">
+        <div className="container-editorial">
+          <LeadMagnetBlock source="territori" />
         </div>
       </section>
 
