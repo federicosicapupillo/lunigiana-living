@@ -10,11 +10,13 @@ import {
   TIPOLOGIE_SEO,
   filterPropertiesForTipologia,
   getTipologiaSeo,
+  localizeTipologiaSeo,
   type TipologiaSeo,
 } from "@/lib/seo-tipologie";
-import { COMUNE_SEO, getComuneSeo } from "@/lib/seo-comuni";
+import { COMUNE_SEO, getComuneSeo, localizeComuneSeo } from "@/lib/seo-comuni";
 import { trackClick } from "@/lib/analytics";
-import { useLanguage } from "@/lib/i18n/LanguageContext";
+import { useLanguage, useT } from "@/lib/i18n/LanguageContext";
+import { useDocHead } from "@/hooks/use-localized-head";
 import { localizePropertyDynamic } from "@/lib/i18n/property-localize";
 import { siteUrl } from "@/lib/site-url";
 
