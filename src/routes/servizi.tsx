@@ -1,7 +1,29 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Compass, KeyRound, Sparkles, FileSearch, Home, Handshake } from "lucide-react";
+import {
+  Compass,
+  Home,
+  MapPin,
+  Eye,
+  Handshake,
+  Camera,
+  BookOpen,
+  Printer,
+  Inbox,
+  FileCheck,
+  Calculator,
+  Globe,
+  MessageCircle,
+  Mail,
+  Ear,
+  Search,
+  CheckCircle2,
+} from "lucide-react";
 import { useT } from "@/lib/i18n/LanguageContext";
 import { useLocalizedHead } from "@/hooks/use-localized-head";
+import { trackClick } from "@/lib/analytics";
+
+const WA_URL =
+  "https://wa.me/393207019985?text=Ciao%20Elena,%20vorrei%20ricevere%20un%20primo%20orientamento%20sui%20vostri%20servizi.";
 
 export const Route = createFileRoute("/servizi")({
   head: () => ({
@@ -19,53 +41,51 @@ export const Route = createFileRoute("/servizi")({
 function ServiziPage() {
   const t = useT();
   useLocalizedHead("seo.servizi.title", "seo.servizi.desc");
-  const services = [
-    { icon: Compass, title: t("servizi.card1.title"), body: t("servizi.card1.body") },
-    { icon: Home, title: t("servizi.card2.title"), body: t("servizi.card2.body") },
-    { icon: KeyRound, title: t("servizi.card3.title"), body: t("servizi.card3.body") },
-    { icon: Sparkles, title: t("servizi.card4.title"), body: t("servizi.card4.body") },
-    { icon: FileSearch, title: t("servizi.card5.title"), body: t("servizi.card5.body") },
-    { icon: Handshake, title: t("servizi.card6.title"), body: t("servizi.card6.body") },
+
+  const buyCards = [
+    { icon: Compass, t: t("srv.buy.c1.t"), b: t("srv.buy.c1.b") },
+    { icon: Home, t: t("srv.buy.c2.t"), b: t("srv.buy.c2.b") },
+    { icon: Eye, t: t("srv.buy.c3.t"), b: t("srv.buy.c3.b") },
+    { icon: MapPin, t: t("srv.buy.c4.t"), b: t("srv.buy.c4.b") },
+    { icon: Handshake, t: t("srv.buy.c5.t"), b: t("srv.buy.c5.b") },
   ];
+
+  const sellCards = [
+    { icon: Calculator, t: t("srv.sell.c1.t"), b: t("srv.sell.c1.b") },
+    { icon: Camera, t: t("srv.sell.c2.t"), b: t("srv.sell.c2.b") },
+    { icon: BookOpen, t: t("srv.sell.c3.t"), b: t("srv.sell.c3.b") },
+    { icon: Printer, t: t("srv.sell.c4.t"), b: t("srv.sell.c4.b") },
+    { icon: Inbox, t: t("srv.sell.c5.t"), b: t("srv.sell.c5.b") },
+    { icon: FileCheck, t: t("srv.sell.c6.t"), b: t("srv.sell.c6.b") },
+  ];
+
+  const abroadPoints = [
+    t("srv.abroad.p1"),
+    t("srv.abroad.p2"),
+    t("srv.abroad.p3"),
+    t("srv.abroad.p4"),
+    t("srv.abroad.p5"),
+    t("srv.abroad.p6"),
+  ];
+
+  const methodSteps = [
+    { icon: Ear, t: t("srv.method.s1.t"), b: t("srv.method.s1.b") },
+    { icon: MapPin, t: t("srv.method.s2.t"), b: t("srv.method.s2.b") },
+    { icon: Search, t: t("srv.method.s3.t"), b: t("srv.method.s3.b") },
+    { icon: Handshake, t: t("srv.method.s4.t"), b: t("srv.method.s4.b") },
+  ];
+
   return (
     <>
-      <section className="relative overflow-hidden bg-[var(--cream)] pb-24 pt-32 md:pt-40">
-        {/* Soft watermark decorations */}
-        <svg
-          aria-hidden="true"
-          viewBox="0 0 400 260"
-          className="pointer-events-none absolute left-0 top-16 hidden h-64 w-auto opacity-[0.18] md:block"
-          fill="none"
-          stroke="var(--terracotta)"
-          strokeWidth="0.7"
-        >
-          <path d="M20 220 L60 220 L60 150 L90 130 L90 90 L110 75 L130 90 L130 130 L160 150 L160 200 L200 200 L200 160 L230 140 L260 160 L260 220 L380 220" />
-          <path d="M80 150 L80 130 M100 120 L100 100 M150 150 L150 130 M210 200 L210 180 M240 220 L240 190" />
-          <path d="M105 75 L110 60 L115 75" />
-          <circle cx="112" cy="58" r="1.5" />
-        </svg>
-        <svg
-          aria-hidden="true"
-          viewBox="0 0 300 300"
-          className="pointer-events-none absolute right-0 top-10 hidden h-80 w-auto opacity-[0.16] md:block"
-          fill="none"
-          stroke="var(--terracotta)"
-          strokeWidth="0.8"
-        >
-          <path d="M260 20 Q200 80 180 180 Q170 240 190 290" />
-          <path d="M220 80 Q180 90 170 130 Q200 120 230 100 Z" />
-          <path d="M205 140 Q165 150 155 190 Q190 180 220 160 Z" />
-          <path d="M195 200 Q155 210 145 250 Q180 240 210 220 Z" />
-        </svg>
-
+      {/* HERO */}
+      <section className="relative overflow-hidden bg-[var(--cream)] pb-20 pt-32 md:pt-40">
         <div className="container-editorial relative">
-          {/* Header */}
           <div className="mx-auto max-w-3xl text-center">
             <div className="mx-auto mb-6 inline-flex h-16 w-12 items-center justify-center rounded-t-[28px] border border-[var(--terracotta)]/40 bg-[var(--warm-ivory)]/60 font-serif text-[1rem] tracking-[0.12em] text-[var(--terracotta)]">
               FI
             </div>
-            <h1 className="font-serif text-5xl leading-tight text-ink md:text-6xl">
-              {t("servizi.title")}
+            <h1 className="font-serif text-4xl leading-tight text-ink md:text-6xl">
+              {t("srv.hero.title")}
             </h1>
             <div className="mx-auto mt-6 flex items-center justify-center gap-3">
               <span className="h-px w-16 bg-[var(--terracotta)]/50" />
@@ -73,71 +93,203 @@ function ServiziPage() {
               <span className="h-px w-16 bg-[var(--terracotta)]/50" />
             </div>
             <p className="mx-auto mt-8 max-w-2xl text-base leading-relaxed text-[var(--ink-soft)]">
-              {t("servizi.subtitle")}
+              {t("srv.hero.subtitle")}
             </p>
-          </div>
-
-          {/* Grid */}
-          <div className="mt-16 grid grid-cols-1 gap-x-8 gap-y-14 sm:grid-cols-2 lg:grid-cols-3">
-            {services.map((s) => (
-              <article
-                key={s.title}
-                className="group relative rounded-2xl border border-[var(--terracotta)]/10 bg-[var(--warm-ivory)]/70 px-7 pb-10 pt-14 text-center shadow-[0_12px_28px_-20px_rgba(36,23,17,0.30)] backdrop-blur-[1px] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_40px_-20px_rgba(36,23,17,0.40)]"
+            <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
+              <Link
+                to="/contatti"
+                data-track="services_cta_buy"
+                onClick={() => trackClick("services_cta_buy", { source: "hero" })}
+                className="inline-block rounded-sm bg-ink px-8 py-4 text-xs uppercase tracking-[0.22em] text-cream transition hover:bg-[var(--terracotta)]"
               >
-                {/* Floating icon badge */}
-                <div className="absolute -top-8 left-1/2 -translate-x-1/2">
-                  <div className="flex h-16 w-16 items-center justify-center rounded-full border border-[var(--terracotta)]/25 bg-[var(--cream)] shadow-[0_8px_20px_-10px_rgba(183,106,76,0.5)]">
-                    <s.icon size={26} strokeWidth={1.4} className="text-[var(--terracotta)]" />
-                  </div>
-                </div>
-
-                <h3 className="font-serif text-[1.55rem] leading-snug text-ink">
-                  {s.title}
-                </h3>
-                <span className="mx-auto mt-4 block h-px w-12 bg-[var(--terracotta)]/60" />
-                <p className="mx-auto mt-5 max-w-[28ch] text-[0.95rem] leading-[1.75] text-[var(--ink-soft)]">
-                  {s.body}
-                </p>
-
-                {/* Bottom decorative bar */}
-                <span className="absolute inset-x-8 bottom-0 h-px bg-gradient-to-r from-transparent via-[var(--terracotta)]/60 to-transparent" />
-              </article>
-            ))}
-          </div>
-
-          {/* Editorial footer mark */}
-          <div className="mt-16 flex flex-col items-center gap-3 text-center">
-            <svg
-              aria-hidden="true"
-              viewBox="0 0 60 20"
-              className="h-5 w-14 text-[var(--terracotta)]"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1"
-            >
-              <path d="M5 10 Q15 2 30 10 Q45 18 55 10" />
-              <circle cx="30" cy="10" r="1.2" fill="currentColor" />
-            </svg>
-            <div className="flex items-center gap-4">
-              <span className="h-px w-20 bg-[var(--terracotta)]/40" />
-              <span className="font-serif text-sm uppercase tracking-[0.32em] text-[var(--ink-soft)]">
-                Furia Immobiliare · Lunigiana
-              </span>
-              <span className="h-px w-20 bg-[var(--terracotta)]/40" />
+                {t("srv.hero.ctaBuy")}
+              </Link>
+              <Link
+                to="/contatti"
+                data-track="services_cta_valuation"
+                onClick={() => trackClick("services_cta_valuation", { source: "hero" })}
+                className="inline-block rounded-sm border border-ink/30 bg-transparent px-8 py-4 text-xs uppercase tracking-[0.22em] text-ink transition hover:border-[var(--terracotta)] hover:text-[var(--terracotta)]"
+              >
+                {t("srv.hero.ctaValuation")}
+              </Link>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="container-editorial pt-20 pb-32">
-        <div className="rounded-sm bg-ink px-8 py-20 text-center text-cream md:px-16">
-          <h2 className="mx-auto max-w-2xl font-serif text-4xl md:text-5xl">
-            {t("servizi.ctaTitle")}
+      {/* FOR BUYERS */}
+      <section className="bg-[var(--warm-ivory)] py-24">
+        <div className="container-editorial">
+          <div className="mx-auto max-w-2xl text-center">
+            <h2 className="font-serif text-3xl text-ink md:text-4xl">{t("srv.buy.title")}</h2>
+            <p className="mt-5 text-[0.98rem] leading-relaxed text-[var(--ink-soft)]">
+              {t("srv.buy.intro")}
+            </p>
+          </div>
+          <div className="mt-14 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {buyCards.map((c) => (
+              <article
+                key={c.t}
+                className="rounded-2xl border border-[var(--terracotta)]/15 bg-[var(--cream)] p-7 shadow-[0_10px_24px_-22px_rgba(36,23,17,0.35)]"
+              >
+                <div className="flex h-11 w-11 items-center justify-center rounded-full border border-[var(--terracotta)]/30 bg-[var(--warm-ivory)]">
+                  <c.icon size={20} strokeWidth={1.5} className="text-[var(--terracotta)]" />
+                </div>
+                <h3 className="mt-5 font-serif text-xl leading-snug text-ink">{c.t}</h3>
+                <p className="mt-3 text-[0.92rem] leading-relaxed text-[var(--ink-soft)]">{c.b}</p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* FOR SELLERS */}
+      <section className="bg-[var(--cream)] py-24">
+        <div className="container-editorial">
+          <div className="mx-auto max-w-2xl text-center">
+            <h2 className="font-serif text-3xl text-ink md:text-4xl">{t("srv.sell.title")}</h2>
+            <p className="mt-5 text-[0.98rem] leading-relaxed text-[var(--ink-soft)]">
+              {t("srv.sell.intro")}
+            </p>
+          </div>
+          <div className="mt-14 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {sellCards.map((c) => (
+              <article
+                key={c.t}
+                className="rounded-2xl border border-[var(--terracotta)]/15 bg-[var(--warm-ivory)] p-7 shadow-[0_10px_24px_-22px_rgba(36,23,17,0.35)]"
+              >
+                <div className="flex h-11 w-11 items-center justify-center rounded-full border border-[var(--terracotta)]/30 bg-[var(--cream)]">
+                  <c.icon size={20} strokeWidth={1.5} className="text-[var(--terracotta)]" />
+                </div>
+                <h3 className="mt-5 font-serif text-xl leading-snug text-ink">{c.t}</h3>
+                <p className="mt-3 text-[0.92rem] leading-relaxed text-[var(--ink-soft)]">{c.b}</p>
+              </article>
+            ))}
+          </div>
+          <div className="mt-12 flex justify-center">
+            <Link
+              to="/contatti"
+              data-track="services_cta_valuation"
+              onClick={() => trackClick("services_cta_valuation", { source: "sell_section" })}
+              className="inline-block rounded-sm bg-ink px-8 py-4 text-xs uppercase tracking-[0.22em] text-cream transition hover:bg-[var(--terracotta)]"
+            >
+              {t("srv.hero.ctaValuation")}
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ABROAD */}
+      <section className="bg-[var(--warm-ivory)] py-24">
+        <div className="container-editorial">
+          <div className="mx-auto grid max-w-5xl gap-12 lg:grid-cols-[1fr_1.1fr] lg:items-center">
+            <div>
+              <div className="flex h-12 w-12 items-center justify-center rounded-full border border-[var(--terracotta)]/30 bg-[var(--cream)]">
+                <Globe size={22} strokeWidth={1.4} className="text-[var(--terracotta)]" />
+              </div>
+              <h2 className="mt-5 font-serif text-3xl text-ink md:text-4xl">
+                {t("srv.abroad.title")}
+              </h2>
+              <p className="mt-5 text-[0.98rem] leading-relaxed text-[var(--ink-soft)]">
+                {t("srv.abroad.body")}
+              </p>
+              <a
+                href={WA_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                data-track="services_cta_abroad"
+                onClick={() =>
+                  trackClick("services_cta_abroad", { source: "abroad_section", channel: "whatsapp" })
+                }
+                className="mt-8 inline-block rounded-sm bg-[var(--terracotta)] px-8 py-4 text-xs uppercase tracking-[0.22em] text-cream transition hover:opacity-90"
+              >
+                {t("srv.abroad.cta")}
+              </a>
+            </div>
+            <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              {abroadPoints.map((p) => (
+                <li
+                  key={p}
+                  className="flex items-start gap-3 rounded-xl border border-[var(--terracotta)]/15 bg-[var(--cream)] p-4"
+                >
+                  <CheckCircle2
+                    size={18}
+                    strokeWidth={1.5}
+                    className="mt-0.5 shrink-0 text-[var(--terracotta)]"
+                  />
+                  <span className="text-[0.92rem] leading-relaxed text-[var(--ink-soft)]">{p}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      {/* METHOD */}
+      <section className="bg-[var(--cream)] py-24">
+        <div className="container-editorial">
+          <div className="mx-auto max-w-2xl text-center">
+            <h2 className="font-serif text-3xl text-ink md:text-4xl">{t("srv.method.title")}</h2>
+            <p className="mt-4 text-[0.98rem] leading-relaxed text-[var(--ink-soft)]">
+              {t("srv.method.subtitle")}
+            </p>
+          </div>
+          <ol className="mx-auto mt-14 grid max-w-5xl grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {methodSteps.map((s, i) => (
+              <li
+                key={s.t}
+                className="relative rounded-2xl border border-[var(--terracotta)]/15 bg-[var(--warm-ivory)] p-7"
+              >
+                <div className="flex items-center gap-3">
+                  <span className="font-serif text-xs uppercase tracking-[0.24em] text-[var(--terracotta)]">
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  <span className="h-px flex-1 bg-[var(--terracotta)]/30" />
+                </div>
+                <div className="mt-5 flex h-11 w-11 items-center justify-center rounded-full border border-[var(--terracotta)]/30 bg-[var(--cream)]">
+                  <s.icon size={20} strokeWidth={1.5} className="text-[var(--terracotta)]" />
+                </div>
+                <h3 className="mt-5 font-serif text-lg leading-snug text-ink">{s.t}</h3>
+                <p className="mt-3 text-[0.9rem] leading-relaxed text-[var(--ink-soft)]">{s.b}</p>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+
+      {/* FINAL CTA */}
+      <section className="container-editorial pb-32 pt-8">
+        <div className="rounded-sm bg-ink px-6 py-16 text-center text-cream md:px-16 md:py-20">
+          <h2 className="mx-auto max-w-2xl font-serif text-3xl md:text-5xl">
+            {t("srv.final.title")}
           </h2>
-          <Link to="/contatti"
-            className="mt-8 inline-block rounded-sm bg-cream px-8 py-4 text-xs uppercase tracking-[0.22em] text-ink">
-            {t("cta.bookConsultation")}
-          </Link>
+          <p className="mx-auto mt-5 max-w-xl text-[0.95rem] leading-relaxed text-cream/80">
+            {t("srv.final.body")}
+          </p>
+          <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
+            <a
+              href={WA_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              data-track="services_final_whatsapp"
+              onClick={() =>
+                trackClick("services_final_whatsapp", { source: "services_final", channel: "whatsapp" })
+              }
+              className="inline-flex items-center gap-2 rounded-sm bg-[var(--terracotta)] px-8 py-4 text-xs uppercase tracking-[0.22em] text-cream transition hover:opacity-90"
+            >
+              <MessageCircle size={16} strokeWidth={1.8} />
+              {t("srv.final.ctaWhatsapp")}
+            </a>
+            <Link
+              to="/contatti"
+              data-track="services_final_contact"
+              onClick={() => trackClick("services_final_contact", { source: "services_final" })}
+              className="inline-flex items-center gap-2 rounded-sm bg-cream px-8 py-4 text-xs uppercase tracking-[0.22em] text-ink transition hover:bg-[var(--warm-ivory)]"
+            >
+              <Mail size={16} strokeWidth={1.8} />
+              {t("srv.final.ctaContact")}
+            </Link>
+          </div>
         </div>
       </section>
     </>
