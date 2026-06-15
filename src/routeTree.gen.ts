@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TrovaCasaLunigianaRouteImport } from './routes/trova-casa-lunigiana'
 import { Route as TerritoriRouteImport } from './routes/territori'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ServiziRouteImport } from './routes/servizi'
@@ -37,6 +38,11 @@ import { Route as AdminAdminImmobiliAssistenteRouteImport } from './routes/_admi
 import { Route as AdminAdminImmobiliIdRouteImport } from './routes/_admin.admin.immobili.$id'
 import { Route as AdminAdminImmobiliIdAnteprimaRouteImport } from './routes/_admin.admin.immobili.$id.anteprima'
 
+const TrovaCasaLunigianaRoute = TrovaCasaLunigianaRouteImport.update({
+  id: '/trova-casa-lunigiana',
+  path: '/trova-casa-lunigiana',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TerritoriRoute = TerritoriRouteImport.update({
   id: '/territori',
   path: '/territori',
@@ -185,6 +191,7 @@ export interface FileRoutesByFullPath {
   '/servizi': typeof ServiziRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/territori': typeof TerritoriRoute
+  '/trova-casa-lunigiana': typeof TrovaCasaLunigianaRoute
   '/admin': typeof AdminAdminRouteWithChildren
   '/admin/login': typeof AdminLoginRoute
   '/case-in-vendita-lunigiana/$tipologia': typeof CaseInVenditaLunigianaTipologiaRoute
@@ -212,6 +219,7 @@ export interface FileRoutesByTo {
   '/servizi': typeof ServiziRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/territori': typeof TerritoriRoute
+  '/trova-casa-lunigiana': typeof TrovaCasaLunigianaRoute
   '/admin/login': typeof AdminLoginRoute
   '/case-in-vendita-lunigiana/$tipologia': typeof CaseInVenditaLunigianaTipologiaRoute
   '/case-in-vendita/$comune': typeof CaseInVenditaComuneRoute
@@ -241,6 +249,7 @@ export interface FileRoutesById {
   '/servizi': typeof ServiziRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/territori': typeof TerritoriRoute
+  '/trova-casa-lunigiana': typeof TrovaCasaLunigianaRoute
   '/_admin/admin': typeof AdminAdminRouteWithChildren
   '/admin/login': typeof AdminLoginRoute
   '/case-in-vendita-lunigiana/$tipologia': typeof CaseInVenditaLunigianaTipologiaRoute
@@ -271,6 +280,7 @@ export interface FileRouteTypes {
     | '/servizi'
     | '/sitemap.xml'
     | '/territori'
+    | '/trova-casa-lunigiana'
     | '/admin'
     | '/admin/login'
     | '/case-in-vendita-lunigiana/$tipologia'
@@ -298,6 +308,7 @@ export interface FileRouteTypes {
     | '/servizi'
     | '/sitemap.xml'
     | '/territori'
+    | '/trova-casa-lunigiana'
     | '/admin/login'
     | '/case-in-vendita-lunigiana/$tipologia'
     | '/case-in-vendita/$comune'
@@ -326,6 +337,7 @@ export interface FileRouteTypes {
     | '/servizi'
     | '/sitemap.xml'
     | '/territori'
+    | '/trova-casa-lunigiana'
     | '/_admin/admin'
     | '/admin/login'
     | '/case-in-vendita-lunigiana/$tipologia'
@@ -356,6 +368,7 @@ export interface RootRouteChildren {
   ServiziRoute: typeof ServiziRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TerritoriRoute: typeof TerritoriRoute
+  TrovaCasaLunigianaRoute: typeof TrovaCasaLunigianaRoute
   AdminLoginRoute: typeof AdminLoginRoute
   CaseInVenditaLunigianaTipologiaRoute: typeof CaseInVenditaLunigianaTipologiaRoute
   CaseInVenditaComuneRoute: typeof CaseInVenditaComuneRoute
@@ -366,6 +379,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/trova-casa-lunigiana': {
+      id: '/trova-casa-lunigiana'
+      path: '/trova-casa-lunigiana'
+      fullPath: '/trova-casa-lunigiana'
+      preLoaderRoute: typeof TrovaCasaLunigianaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/territori': {
       id: '/territori'
       path: '/territori'
@@ -630,6 +650,7 @@ const rootRouteChildren: RootRouteChildren = {
   ServiziRoute: ServiziRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TerritoriRoute: TerritoriRoute,
+  TrovaCasaLunigianaRoute: TrovaCasaLunigianaRoute,
   AdminLoginRoute: AdminLoginRoute,
   CaseInVenditaLunigianaTipologiaRoute: CaseInVenditaLunigianaTipologiaRoute,
   CaseInVenditaComuneRoute: CaseInVenditaComuneRoute,
