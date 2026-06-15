@@ -32,6 +32,19 @@ export type TipologiaSeo = {
   suggestedComuni: string[];
   /** Conservative match: returns true ONLY when coherent. */
   matches: (p: PublicProperty) => boolean;
+  /** English copy. When undefined, IT fallback is used. */
+  en?: {
+    name: string;
+    fullName: string;
+    h1: string;
+    metaTitle: string;
+    metaDescription: string;
+    subtitle: string;
+    paragraphs: [string, string];
+    audience: string[];
+    considerations: string[];
+    blurb: string;
+  };
 };
 
 // ── helpers ────────────────────────────────────────────────────────────
