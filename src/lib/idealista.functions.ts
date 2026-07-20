@@ -486,3 +486,296 @@ export const verifyIdealistaFeed = createServerFn({ method: "POST" })
       xmlBytes,
     };
   });
+
+// --- Idealista V6 JSON sample export ---
+// Builds a JSON payload conforming to the Idealista "properties integration V6"
+// bulk format, populated from currently published Furia Immobiliare properties.
+// Note: some V6 enumerated values (heating types, condition, etc.) are best-effort
+// mappings from Furia's Italian free-text fields. Idealista schemas were not
+// available at build time; a follow-up pass should validate against the official
+// JSON Schemas once provided.
+
+const PROPERTY_TYPE_TO_V6: Record<string, string> = {
+  appartamento: "flat",
+  attico: "flat",
+  monolocale: "flat",
+  bilocale: "flat",
+  trilocale: "flat",
+  loft: "flat",
+  casa: "house",
+  villa: "house",
+  villetta: "house",
+  "casa singola": "house",
+  "casa indipendente": "house",
+  "casa semindipendente": "house",
+  "casa a schiera": "house",
+  rustico: "rustic",
+  casale: "rustic",
+  cascina: "rustic",
+  fattoria: "rustic",
+  terreno: "land",
+  "terreno agricolo": "land",
+  "terreno edificabile": "land",
+  box: "garage",
+  garage: "garage",
+  posto: "garage",
+  "posto auto": "garage",
+  ufficio: "office",
+  "locale commerciale": "premises_commercial",
+  negozio: "premises_commercial",
+  magazzino: "storage",
+  deposito: "storage",
+  cantina: "storage",
+  palazzo: "building",
+  edificio: "building",
+  stabile: "building",
+};
+
+function mapPropertyTypeToV6(pt: string | null | undefined): string {
+  if (!pt) return "house";
+  const key = pt.trim().toLowerCase();
+  if (PROPERTY_TYPE_TO_V6[key]) return PROPERTY_TYPE_TO_V6[key];
+  for (const [k, v] of Object.entries(PROPERTY_TYPE_TO_V6)) {
+    if (key.includes(k)) return v;
+  }
+  return "house";
+}
+
+function mapContractTypeToV6(ct: string | null | undefined): "sale" | "rent" {
+  const k = (ct ?? "").toLowerCase();
+  if (k.includes("affitt") || k.includes("rent") || k.includes("locaz")) return "rent";
+  return "sale";
+}
+
+function mapConditionToV6(c: string | null | undefined): string | undefined {
+  if (!c) return undefined;
+  const k = c.toLowerCase();
+  if (k.includes("nuov")) return "new";
+  if (k.includes("ottim") || k.includes("ristruttur") || k.includes("buon")) return "good";
+  if (k.includes("ristruttur")) return "renewed";
+  if (k.includes("da ristr") || k.includes("restaur") || k.includes("rudere")) return "toRestore";
+  return "good";
+}
+
+function digits(s: string | null | undefined): string {
+  return (s ?? "").replace(/\D+/g, "");
+}
+
+function splitPhone(raw: string | null | undefined, defaultPrefix = "39"): {
+  prefix: string;
+  number: string;
+} | null {
+  if (!raw) return null;
+  const t = raw.trim();
+  if (!t) return null;
+  const m = t.match(/^\+?(\d{1,3})[\s\-]?(\d{5,})$/);
+  if (m) return { prefix: m[1], number: m[2] };
+  const d = digits(t);
+  if (!d) return null;
+  if (d.startsWith("00")) {
+    const rest = d.slice(2);
+    return { prefix: rest.slice(0, 2), number: rest.slice(2) };
+  }
+  return { prefix: defaultPrefix, number: d };
+}
+
+function languageCode(lang: string): string {
+  const k = lang.toLowerCase();
+  if (k.startsWith("it")) return "italian";
+  if (k.startsWith("en")) return "english";
+  if (k.startsWith("es")) return "spanish";
+  if (k.startsWith("fr")) return "french";
+  if (k.startsWith("de")) return "german";
+  if (k.startsWith("pt")) return "portuguese";
+  if (k.startsWith("ru")) return "russian";
+  if (k.startsWith("zh")) return "chinese";
+  return "italian";
+}
+
+function formatSendDate(d: Date): string {
+  const pad = (n: number) => n.toString().padStart(2, "0");
+  return `${d.getFullYear()}/${pad(d.getMonth() + 1)}/${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+}
+
+export const buildIdealistaV6Sample = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context.userId);
+
+    // Load customer config from site_settings
+    const { data: cfgRow } = await supabaseAdmin
+      .from("site_settings")
+      .select("value")
+      .eq("key", "idealista_v6_customer")
+      .maybeSingle();
+    let cfg: any = {};
+    try {
+      cfg = cfgRow?.value ? JSON.parse(cfgRow.value) : {};
+    } catch {
+      cfg = {};
+    }
+    const { data: acctRow } = await supabaseAdmin
+      .from("site_settings")
+      .select("value")
+      .eq("key", "idealista_account")
+      .maybeSingle();
+    const acctEmail = (() => {
+      try {
+        return acctRow?.value ? JSON.parse(acctRow.value).email : null;
+      } catch {
+        return null;
+      }
+    })();
+
+    const contactPhone = splitPhone(cfg.contactPrimaryPhone ?? "+39 0187 831165");
+    const contactPhone2 = splitPhone(cfg.contactSecondaryPhone ?? "+39 335 6360402");
+
+    // Load published properties eligible for Idealista
+    const { data: props } = await supabaseAdmin
+      .from("properties")
+      .select("*")
+      .eq("status", "published")
+      .in("idealista_status", ["to_publish", "published"])
+      .is("deleted_at", null)
+      .order("created_at", { ascending: false });
+
+    const propList: any[] = props ?? [];
+    const propIds = propList.map((p) => p.id);
+
+    const { data: descs } = propIds.length
+      ? await supabaseAdmin
+          .from("property_descriptions")
+          .select("property_id, generated_description, edited_description, language")
+          .in("property_id", propIds)
+      : { data: [] as any[] };
+    const descByProp = new Map<string, any[]>();
+    for (const d of descs ?? []) {
+      const arr = descByProp.get(d.property_id) ?? [];
+      arr.push(d);
+      descByProp.set(d.property_id, arr);
+    }
+
+    const { data: imgs } = propIds.length
+      ? await supabaseAdmin
+          .from("property_images")
+          .select(
+            "property_id, image_url, enhanced_image_url, use_enhanced, sort_order, is_cover, idealista_included",
+          )
+          .in("property_id", propIds)
+          .eq("idealista_included", true)
+          .order("sort_order", { ascending: true })
+      : { data: [] as any[] };
+    const imgsByProp = new Map<string, any[]>();
+    for (const im of imgs ?? []) {
+      const arr = imgsByProp.get(im.property_id) ?? [];
+      arr.push(im);
+      imgsByProp.set(im.property_id, arr);
+    }
+
+    const customerProperties = propList.map((p) => {
+      const featuresType = mapPropertyTypeToV6(p.property_type);
+      const operationType = mapContractTypeToV6(p.contract_type);
+      const price = p.price_on_request ? undefined : Number(p.price ?? 0) || undefined;
+
+      const propertyDescriptions: any[] = [];
+      const seen = new Set<string>();
+      // From property_descriptions (may hold multiple languages)
+      for (const d of descByProp.get(p.id) ?? []) {
+        const text = (d.edited_description || d.generated_description || "").trim();
+        if (!text) continue;
+        const lang = languageCode(d.language ?? "it");
+        if (seen.has(lang)) continue;
+        seen.add(lang);
+        propertyDescriptions.push({ descriptionLanguage: lang, descriptionText: text });
+      }
+      // Fallback to summary_en for english if missing
+      if (!seen.has("english") && p.summary_en) {
+        propertyDescriptions.push({
+          descriptionLanguage: "english",
+          descriptionText: String(p.summary_en).trim(),
+        });
+      }
+
+      const propertyImages = (imgsByProp.get(p.id) ?? []).map((im, i) => {
+        const url = im.use_enhanced && im.enhanced_image_url ? im.enhanced_image_url : im.image_url;
+        return {
+          imageOrder: i + 1,
+          imageLabel: im.is_cover ? "facade" : "details",
+          imageUrl: url,
+        };
+      });
+
+      const conservation = mapConditionToV6(p.condition);
+
+      const property: any = {
+        propertyCode: p.reference_code || p.id,
+        propertyReference: p.slug || p.reference_code || p.id,
+        propertyVisibility: "idealista",
+        propertyOperation: {
+          operationType,
+          ...(price != null ? { operationPrice: price } : {}),
+        },
+        propertyAddress: {
+          addressVisibility: p.show_full_address ? "street" : "hidden",
+          ...(p.address ? { addressStreetName: p.address } : {}),
+          ...(p.postal_code ? { addressPostalCode: p.postal_code } : {}),
+          addressTown: p.municipality ?? "",
+          addressCountry: "Italy",
+          addressCoordinatesPrecision: p.show_full_address ? "exact" : "moved",
+          ...(p.latitude != null ? { addressCoordinatesLatitude: Number(p.latitude) } : {}),
+          ...(p.longitude != null ? { addressCoordinatesLongitude: Number(p.longitude) } : {}),
+        },
+        propertyFeatures: {
+          featuresType,
+          ...(p.size_sqm != null ? { featuresAreaConstructed: Number(p.size_sqm) } : {}),
+          ...(p.bedrooms != null ? { featuresBedroomNumber: Number(p.bedrooms) } : {}),
+          ...(p.bathrooms != null ? { featuresBathroomNumber: Number(p.bathrooms) } : {}),
+          ...(conservation ? { featuresConservation: conservation } : {}),
+          ...(p.energy_class ? { featuresEnergyCertificateRating: p.energy_class } : {}),
+          ...(p.energy_performance_index_value != null
+            ? { featuresEnergyCertificatePerformance: Number(p.energy_performance_index_value) }
+            : {}),
+          ...(p.garden ? { featuresGarden: true } : {}),
+          ...(p.terrace ? { featuresTerrace: true } : {}),
+          ...(p.garage ? { featuresParkingAvailable: true } : {}),
+          ...(p.elevator ? { featuresLiftAvailable: true } : {}),
+          ...(p.furnished ? { featuresEquippedWithFurniture: true } : {}),
+          ...(p.historic_property ? { featuresHistoric: true } : {}),
+        },
+        propertyDescriptions,
+        propertyImages,
+      };
+
+      return property;
+    });
+
+    const payload = {
+      customerCountry: "Italy",
+      customerCode: cfg.customerCode ?? "FURIA-PENDING",
+      customerReference: cfg.customerReference ?? "furia-immobiliare",
+      customerSendDate: formatSendDate(new Date()),
+      customerContact: {
+        contactName: cfg.contactName ?? "Furia Immobiliare",
+        contactEmail: cfg.contactEmail ?? acctEmail ?? "info@furiaimmobiliare.it",
+        ...(contactPhone
+          ? {
+              contactPrimaryPhonePrefix: contactPhone.prefix,
+              contactPrimaryPhoneNumber: contactPhone.number,
+            }
+          : {}),
+        ...(contactPhone2
+          ? {
+              contactSecondaryPhonePrefix: contactPhone2.prefix,
+              contactSecondaryPhoneNumber: contactPhone2.number,
+            }
+          : {}),
+      },
+      customerProperties,
+    };
+
+    return {
+      json: JSON.stringify(payload, null, 2),
+      propertyCount: customerProperties.length,
+      generatedAt: new Date().toISOString(),
+    };
+  });
