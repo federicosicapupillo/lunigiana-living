@@ -1,0 +1,39 @@
+# Furia Immobiliare
+
+> Agenzia immobiliare a Pontremoli (Lunigiana, Toscana). Case, ville, rustici, casali e immobili di carattere in Lunigiana: guida locale, ricerca guidata, servizi di acquisto e vendita.
+
+Furia Immobiliare, guidata da Elena Furia, aiuta clienti italiani e stranieri a trovare casa in Lunigiana — tra Pontremoli, Villafranca, Filattiera, Mulazzo, Bagnone, Zeri e Aulla — con un approccio umano, locale e concreto.
+
+## Pages
+
+- [Home](/): chi siamo, cosa facciamo, immobili in evidenza.
+- [Immobili in vendita](/immobili): tutti gli immobili pubblicati, con filtri per zona, tipologia e prezzo.
+- [Territori della Lunigiana](/territori): guida ai comuni e alle zone della Lunigiana.
+- [Servizi](/servizi): acquisto, vendita, valutazione, assistenza per clienti stranieri.
+- [Chi siamo](/chi-siamo): Elena Furia e l'agenzia di Pontremoli.
+- [Contatti](/contatti): telefono, email, indirizzo, WhatsApp.
+- [Trova la tua casa ideale](/trova-casa-lunigiana): percorso guidato per descrivere la casa che cerchi.
+
+## Case in vendita per comune
+
+- [Case in vendita in Lunigiana — hub comuni](/case-in-vendita): indice delle pagine per comune.
+- [Case in vendita a Pontremoli](/case-in-vendita/pontremoli)
+- [Case in vendita a Villafranca in Lunigiana](/case-in-vendita/villafranca-in-lunigiana)
+- [Case in vendita a Filattiera](/case-in-vendita/filattiera)
+- [Case in vendita a Mulazzo](/case-in-vendita/mulazzo)
+- [Case in vendita a Bagnone](/case-in-vendita/bagnone)
+- [Case in vendita a Zeri](/case-in-vendita/zeri)
+- [Case in vendita ad Aulla](/case-in-vendita/aulla)
+
+## Case in vendita per tipologia
+
+- [Tipologie in Lunigiana — hub](/case-in-vendita-lunigiana): indice delle tipologie.
+- [Rustici in vendita in Lunigiana](/case-in-vendita-lunigiana/rustici)
+- [Casali in vendita in Lunigiana](/case-in-vendita-lunigiana/casali)
+- [Case indipendenti in vendita in Lunigiana](/case-in-vendita-lunigiana/case-indipendenti)
+- [Appartamenti in vendita in Lunigiana](/case-in-vendita-lunigiana/appartamenti)
+- [Ville in vendita in Lunigiana](/case-in-vendita-lunigiana/ville)
+
+## Optional
+
+- [Sitemap XML](/sitemap.xml)

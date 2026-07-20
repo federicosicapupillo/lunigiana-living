@@ -29,6 +29,14 @@ import {
 import { COMMERCIAL_HIGHLIGHT_EN } from "@/lib/admin/property-constants";
 import { img, imgSrcSet } from "@/lib/image-url";
 import { trackEvent, trackClick } from "@/lib/analytics";
+import { siteUrl } from "@/lib/site-url";
+
+function truncateTitle(s: string, max = 60): string {
+  if (s.length <= max) return s;
+  const cut = s.slice(0, max - 1);
+  const lastSpace = cut.lastIndexOf(" ");
+  return (lastSpace > 30 ? cut.slice(0, lastSpace) : cut).trimEnd() + "…";
+}
 
 export const Route = createFileRoute("/immobili/$id")({
   loader: async ({ params }) => {
@@ -39,14 +47,19 @@ export const Route = createFileRoute("/immobili/$id")({
   head: ({ loaderData }) => {
     const p = loaderData?.property;
     if (!p) return { meta: [{ title: "Immobile — Furia Immobiliare" }] };
+    const canonical = siteUrl(`/immobili/${p.slug || p.id}`);
+    const rawTitle = `${p.title} a ${p.location} — ${p.reference} | Furia Immobiliare`;
+    const title = truncateTitle(rawTitle, 60);
     return {
       meta: [
-        { title: `${p.title} a ${p.location} — ${p.reference} | Furia Immobiliare` },
+        { title },
         { name: "description", content: `${p.title} a ${p.location}. ${p.sqm ? p.sqm + ' m². ' : ''}${p.rooms ? p.rooms + ' locali. ' : ''}${p.price}.` },
         { property: "og:title", content: `${p.title} — ${p.location}` },
         { property: "og:description", content: p.description.slice(0, 200) },
+        { property: "og:url", content: canonical },
         ...(p.image ? [{ property: "og:image", content: p.image }] : []),
       ],
+      links: [{ rel: "canonical", href: canonical }],
     };
   },
   notFoundComponent: NotFound,

@@ -8,7 +8,7 @@
  * Aggiornare DEFAULT_SITE_URL solo se il dominio di produzione cambia
  * in modo stabile.
  */
-const DEFAULT_SITE_URL = "https://furia.cap-ann-one.life";
+const DEFAULT_SITE_URL = "https://furiaimmobiliare.it";
 
 function readEnv(): string | undefined {
   // import.meta.env (Vite, lato client + SSR)
