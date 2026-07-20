@@ -11,6 +11,7 @@ import {
   getIdealistaAccount,
   setIdealistaAccount,
   verifyIdealistaFeed,
+  buildIdealistaV6Sample,
   type IdealistaStatus,
 } from "@/lib/idealista.functions";
 import { toast } from "sonner";
@@ -18,6 +19,7 @@ import {
   AlertTriangle,
   CheckCircle2,
   Copy,
+  Download,
   ExternalLink,
   Image as ImageIcon,
   Loader2,
@@ -58,6 +60,8 @@ function IdealistaAdminPage() {
   const fetchAccount = useServerFn(getIdealistaAccount);
   const saveAccount = useServerFn(setIdealistaAccount);
   const verifyFeed = useServerFn(verifyIdealistaFeed);
+  const exportV6 = useServerFn(buildIdealistaV6Sample);
+  const [exportingV6, setExportingV6] = useState(false);
 
   const { data, isLoading, refetch, isFetching } = useQuery({
     queryKey: ["idealista-overview"],
@@ -149,6 +153,28 @@ function IdealistaAdminPage() {
     const body = `Buongiorno,\n\nvi invio il feed XML per l'import automatico degli annunci dell'agenzia Furia Immobiliare.\n\nURL feed:\n${feedUrl}\n\nAccount agenzia:\n${account}\n\nResto a disposizione per eventuali verifiche tecniche o adeguamenti richiesti dal vostro sistema.\n\nCordiali saluti`;
     await navigator.clipboard.writeText(body);
     toast.success("Testo email copiato");
+  };
+
+  const onExportV6 = async () => {
+    setExportingV6(true);
+    try {
+      const r = await exportV6();
+      const blob = new Blob([r.json], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      const ts = new Date().toISOString().replace(/[:.]/g, "-");
+      a.download = `furia-idealista-v6-${ts}.json`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      toast.success(`Sample V6 scaricato · ${r.propertyCount} immobili`);
+    } catch (e: any) {
+      toast.error(e?.message ?? "Errore export V6");
+    } finally {
+      setExportingV6(false);
+    }
   };
 
   const onSaveEmail = async () => {
@@ -310,6 +336,15 @@ function IdealistaAdminPage() {
             className="inline-flex items-center gap-1.5 rounded-sm border border-border px-3 py-1.5 text-xs hover:border-primary/50 disabled:opacity-50"
           >
             <Mail size={12} /> Copia email per Idealista
+          </button>
+          <button
+            onClick={onExportV6}
+            disabled={exportingV6}
+            className="inline-flex items-center gap-1.5 rounded-sm border border-border px-3 py-1.5 text-xs hover:border-primary/50 disabled:opacity-50"
+            title="Genera un file JSON conforme al formato Idealista Properties Integration V6 con gli immobili pubblicati"
+          >
+            {exportingV6 ? <Loader2 size={12} className="animate-spin" /> : <Download size={12} />}
+            Scarica sample V6 (JSON)
           </button>
         </div>
 
