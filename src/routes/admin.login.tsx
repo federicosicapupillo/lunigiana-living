@@ -17,7 +17,6 @@ export const Route = createFileRoute("/admin/login")({
 function AdminLoginPage() {
   const navigate = useNavigate();
   const { session, isAdmin, loading } = useAdmin();
-  const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
@@ -32,19 +31,9 @@ function AdminLoginPage() {
     e.preventDefault();
     setBusy(true);
     try {
-      if (mode === "signup") {
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: { emailRedirectTo: `${window.location.origin}/admin/immobili` },
-        });
-        if (error) throw error;
-        toast.success("Account creato. Controlla l'email per confermare.");
-      } else {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
-        toast.success("Accesso effettuato.");
-      }
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+      toast.success("Accesso effettuato.");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Errore di autenticazione");
     } finally {
@@ -63,32 +52,7 @@ function AdminLoginPage() {
           Accesso esclusivo allo staff Furia Immobiliare.
         </p>
 
-        <div className="mt-8 flex gap-2 text-xs uppercase tracking-[0.15em]">
-          <button
-            type="button"
-            onClick={() => setMode("signin")}
-            className={`flex-1 rounded-sm border px-3 py-2 transition ${
-              mode === "signin"
-                ? "border-primary bg-primary text-primary-foreground"
-                : "border-border text-muted-foreground hover:border-primary/40"
-            }`}
-          >
-            Accedi
-          </button>
-          <button
-            type="button"
-            onClick={() => setMode("signup")}
-            className={`flex-1 rounded-sm border px-3 py-2 transition ${
-              mode === "signup"
-                ? "border-primary bg-primary text-primary-foreground"
-                : "border-border text-muted-foreground hover:border-primary/40"
-            }`}
-          >
-            Crea account
-          </button>
-        </div>
-
-        <form onSubmit={submit} className="mt-6 space-y-4">
+        <form onSubmit={submit} className="mt-8 space-y-4">
           <div>
             <label className="text-xs uppercase tracking-wider text-muted-foreground">Email</label>
             <input
@@ -115,7 +79,7 @@ function AdminLoginPage() {
             disabled={busy}
             className="w-full rounded-sm bg-primary px-6 py-3.5 text-xs uppercase tracking-[0.2em] text-primary-foreground transition hover:bg-primary/90 disabled:opacity-50"
           >
-            {busy ? "Attendere..." : mode === "signup" ? "Crea account" : "Accedi"}
+            {busy ? "Attendere..." : "Accedi"}
           </button>
         </form>
 
