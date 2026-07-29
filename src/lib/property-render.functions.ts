@@ -2,13 +2,13 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import {
-import {
   AI_IMAGE_MODEL,
   createPhaseLogger,
   fetchWithTimeout,
   fromBase64,
   toBase64,
 } from "@/lib/ai-image-utils";
+import {
   PHOTO_TYPES,
   INTERNAL_CATEGORIES,
   EXTERNAL_CATEGORIES,
