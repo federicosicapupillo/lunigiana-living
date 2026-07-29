@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import {
@@ -47,6 +47,14 @@ import {
 } from "@/lib/admin/property-constants";
 import { MultiSelectChips } from "@/components/admin/multi-select-chips";
 import { LocationFields, EMPTY_LOCATION, type LocationValue } from "@/components/admin/location-fields";
+import {
+  normalizeReferenceCode,
+  validateReferenceCode,
+  isReferenceCodeTaken,
+  isDuplicateReferenceError,
+  suggestNextReferenceCode,
+  REFERENCE_DUPLICATE_MESSAGE,
+} from "@/lib/admin/reference-code";
 
 export const Route = createFileRoute("/_admin/admin/immobili/nuovo")({
   head: () => ({
@@ -63,6 +71,7 @@ type Status = "draft" | "ready" | "published";
 type FormState = {
   // Sezione 1
   title: string;
+  reference_code: string;
   property_type: string;
   descrizione_libera: string;
   contract_type: string;
@@ -105,6 +114,7 @@ type FormState = {
 
 const empty: FormState = {
   title: "",
+  reference_code: "",
   property_type: "",
   descrizione_libera: "",
   contract_type: "",
@@ -171,6 +181,18 @@ function NewPropertyPage() {
   const upd = <K extends keyof FormState>(k: K, v: FormState[K]) =>
     setF((s) => ({ ...s, [k]: v }));
 
+  // Propone un codice progressivo automatico, modificabile prima del salvataggio.
+  useEffect(() => {
+    let cancelled = false;
+    void suggestNextReferenceCode().then((code) => {
+      if (cancelled) return;
+      setF((s) => (s.reference_code ? s : { ...s, reference_code: code }));
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   /**
    * Crea l'immobile + features narrative.
    * Ritorna l'id se ok, null in caso di errore.
@@ -184,6 +206,17 @@ function NewPropertyPage() {
       toast.error("La tipologia immobile è obbligatoria");
       return null;
     }
+    const referenceCode = normalizeReferenceCode(f.reference_code);
+    const refError = validateReferenceCode(referenceCode);
+    if (refError) {
+      toast.error(refError);
+      return null;
+    }
+    if (await isReferenceCodeTaken(referenceCode)) {
+      toast.error(REFERENCE_DUPLICATE_MESSAGE);
+      return null;
+    }
+    setF((s) => ({ ...s, reference_code: referenceCode }));
     setSaving(true);
     const t = toast.loading("Salvataggio in corso…");
     try {
@@ -233,6 +266,7 @@ function NewPropertyPage() {
 
       const payload = {
         title: f.title.trim(),
+        reference_code: referenceCode,
         slug: slugify(
           [f.title, f.municipality].filter((v) => v && v.trim()).join(" ") ||
             "immobile",
@@ -274,7 +308,12 @@ function NewPropertyPage() {
 
       if (error || !data) {
         console.error("[nuovo] insert failed:", error);
-        toast.error(`Impossibile salvare: ${error?.message ?? "errore sconosciuto"}`, { id: t });
+        toast.error(
+          isDuplicateReferenceError(error)
+            ? REFERENCE_DUPLICATE_MESSAGE
+            : `Impossibile salvare: ${error?.message ?? "errore sconosciuto"}`,
+          { id: t },
+        );
         return null;
       }
 
@@ -418,6 +457,16 @@ function NewPropertyPage() {
         <Section title="1. Dati principali" subtitle="Identificazione dell'annuncio">
           <Field label="Titolo annuncio" full required>
             <TextInput value={f.title} onChange={(v) => upd("title", v)} placeholder="Es. Casale in pietra con vista sulle Apuane" />
+          </Field>
+          <Field label="Codice annuncio" full required>
+            <TextInput
+              value={f.reference_code}
+              onChange={(v) => upd("reference_code", v)}
+              placeholder="Es. FURIA-0042"
+            />
+            <p className="mt-1 text-xs text-muted-foreground">
+              Proposto automaticamente: puoi modificarlo prima del salvataggio. Lettere, numeri, trattini e underscore.
+            </p>
           </Field>
           <Field label="Tipologia immobile" full required>
             <SelectInput

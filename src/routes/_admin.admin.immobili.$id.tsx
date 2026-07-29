@@ -19,6 +19,13 @@ import { LocationFields } from "@/components/admin/location-fields";
 import { WindowFlyerDialog } from "@/components/admin/window-flyer-dialog";
 import { IdealistaPublishDialog } from "@/components/admin/idealista-publish-dialog";
 import {
+  normalizeReferenceCode,
+  validateReferenceCode,
+  isReferenceCodeTaken,
+  isDuplicateReferenceError,
+  REFERENCE_DUPLICATE_MESSAGE,
+} from "@/lib/admin/reference-code";
+import {
   PROPERTY_TYPES,
   CONTRACT_TYPES,
   ENERGY_CLASSES,
@@ -272,6 +279,18 @@ function PropertyEditor() {
 
   const save = async (silent = false) => {
     if (!prop) return;
+    // Il codice annuncio è un dato commerciale modificabile: l'identità tecnica
+    // dell'immobile resta l'UUID (`id`), che non viene mai toccato.
+    const referenceCode = normalizeReferenceCode(prop.reference_code);
+    const refError = validateReferenceCode(referenceCode);
+    if (refError) {
+      toast.error(refError);
+      return;
+    }
+    if (await isReferenceCodeTaken(referenceCode, id)) {
+      toast.error(REFERENCE_DUPLICATE_MESSAGE);
+      return;
+    }
     setSaving(true);
     // Lo slug è un dato tecnico interno: si genera solo se manca,
     // non viene mai rigenerato dal titolo dopo la creazione (stabilità SEO/link).
@@ -280,16 +299,16 @@ function PropertyEditor() {
       existingSlug && existingSlug.length > 0
         ? existingSlug
         : slugify(
-            [prop.title, prop.municipality, prop.reference_code]
+            [prop.title, prop.municipality, referenceCode]
               .filter(Boolean)
               .join(" ") || "immobile",
           );
     const { error } = await supabase
       .from("properties")
-      .update({ ...prop, slug })
+      .update({ ...prop, reference_code: referenceCode, slug })
       .eq("id", id);
     if (error) {
-      toast.error(error.message);
+      toast.error(isDuplicateReferenceError(error) ? REFERENCE_DUPLICATE_MESSAGE : error.message);
       setSaving(false);
       return;
     }
@@ -300,7 +319,7 @@ function PropertyEditor() {
       .map(([feature_name, feature_value]) => ({ property_id: id, feature_name, feature_value }));
     if (rows.length) await supabase.from("property_features").insert(rows);
 
-    setProp((p) => (p ? { ...p, slug } : p));
+    setProp((p) => (p ? { ...p, reference_code: referenceCode, slug } : p));
     setSaving(false);
     if (!silent) toast.success("Salvato");
   };
@@ -777,14 +796,18 @@ function MainTab({
 }) {
   return (
     <Section title="Dati principali">
-      <Field label="Codice riferimento">
+      <Field label="Codice annuncio">
         <input
           type="text"
           value={prop.reference_code ?? ""}
-          readOnly
-          disabled
-          className={`${inputCls} cursor-not-allowed bg-muted/40 text-muted-foreground`}
+          onChange={(e) => update({ reference_code: e.target.value })}
+          onBlur={(e) => update({ reference_code: normalizeReferenceCode(e.target.value) })}
+          placeholder="Es. FURIA-0042"
+          className={inputCls}
         />
+        <p className="mt-1 text-xs text-muted-foreground">
+          Codice visibile su scheda, elenco, cartello A3 e feed portali. Deve essere unico.
+        </p>
       </Field>
       <Field label="Tipologia immobile">
         <SelectInput
