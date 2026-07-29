@@ -33,6 +33,7 @@ import {
   setPropertyImageEnhancedPublished,
 } from "@/lib/property-enhance.functions";
 import { RenderSettingsPanel } from "@/components/admin/render-settings-panel";
+import { PhotoOrderManager } from "@/components/admin/photo-order-manager";
 import type { RenderSettings } from "@/lib/render-options";
 
 type Image = {
@@ -270,7 +271,7 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
     setLastError(null);
     const errors: string[] = [];
     try {
-      const baseOrder = images.length;
+      const baseOrder = images.reduce((max, i) => Math.max(max, i.sort_order ?? 0), 0) + 1;
       const willBeFirstUpload = images.length === 0;
       let count = 0;
       for (const file of Array.from(files)) {
@@ -372,12 +373,18 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
   };
 
   const setCover = async (id: string) => {
-    const { error } = await supabase
-      .from("property_images")
-      .update({ is_cover: true })
-      .eq("id", id);
-    if (error) return toast.error(error.message);
-    toast.success("Cover impostata");
+    const reordered = [
+      ...images.filter((i) => i.id === id),
+      ...images.filter((i) => i.id !== id),
+    ];
+    for (let i = 0; i < reordered.length; i++) {
+      const { error } = await supabase
+        .from("property_images")
+        .update({ sort_order: i + 1, is_cover: i === 0 })
+        .eq("id", reordered[i].id);
+      if (error) return toast.error(error.message);
+    }
+    toast.success("Copertina impostata");
     await load();
   };
 
@@ -386,6 +393,13 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
     await supabase.storage.from(STORAGE_BUCKET).remove([img.storage_path]);
     const { error } = await supabase.from("property_images").delete().eq("id", img.id);
     if (error) return toast.error(error.message);
+    const remaining = images.filter((i) => i.id !== img.id);
+    for (let i = 0; i < remaining.length; i++) {
+      await supabase
+        .from("property_images")
+        .update({ sort_order: i + 1, is_cover: i === 0 })
+        .eq("id", remaining[i].id);
+    }
     toast.success("Immagine eliminata");
     await load();
   };
@@ -580,6 +594,28 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
           </span>
         </button>
       ) : (
+        <>
+        <PhotoOrderManager
+          images={images.map((i) => ({
+            id: i.id,
+            url: i.published_image_url ?? i.enhanced_image_url ?? i.image_url,
+            alt: i.alt_text ?? "Foto immobile",
+          }))}
+          onSaved={load}
+          onDelete={(id) => {
+            const target = images.find((i) => i.id === id);
+            if (target) remove(target);
+          }}
+          onZoom={(id) => {
+            const target = images.find((i) => i.id === id);
+            if (target)
+              setCompareState({
+                image: target,
+                mode: target.enhanced_image_url ? "enhanced" : "rendered",
+                afterMissing: !target.enhanced_image_url && !target.rendered_signed_url,
+              });
+          }}
+        />
         <div
           className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
           onDrop={onDrop}
@@ -892,6 +928,7 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
             </div>
           ))}
         </div>
+        </>
       )}
       {compareState && (
         <BeforeAfterDialog
