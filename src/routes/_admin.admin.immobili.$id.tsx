@@ -777,14 +777,18 @@ function MainTab({
 }) {
   return (
     <Section title="Dati principali">
-      <Field label="Codice riferimento">
+      <Field label="Codice annuncio">
         <input
           type="text"
           value={prop.reference_code ?? ""}
-          readOnly
-          disabled
-          className={`${inputCls} cursor-not-allowed bg-muted/40 text-muted-foreground`}
+          onChange={(e) => update({ reference_code: e.target.value })}
+          onBlur={(e) => update({ reference_code: normalizeReferenceCode(e.target.value) })}
+          placeholder="Es. FURIA-0042"
+          className={inputCls}
         />
+        <p className="mt-1 text-xs text-muted-foreground">
+          Codice visibile su scheda, elenco, cartello A3 e feed portali. Deve essere unico.
+        </p>
       </Field>
       <Field label="Tipologia immobile">
         <SelectInput
