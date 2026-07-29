@@ -118,27 +118,6 @@ function logUploadStep(
   method(`[Foto admin] ${step}`, details);
 }
 
-async function verifyStorageObjectExists(path: string) {
-  const lastSlash = path.lastIndexOf("/");
-  const folder = lastSlash >= 0 ? path.slice(0, lastSlash) : "";
-  const filename = lastSlash >= 0 ? path.slice(lastSlash + 1) : path;
-
-  for (let attempt = 0; attempt < 3; attempt++) {
-    const { data, error } = await supabase.storage
-      .from(STORAGE_BUCKET)
-      .list(folder, { search: filename, limit: 20 });
-    if (error) return { exists: false, error: error.message, filename };
-    if ((data ?? []).some((object) => object.name === filename)) {
-      return { exists: true, error: null, filename };
-    }
-    if (attempt < 2) {
-      await new Promise((resolve) => window.setTimeout(resolve, 250 * (attempt + 1)));
-    }
-  }
-
-  return { exists: false, error: "Object not found dopo upload completato", filename };
-}
-
 function computeAvailability(row: {
   id: string;
   storage_path: string;
