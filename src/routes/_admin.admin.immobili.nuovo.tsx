@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import {
@@ -47,6 +47,14 @@ import {
 } from "@/lib/admin/property-constants";
 import { MultiSelectChips } from "@/components/admin/multi-select-chips";
 import { LocationFields, EMPTY_LOCATION, type LocationValue } from "@/components/admin/location-fields";
+import {
+  normalizeReferenceCode,
+  validateReferenceCode,
+  isReferenceCodeTaken,
+  isDuplicateReferenceError,
+  suggestNextReferenceCode,
+  REFERENCE_DUPLICATE_MESSAGE,
+} from "@/lib/admin/reference-code";
 
 export const Route = createFileRoute("/_admin/admin/immobili/nuovo")({
   head: () => ({
@@ -63,6 +71,7 @@ type Status = "draft" | "ready" | "published";
 type FormState = {
   // Sezione 1
   title: string;
+  reference_code: string;
   property_type: string;
   descrizione_libera: string;
   contract_type: string;
@@ -105,6 +114,7 @@ type FormState = {
 
 const empty: FormState = {
   title: "",
+  reference_code: "",
   property_type: "",
   descrizione_libera: "",
   contract_type: "",
