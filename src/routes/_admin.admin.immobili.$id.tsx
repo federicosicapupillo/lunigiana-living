@@ -179,7 +179,8 @@ function PropertyEditor() {
   const [desc, setDesc] = useState<Description | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [generating, setGenerating] = useState(false);
+  const [generating, setGenerating] = useState<"overwrite" | "proposal" | null>(null);
+  const [proposal, setProposal] = useState<string | null>(null);
   const [flyerOpen, setFlyerOpen] = useState(false);
   const [idealistaOpen, setIdealistaOpen] = useState(false);
   const [titleManual, setTitleManual] = useState(false);
@@ -355,9 +356,9 @@ function PropertyEditor() {
     update({ status: res.status });
   };
 
-  const generate = async () => {
-    if (!prop) return;
-    setGenerating(true);
+  const runGeneration = async (mode: "overwrite" | "proposal") => {
+    if (!prop || generating) return; // blocca doppi clic e richieste duplicate
+    setGenerating(mode);
     try {
       // Auto-save first so AI sees latest data
       await save(true);
@@ -367,23 +368,75 @@ function PropertyEditor() {
           length: genLength,
           tone: genTone,
           seoFocus: seoFocus.trim() || undefined,
+          persist: mode === "overwrite",
         },
       });
-      setDesc((d) => ({
-        ...(d ?? { edited_description: null }),
-        generated_description: result.description,
-        tone_of_voice: genTone,
-        length_preference: genLength,
-        seo_focus: seoFocus.trim() || null,
-        generated_at: new Date().toISOString(),
-      }));
-      toast.success("Descrizione generata");
+      if (mode === "proposal") {
+        setProposal(result.description);
+        toast.success("Nuova versione pronta: confrontala e scegli quale tenere");
+      } else {
+        // Sovrascrive anche il testo editato, altrimenti la rigenerazione
+        // resterebbe invisibile nell'editor.
+        setDesc((d) => ({
+          ...(d ?? { edited_description: null }),
+          generated_description: result.description,
+          edited_description: result.description,
+          tone_of_voice: genTone,
+          length_preference: genLength,
+          seo_focus: seoFocus.trim() || null,
+          generated_at: new Date().toISOString(),
+        }));
+        await supabase
+          .from("property_descriptions")
+          .update({ edited_description: result.description })
+          .eq("property_id", id);
+        toast.success("Descrizione rigenerata");
+      }
       setTab("description");
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Errore generazione");
     } finally {
-      setGenerating(false);
+      setGenerating(null);
     }
+  };
+
+  const generate = () => {
+    const current = desc?.edited_description ?? desc?.generated_description ?? "";
+    if (current.trim()) {
+      if (!confirm("La descrizione attuale verrà sostituita. Vuoi continuare?")) return;
+    }
+    void runGeneration("overwrite");
+  };
+
+  const generateProposal = () => void runGeneration("proposal");
+
+  const acceptProposal = async () => {
+    if (!proposal) return;
+    setDesc((d) => ({
+      ...(d ?? { edited_description: null }),
+      generated_description: proposal,
+      edited_description: proposal,
+      tone_of_voice: genTone,
+      length_preference: genLength,
+      seo_focus: seoFocus.trim() || null,
+      generated_at: new Date().toISOString(),
+    }));
+    const { error } = await supabase.from("property_descriptions").upsert(
+      {
+        property_id: id,
+        generated_description: proposal,
+        edited_description: proposal,
+        tone_of_voice: genTone,
+        length_preference: genLength,
+        seo_focus: seoFocus.trim() || null,
+        language: "it",
+        generated_at: new Date().toISOString(),
+      },
+      { onConflict: "property_id" },
+    );
+    if (error) return toast.error(error.message);
+    setProposal(null);
+    toast.success("Nuova descrizione applicata");
   };
 
   const saveEditedDesc = async () => {
@@ -534,6 +587,10 @@ function PropertyEditor() {
             setDesc={setDesc}
             generating={generating}
             onGenerate={generate}
+            onGenerateProposal={generateProposal}
+            proposal={proposal}
+            onAcceptProposal={acceptProposal}
+            onDiscardProposal={() => setProposal(null)}
             onSaveEdit={saveEditedDesc}
             length={genLength}
             setLength={setGenLength}
@@ -1467,6 +1524,10 @@ function DescriptionTab({
   setDesc,
   generating,
   onGenerate,
+  onGenerateProposal,
+  proposal,
+  onAcceptProposal,
+  onDiscardProposal,
   onSaveEdit,
   length,
   setLength,
@@ -1477,8 +1538,12 @@ function DescriptionTab({
 }: {
   desc: Description | null;
   setDesc: (d: Description | null) => void;
-  generating: boolean;
+  generating: "overwrite" | "proposal" | null;
   onGenerate: () => void;
+  onGenerateProposal: () => void;
+  proposal: string | null;
+  onAcceptProposal: () => void;
+  onDiscardProposal: () => void;
   onSaveEdit: () => void;
   length: "breve" | "media" | "editoriale";
   setLength: (v: "breve" | "media" | "editoriale") => void;
@@ -1545,12 +1610,41 @@ function DescriptionTab({
 
           <button
             onClick={onGenerate}
-            disabled={generating}
+            disabled={generating !== null}
             className="inline-flex w-full items-center justify-center gap-2 rounded-sm bg-primary px-4 py-3 text-xs uppercase tracking-[0.18em] text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
           >
-            {generating ? <Loader2 size={14} className="animate-spin" /> : <Sparkles size={14} />}
-            {generating ? "Generazione in corso..." : hasGenerated ? "Rigenera descrizione" : "Genera descrizione"}
+            {generating === "overwrite" ? (
+              <Loader2 size={14} className="animate-spin" />
+            ) : (
+              <Sparkles size={14} />
+            )}
+            {generating === "overwrite"
+              ? "Generazione in corso..."
+              : hasGenerated
+                ? "Rigenera descrizione"
+                : "Genera descrizione"}
           </button>
+
+          {hasGenerated && (
+            <button
+              onClick={onGenerateProposal}
+              disabled={generating !== null}
+              className="inline-flex w-full items-center justify-center gap-2 rounded-sm border border-border px-4 py-3 text-xs uppercase tracking-[0.18em] text-ink hover:border-primary/50 disabled:opacity-50"
+            >
+              {generating === "proposal" ? (
+                <Loader2 size={14} className="animate-spin" />
+              ) : (
+                <Sparkles size={14} />
+              )}
+              {generating === "proposal" ? "Generazione in corso..." : "Genera nuova versione"}
+            </button>
+          )}
+          {hasGenerated && (
+            <p className="text-[11px] leading-relaxed text-muted-foreground">
+              “Genera nuova versione” crea una proposta alternativa senza sovrascrivere la
+              descrizione attuale.
+            </p>
+          )}
 
           {desc?.generated_at && (
             <p className="text-xs text-muted-foreground">
@@ -1562,6 +1656,43 @@ function DescriptionTab({
 
       {/* Editor */}
       <div className="lg:col-span-8">
+        {proposal && (
+          <div className="mb-6 rounded-sm border border-primary/50 bg-primary/5 p-6">
+            <h4 className="font-serif text-lg text-ink">Nuova versione proposta</h4>
+            <div className="mt-4 grid gap-4 lg:grid-cols-2">
+              <div>
+                <div className="text-[11px] uppercase tracking-wider text-muted-foreground">
+                  Descrizione attuale
+                </div>
+                <div className="mt-2 max-h-72 overflow-auto whitespace-pre-line rounded-sm border border-border bg-background p-3 text-sm leading-relaxed text-ink">
+                  {edited || "—"}
+                </div>
+              </div>
+              <div>
+                <div className="text-[11px] uppercase tracking-wider text-primary">
+                  Nuova descrizione generata
+                </div>
+                <div className="mt-2 max-h-72 overflow-auto whitespace-pre-line rounded-sm border border-primary/40 bg-background p-3 text-sm leading-relaxed text-ink">
+                  {proposal}
+                </div>
+              </div>
+            </div>
+            <div className="mt-4 flex flex-wrap justify-end gap-2">
+              <button
+                onClick={onDiscardProposal}
+                className="rounded-sm border border-border px-4 py-2 text-xs uppercase tracking-wider text-ink hover:border-primary/50"
+              >
+                Mantieni descrizione attuale
+              </button>
+              <button
+                onClick={onAcceptProposal}
+                className="rounded-sm bg-primary px-4 py-2 text-xs uppercase tracking-wider text-primary-foreground hover:bg-primary/90"
+              >
+                Usa nuova descrizione
+              </button>
+            </div>
+          </div>
+        )}
         <div className="rounded-sm border border-border bg-card p-6">
           <div className="flex items-center justify-between">
             <h3 className="flex items-center gap-2 font-serif text-lg text-ink">

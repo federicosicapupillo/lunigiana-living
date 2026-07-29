@@ -2,6 +2,13 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import {
+  AI_IMAGE_MODEL,
+  createPhaseLogger,
+  fetchWithTimeout,
+  fromBase64,
+  toBase64,
+} from "@/lib/ai-image-utils";
+import {
   PHOTO_TYPES,
   INTERNAL_CATEGORIES,
   EXTERNAL_CATEGORIES,
@@ -399,6 +406,9 @@ export const renderPropertyImage = createServerFn({ method: "POST" })
       throw new Error(availability.message ?? IMPORTED_NOT_SYNCED_MESSAGE);
     }
 
+    const log = createPhaseLogger("image_render", data.imageId);
+    log.phase("request_started");
+
     const settings: RenderSettings = {
       photo_type: img.photo_type,
       photo_category: img.photo_category,
@@ -433,9 +443,9 @@ export const renderPropertyImage = createServerFn({ method: "POST" })
       }
       mime = blob.type || mime;
       bytesIn = new Uint8Array(await blob.arrayBuffer());
-      let bin = "";
-      for (let i = 0; i < bytesIn.length; i++) bin += String.fromCharCode(bytesIn[i]);
-      const dataUrl = `data:${mime};base64,${btoa(bin)}`;
+      log.phase("source_download_completed", { bytes: bytesIn.length });
+      const dataUrl = `data:${mime};base64,${toBase64(bytesIn)}`;
+      log.phase("source_encoded");
 
       const key = process.env.LOVABLE_API_KEY;
       if (!key) throw new Error("AI non configurata");
@@ -445,7 +455,7 @@ export const renderPropertyImage = createServerFn({ method: "POST" })
         method: "POST",
         headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
         body: JSON.stringify({
-          model: "google/gemini-3.1-flash-image-preview",
+          model: AI_IMAGE_MODEL,
           modalities: ["image", "text"],
           messages: [
             {
@@ -465,13 +475,15 @@ export const renderPropertyImage = createServerFn({ method: "POST" })
       const json = (await upstream.json()) as { data?: Array<{ b64_json?: string }> };
       const b64 = json.data?.[0]?.b64_json;
       if (!b64) throw new Error("Nessuna immagine generata");
+      log.phase("ai_generation_completed");
 
-      const bytes = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
+      const bytes = fromBase64(b64);
       const renderedPath = `${img.property_id}/rendered/${img.id}-${Date.now()}.png`;
       const { error: upErr } = await supabaseAdmin.storage
         .from(BUCKET)
         .upload(renderedPath, bytes, { contentType: "image/png", upsert: false });
       if (upErr) throw new Error(`Upload rendering fallito: ${upErr.message}`);
+      log.phase("storage_upload_completed", { bytes: bytes.length });
       const { data: renderedSigned } = await supabaseAdmin.storage
         .from(BUCKET)
         .createSignedUrl(renderedPath, SIGNED_URL_TTL_SECONDS);
@@ -488,6 +500,7 @@ export const renderPropertyImage = createServerFn({ method: "POST" })
         })
         .eq("id", data.imageId);
       if (updErr) throw new Error(updErr.message);
+      log.phase("database_update_completed");
 
       return { ok: true as const, renderedPath };
     } catch (err) {

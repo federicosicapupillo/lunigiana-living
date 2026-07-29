@@ -34,6 +34,23 @@ import {
 } from "@/lib/property-enhance.functions";
 import { RenderSettingsPanel } from "@/components/admin/render-settings-panel";
 import { PhotoOrderManager } from "@/components/admin/photo-order-manager";
+import {
+  formatBytes,
+  optimizeImage,
+  runWithConcurrency,
+} from "@/lib/admin/image-optimize";
+
+type UploadTask = {
+  key: string;
+  name: string;
+  status: "queued" | "optimizing" | "uploading" | "done" | "error";
+  bytesBefore: number;
+  bytesAfter: number | null;
+  error: string | null;
+  preview: string | null;
+};
+
+const UPLOAD_CONCURRENCY = 4;
 import type { RenderSettings } from "@/lib/render-options";
 
 type Image = {
@@ -99,27 +116,6 @@ function logUploadStep(
 ) {
   const method = step === "SIGNED URL FAILED" ? console.error : console.info;
   method(`[Foto admin] ${step}`, details);
-}
-
-async function verifyStorageObjectExists(path: string) {
-  const lastSlash = path.lastIndexOf("/");
-  const folder = lastSlash >= 0 ? path.slice(0, lastSlash) : "";
-  const filename = lastSlash >= 0 ? path.slice(lastSlash + 1) : path;
-
-  for (let attempt = 0; attempt < 3; attempt++) {
-    const { data, error } = await supabase.storage
-      .from(STORAGE_BUCKET)
-      .list(folder, { search: filename, limit: 20 });
-    if (error) return { exists: false, error: error.message, filename };
-    if ((data ?? []).some((object) => object.name === filename)) {
-      return { exists: true, error: null, filename };
-    }
-    if (attempt < 2) {
-      await new Promise((resolve) => window.setTimeout(resolve, 250 * (attempt + 1)));
-    }
-  }
-
-  return { exists: false, error: "Object not found dopo upload completato", filename };
 }
 
 function computeAvailability(row: {
@@ -196,6 +192,7 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
   const runSetEnhancedPublished = useServerFn(setPropertyImageEnhancedPublished);
   const [lastError, setLastError] = useState<string | null>(null);
   const [dragOver, setDragOver] = useState(false);
+  const [tasks, setTasks] = useState<UploadTask[]>([]);
   const [compareState, setCompareState] = useState<{
     image: Image;
     mode: "enhanced" | "rendered";
@@ -265,95 +262,144 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
     load();
   }, [propertyId]);
 
+  useEffect(() => {
+    if (!uploading) return;
+    const msg = "Ci sono fotografie ancora in caricamento. Vuoi uscire senza completarle?";
+    const handler = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = msg;
+      return msg;
+    };
+    window.addEventListener("beforeunload", handler);
+    return () => window.removeEventListener("beforeunload", handler);
+  }, [uploading]);
+
+  const uploadSingle = async (
+    file: File,
+    order: number,
+    isFirstEver: boolean,
+    key: string,
+  ) => {
+    const t0 = performance.now();
+    const patch = (p: Partial<UploadTask>) =>
+      setTasks((prev) => prev.map((t) => (t.key === key ? { ...t, ...p } : t)));
+
+    patch({ status: "optimizing" });
+    const optimized = await optimizeImage(file);
+    const tOpt = performance.now();
+
+    patch({ status: "uploading", bytesAfter: optimized.bytesAfter });
+    const ext = optimized.contentType === "image/jpeg" ? "jpg" : (file.name.split(".").pop()?.toLowerCase() || "jpg");
+    const path = `${propertyId}/${crypto.randomUUID()}.${ext}`;
+    const logDetails = { bucket: STORAGE_BUCKET, path, filename: file.name, property_id: propertyId };
+    logUploadStep("UPLOAD START", logDetails);
+
+    const { error: upErr } = await supabase.storage
+      .from(STORAGE_BUCKET)
+      .upload(path, optimized.blob, {
+        cacheControl: "31536000",
+        upsert: false,
+        contentType: optimized.contentType,
+      });
+    if (upErr) throw new Error(`Upload fallito (${file.name}): ${upErr.message}`);
+    logUploadStep("UPLOAD SUCCESS", logDetails);
+    const tUp = performance.now();
+
+    // L'upload riuscito garantisce già l'esistenza dell'oggetto:
+    // il vecchio polling con list() aggiungeva fino a ~1s per foto.
+    const { data: signed, error: signErr } = await supabase.storage
+      .from(STORAGE_BUCKET)
+      .createSignedUrl(path, SIGNED_URL_TTL_SECONDS);
+    if (signErr || !signed) {
+      await supabase.storage.from(STORAGE_BUCKET).remove([path]);
+      throw new Error(`URL firmato fallito (${file.name}): ${signErr?.message ?? "n/d"}`);
+    }
+
+    const { error: insErr } = await supabase.from("property_images").insert({
+      property_id: propertyId,
+      image_url: signed.signedUrl,
+      original_image_url: signed.signedUrl,
+      published_image_url: signed.signedUrl,
+      storage_path: path,
+      sort_order: order,
+      is_cover: isFirstEver,
+      is_imported: false,
+      import_status: "synced_to_storage",
+      render_status: "not_generated",
+    });
+    if (insErr) {
+      await supabase.storage.from(STORAGE_BUCKET).remove([path]);
+      throw new Error(`Errore salvataggio foto (${file.name}): ${insErr.message}`);
+    }
+
+    const tEnd = performance.now();
+    console.info(
+      JSON.stringify({
+        scope: "photo_upload",
+        file: file.name,
+        bytes_before: optimized.bytesBefore,
+        bytes_after: optimized.bytesAfter,
+        ms_optimize: Math.round(tOpt - t0),
+        ms_upload: Math.round(tUp - tOpt),
+        ms_total: Math.round(tEnd - t0),
+      }),
+    );
+    patch({ status: "done" });
+  };
+
   const handleFiles = async (files: FileList | null) => {
     if (!files || files.length === 0) return;
+    const list = Array.from(files).filter((f) => f.type.startsWith("image/") || /\.hei[cf]$/i.test(f.name));
+    const rejected = Array.from(files).length - list.length;
+    if (rejected > 0) toast.error(`${rejected} file ignorati: formato non supportato`);
+    if (list.length === 0) return;
+
     setUploading(true);
     setLastError(null);
+    const baseOrder = images.reduce((max, i) => Math.max(max, i.sort_order ?? 0), 0) + 1;
+    const isEmptyGallery = images.length === 0;
+
+    const queued: UploadTask[] = list.map((f, i) => ({
+      key: `${Date.now()}-${i}-${f.name}`,
+      name: f.name,
+      status: "queued",
+      bytesBefore: f.size,
+      bytesAfter: null,
+      error: null,
+      preview: URL.createObjectURL(f),
+    }));
+    setTasks(queued);
+
     const errors: string[] = [];
-    try {
-      const baseOrder = images.reduce((max, i) => Math.max(max, i.sort_order ?? 0), 0) + 1;
-      const willBeFirstUpload = images.length === 0;
-      let count = 0;
-      for (const file of Array.from(files)) {
-        if (!file.type.startsWith("image/")) {
-          errors.push(`${file.name}: tipo file non supportato (${file.type || "sconosciuto"})`);
-          continue;
-        }
-        const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
-        const path = `${propertyId}/${crypto.randomUUID()}.${ext}`;
-        const logDetails = {
-          bucket: STORAGE_BUCKET,
-          path,
-          filename: file.name,
-          property_id: propertyId,
-        };
-        logUploadStep("UPLOAD START", logDetails);
-        logUploadStep("OBJECT PATH", logDetails);
-        const { error: upErr } = await supabase.storage
-          .from(STORAGE_BUCKET)
-          .upload(path, file, { cacheControl: "31536000", upsert: false });
-        if (upErr) {
-          const msg = `Upload fallito (${file.name}): ${upErr.message}`;
-          toast.error(msg);
+    await runWithConcurrency(
+      list.map((file, i) => async () => {
+        try {
+          await uploadSingle(file, baseOrder + i, isEmptyGallery && i === 0, queued[i].key);
+        } catch (e) {
+          const msg = e instanceof Error ? e.message : "Errore sconosciuto";
           errors.push(msg);
-          continue;
+          setTasks((prev) =>
+            prev.map((t) => (t.key === queued[i].key ? { ...t, status: "error", error: msg } : t)),
+          );
         }
-        logUploadStep("UPLOAD SUCCESS", logDetails);
+      }),
+      UPLOAD_CONCURRENCY,
+    );
 
-        const existsCheck = await verifyStorageObjectExists(path);
-        if (!existsCheck.exists) {
-          const msg = `File non trovato nello storage dopo upload (${file.name}). Bucket: ${STORAGE_BUCKET} · Path: ${path} · Dettaglio: ${existsCheck.error ?? "n/d"}`;
-          logUploadStep("SIGNED URL FAILED", { ...logDetails, error: msg });
-          toast.error(msg);
-          errors.push(msg);
-          continue;
-        }
-
-        logUploadStep("SIGNED URL REQUEST", logDetails);
-        const { data: signed, error: signErr } = await supabase.storage
-          .from(STORAGE_BUCKET)
-          .createSignedUrl(path, SIGNED_URL_TTL_SECONDS);
-        if (signErr || !signed) {
-          const msg = `URL firmato fallito (${file.name}). Bucket: ${STORAGE_BUCKET} · Path: ${path} · Dettaglio: ${signErr?.message ?? "n/d"}`;
-          logUploadStep("SIGNED URL FAILED", { ...logDetails, error: signErr?.message ?? "n/d" });
-          toast.error(msg);
-          errors.push(msg);
-          continue;
-        }
-        logUploadStep("SIGNED URL SUCCESS", logDetails);
-        const { error: insErr } = await supabase.from("property_images").insert({
-          property_id: propertyId,
-          image_url: signed.signedUrl,
-          original_image_url: signed.signedUrl,
-          published_image_url: signed.signedUrl,
-          storage_path: path,
-          sort_order: baseOrder + count,
-          is_cover: willBeFirstUpload && count === 0,
-          is_imported: false,
-          import_status: "synced_to_storage",
-          render_status: "not_generated",
-        });
-        if (insErr) {
-          const msg = `Errore caricamento foto (${file.name}): ${insErr.message}`;
-          toast.error(msg);
-          errors.push(msg);
-          // best-effort cleanup of orphan storage object
-          await supabase.storage.from(STORAGE_BUCKET).remove([path]);
-          continue;
-        }
-        count++;
-      }
-      if (count > 0) toast.success(`${count} immagine/i caricate`);
-      if (errors.length > 0) setLastError(errors.join(" · "));
-      await load();
-    } catch (e) {
-      const msg = e instanceof Error ? e.message : "Errore sconosciuto";
-      toast.error(`Errore caricamento foto: ${msg}`);
-      setLastError(`Errore caricamento foto: ${msg}`);
-    } finally {
-      setUploading(false);
-      if (fileRef.current) fileRef.current.value = "";
+    const ok = list.length - errors.length;
+    if (ok > 0) toast.success(`${ok} immagine/i caricate`);
+    if (errors.length > 0) {
+      toast.error(`${errors.length} foto non caricate`);
+      setLastError(errors.join(" · "));
     }
+    await load();
+    setUploading(false);
+    if (fileRef.current) fileRef.current.value = "";
+    // Ripulisci le anteprime completate dopo un istante
+    window.setTimeout(() => {
+      queued.forEach((t) => t.preview && URL.revokeObjectURL(t.preview));
+      setTasks((prev) => prev.filter((t) => t.status === "error"));
+    }, 1500);
   };
 
   const onDrop = (e: React.DragEvent) => {
@@ -561,6 +607,44 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
           >
             <X size={12} />
           </button>
+        </div>
+      )}
+
+      {tasks.length > 0 && (
+        <div className="mt-4 space-y-2 rounded-sm border border-border bg-muted/20 p-3">
+          {tasks.map((t) => (
+            <div key={t.key} className="flex items-center gap-3 text-xs">
+              {t.preview ? (
+                <img src={t.preview} alt="" className="h-10 w-14 rounded-sm object-cover" />
+              ) : null}
+              <span className="min-w-0 flex-1 truncate text-ink">{t.name}</span>
+              <span className="shrink-0 text-muted-foreground">
+                {formatBytes(t.bytesBefore)}
+                {t.bytesAfter != null && t.bytesAfter !== t.bytesBefore
+                  ? ` → ${formatBytes(t.bytesAfter)}`
+                  : ""}
+              </span>
+              <span
+                className={`shrink-0 rounded-sm px-2 py-0.5 uppercase tracking-wider ${
+                  t.status === "error"
+                    ? "bg-destructive/10 text-destructive"
+                    : t.status === "done"
+                      ? "bg-primary/10 text-primary"
+                      : "bg-background text-muted-foreground"
+                }`}
+              >
+                {t.status === "queued"
+                  ? "In attesa"
+                  : t.status === "optimizing"
+                    ? "Ottimizzazione"
+                    : t.status === "uploading"
+                      ? "Caricamento"
+                      : t.status === "done"
+                        ? "Completato"
+                        : "Errore"}
+              </span>
+            </div>
+          ))}
         </div>
       )}
 

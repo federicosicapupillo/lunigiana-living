@@ -8,6 +8,11 @@ const Input = z.object({
   length: z.enum(["breve", "media", "editoriale"]).default("media"),
   tone: z.enum(["neutro", "emozionale", "commerciale"]).default("neutro"),
   seoFocus: z.string().max(200).optional(),
+  /**
+   * Quando false, la descrizione viene solo restituita come proposta
+   * alternativa e NON sovrascrive quella salvata ("Genera nuova versione").
+   */
+  persist: z.boolean().default(true),
 });
 
 type Property = {
@@ -182,6 +187,10 @@ export const generateDescription = createServerFn({ method: "POST" })
     const text = json.choices?.[0]?.message?.content?.trim() ?? "";
     if (!text) throw new Error("Risposta AI vuota.");
 
+    if (!data.persist) {
+      return { description: text, persisted: false as const };
+    }
+
     // Persist
     const { error: upErr } = await supabase
       .from("property_descriptions")
@@ -199,5 +208,5 @@ export const generateDescription = createServerFn({ method: "POST" })
       );
     if (upErr) throw new Error(`Salvataggio fallito: ${upErr.message}`);
 
-    return { description: text };
+    return { description: text, persisted: true as const };
   });

@@ -1,6 +1,13 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import {
+  AI_IMAGE_MODEL,
+  createPhaseLogger,
+  fetchWithTimeout,
+  fromBase64,
+  toBase64,
+} from "@/lib/ai-image-utils";
 
 const BUCKET = "property-images";
 const SIGNED_URL_TTL_SECONDS = 60 * 60 * 24 * 365 * 5;
@@ -42,16 +49,32 @@ async function ensureAdmin(supabase: any, userId: string) {
   if (!roleRow) throw new Error("Solo gli admin possono migliorare le foto");
 }
 
-async function enhanceOne(imageId: string): Promise<{ ok: true; enhancedPath: string }> {
+async function enhanceOne(
+  imageId: string,
+  opts: { force?: boolean } = {},
+): Promise<{ ok: true; enhancedPath: string; enhancedUrl: string | null; skipped?: boolean }> {
+  const log = createPhaseLogger("image_enhance", imageId);
+  log.phase("request_started");
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { data: img, error } = await supabaseAdmin
     .from("property_images")
-    .select("id, property_id, storage_path, use_enhanced")
+    .select("id, property_id, storage_path, use_enhanced, enhancement_status, enhanced_storage_path, enhanced_image_url")
     .eq("id", imageId)
     .maybeSingle();
   if (error || !img) throw new Error("Immagine non trovata");
   if (!img.storage_path || /^https?:\/\//i.test(img.storage_path)) {
     throw new Error("Sincronizza prima la foto nello storage interno");
+  }
+
+  // Non rigenerare ciò che è già stato completato (evita lavoro AI inutile).
+  if (!opts.force && img.enhancement_status === "enhanced" && img.enhanced_storage_path) {
+    log.phase("skipped_already_enhanced");
+    return {
+      ok: true as const,
+      enhancedPath: img.enhanced_storage_path,
+      enhancedUrl: img.enhanced_image_url,
+      skipped: true,
+    };
   }
 
   await supabaseAdmin
@@ -66,18 +89,19 @@ async function enhanceOne(imageId: string): Promise<{ ok: true; enhancedPath: st
     if (dlErr || !blob) throw new Error("Foto originale non trovata nello storage");
     const mime = blob.type || "image/jpeg";
     const bytesIn = new Uint8Array(await blob.arrayBuffer());
-    let bin = "";
-    for (let i = 0; i < bytesIn.length; i++) bin += String.fromCharCode(bytesIn[i]);
-    const dataUrl = `data:${mime};base64,${btoa(bin)}`;
+    log.phase("source_download_completed", { bytes: bytesIn.length });
+    const dataUrl = `data:${mime};base64,${toBase64(bytesIn)}`;
+    log.phase("source_encoded");
 
     const key = process.env.LOVABLE_API_KEY;
     if (!key) throw new Error("AI non configurata");
 
-    const upstream = await fetch("https://ai.gateway.lovable.dev/v1/images/generations", {
+    log.phase("ai_generation_started");
+    const upstream = await fetchWithTimeout("https://ai.gateway.lovable.dev/v1/images/generations", {
       method: "POST",
       headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "google/gemini-3.1-flash-image-preview",
+        model: AI_IMAGE_MODEL,
         modalities: ["image", "text"],
         messages: [
           {
@@ -97,13 +121,15 @@ async function enhanceOne(imageId: string): Promise<{ ok: true; enhancedPath: st
     const json = (await upstream.json()) as { data?: Array<{ b64_json?: string }> };
     const b64 = json.data?.[0]?.b64_json;
     if (!b64) throw new Error("Nessuna immagine restituita");
+    log.phase("ai_generation_completed");
 
-    const bytes = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
+    const bytes = fromBase64(b64);
     const enhancedPath = `${img.property_id}/enhanced/${img.id}-${Date.now()}.png`;
     const { error: upErr } = await supabaseAdmin.storage
       .from(BUCKET)
       .upload(enhancedPath, bytes, { contentType: "image/png", upsert: false });
     if (upErr) throw new Error(`Upload fallito: ${upErr.message}`);
+    log.phase("storage_upload_completed", { bytes: bytes.length });
     const { data: signed } = await supabaseAdmin.storage
       .from(BUCKET)
       .createSignedUrl(enhancedPath, SIGNED_URL_TTL_SECONDS);
@@ -124,8 +150,13 @@ async function enhanceOne(imageId: string): Promise<{ ok: true; enhancedPath: st
       )
       .eq("id", imageId);
     if (updErr) throw new Error(updErr.message);
+    log.phase("database_update_completed");
 
-    return { ok: true as const, enhancedPath };
+    return {
+      ok: true as const,
+      enhancedPath,
+      enhancedUrl: signed?.signedUrl ?? null,
+    };
   } catch (err) {
     const msg = err instanceof Error ? err.message : "Errore miglioramento";
     await supabaseAdmin
