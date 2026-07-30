@@ -58,7 +58,7 @@ const it: Dict = {
     "Da 18 anni a Pontremoli. Case di pietra, ville panoramiche e dimore di carattere in tutta la Lunigiana — selezionate da chi questa terra la abita davvero.",
   "home.trust.years": "a Pontremoli",
   "home.trust.properties": "immobili trattati",
-  "home.trust.comuni": "della Lunigiana",
+  "home.trust.comuni": "COMUNI DELLA LUNIGIANA",
   "home.trust.fiaip": "agenzia iscritta",
   "home.brand.eyebrow": "Chi siamo",
   "home.brand.title1": "Abitare la Lunigiana,",
