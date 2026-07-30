@@ -252,8 +252,8 @@ const it: Dict = {
   // Immobili list
   "list.eyebrow": "Immobili",
   "list.title": "La nostra selezione di case in Lunigiana.",
-  "list.intro": "immobili reali importati dal nostro archivio. Filtra per categoria o comune per trovare il tuo posto.",
-  "list.count.available": "immobili disponibili",
+  "list.intro": "Filtra per categoria o comune per trovare il tuo posto.",
+  "list.count.available": "Immobili disponibili",
   "list.empty": "Nessun immobile trovato per questa ricerca.",
   "list.notFound": "Non trovi quello che cerchi?",
 

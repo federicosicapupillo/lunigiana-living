@@ -160,7 +160,7 @@ function ImmobiliPage() {
             {t("list.title")}
           </h1>
           <p className="mt-5 max-w-2xl text-base leading-relaxed text-foreground/75">
-            {allProperties.length} {t("list.intro")}
+            {t("list.intro")}
           </p>
 
           <div className="mt-10">
@@ -185,8 +185,7 @@ function ImmobiliPage() {
 
       <section className="container-editorial py-20">
         <div className="mb-10 flex items-end justify-between border-b border-border pb-5">
-          <p className="text-sm text-muted-foreground">
-            <span className="font-serif text-lg text-ink">{filtered.length}</span>{" "}
+          <p className="text-sm text-muted-foreground uppercase tracking-widest">
             {t("list.count.available")}
           </p>
         </div>
