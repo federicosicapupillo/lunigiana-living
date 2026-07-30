@@ -795,7 +795,7 @@ const en: Dict = {
     "18 years in Pontremoli. Stone houses, panoramic villas and homes with character across Lunigiana — chosen by people who truly live in this land.",
   "home.trust.years": "in Pontremoli",
   "home.trust.properties": "properties handled",
-  "home.trust.comuni": "of Lunigiana",
+  "home.trust.comuni": "MUNICIPALITIES",
   "home.trust.fiaip": "registered agency",
   "home.brand.eyebrow": "About us",
   "home.brand.title1": "Living in Lunigiana,",
