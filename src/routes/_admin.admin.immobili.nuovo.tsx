@@ -425,7 +425,7 @@ function NewPropertyPage() {
               className="inline-flex items-center gap-2 rounded-sm border border-border bg-background px-4 py-2 text-xs uppercase tracking-wider hover:border-primary/50 disabled:opacity-50"
             >
               {saving ? <Loader2 size={13} className="animate-spin" /> : <Save size={13} />}
-              Salva bozza
+              SALVA
             </button>
             <button
               onClick={onSaveContinue}
