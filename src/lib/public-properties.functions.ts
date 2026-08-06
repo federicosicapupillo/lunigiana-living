@@ -610,13 +610,17 @@ export const listPublishedPropertiesSummary = createServerFn({ method: "GET" }).
       continue;
     }
     // pick the one path that resolveBefore/resolveRender will actually read
-    if (i.use_rendered && i.rendered_image_url) continue;
+    if (i.use_rendered && i.rendered_image_url) {
+      const p = pathFromStorageUrl(i.rendered_image_url);
+      if (p) pathsToSign.push(p);
+      continue;
+    }
     if (i.use_rendered && i.rendered_storage_path) {
       pathsToSign.push(i.rendered_storage_path);
       continue;
     }
     if (i.use_enhanced && i.enhanced_storage_path) {
-      if (!i.enhanced_image_url) pathsToSign.push(i.enhanced_storage_path);
+      pathsToSign.push(i.enhanced_storage_path);
       continue;
     }
     pathsToSign.push(i.storage_path);
