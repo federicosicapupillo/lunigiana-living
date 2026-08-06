@@ -250,7 +250,7 @@ function AdminPropertiesPage() {
         <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
           <Link
             to="/admin/immobili/assistente"
-            search={{}}
+            search={{ audio: undefined }}
             className="inline-flex items-center justify-center gap-2 rounded-sm border border-primary bg-primary/10 px-4 py-3 text-xs uppercase tracking-[0.18em] text-primary hover:bg-primary/20 sm:px-5 sm:py-2.5"
           >
             <Sparkles size={15} /> Crea annuncio con IA
