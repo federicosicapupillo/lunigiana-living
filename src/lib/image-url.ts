@@ -5,7 +5,10 @@
  * with the transform options baked into the JWT, producing variant URLs
  * served from `/storage/v1/render/image/sign/...`. Variants are returned
  * to the client as `PublicProperty.imageVariants` — a map keyed by the
- * original signed URL.
+ * **stable storage path** of the object (e.g.
+ * `<property_id>/imported/<uuid>.jpg`), NOT by the signed URL: signed
+ * URLs carry a token that changes on every signature, so a URL key can
+ * never be matched reliably by the consumer.
  *
  * These helpers accept that map and resolve the right variant, falling
  * back to the original URL when:
@@ -29,10 +32,33 @@ export const PRESET_WIDTHS = {
   original: null,
 } as const;
 
+/**
+ * Derive the stable storage-path key from any URL that points at the
+ * `property-images` bucket (signed `object/sign/...`, transformed
+ * `render/image/sign/...` or public `object/public/...`). Query string
+ * and token are stripped. Returns `null` for external/data URLs.
+ */
+export function variantKey(url: string): string | null {
+  if (!url) return null;
+  const marker = "/property-images/";
+  const at = url.indexOf(marker);
+  if (at === -1) return null;
+  const rest = url.slice(at + marker.length);
+  const path = rest.split("?")[0];
+  return path ? decodeURIComponent(path) : null;
+}
+
+function lookup(url: string, variants?: VariantsMap): ImageVariants | undefined {
+  if (!variants) return undefined;
+  const key = variantKey(url);
+  // Stable path key first; legacy signed-URL key kept as a fallback.
+  return (key ? variants[key] : undefined) ?? variants[url];
+}
+
 /** Resolve a single variant URL. Falls back to `url` on any miss. */
 export function imgVariant(url: string, preset: ImgPreset, variants?: VariantsMap): string {
   if (!url || preset === "original") return url;
-  const v = variants?.[url];
+  const v = lookup(url, variants);
   return v?.[preset] || url;
 }
 
@@ -42,7 +68,7 @@ export function imgVariant(url: string, preset: ImgPreset, variants?: VariantsMa
  * stays fully responsible for the fallback.
  */
 export function imgSrcSet(url: string, presets: ImgPreset[], variants?: VariantsMap): string {
-  const v = variants?.[url];
+  const v = lookup(url, variants);
   if (!v) return "";
   const parts: string[] = [];
   for (const p of presets) {

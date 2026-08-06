@@ -80,10 +80,11 @@ export type PublicProperty = {
    */
   visionRenderings: string[];
   /**
-   * Variant URL map keyed by the original signed URL that appears in
-   * `image` / `gallery` / `renderings`. When a variant is missing
-   * (external URL, transform failed, publisher-supplied URL, etc.)
-   * consumers fall back to the original key.
+   * Variant URL map keyed by the **stable storage path** of each object
+   * (e.g. `<property_id>/imported/<uuid>.jpg`). Consumers derive that key
+   * from whatever URL they hold (see `variantKey` in `@/lib/image-url`),
+   * so a re-signed / stored URL still resolves. When a variant is missing
+   * (external URL, transform failed, etc.) consumers fall back to the URL.
    */
   imageVariants: Record<string, ImageVariants>;
   createdAt: string | null;
@@ -295,13 +296,11 @@ function adapt(
   const imageVariants: Record<string, ImageVariants> = {};
   const attach = (path: string | null | undefined) => {
     if (!path || isExternalUrl(path)) return;
-    const origUrl = signedMap[path];
-    if (!origUrl) return;
     const v: ImageVariants = {};
     if (variantMaps.card?.[path])  v.card  = variantMaps.card[path];
     if (variantMaps.hero?.[path])  v.hero  = variantMaps.hero[path];
     if (variantMaps.thumb?.[path]) v.thumb = variantMaps.thumb[path];
-    if (v.card || v.hero || v.thumb) imageVariants[origUrl] = v;
+    if (v.card || v.hero || v.thumb) imageVariants[path] = v;
   };
   for (const i of sortedImages) {
     attach(i.storage_path);
