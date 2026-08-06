@@ -227,7 +227,7 @@ const it: Dict = {
   "search.priceNoMax": "Nessun massimo",
 
   // Property card
-  "card.rooms": "locali",
+  "card.rooms": "camere",
   "card.epi": "IPE",
 
   // Contatti
@@ -964,7 +964,7 @@ const en: Dict = {
   "search.priceNoMax": "No maximum",
 
   // Property card
-  "card.rooms": "rooms",
+  "card.rooms": "bedrooms",
   "card.epi": "EPI",
 
   // Contatti

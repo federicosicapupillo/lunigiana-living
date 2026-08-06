@@ -91,9 +91,12 @@ export function PropertyCard({ p }: { p: PropertyCardData }) {
         <div className="relative aspect-[4/3] overflow-hidden bg-muted">
           <WatermarkedImage
             src={img.card(p.image, p.imageVariants)}
-            srcSet={imgSrcSet(p.image, ["thumb", "card"], p.imageVariants) || undefined}
+            srcSet={imgSrcSet(p.image, ["thumb", "card", "hero"], p.imageVariants) || undefined}
             alt={displayTitle}
             loading="lazy"
+            decoding="async"
+            width={800}
+            height={600}
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
             watermarkSize="md"
             className="h-full w-full object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-105"
