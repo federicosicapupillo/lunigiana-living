@@ -11,6 +11,7 @@ import { ArrowRight, MapPin, Mountain, Sparkles } from "lucide-react";
 import { useT } from "@/lib/i18n/LanguageContext";
 import { useLocalizedHead } from "@/hooks/use-localized-head";
 import { LeadMagnetBlock } from "@/components/lead-magnet-block";
+import { siteUrl } from "@/lib/site-url";
 
 const imageBySlug: Record<string, string> = {
   pontremoli: pontremoliAsset.url,
@@ -28,8 +29,9 @@ export const Route = createFileRoute("/territori")({
       { name: "description", content: "Pontremoli, Villafranca, Bagnone, Filattiera, Mulazzo, Zeri: una guida ai borghi della Lunigiana per scegliere con consapevolezza dove vivere o comprare casa." },
       { property: "og:title", content: "Vivere in Lunigiana — Furia Immobiliare" },
       { property: "og:description", content: "Sei borghi, sei atmosfere. Una guida sincera alla Lunigiana, scritta da chi questa terra la abita e la racconta ogni giorno." },
+      { property: "og:url", content: siteUrl("/territori") },
     ],
-    links: [{ rel: "canonical", href: "/territori" }],
+    links: [{ rel: "canonical", href: siteUrl("/territori") }],
   }),
   component: TerritoriPage,
 });

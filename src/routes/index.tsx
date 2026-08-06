@@ -21,6 +21,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useLanguage, useT } from "@/lib/i18n/LanguageContext";
 import { useLocalizedHead } from "@/hooks/use-localized-head";
 import { localizePropertyDynamic } from "@/lib/i18n/property-localize";
+import { siteUrl } from "@/lib/site-url";
 
 const AGENCY_FACTS = {
   yearsActive: 18,
@@ -73,9 +74,10 @@ export const Route = createFileRoute("/")({
       { name: "description", content: "Agenzia immobiliare a Pontremoli. Vendita e affitto di case, ville e immobili in Lunigiana: Pontremoli, Villafranca, Filattiera, Mulazzo, Bagnone, Zeri." },
       { property: "og:title", content: "Furia Immobiliare — Case di carattere in Lunigiana" },
       { property: "og:description", content: "Trova il tuo posto in Lunigiana. Immobili scelti per chi cerca autenticità, panorama e qualità del vivere." },
+      { property: "og:url", content: siteUrl("/") },
     ],
     links: [
-      { rel: "canonical", href: "/" },
+      { rel: "canonical", href: siteUrl("/") },
       { rel: "preload", as: "image", href: heroTramontoVignetiAsset.url, fetchPriority: "high" },
     ],
     scripts: [
