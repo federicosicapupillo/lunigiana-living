@@ -135,7 +135,11 @@ export function propertyGraph(p: PublicProperty) {
           },
         }
       : {}),
-    ...(p.rooms && p.rooms > 0 ? { numberOfRooms: p.rooms } : {}),
+    // La colonna sorgente è `properties.bedrooms` (UI scheda: "Camere" /
+    // "Bedrooms"): rappresenta le camere da letto, non i locali totali.
+    // Nessun campo affidabile per il numero complessivo di locali esiste,
+    // quindi `numberOfRooms` è volutamente omesso.
+    ...(p.rooms && p.rooms > 0 ? { numberOfBedrooms: p.rooms } : {}),
     ...(p.bathrooms && p.bathrooms > 0 ? { numberOfBathroomsTotal: p.bathrooms } : {}),
     ...(p.energyClass
       ? {
@@ -151,6 +155,11 @@ export function propertyGraph(p: PublicProperty) {
   };
 
   const hasPrice = typeof p.priceValue === "number" && Number.isFinite(p.priceValue) && p.priceValue > 0;
+  // Per le locazioni non esiste in banca dati alcuna periodicità del prezzo
+  // (mensile/settimanale/notte) e il testo pubblico indica "prezzo da
+  // concordare": pubblicare un importo senza periodo sarebbe fuorviante,
+  // quindi l'intero nodo Offer viene omesso.
+  const emitOffer = hasPrice && !p.isRent;
 
   const listing: Record<string, unknown> = {
     "@type": "RealEstateListing",
@@ -165,7 +174,7 @@ export function propertyGraph(p: PublicProperty) {
     about: { "@id": `${canonical}#accommodation` },
     // `image` volutamente omesso: le foto sono servite con URL firmate a
     // scadenza, non adatte al markup pubblico.
-    ...(hasPrice
+    ...(emitOffer
       ? {
           offers: {
             "@type": "Offer",
