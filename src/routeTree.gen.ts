@@ -9,13 +9,18 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as Vendite2DotaspRouteImport } from './routes/vendite2[.]asp'
 import { Route as TrovaCasaLunigianaRouteImport } from './routes/trova-casa-lunigiana'
 import { Route as TerritoriRouteImport } from './routes/territori'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ServiziRouteImport } from './routes/servizi'
+import { Route as IndexDotaspRouteImport } from './routes/index[.]asp'
 import { Route as ImmobiliRouteImport } from './routes/immobili'
 import { Route as ContattiRouteImport } from './routes/contatti'
+import { Route as ContattaciDotaspRouteImport } from './routes/contattaci[.]asp'
+import { Route as Chi_siamoDotaspRouteImport } from './routes/chi_siamo[.]asp'
 import { Route as ChiSiamoRouteImport } from './routes/chi-siamo'
+import { Route as AnnuncioDotaspRouteImport } from './routes/annuncio[.]asp'
 import { Route as AdminRouteImport } from './routes/_admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ImmobiliIndexRouteImport } from './routes/immobili.index'
@@ -38,6 +43,11 @@ import { Route as AdminAdminImmobiliAssistenteRouteImport } from './routes/_admi
 import { Route as AdminAdminImmobiliIdRouteImport } from './routes/_admin.admin.immobili.$id'
 import { Route as AdminAdminImmobiliIdAnteprimaRouteImport } from './routes/_admin.admin.immobili.$id.anteprima'
 
+const Vendite2DotaspRoute = Vendite2DotaspRouteImport.update({
+  id: '/vendite2.asp',
+  path: '/vendite2.asp',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TrovaCasaLunigianaRoute = TrovaCasaLunigianaRouteImport.update({
   id: '/trova-casa-lunigiana',
   path: '/trova-casa-lunigiana',
@@ -58,6 +68,11 @@ const ServiziRoute = ServiziRouteImport.update({
   path: '/servizi',
   getParentRoute: () => rootRouteImport,
 } as any)
+const IndexDotaspRoute = IndexDotaspRouteImport.update({
+  id: '/index.asp',
+  path: '/index.asp',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ImmobiliRoute = ImmobiliRouteImport.update({
   id: '/immobili',
   path: '/immobili',
@@ -68,9 +83,24 @@ const ContattiRoute = ContattiRouteImport.update({
   path: '/contatti',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ContattaciDotaspRoute = ContattaciDotaspRouteImport.update({
+  id: '/contattaci.asp',
+  path: '/contattaci.asp',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const Chi_siamoDotaspRoute = Chi_siamoDotaspRouteImport.update({
+  id: '/chi_siamo.asp',
+  path: '/chi_siamo.asp',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ChiSiamoRoute = ChiSiamoRouteImport.update({
   id: '/chi-siamo',
   path: '/chi-siamo',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AnnuncioDotaspRoute = AnnuncioDotaspRouteImport.update({
+  id: '/annuncio.asp',
+  path: '/annuncio.asp',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminRoute = AdminRouteImport.update({
@@ -185,13 +215,18 @@ const AdminAdminImmobiliIdAnteprimaRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/annuncio.asp': typeof AnnuncioDotaspRoute
   '/chi-siamo': typeof ChiSiamoRoute
+  '/chi_siamo.asp': typeof Chi_siamoDotaspRoute
+  '/contattaci.asp': typeof ContattaciDotaspRoute
   '/contatti': typeof ContattiRoute
   '/immobili': typeof ImmobiliRouteWithChildren
+  '/index.asp': typeof IndexDotaspRoute
   '/servizi': typeof ServiziRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/territori': typeof TerritoriRoute
   '/trova-casa-lunigiana': typeof TrovaCasaLunigianaRoute
+  '/vendite2.asp': typeof Vendite2DotaspRoute
   '/admin': typeof AdminAdminRouteWithChildren
   '/admin/login': typeof AdminLoginRoute
   '/case-in-vendita-lunigiana/$tipologia': typeof CaseInVenditaLunigianaTipologiaRoute
@@ -214,12 +249,17 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/annuncio.asp': typeof AnnuncioDotaspRoute
   '/chi-siamo': typeof ChiSiamoRoute
+  '/chi_siamo.asp': typeof Chi_siamoDotaspRoute
+  '/contattaci.asp': typeof ContattaciDotaspRoute
   '/contatti': typeof ContattiRoute
+  '/index.asp': typeof IndexDotaspRoute
   '/servizi': typeof ServiziRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/territori': typeof TerritoriRoute
   '/trova-casa-lunigiana': typeof TrovaCasaLunigianaRoute
+  '/vendite2.asp': typeof Vendite2DotaspRoute
   '/admin/login': typeof AdminLoginRoute
   '/case-in-vendita-lunigiana/$tipologia': typeof CaseInVenditaLunigianaTipologiaRoute
   '/case-in-vendita/$comune': typeof CaseInVenditaComuneRoute
@@ -243,13 +283,18 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_admin': typeof AdminRouteWithChildren
+  '/annuncio.asp': typeof AnnuncioDotaspRoute
   '/chi-siamo': typeof ChiSiamoRoute
+  '/chi_siamo.asp': typeof Chi_siamoDotaspRoute
+  '/contattaci.asp': typeof ContattaciDotaspRoute
   '/contatti': typeof ContattiRoute
   '/immobili': typeof ImmobiliRouteWithChildren
+  '/index.asp': typeof IndexDotaspRoute
   '/servizi': typeof ServiziRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/territori': typeof TerritoriRoute
   '/trova-casa-lunigiana': typeof TrovaCasaLunigianaRoute
+  '/vendite2.asp': typeof Vendite2DotaspRoute
   '/_admin/admin': typeof AdminAdminRouteWithChildren
   '/admin/login': typeof AdminLoginRoute
   '/case-in-vendita-lunigiana/$tipologia': typeof CaseInVenditaLunigianaTipologiaRoute
@@ -274,13 +319,18 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/annuncio.asp'
     | '/chi-siamo'
+    | '/chi_siamo.asp'
+    | '/contattaci.asp'
     | '/contatti'
     | '/immobili'
+    | '/index.asp'
     | '/servizi'
     | '/sitemap.xml'
     | '/territori'
     | '/trova-casa-lunigiana'
+    | '/vendite2.asp'
     | '/admin'
     | '/admin/login'
     | '/case-in-vendita-lunigiana/$tipologia'
@@ -303,12 +353,17 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/annuncio.asp'
     | '/chi-siamo'
+    | '/chi_siamo.asp'
+    | '/contattaci.asp'
     | '/contatti'
+    | '/index.asp'
     | '/servizi'
     | '/sitemap.xml'
     | '/territori'
     | '/trova-casa-lunigiana'
+    | '/vendite2.asp'
     | '/admin/login'
     | '/case-in-vendita-lunigiana/$tipologia'
     | '/case-in-vendita/$comune'
@@ -331,13 +386,18 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_admin'
+    | '/annuncio.asp'
     | '/chi-siamo'
+    | '/chi_siamo.asp'
+    | '/contattaci.asp'
     | '/contatti'
     | '/immobili'
+    | '/index.asp'
     | '/servizi'
     | '/sitemap.xml'
     | '/territori'
     | '/trova-casa-lunigiana'
+    | '/vendite2.asp'
     | '/_admin/admin'
     | '/admin/login'
     | '/case-in-vendita-lunigiana/$tipologia'
@@ -362,13 +422,18 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRouteWithChildren
+  AnnuncioDotaspRoute: typeof AnnuncioDotaspRoute
   ChiSiamoRoute: typeof ChiSiamoRoute
+  Chi_siamoDotaspRoute: typeof Chi_siamoDotaspRoute
+  ContattaciDotaspRoute: typeof ContattaciDotaspRoute
   ContattiRoute: typeof ContattiRoute
   ImmobiliRoute: typeof ImmobiliRouteWithChildren
+  IndexDotaspRoute: typeof IndexDotaspRoute
   ServiziRoute: typeof ServiziRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TerritoriRoute: typeof TerritoriRoute
   TrovaCasaLunigianaRoute: typeof TrovaCasaLunigianaRoute
+  Vendite2DotaspRoute: typeof Vendite2DotaspRoute
   AdminLoginRoute: typeof AdminLoginRoute
   CaseInVenditaLunigianaTipologiaRoute: typeof CaseInVenditaLunigianaTipologiaRoute
   CaseInVenditaComuneRoute: typeof CaseInVenditaComuneRoute
@@ -379,6 +444,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/vendite2.asp': {
+      id: '/vendite2.asp'
+      path: '/vendite2.asp'
+      fullPath: '/vendite2.asp'
+      preLoaderRoute: typeof Vendite2DotaspRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/trova-casa-lunigiana': {
       id: '/trova-casa-lunigiana'
       path: '/trova-casa-lunigiana'
@@ -407,6 +479,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ServiziRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/index.asp': {
+      id: '/index.asp'
+      path: '/index.asp'
+      fullPath: '/index.asp'
+      preLoaderRoute: typeof IndexDotaspRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/immobili': {
       id: '/immobili'
       path: '/immobili'
@@ -421,11 +500,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ContattiRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/contattaci.asp': {
+      id: '/contattaci.asp'
+      path: '/contattaci.asp'
+      fullPath: '/contattaci.asp'
+      preLoaderRoute: typeof ContattaciDotaspRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/chi_siamo.asp': {
+      id: '/chi_siamo.asp'
+      path: '/chi_siamo.asp'
+      fullPath: '/chi_siamo.asp'
+      preLoaderRoute: typeof Chi_siamoDotaspRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/chi-siamo': {
       id: '/chi-siamo'
       path: '/chi-siamo'
       fullPath: '/chi-siamo'
       preLoaderRoute: typeof ChiSiamoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/annuncio.asp': {
+      id: '/annuncio.asp'
+      path: '/annuncio.asp'
+      fullPath: '/annuncio.asp'
+      preLoaderRoute: typeof AnnuncioDotaspRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_admin': {
@@ -644,13 +744,18 @@ const ImmobiliRouteWithChildren = ImmobiliRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRouteWithChildren,
+  AnnuncioDotaspRoute: AnnuncioDotaspRoute,
   ChiSiamoRoute: ChiSiamoRoute,
+  Chi_siamoDotaspRoute: Chi_siamoDotaspRoute,
+  ContattaciDotaspRoute: ContattaciDotaspRoute,
   ContattiRoute: ContattiRoute,
   ImmobiliRoute: ImmobiliRouteWithChildren,
+  IndexDotaspRoute: IndexDotaspRoute,
   ServiziRoute: ServiziRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TerritoriRoute: TerritoriRoute,
   TrovaCasaLunigianaRoute: TrovaCasaLunigianaRoute,
+  Vendite2DotaspRoute: Vendite2DotaspRoute,
   AdminLoginRoute: AdminLoginRoute,
   CaseInVenditaLunigianaTipologiaRoute: CaseInVenditaLunigianaTipologiaRoute,
   CaseInVenditaComuneRoute: CaseInVenditaComuneRoute,
