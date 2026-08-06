@@ -88,7 +88,7 @@ export const Route = createFileRoute("/immobili/$id")({
     return {
       meta: [
         { title },
-        { name: "description", content: `${p.title} a ${p.location}. ${p.sqm ? p.sqm + ' m². ' : ''}${p.rooms ? p.rooms + ' locali. ' : ''}${p.price}.` },
+        { name: "description", content: `${p.title} a ${p.location}. ${p.sqm ? p.sqm + ' m². ' : ''}${p.rooms ? p.rooms + ' camere. ' : ''}${p.price}.` },
         { property: "og:title", content: `${p.title} — ${p.location}` },
         { property: "og:description", content: p.description.slice(0, 200) },
         { property: "og:url", content: canonical },
@@ -578,10 +578,20 @@ function PropertyDetail() {
                 )}
                 <WatermarkedImage
                   key={main}
+                  imgRef={(el) => {
+                    // A cache-complete image (SSR markup already decoded) never
+                    // fires onLoad after hydration: check `complete` directly so
+                    // the main photo is never stuck behind the skeleton.
+                    if (el?.complete && el.naturalWidth > 0) setMainLoaded(true);
+                  }}
                   src={img.hero(main, p.imageVariants)}
                   srcSet={imgSrcSet(main, ["card", "hero"], p.imageVariants) || undefined}
                   alt={title}
+                  loading="eager"
                   fetchPriority="high"
+                  decoding="async"
+                  width={1600}
+                  height={1067}
                   sizes="(max-width: 1024px) 100vw, 70vw"
                   watermarkSize="lg"
                   onLoad={() => setMainLoaded(true)}
