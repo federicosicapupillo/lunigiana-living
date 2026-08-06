@@ -61,9 +61,26 @@ export const Route = createFileRoute("/immobili/$id")({
     }
     return { property };
   },
-  head: ({ loaderData }) => {
+  head: ({ params, loaderData }) => {
     const p = loaderData?.property;
-    if (!p) return { meta: [{ title: "Immobile — Furia Immobiliare" }] };
+    // Durante una navigazione client-side il loader può non essere ancora
+    // risolto: in quel caso canonical/og:url vengono derivati dallo slug in
+    // URL (mai da un UUID, che viene reindirizzato 301 lato server) così i
+    // meta della pagina precedente non restano mai attivi.
+    if (!p) {
+      const slugParam = params?.id?.trim();
+      if (!slugParam || isUuid(slugParam)) {
+        return { meta: [{ title: "Immobile — Furia Immobiliare" }] };
+      }
+      const url = siteUrl(`/immobili/${slugParam}`);
+      return {
+        meta: [
+          { title: "Immobile — Furia Immobiliare" },
+          { property: "og:url", content: url },
+        ],
+        links: [{ rel: "canonical", href: url }],
+      };
+    }
     const canonical = siteUrl(propertyPath(p));
     const rawTitle = `${p.title} a ${p.location} — ${p.reference} | Furia Immobiliare`;
     const title = truncateTitle(rawTitle, 60);
