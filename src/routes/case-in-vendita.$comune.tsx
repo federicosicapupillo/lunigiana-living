@@ -9,6 +9,7 @@ import { useLanguage, useT } from "@/lib/i18n/LanguageContext";
 import { useDocHead } from "@/hooks/use-localized-head";
 import { localizePropertyDynamic } from "@/lib/i18n/property-localize";
 import { siteUrl } from "@/lib/site-url";
+import { propertyPath } from "@/lib/property-url";
 
 export const Route = createFileRoute("/case-in-vendita/$comune")({
   loader: async ({ params }) => {
@@ -46,7 +47,7 @@ export const Route = createFileRoute("/case-in-vendita/$comune")({
       itemListElement: items.slice(0, 25).map((p, i) => ({
         "@type": "ListItem",
         position: i + 1,
-        url: siteUrl(`/immobili/${p.slug || p.id}`),
+        url: siteUrl(propertyPath(p)),
         name: p.title,
       })),
     };
