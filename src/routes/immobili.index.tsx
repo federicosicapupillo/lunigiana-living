@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, stripSearchParams } from "@tanstack/react-router";
 import { zodValidator, fallback } from "@tanstack/zod-adapter";
 import { z } from "zod";
 import { PropertyCard } from "@/components/property-card";
@@ -13,21 +13,38 @@ import { useLocalizedHead } from "@/hooks/use-localized-head";
 import { localizePropertyDynamic } from "@/lib/i18n/property-localize";
 import { TIPOLOGIE_SEO, localizeTipologiaSeo } from "@/lib/seo-tipologie";
 
+// Tutti i parametri sono opzionali: se assenti dalla URL restano assenti
+// (nessuna query string vuota generata dalla normalizzazione del router).
 const searchSchema = z.object({
-  contract: fallback(z.string(), "").default(""),
-  featured: fallback(z.string(), "").default(""),
-  type: fallback(z.string(), "").default(""),
-  comune: fallback(z.string(), "").default(""),
-  price_min: fallback(z.string(), "").default(""),
-  price_max: fallback(z.string(), "").default(""),
-  size: fallback(z.string(), "").default(""),
-  rooms: fallback(z.string(), "").default(""),
-  features: fallback(z.string(), "").default(""),
-  sort: fallback(z.string(), "").default(""),
+  contract: fallback(z.string(), "").optional(),
+  featured: fallback(z.string(), "").optional(),
+  type: fallback(z.string(), "").optional(),
+  comune: fallback(z.string(), "").optional(),
+  price_min: fallback(z.string(), "").optional(),
+  price_max: fallback(z.string(), "").optional(),
+  size: fallback(z.string(), "").optional(),
+  rooms: fallback(z.string(), "").optional(),
+  features: fallback(z.string(), "").optional(),
+  sort: fallback(z.string(), "").optional(),
 });
+
+// Rimuove dalla URL i parametri di valore vuoto (equivalenti all'assenza).
+const EMPTY_SEARCH = {
+  contract: "",
+  featured: "",
+  type: "",
+  comune: "",
+  price_min: "",
+  price_max: "",
+  size: "",
+  rooms: "",
+  features: "",
+  sort: "",
+} as const;
 
 export const Route = createFileRoute("/immobili/")({
   validateSearch: zodValidator(searchSchema),
+  search: { middlewares: [stripSearchParams(EMPTY_SEARCH)] },
   loader: () => listPublishedPropertiesSummary(),
   head: () => ({
     meta: [
@@ -36,7 +53,9 @@ export const Route = createFileRoute("/immobili/")({
       { property: "og:title", content: "Immobili in Lunigiana — Furia Immobiliare" },
       { property: "og:description", content: "Una selezione curata di immobili in tutta la Lunigiana." },
     ],
-    links: [{ rel: "canonical", href: "/immobili" }],
+      { property: "og:url", content: siteUrl("/immobili") },
+    ],
+    links: [{ rel: "canonical", href: siteUrl("/immobili") }],
   }),
   errorComponent: ({ error }) => (
     <div className="container-editorial py-32 text-center">
