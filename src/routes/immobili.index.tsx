@@ -12,6 +12,7 @@ import { useLanguage, useT } from "@/lib/i18n/LanguageContext";
 import { useLocalizedHead } from "@/hooks/use-localized-head";
 import { localizePropertyDynamic } from "@/lib/i18n/property-localize";
 import { TIPOLOGIE_SEO, localizeTipologiaSeo } from "@/lib/seo-tipologie";
+import { siteUrl } from "@/lib/site-url";
 
 // Tutti i parametri sono opzionali: se assenti dalla URL restano assenti
 // (nessuna query string vuota generata dalla normalizzazione del router).
