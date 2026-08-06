@@ -74,7 +74,7 @@ export function PropertyCard({ p }: { p: PropertyCardData }) {
     <div className="card-property group block overflow-hidden">
       <Link
         to="/immobili/$id"
-        params={{ id: String(p.id) }}
+        params={{ id: propertyParam(p) }}
         aria-label={`${t("cta.openListing")} ${p.reference} — ${displayTitle} (${p.location})`}
         data-track="property_card_click"
         onClick={() =>
