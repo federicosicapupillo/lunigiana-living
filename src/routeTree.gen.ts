@@ -16,6 +16,7 @@ import { Route as ServiziRouteImport } from './routes/servizi'
 import { Route as ImmobiliRouteImport } from './routes/immobili'
 import { Route as ContattiRouteImport } from './routes/contatti'
 import { Route as ChiSiamoRouteImport } from './routes/chi-siamo'
+import { Route as AnnuncioDotaspRouteImport } from './routes/annuncio[.]asp'
 import { Route as AdminRouteImport } from './routes/_admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ImmobiliIndexRouteImport } from './routes/immobili.index'
@@ -71,6 +72,11 @@ const ContattiRoute = ContattiRouteImport.update({
 const ChiSiamoRoute = ChiSiamoRouteImport.update({
   id: '/chi-siamo',
   path: '/chi-siamo',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AnnuncioDotaspRoute = AnnuncioDotaspRouteImport.update({
+  id: '/annuncio.asp',
+  path: '/annuncio.asp',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminRoute = AdminRouteImport.update({
@@ -185,6 +191,7 @@ const AdminAdminImmobiliIdAnteprimaRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/annuncio.asp': typeof AnnuncioDotaspRoute
   '/chi-siamo': typeof ChiSiamoRoute
   '/contatti': typeof ContattiRoute
   '/immobili': typeof ImmobiliRouteWithChildren
@@ -214,6 +221,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/annuncio.asp': typeof AnnuncioDotaspRoute
   '/chi-siamo': typeof ChiSiamoRoute
   '/contatti': typeof ContattiRoute
   '/servizi': typeof ServiziRoute
@@ -243,6 +251,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_admin': typeof AdminRouteWithChildren
+  '/annuncio.asp': typeof AnnuncioDotaspRoute
   '/chi-siamo': typeof ChiSiamoRoute
   '/contatti': typeof ContattiRoute
   '/immobili': typeof ImmobiliRouteWithChildren
@@ -274,6 +283,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/annuncio.asp'
     | '/chi-siamo'
     | '/contatti'
     | '/immobili'
@@ -303,6 +313,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/annuncio.asp'
     | '/chi-siamo'
     | '/contatti'
     | '/servizi'
@@ -331,6 +342,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_admin'
+    | '/annuncio.asp'
     | '/chi-siamo'
     | '/contatti'
     | '/immobili'
@@ -362,6 +374,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRouteWithChildren
+  AnnuncioDotaspRoute: typeof AnnuncioDotaspRoute
   ChiSiamoRoute: typeof ChiSiamoRoute
   ContattiRoute: typeof ContattiRoute
   ImmobiliRoute: typeof ImmobiliRouteWithChildren
@@ -426,6 +439,13 @@ declare module '@tanstack/react-router' {
       path: '/chi-siamo'
       fullPath: '/chi-siamo'
       preLoaderRoute: typeof ChiSiamoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/annuncio.asp': {
+      id: '/annuncio.asp'
+      path: '/annuncio.asp'
+      fullPath: '/annuncio.asp'
+      preLoaderRoute: typeof AnnuncioDotaspRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_admin': {
@@ -644,6 +664,7 @@ const ImmobiliRouteWithChildren = ImmobiliRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRouteWithChildren,
+  AnnuncioDotaspRoute: AnnuncioDotaspRoute,
   ChiSiamoRoute: ChiSiamoRoute,
   ContattiRoute: ContattiRoute,
   ImmobiliRoute: ImmobiliRouteWithChildren,
