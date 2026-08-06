@@ -322,6 +322,8 @@ function adapt(
     attach(i.enhanced_storage_path);
     attach(i.rendered_storage_path);
     attach(pathFromStorageUrl(i.published_image_url));
+    attach(pathFromStorageUrl(i.enhanced_image_url));
+    attach(pathFromStorageUrl(i.rendered_image_url));
   }
   const attrs: Record<string, string> = {};
   const amenities: string[] = [];
