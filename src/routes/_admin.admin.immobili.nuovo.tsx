@@ -398,7 +398,7 @@ function NewPropertyPage() {
           </Link>
           <Link
             to="/admin/immobili/assistente"
-            search={{}}
+            search={{ audio: undefined }}
             className="inline-flex items-center gap-2 rounded-sm border border-primary bg-primary/10 px-3 py-1.5 text-[11px] uppercase tracking-wider text-primary hover:bg-primary/20"
           >
             <Sparkles size={13} /> Crea con IA
