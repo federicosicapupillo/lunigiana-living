@@ -114,6 +114,7 @@ export function propertyGraph(p: PublicProperty) {
 
   const about: Record<string, unknown> = {
     "@type": accommodationType(p.type),
+    "@id": `${canonical}#accommodation`,
     name: p.title,
     ...(locality
       ? {
@@ -158,24 +159,25 @@ export function propertyGraph(p: PublicProperty) {
     name: p.title,
     ...(description ? { description } : {}),
     ...(p.reference ? { identifier: p.reference } : {}),
-    ...(p.createdAt ? { datePosted: p.createdAt } : {}),
     inLanguage: "it-IT",
     isPartOf: { "@id": WEBSITE_ID },
     provider: { "@id": AGENCY_ID },
-    about,
+    about: { "@id": `${canonical}#accommodation` },
     // `image` volutamente omesso: le foto sono servite con URL firmate a
     // scadenza, non adatte al markup pubblico.
     ...(hasPrice
       ? {
           offers: {
             "@type": "Offer",
+            "@id": `${canonical}#offer`,
             price: p.priceValue,
             priceCurrency: "EUR",
             availability: "https://schema.org/InStock",
             businessFunction: p.isRent
-              ? "https://schema.org/LeaseOut"
-              : "https://schema.org/Sell",
+              ? "http://purl.org/goodrelations/v1#LeaseOut"
+              : "http://purl.org/goodrelations/v1#Sell",
             url: canonical,
+            itemOffered: { "@id": `${canonical}#accommodation` },
             seller: { "@id": AGENCY_ID },
           },
         }
@@ -201,6 +203,7 @@ export function propertyGraph(p: PublicProperty) {
         mainEntity: { "@id": listingId },
       },
       listing,
+      about,
       breadcrumb,
     ],
   };
