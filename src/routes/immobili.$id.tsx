@@ -31,6 +31,7 @@ import { img, imgSrcSet } from "@/lib/image-url";
 import { trackEvent, trackClick } from "@/lib/analytics";
 import { siteUrl } from "@/lib/site-url";
 import { propertyPath } from "@/lib/property-url";
+import { propertyGraph } from "@/lib/structured-data";
 
 function truncateTitle(s: string, max = 60): string {
   if (s.length <= max) return s;
@@ -94,6 +95,12 @@ export const Route = createFileRoute("/immobili/$id")({
         ...(p.image ? [{ property: "og:image", content: p.image }] : []),
       ],
       links: [{ rel: "canonical", href: canonical }],
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify(propertyGraph(p)),
+        },
+      ],
     };
   },
   notFoundComponent: NotFound,
