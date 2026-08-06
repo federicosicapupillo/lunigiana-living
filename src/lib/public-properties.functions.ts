@@ -471,18 +471,34 @@ export const listPublishedProperties = createServerFn({ method: "GET" }).handler
   return { properties: result };
 });
 
+const UUID_RE =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/** True quando la stringa è un UUID valido (evita cast UUID fallito in Postgres). */
+export function isUuid(value: string): boolean {
+  return UUID_RE.test(value.trim());
+}
+
 export const getPublishedProperty = createServerFn({ method: "GET" })
   .inputValidator((data: { id: string }) => z.object({ id: z.string().min(1).max(128) }).parse(data))
   .handler(async ({ data }) => {
-    const { data: p, error } = await supabaseAdmin
+    const key = data.id.trim();
+    const query = supabaseAdmin
       .from("properties")
     .select(
       "id, slug, reference_code, title, title_en, subtitle_en, summary_en, location_description_en, municipality, area_zone, price, price_on_request, property_type, contract_type, size_sqm, bedrooms, bathrooms, floors, short_notes, panoramic_view, historic_property, featured, energy_class, energy_performance_index_status, energy_performance_index_value, commercial_highlights, occasione_settings, created_at",
     )
-      .eq("status", "published")
-      .or(`id.eq.${data.id},slug.eq.${data.id}`)
-      .maybeSingle();
-    if (error) throw new Error(error.message);
+      .eq("status", "published");
+    // La colonna `id` è UUID: confrontarla con uno slug testuale genera un
+    // errore Postgres (SSR 500). Selezioniamo una sola colonna in base al formato.
+    const { data: p, error } = await (isUuid(key)
+      ? query.eq("id", key)
+      : query.eq("slug", key)
+    ).maybeSingle();
+    if (error) {
+      console.error("[getPublishedProperty] db error", { key, error });
+      throw new Error(error.message);
+    }
     if (!p) return { property: null };
 
     const propRow = p as PropertyRow;
