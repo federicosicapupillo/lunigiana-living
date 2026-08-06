@@ -1,5 +1,5 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { getPublishedProperty, type PublicProperty } from "@/lib/public-properties.functions";
+import { createFileRoute, Link, notFound, redirect } from "@tanstack/react-router";
+import { getPublishedProperty, isUuid, type PublicProperty } from "@/lib/public-properties.functions";
 import { getLocalizedProperty } from "@/lib/property-i18n.functions";
 import {
   ArrowLeft, ChevronLeft, ChevronRight, MapPin, Maximize2, BedDouble, Bath, Building2,
@@ -30,6 +30,7 @@ import { COMMERCIAL_HIGHLIGHT_EN } from "@/lib/admin/property-constants";
 import { img, imgSrcSet } from "@/lib/image-url";
 import { trackEvent, trackClick } from "@/lib/analytics";
 import { siteUrl } from "@/lib/site-url";
+import { propertyPath } from "@/lib/property-url";
 
 function truncateTitle(s: string, max = 60): string {
   if (s.length <= max) return s;
@@ -42,12 +43,28 @@ export const Route = createFileRoute("/immobili/$id")({
   loader: async ({ params }) => {
     const { property } = await getPublishedProperty({ data: { id: params.id } });
     if (!property) throw notFound();
+    // Gli slug sono gli URL pubblici canonici: un accesso via UUID viene
+    // reindirizzato lato server con un 301 permanente verso lo slug.
+    // Un solo salto, destinazione già canonica (nessuna catena/loop).
+    const slug = property.slug?.trim();
+    if (isUuid(params.id) && slug) {
+      throw redirect({
+        to: "/immobili/$id",
+        params: { id: slug },
+        statusCode: 301,
+      });
+    }
+    if (isUuid(params.id) && !slug) {
+      // Anomalia: immobile pubblicato senza slug. Nessun redirect vuoto,
+      // la pagina UUID resta raggiungibile.
+      console.warn("[immobili/$id] immobile pubblicato senza slug", { id: property.id });
+    }
     return { property };
   },
   head: ({ loaderData }) => {
     const p = loaderData?.property;
     if (!p) return { meta: [{ title: "Immobile — Furia Immobiliare" }] };
-    const canonical = siteUrl(`/immobili/${p.slug || p.id}`);
+    const canonical = siteUrl(propertyPath(p));
     const rawTitle = `${p.title} a ${p.location} — ${p.reference} | Furia Immobiliare`;
     const title = truncateTitle(rawTitle, 60);
     return {

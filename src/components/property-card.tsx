@@ -13,9 +13,11 @@ import { COMMERCIAL_HIGHLIGHT_EN } from "@/lib/admin/property-constants";
 import { img, imgSrcSet, type VariantsMap } from "@/lib/image-url";
 import { getPropertyDisplayTitle } from "@/lib/property-display-title";
 import { trackClick } from "@/lib/analytics";
+import { propertyParam } from "@/lib/property-url";
 
 type PropertyCardData = {
   id: number | string;
+  slug?: string | null;
   reference: string;
   title: string;
   titleEn?: string | null;
@@ -74,7 +76,7 @@ export function PropertyCard({ p }: { p: PropertyCardData }) {
     <div className="card-property group block overflow-hidden">
       <Link
         to="/immobili/$id"
-        params={{ id: String(p.id) }}
+        params={{ id: propertyParam(p) }}
         aria-label={`${t("cta.openListing")} ${p.reference} — ${displayTitle} (${p.location})`}
         data-track="property_card_click"
         onClick={() =>
