@@ -36,33 +36,12 @@ const AGENCY_FACTS = {
   googleReviewsUrl: "https://share.google/XuLvMM0CG6tmjlwpO",
 };
 
-const ORGANIZATION_JSONLD = {
-  "@context": "https://schema.org",
-  "@type": "RealEstateAgent",
-  name: "Furia Immobiliare",
-  description:
-    "Agenzia immobiliare a Pontremoli. Vendita e affitto di case, ville e dimore di carattere in Lunigiana.",
-  url: "https://furiaimmobiliare.it/",
-  telephone: "+39 0187 830229",
-  email: AGENCY_FACTS.email,
-  address: {
-    "@type": "PostalAddress",
-    streetAddress: "Via Pirandello 7",
-    addressLocality: "Pontremoli",
-    postalCode: "54027",
-    addressRegion: "MS",
-    addressCountry: "IT",
-  },
-  areaServed: [
-    "Pontremoli",
-    "Villafranca in Lunigiana",
-    "Filattiera",
-    "Mulazzo",
-    "Bagnone",
-    "Zeri",
-  ],
-  memberOf: { "@type": "Organization", name: "FIAIP" },
-};
+const HOME_TITLE = "Furia Immobiliare — Case di carattere in Lunigiana";
+const HOME_DESCRIPTION =
+  "Agenzia immobiliare a Pontremoli. Vendita e affitto di case, ville e immobili in Lunigiana: Pontremoli, Villafranca, Filattiera, Mulazzo, Bagnone, Zeri.";
+
+/** Unico blocco JSON-LD della home: RealEstateAgent + WebSite + WebPage. */
+const HOME_JSONLD = homeGraph(HOME_TITLE, HOME_DESCRIPTION);
 
 export const Route = createFileRoute("/")({
   loader: async () => {
@@ -71,9 +50,9 @@ export const Route = createFileRoute("/")({
   },
   head: () => ({
     meta: [
-      { title: "Furia Immobiliare — Case di carattere in Lunigiana" },
-      { name: "description", content: "Agenzia immobiliare a Pontremoli. Vendita e affitto di case, ville e immobili in Lunigiana: Pontremoli, Villafranca, Filattiera, Mulazzo, Bagnone, Zeri." },
-      { property: "og:title", content: "Furia Immobiliare — Case di carattere in Lunigiana" },
+      { title: HOME_TITLE },
+      { name: "description", content: HOME_DESCRIPTION },
+      { property: "og:title", content: HOME_TITLE },
       { property: "og:description", content: "Trova il tuo posto in Lunigiana. Immobili scelti per chi cerca autenticità, panorama e qualità del vivere." },
       { property: "og:url", content: siteUrl("/") },
     ],
@@ -84,7 +63,7 @@ export const Route = createFileRoute("/")({
     scripts: [
       {
         type: "application/ld+json",
-        children: JSON.stringify(ORGANIZATION_JSONLD),
+        children: JSON.stringify(HOME_JSONLD),
       },
     ],
   }),
