@@ -1,4 +1,4 @@
-import { type ImgHTMLAttributes } from "react";
+import { type ImgHTMLAttributes, type Ref } from "react";
 import watermarkAsset from "@/assets/furia-watermark.png.asset.json";
 import { cn } from "@/lib/utils";
 
@@ -8,6 +8,8 @@ type Props = ImgHTMLAttributes<HTMLImageElement> & {
   containerClassName?: string;
   watermarkSize?: Size;
   watermark?: boolean;
+  /** Ref forwarded to the inner <img> (used to detect cache-complete loads). */
+  imgRef?: Ref<HTMLImageElement>;
 };
 
 const SIZE_CLASSES: Record<Size, string> = {
@@ -27,6 +29,7 @@ export function WatermarkedImage({
   watermarkSize = "md",
   watermark = true,
   alt,
+  imgRef,
   ...imgProps
 }: Props) {
   return (
@@ -34,6 +37,7 @@ export function WatermarkedImage({
       <img
         decoding="async"
         {...imgProps}
+        ref={imgRef}
         alt={alt}
         className={cn("h-full w-full object-cover", className)}
       />

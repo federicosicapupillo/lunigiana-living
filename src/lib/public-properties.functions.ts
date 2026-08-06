@@ -80,10 +80,11 @@ export type PublicProperty = {
    */
   visionRenderings: string[];
   /**
-   * Variant URL map keyed by the original signed URL that appears in
-   * `image` / `gallery` / `renderings`. When a variant is missing
-   * (external URL, transform failed, publisher-supplied URL, etc.)
-   * consumers fall back to the original key.
+   * Variant URL map keyed by the **stable storage path** of each object
+   * (e.g. `<property_id>/imported/<uuid>.jpg`). Consumers derive that key
+   * from whatever URL they hold (see `variantKey` in `@/lib/image-url`),
+   * so a re-signed / stored URL still resolves. When a variant is missing
+   * (external URL, transform failed, etc.) consumers fall back to the URL.
    */
   imageVariants: Record<string, ImageVariants>;
   createdAt: string | null;
@@ -112,6 +113,21 @@ function deriveCategory(contract: string | null): PublicProperty["category"] {
 
 function isExternalUrl(p: string): boolean {
   return /^https?:\/\//i.test(p);
+}
+
+/**
+ * Extract the stable storage path from a stored Supabase URL
+ * (`.../object/sign/property-images/<path>?token=...`). Used to know which
+ * object a stored `published_image_url` points at, so its transformed
+ * variants can be signed and keyed by that same path.
+ */
+function pathFromStorageUrl(url: string | null | undefined): string | null {
+  if (!url) return null;
+  const marker = "/property-images/";
+  const at = url.indexOf(marker);
+  if (at === -1) return null;
+  const path = url.slice(at + marker.length).split("?")[0];
+  return path ? decodeURIComponent(path) : null;
 }
 
 async function signMany(paths: string[]): Promise<Record<string, string>> {
@@ -295,18 +311,19 @@ function adapt(
   const imageVariants: Record<string, ImageVariants> = {};
   const attach = (path: string | null | undefined) => {
     if (!path || isExternalUrl(path)) return;
-    const origUrl = signedMap[path];
-    if (!origUrl) return;
     const v: ImageVariants = {};
     if (variantMaps.card?.[path])  v.card  = variantMaps.card[path];
     if (variantMaps.hero?.[path])  v.hero  = variantMaps.hero[path];
     if (variantMaps.thumb?.[path]) v.thumb = variantMaps.thumb[path];
-    if (v.card || v.hero || v.thumb) imageVariants[origUrl] = v;
+    if (v.card || v.hero || v.thumb) imageVariants[path] = v;
   };
   for (const i of sortedImages) {
     attach(i.storage_path);
     attach(i.enhanced_storage_path);
     attach(i.rendered_storage_path);
+    attach(pathFromStorageUrl(i.published_image_url));
+    attach(pathFromStorageUrl(i.enhanced_image_url));
+    attach(pathFromStorageUrl(i.rendered_image_url));
   }
   const attrs: Record<string, string> = {};
   const amenities: string[] = [];
@@ -587,15 +604,25 @@ export const listPublishedPropertiesSummary = createServerFn({ method: "GET" }).
   // Sign only paths actually used to render the cover.
   const pathsToSign: string[] = [];
   for (const i of coverImages) {
-    if (i.published_image_url) continue;
+    // A stored `published_image_url` is still rendered as-is, but we must sign
+    // the object it points at so its 320/800 variants exist for the card.
+    if (i.published_image_url) {
+      const p = pathFromStorageUrl(i.published_image_url);
+      if (p) pathsToSign.push(p);
+      continue;
+    }
     // pick the one path that resolveBefore/resolveRender will actually read
-    if (i.use_rendered && i.rendered_image_url) continue;
+    if (i.use_rendered && i.rendered_image_url) {
+      const p = pathFromStorageUrl(i.rendered_image_url);
+      if (p) pathsToSign.push(p);
+      continue;
+    }
     if (i.use_rendered && i.rendered_storage_path) {
       pathsToSign.push(i.rendered_storage_path);
       continue;
     }
     if (i.use_enhanced && i.enhanced_storage_path) {
-      if (!i.enhanced_image_url) pathsToSign.push(i.enhanced_storage_path);
+      pathsToSign.push(i.enhanced_storage_path);
       continue;
     }
     pathsToSign.push(i.storage_path);
