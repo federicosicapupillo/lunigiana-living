@@ -52,7 +52,6 @@ export const Route = createFileRoute("/immobili/")({
       { name: "description", content: "Case, ville, rustici e appartamenti in vendita in Lunigiana: Pontremoli, Villafranca, Filattiera, Mulazzo, Bagnone, Zeri." },
       { property: "og:title", content: "Immobili in Lunigiana — Furia Immobiliare" },
       { property: "og:description", content: "Una selezione curata di immobili in tutta la Lunigiana." },
-    ],
       { property: "og:url", content: siteUrl("/immobili") },
     ],
     links: [{ rel: "canonical", href: siteUrl("/immobili") }],
@@ -86,7 +85,23 @@ function ImmobiliPage() {
     () => new Map((localizedQuery.data?.properties ?? []).map((p) => [p.id, p as PublicProperty])),
     [localizedQuery.data?.properties],
   );
-  const urlSearch = Route.useSearch();
+  const rawSearch = Route.useSearch();
+  // Normalizza undefined -> "" per mantenere invariata la logica dei filtri.
+  const urlSearch = useMemo(
+    () => ({
+      contract: rawSearch.contract ?? "",
+      featured: rawSearch.featured ?? "",
+      type: rawSearch.type ?? "",
+      comune: rawSearch.comune ?? "",
+      price_min: rawSearch.price_min ?? "",
+      price_max: rawSearch.price_max ?? "",
+      size: rawSearch.size ?? "",
+      rooms: rawSearch.rooms ?? "",
+      features: rawSearch.features ?? "",
+      sort: rawSearch.sort ?? "",
+    }),
+    [rawSearch],
+  );
   const uniqueLocations = useMemo(
     () => Array.from(new Set(allProperties.map((p) => p.location).filter(Boolean))).sort(),
     [allProperties],
