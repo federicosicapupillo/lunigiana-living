@@ -5,6 +5,7 @@ import { useLocalizedHead } from "@/hooks/use-localized-head";
 import { trackClick } from "@/lib/analytics";
 import { GOOGLE_REVIEWS_URL } from "@/components/reviews-trust-block";
 import { Star, ArrowRight } from "lucide-react";
+import { siteUrl } from "@/lib/site-url";
 
 export const Route = createFileRoute("/chi-siamo")({
   head: () => ({
@@ -13,8 +14,9 @@ export const Route = createFileRoute("/chi-siamo")({
       { name: "description", content: "Dietro Furia Immobiliare c'è Elena: un volto, una voce e una presenza costante per chi sceglie casa in Lunigiana. Consulenze personalizzate e assistenza completa." },
       { property: "og:title", content: "Chi siamo — Furia Immobiliare" },
       { property: "og:description", content: "Crediamo che una casa non sia solo metri quadri, ma un pezzo di vita. Mettiamo al centro le persone prima degli immobili." },
+      { property: "og:url", content: siteUrl("/chi-siamo") },
     ],
-    links: [{ rel: "canonical", href: "/chi-siamo" }],
+    links: [{ rel: "canonical", href: siteUrl("/chi-siamo") }],
   }),
   component: ChiSiamoPage,
 });

@@ -23,6 +23,7 @@ import { useLocalizedHead } from "@/hooks/use-localized-head";
 import { trackClick } from "@/lib/analytics";
 import { LeadMagnetBlock } from "@/components/lead-magnet-block";
 import { ReviewsTrustBlock } from "@/components/reviews-trust-block";
+import { siteUrl } from "@/lib/site-url";
 
 const WA_URL =
   "https://wa.me/393207019985?text=Ciao%20Elena,%20vorrei%20ricevere%20un%20primo%20orientamento%20sui%20vostri%20servizi.";
@@ -34,8 +35,9 @@ export const Route = createFileRoute("/servizi")({
       { name: "description", content: "Ricerca su misura, consulenza, valutazioni, assistenza alla vendita e accompagnamento all'acquisto in Lunigiana." },
       { property: "og:title", content: "Servizi — Furia Immobiliare" },
       { property: "og:description", content: "Un servizio sartoriale, una conoscenza locale." },
+      { property: "og:url", content: siteUrl("/servizi") },
     ],
-    links: [{ rel: "canonical", href: "/servizi" }],
+    links: [{ rel: "canonical", href: siteUrl("/servizi") }],
   }),
   component: ServiziPage,
 });

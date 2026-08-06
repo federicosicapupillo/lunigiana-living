@@ -4,6 +4,7 @@ import { Link } from "@tanstack/react-router";
 import { whatsappUrl } from "@/components/whatsapp-float";
 import { LeadForm } from "@/components/lead-form";
 import { useT } from "@/lib/i18n/LanguageContext";
+import { siteUrl } from "@/lib/site-url";
 
 export const Route = createFileRoute("/contatti")({
   head: () => ({
@@ -12,8 +13,9 @@ export const Route = createFileRoute("/contatti")({
       { name: "description", content: "Scrivici o vienici a trovare in agenzia a Pontremoli. Siamo qui per aiutarti a trovare il tuo posto in Lunigiana." },
       { property: "og:title", content: "Contatti — Furia Immobiliare" },
       { property: "og:description", content: "Parla con la nostra agenzia di Pontremoli." },
+      { property: "og:url", content: siteUrl("/contatti") },
     ],
-    links: [{ rel: "canonical", href: "/contatti" }],
+    links: [{ rel: "canonical", href: siteUrl("/contatti") }],
   }),
   component: ContattiPage,
 });
