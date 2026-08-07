@@ -28,13 +28,12 @@ function fallbackRedirect(): Response {
   return Response.redirect(FALLBACK_URL, 302);
 }
 
-export const Route = createFileRoute("/media/og/immobili/$slug.jpg")({
+export const Route = createFileRoute("/media/og/immobili/$")({
   server: {
     handlers: {
       GET: async ({ params }) => {
-        const raw = (params.slug ?? "").trim();
+        const raw = (params._splat ?? "").trim();
         const slug = raw.replace(/\.(jpg|jpeg)$/i, "");
-        console.log("[media/og] slug", JSON.stringify({ raw, slug }));
         if (!slug || !SLUG_RE.test(slug)) {
           return new Response("Not found", { status: 404 });
         }
