@@ -28,7 +28,7 @@ function fallbackRedirect(): Response {
   return Response.redirect(FALLBACK_URL, 302);
 }
 
-export const Route = createFileRoute("/media/og/immobili/$slug")({
+export const Route = createFileRoute("/media/og/immobili/$slug.jpg")({
   server: {
     handlers: {
       GET: async ({ params }) => {
