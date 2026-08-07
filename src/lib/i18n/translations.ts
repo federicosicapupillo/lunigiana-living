@@ -481,7 +481,7 @@ const it: Dict = {
  "detail.summaryContractRent": "Affitto",
 
   // SEO meta
-  "seo.home.title": "Agenzia immobiliare a Pontremoli e Lunigiana | Furia Immobiliare",
+  "seo.home.title": "Agenzia immobiliare a Pontremoli e in Lunigiana | Furia Immobiliare",
   "seo.home.desc": "Agenzia immobiliare a Pontremoli. Vendita e affitto di case, ville e immobili in Lunigiana.",
   "seo.chi.title": "Chi siamo — Furia Immobiliare, Pontremoli",
   "seo.chi.desc": "Dietro Furia Immobiliare c'è Elena: un volto, una voce e una presenza costante per chi sceglie casa in Lunigiana.",

@@ -38,7 +38,7 @@ const AGENCY_FACTS = {
   googleReviewsUrl: "https://share.google/XuLvMM0CG6tmjlwpO",
 };
 
-const HOME_TITLE = "Agenzia immobiliare a Pontremoli e Lunigiana | Furia Immobiliare";
+const HOME_TITLE = "Agenzia immobiliare a Pontremoli e in Lunigiana | Furia Immobiliare";
 const HOME_DESCRIPTION =
   "Agenzia immobiliare a Pontremoli. Vendita e affitto di case, ville e immobili in Lunigiana: Pontremoli, Villafranca, Filattiera, Mulazzo, Bagnone, Zeri.";
 
