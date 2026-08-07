@@ -1,6 +1,7 @@
 import { type ImgHTMLAttributes, type Ref } from "react";
 import watermarkAsset from "@/assets/furia-watermark.png.asset.json";
 import { cn } from "@/lib/utils";
+import { staticSet } from "@/components/static-image";
 
 type Size = "sm" | "md" | "lg";
 
@@ -43,7 +44,9 @@ export function WatermarkedImage({
       />
       {watermark && (
         <img
-          src={watermarkAsset.url}
+          src={staticSet("furia-watermark")?.src ?? watermarkAsset.url}
+          srcSet={staticSet("furia-watermark")?.webp}
+          sizes="240px"
           alt=""
           aria-hidden="true"
           draggable={false}
