@@ -104,7 +104,20 @@ function ImmobiliPage() {
     [rawSearch],
   );
   const uniqueLocations = useMemo(
-    () => Array.from(new Set(allProperties.map((p) => p.location).filter(Boolean))).sort(),
+    () =>
+      Array.from(
+        new Set(
+          allProperties
+            .map((p) =>
+              (p.location || "")
+                // rimuove descrizioni di zona importate dal gestionale
+                // es. "Pontremoli zona residenziale" -> "Pontremoli"
+                .replace(/\s*[-–,]?\s*(zona|localit[aà]|frazione|loc\.?)\b.*$/i, "")
+                .trim(),
+            )
+            .filter(Boolean),
+        ),
+      ).sort((a, b) => a.localeCompare(b, "it")),
     [allProperties],
   );
 
