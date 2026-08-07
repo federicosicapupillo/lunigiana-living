@@ -475,6 +475,17 @@ function ComuneSeoPage() {
               </Link>
               .
             </p>
+            {comune.slug === "pontremoli" && (
+              <p className="mt-4 text-[0.95rem] leading-relaxed text-[var(--ink-soft)]">
+                <Link
+                  to="/vivere-a-pontremoli"
+                  className="text-[var(--terracotta)] underline hover:no-underline"
+                >
+                  Scopri cosa significa vivere a Pontremoli
+                </Link>
+                : zone, frazioni e vita quotidiana prima di scegliere casa.
+              </p>
+            )}
           </div>
         </section>
       )}

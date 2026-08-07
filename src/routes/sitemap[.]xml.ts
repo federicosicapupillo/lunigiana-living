@@ -19,6 +19,7 @@ export const Route = createFileRoute("/sitemap.xml")({
           "/case-in-vendita-lunigiana",
           ...TIPOLOGIE_SEO.map((t) => `/case-in-vendita-lunigiana/${t.slug}`),
           "/trova-casa-lunigiana",
+          "/vivere-a-pontremoli",
           ...properties.map((p) => propertyPath(p)),
         ];
         const urls = paths.map(
