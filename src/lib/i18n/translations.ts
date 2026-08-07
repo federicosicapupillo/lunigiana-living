@@ -50,12 +50,12 @@ const it: Dict = {
 
   // Home
   "home.eyebrow": "Agenzia immobiliare · Pontremoli · Lunigiana",
-  "home.hero.title1": "Case in vendita in Lunigiana,",
+  "home.hero.title1": "Case di carattere in Lunigiana,",
   "home.hero.title2": "scelte una per una.",
   "home.hero.lead":
-    "Da 18 anni a Pontremoli. Elena e Cometa ti accompagnano a trovare la casa giusta in Lunigiana: visite sul posto, conoscenza reale dei borghi, nessuna pressione di vendita.",
+    "Agenzia immobiliare a Pontremoli da 18 anni: Elena e Cometa ti accompagnano a trovare la casa giusta in Lunigiana, con visite sul posto, conoscenza reale dei borghi e nessuna pressione di vendita.",
   "home.hero.leadAlt":
-    "Da 18 anni a Pontremoli. Case di pietra, ville panoramiche e dimore di carattere in tutta la Lunigiana — selezionate da chi questa terra la abita davvero.",
+    "Agenzia immobiliare a Pontremoli da 18 anni: case di pietra, ville panoramiche e dimore di carattere in tutta la Lunigiana, selezionate da chi questa terra la abita davvero.",
   "home.trust.years": "a Pontremoli",
   "home.trust.properties": "immobili trattati",
   "home.trust.comuni": "COMUNI DELLA LUNIGIANA",
@@ -251,7 +251,7 @@ const it: Dict = {
 
   // Immobili list
   "list.eyebrow": "Immobili",
-  "list.title": "La nostra selezione di case in Lunigiana.",
+  "list.title": "Tutti gli immobili disponibili in Lunigiana",
   "list.intro": "Filtra per categoria o comune per trovare il tuo posto.",
   "list.count.available": "Immobili disponibili",
   "list.empty": "Nessun immobile trovato per questa ricerca.",
@@ -481,7 +481,7 @@ const it: Dict = {
  "detail.summaryContractRent": "Affitto",
 
   // SEO meta
-  "seo.home.title": "Furia Immobiliare — Case di carattere in Lunigiana",
+  "seo.home.title": "Agenzia immobiliare a Pontremoli e Lunigiana | Furia Immobiliare",
   "seo.home.desc": "Agenzia immobiliare a Pontremoli. Vendita e affitto di case, ville e immobili in Lunigiana.",
   "seo.chi.title": "Chi siamo — Furia Immobiliare, Pontremoli",
   "seo.chi.desc": "Dietro Furia Immobiliare c'è Elena: un volto, una voce e una presenza costante per chi sceglie casa in Lunigiana.",
@@ -491,7 +491,7 @@ const it: Dict = {
   "seo.territori.desc": "Pontremoli, Villafranca, Bagnone, Filattiera, Mulazzo, Zeri: una guida ai borghi della Lunigiana.",
   "seo.contatti.title": "Contatti — Furia Immobiliare, Pontremoli",
   "seo.contatti.desc": "Scrivici o vienici a trovare in agenzia a Pontremoli. Siamo qui per aiutarti a trovare il tuo posto in Lunigiana.",
-  "seo.immobili.title": "Immobili in vendita in Lunigiana — Furia Immobiliare",
+  "seo.immobili.title": "Immobili in Lunigiana | Ricerca e filtri | Furia Immobiliare",
   "seo.immobili.desc": "Case, ville, rustici e appartamenti in vendita in Lunigiana.",
 
   // Home additional sections
@@ -616,18 +616,32 @@ const it: Dict = {
   "seoPage.related.tileSee": "Vedi case",
 
   // SEO Comune page
-  "seoComune.h1": "Case in vendita a {name}",
+  "seoComune.h1": "Case in vendita {a} {name}",
   "seoComune.section.eyebrow": "Il territorio",
   "seoComune.section.title": "{name}, in Lunigiana",
-  "seoComune.props.count.one": "{n} immobile a {name}",
-  "seoComune.props.count.many": "{n} immobili a {name}",
-  "seoComune.props.fallback": "Immobili a {name}",
+  "seoComune.props.count.one": "{n} immobile in vendita {a} {name}",
+  "seoComune.props.count.many": "{n} immobili in vendita {a} {name}",
+  "seoComune.props.fallback": "Immobili {a} {name}",
   "seoComune.audience.title": "{name} è la scelta giusta se…",
-  "seoComune.cta.title": "Vuoi trovare casa a {name}?",
+  "seoComune.cta.title": "Vuoi trovare casa {a} {name}?",
   "seoComune.cta.body": "Scrivi a Elena: ti aiuterà a capire quali immobili sono davvero coerenti con il tuo progetto. Lavoriamo spesso anche con chi compra da fuori regione o dall'estero.",
   "seoComune.notFound": "Pagina non trovata",
   "seoComune.notFound.body": "Il comune richiesto non è disponibile.",
   "seoComune.notFound.link": "Vedi tutti i comuni",
+
+  "seoComune.empty.title": "Al momento non abbiamo immobili disponibili {a} {name}.",
+  "seoComune.empty.body": "Possiamo comunque aiutarti: raccontaci cosa cerchi e ti segnaliamo le soluzioni coerenti appena disponibili, anche nei comuni vicini.",
+  "seoComune.empty.finder": "Compila il percorso guidato per trovare casa in Lunigiana",
+  "seoComune.nearby.title": "Comuni vicini con immobili disponibili",
+  "seoComune.types.eyebrow": "Cerca per tipologia",
+  "seoComune.types.title": "Tipologie disponibili {a} {name}",
+  "seoComune.types.body": "Mostriamo solo le categorie che hanno davvero almeno un immobile in vendita in questo comune.",
+  "seoHub.crumb.current.comuni": "Case in vendita per comune",
+  "seoHub.crumb.current.tipologie": "Case in vendita per tipologia",
+  "seoHub.finder.link": "Percorso guidato: trova la tua casa ideale in Lunigiana",
+  "detail.moreInComune": "Altri immobili in vendita {a} {name}",
+  "detail.moreInType": "Vedi tutti i {type} in vendita in Lunigiana",
+  "detail.internalLinks.eyebrow": "Continua la ricerca",
 
   // SEO Comuni hub
   "seoComuni.hub.eyebrow": "Case in vendita",
@@ -668,7 +682,7 @@ const it: Dict = {
 
   // SEO Tipologia hub
   "seoTipologie.hub.eyebrow": "Cerca per tipologia",
-  "seoTipologie.hub.h1": "Case in vendita in Lunigiana",
+  "seoTipologie.hub.h1": "Che tipo di casa cerchi in Lunigiana?",
   "seoTipologie.hub.lead.a": "Ogni casa nasce da un'idea diversa: una casa di carattere in pietra, un appartamento comodo nel borgo, una villa con giardino, una seconda casa per il fine settimana. Scegli da dove vuoi partire — per tipologia o",
   "seoTipologie.hub.lead.byComune": "per comune",
   "seoTipologie.hub.types.eyebrow": "Tipologie",
@@ -1365,6 +1379,20 @@ const en: Dict = {
   "seoComune.notFound": "Page not found",
   "seoComune.notFound.body": "The municipality you requested is not available.",
   "seoComune.notFound.link": "View all municipalities",
+
+  "seoComune.empty.title": "We currently have no properties available in {name}.",
+  "seoComune.empty.body": "We can still help: tell us what you are looking for and we'll flag suitable properties as soon as they become available, including in nearby municipalities.",
+  "seoComune.empty.finder": "Use the guided path to find your home in Lunigiana",
+  "seoComune.nearby.title": "Nearby municipalities with available properties",
+  "seoComune.types.eyebrow": "Search by type",
+  "seoComune.types.title": "Property types available in {name}",
+  "seoComune.types.body": "We only show the categories that really have at least one property for sale in this municipality.",
+  "seoHub.crumb.current.comuni": "Homes for sale by municipality",
+  "seoHub.crumb.current.tipologie": "Homes for sale by property type",
+  "seoHub.finder.link": "Guided path: find your ideal home in Lunigiana",
+  "detail.moreInComune": "More homes for sale in {name}",
+  "detail.moreInType": "See all {type} for sale in Lunigiana",
+  "detail.internalLinks.eyebrow": "Continue your search",
 
   // SEO Comuni hub
   "seoComuni.hub.eyebrow": "Homes for sale",
