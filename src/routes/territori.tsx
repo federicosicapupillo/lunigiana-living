@@ -191,6 +191,17 @@ function TerritoriPage() {
                     </h3>
                     <div className="mt-5 h-px w-12 bg-warm-border" />
                     <p className="mt-5 text-base leading-relaxed text-foreground/80">{t(`terr.t.${terr.slug}.body`)}</p>
+                    {terr.slug === "pontremoli" && (
+                      <p className="mt-4 text-[0.95rem] leading-relaxed text-foreground/75">
+                        <Link
+                          to="/vivere-a-pontremoli"
+                          className="text-primary underline hover:no-underline"
+                        >
+                          Scopri cosa significa vivere a Pontremoli
+                        </Link>
+                        : centro storico, zone residenziali e frazioni a confronto.
+                      </p>
+                    )}
                     {comuneSlugFor(terr.slug) ? (
                       <Link
                         to="/case-in-vendita/$comune"

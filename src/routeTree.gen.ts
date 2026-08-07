@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as VivereAPontremoliRouteImport } from './routes/vivere-a-pontremoli'
 import { Route as Vendite2DotaspRouteImport } from './routes/vendite2[.]asp'
 import { Route as TrovaCasaLunigianaRouteImport } from './routes/trova-casa-lunigiana'
 import { Route as TerritoriRouteImport } from './routes/territori'
@@ -44,6 +45,11 @@ import { Route as AdminAdminImmobiliAssistenteRouteImport } from './routes/_admi
 import { Route as AdminAdminImmobiliIdRouteImport } from './routes/_admin.admin.immobili.$id'
 import { Route as AdminAdminImmobiliIdAnteprimaRouteImport } from './routes/_admin.admin.immobili.$id.anteprima'
 
+const VivereAPontremoliRoute = VivereAPontremoliRouteImport.update({
+  id: '/vivere-a-pontremoli',
+  path: '/vivere-a-pontremoli',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const Vendite2DotaspRoute = Vendite2DotaspRouteImport.update({
   id: '/vendite2.asp',
   path: '/vendite2.asp',
@@ -233,6 +239,7 @@ export interface FileRoutesByFullPath {
   '/territori': typeof TerritoriRoute
   '/trova-casa-lunigiana': typeof TrovaCasaLunigianaRoute
   '/vendite2.asp': typeof Vendite2DotaspRoute
+  '/vivere-a-pontremoli': typeof VivereAPontremoliRoute
   '/admin': typeof AdminAdminRouteWithChildren
   '/admin/login': typeof AdminLoginRoute
   '/case-in-vendita-lunigiana/$tipologia': typeof CaseInVenditaLunigianaTipologiaRoute
@@ -267,6 +274,7 @@ export interface FileRoutesByTo {
   '/territori': typeof TerritoriRoute
   '/trova-casa-lunigiana': typeof TrovaCasaLunigianaRoute
   '/vendite2.asp': typeof Vendite2DotaspRoute
+  '/vivere-a-pontremoli': typeof VivereAPontremoliRoute
   '/admin/login': typeof AdminLoginRoute
   '/case-in-vendita-lunigiana/$tipologia': typeof CaseInVenditaLunigianaTipologiaRoute
   '/case-in-vendita/$comune': typeof CaseInVenditaComuneRoute
@@ -303,6 +311,7 @@ export interface FileRoutesById {
   '/territori': typeof TerritoriRoute
   '/trova-casa-lunigiana': typeof TrovaCasaLunigianaRoute
   '/vendite2.asp': typeof Vendite2DotaspRoute
+  '/vivere-a-pontremoli': typeof VivereAPontremoliRoute
   '/_admin/admin': typeof AdminAdminRouteWithChildren
   '/admin/login': typeof AdminLoginRoute
   '/case-in-vendita-lunigiana/$tipologia': typeof CaseInVenditaLunigianaTipologiaRoute
@@ -340,6 +349,7 @@ export interface FileRouteTypes {
     | '/territori'
     | '/trova-casa-lunigiana'
     | '/vendite2.asp'
+    | '/vivere-a-pontremoli'
     | '/admin'
     | '/admin/login'
     | '/case-in-vendita-lunigiana/$tipologia'
@@ -374,6 +384,7 @@ export interface FileRouteTypes {
     | '/territori'
     | '/trova-casa-lunigiana'
     | '/vendite2.asp'
+    | '/vivere-a-pontremoli'
     | '/admin/login'
     | '/case-in-vendita-lunigiana/$tipologia'
     | '/case-in-vendita/$comune'
@@ -409,6 +420,7 @@ export interface FileRouteTypes {
     | '/territori'
     | '/trova-casa-lunigiana'
     | '/vendite2.asp'
+    | '/vivere-a-pontremoli'
     | '/_admin/admin'
     | '/admin/login'
     | '/case-in-vendita-lunigiana/$tipologia'
@@ -446,6 +458,7 @@ export interface RootRouteChildren {
   TerritoriRoute: typeof TerritoriRoute
   TrovaCasaLunigianaRoute: typeof TrovaCasaLunigianaRoute
   Vendite2DotaspRoute: typeof Vendite2DotaspRoute
+  VivereAPontremoliRoute: typeof VivereAPontremoliRoute
   AdminLoginRoute: typeof AdminLoginRoute
   CaseInVenditaLunigianaTipologiaRoute: typeof CaseInVenditaLunigianaTipologiaRoute
   CaseInVenditaComuneRoute: typeof CaseInVenditaComuneRoute
@@ -457,6 +470,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/vivere-a-pontremoli': {
+      id: '/vivere-a-pontremoli'
+      path: '/vivere-a-pontremoli'
+      fullPath: '/vivere-a-pontremoli'
+      preLoaderRoute: typeof VivereAPontremoliRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/vendite2.asp': {
       id: '/vendite2.asp'
       path: '/vendite2.asp'
@@ -776,6 +796,7 @@ const rootRouteChildren: RootRouteChildren = {
   TerritoriRoute: TerritoriRoute,
   TrovaCasaLunigianaRoute: TrovaCasaLunigianaRoute,
   Vendite2DotaspRoute: Vendite2DotaspRoute,
+  VivereAPontremoliRoute: VivereAPontremoliRoute,
   AdminLoginRoute: AdminLoginRoute,
   CaseInVenditaLunigianaTipologiaRoute: CaseInVenditaLunigianaTipologiaRoute,
   CaseInVenditaComuneRoute: CaseInVenditaComuneRoute,
@@ -787,13 +808,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
