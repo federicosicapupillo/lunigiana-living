@@ -34,7 +34,16 @@ export function isForSale(p: Pick<PublicProperty, "isRent" | "category">): boole
 
 /** Whitelist di property_type per ciascuna landing tipologica. */
 export const TYPE_WHITELIST: Record<string, string[]> = {
-  "rustici-casali": ["rustico", "casale", "casa colonica", "cascina", "fienile"],
+  // "Casa di borgo" = casa storica in pietra nel borgo: appartiene per natura
+  // alla famiglia rustici/casali, non alle case indipendenti moderne.
+  "rustici-casali": [
+    "rustico",
+    "casale",
+    "casa colonica",
+    "cascina",
+    "fienile",
+    "casa di borgo",
+  ],
   "case-indipendenti": [
     "casa indipendente",
     "casa singola",
