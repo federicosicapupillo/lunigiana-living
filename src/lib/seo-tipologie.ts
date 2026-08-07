@@ -76,11 +76,6 @@ function anyKeyword(p: PublicProperty, kws: string[]): boolean {
   return kws.some((k) => h.includes(k));
 }
 
-function typeMatches(p: PublicProperty, kws: string[]): boolean {
-  const t = norm(p.type);
-  return kws.some((k) => t.includes(k));
-}
-
 // ── entries ────────────────────────────────────────────────────────────
 export const TIPOLOGIE_SEO: TipologiaSeo[] = [
   {
@@ -545,6 +540,14 @@ export function filterPropertiesForTipologia<T extends PublicProperty>(
   // Tutte le landing tipologiche hanno intento "in vendita": filtro contratto
   // strutturato prima di qualsiasi altra regola.
   return properties.filter((p) => isForSale(p) && tipologia.matches(p)).slice(0, 60);
+}
+
+/** True quando l'immobile appartiene alla landing (contratto + regola). */
+export function propertyMatchesTipologia(
+  tipologia: TipologiaSeo,
+  p: PublicProperty,
+): boolean {
+  return isForSale(p) && tipologia.matches(p);
 }
 
 export type TipologiaSeoLocalized = {
