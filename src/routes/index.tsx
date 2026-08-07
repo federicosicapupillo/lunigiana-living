@@ -58,7 +58,6 @@ export const Route = createFileRoute("/")({
     ],
     links: [
       { rel: "canonical", href: siteUrl("/") },
-      { rel: "preload", as: "image", href: heroTramontoVignetiAsset.url, fetchPriority: "high" },
     ],
     scripts: [
       {
