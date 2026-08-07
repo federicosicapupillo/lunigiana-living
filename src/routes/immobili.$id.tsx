@@ -83,6 +83,8 @@ export const Route = createFileRoute("/immobili/$id")({
       };
     }
     const canonical = siteUrl(propertyPath(p));
+    // URL immagine social stabile (nessun token, dominio canonico).
+    const ogImage = siteUrl(propertyOgImagePath(p));
     const rawTitle = `${p.title} a ${p.location} — ${p.reference} | Furia Immobiliare`;
     const title = truncateTitle(rawTitle, 60);
     return {
@@ -92,7 +94,11 @@ export const Route = createFileRoute("/immobili/$id")({
         { property: "og:title", content: `${p.title} — ${p.location}` },
         { property: "og:description", content: p.description.slice(0, 200) },
         { property: "og:url", content: canonical },
-        ...(p.image ? [{ property: "og:image", content: p.image }] : []),
+        { property: "og:image", content: ogImage },
+        { property: "og:image:width", content: "1200" },
+        { property: "og:image:height", content: "630" },
+        { name: "twitter:image", content: ogImage },
+        { name: "twitter:card", content: "summary_large_image" },
       ],
       links: [{ rel: "canonical", href: canonical }],
       scripts: [
