@@ -6,7 +6,12 @@ import { siteUrl } from "@/lib/site-url";
 /**
  * Immagine Open Graph stabile per le schede immobile.
  *
- *   /media/og/immobili/<slug>.jpg
+ *   /media/og/immobili/<slug>
+ *
+ * URL senza estensione: Supabase Image Transformations conserva il formato
+ * d'origine (una cover PNG resta PNG) e non introduciamo alcuna pipeline di
+ * ricodifica. Il `content-type` restituito è quello reale dell'immagine
+ * prodotta, così non esiste mai un mismatch estensione/formato.
  *
  * L'unico identificatore accettato è lo slug pubblico: nessun percorso
  * storage, nessuna URL esterna, nessun proxy generico. Il bucket resta
@@ -67,22 +72,18 @@ export const Route = createFileRoute("/media/og/immobili/$")({
           .order("is_cover", { ascending: false })
           .order("sort_order", { ascending: true });
 
+        // La sorgente è SEMPRE la vera copertina della scheda: prima riga
+        // ordinata per is_cover/sort_order, risolta con lo stesso resolver
+        // usato dal front-end (rendered / enhanced / published / original,
+        // rispettando use_rendered, use_enhanced e render_publish_mode).
+        // Nessuna sostituzione con un'altra foto per motivi di formato.
         // Vincolo di appartenenza: le righe arrivano dalla query filtrata per
         // property_id e il percorso deve iniziare con l'id dell'immobile.
-        // Supabase Image Transformations conserva il formato d'origine: per
-        // garantire `image/jpeg` ai crawler social usiamo la prima immagine
-        // pubblicata in formato JPEG (la copertina nella quasi totalità dei
-        // casi), altrimenti l'immagine di brand statica.
-        let path: string | null = null;
-        for (const row of images ?? []) {
-          if (row.property_id !== prop.id) continue;
-          const p = publishedImagePath(row);
-          if (!p || !p.startsWith(`${prop.id}/`)) continue;
-          if (!/\.jpe?g$/i.test(p)) continue;
-          path = p;
-          break;
+        const cover = images?.[0];
+        const path = cover ? publishedImagePath(cover) : null;
+        if (!cover || !path || cover.property_id !== prop.id || !path.startsWith(`${prop.id}/`)) {
+          return fallbackRedirect();
         }
-        if (!path) return fallbackRedirect();
 
         const { data: signed, error: signError } = await supabaseAdmin.storage
           .from("property-images")
@@ -94,10 +95,14 @@ export const Route = createFileRoute("/media/og/immobili/$")({
         const upstream = await fetch(signed.signedUrl);
         if (!upstream.ok || !upstream.body) return fallbackRedirect();
 
+        // Content-Type reale dell'immagine prodotta da Supabase.
+        const contentType = upstream.headers.get("content-type") || "application/octet-stream";
+        if (!contentType.startsWith("image/")) return fallbackRedirect();
+
         return new Response(upstream.body, {
           status: 200,
           headers: {
-            "content-type": "image/jpeg",
+            "content-type": contentType,
             "cache-control": CACHE_CONTROL,
             "x-content-type-options": "nosniff",
           },
