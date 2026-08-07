@@ -185,8 +185,11 @@ function Index() {
         </section>
       ) : (
       <section className="relative isolate -mt-20 flex min-h-[88svh] items-end overflow-hidden sm:min-h-[92svh] md:min-h-[100svh]">
-        <img
-          src={heroSrc}
+        <StaticImage
+          name={heroSetName(heroVariant)}
+          fallbackSrc={heroSrc}
+          sizes={heroSizes(heroVariant)}
+          pictureClassName="contents"
           alt={heroAlt}
           width={1920}
           height={1080}
