@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, ChevronRight, Compass, MapPin, MessageCircle } from "lucide-react";
 import { TIPOLOGIE_SEO, localizeTipologiaSeo } from "@/lib/seo-tipologie";
-import { COMUNE_SEO, localizeComuneSeo } from "@/lib/seo-comuni";
+import { HUB_TIPOLOGIE_INTRO, SEO_1B_UI, TIPOLOGIA_HUB_COPY, pick } from "@/lib/seo-editorial";
 import { siteUrl } from "@/lib/site-url";
 import { useLanguage, useT } from "@/lib/i18n/LanguageContext";
 import { useDocHead } from "@/hooks/use-localized-head";
@@ -74,6 +74,11 @@ function TipologieHub() {
             </Link>
             .
           </p>
+          <div className="mt-6 max-w-2xl space-y-4 text-[0.98rem] leading-[1.75] text-[var(--ink-soft)]">
+            {pick(HUB_TIPOLOGIE_INTRO, language).map((p) => (
+              <p key={p.slice(0, 24)}>{p}</p>
+            ))}
+          </div>
           <p className="mt-5">
             <Link
               to="/trova-casa-lunigiana"
@@ -92,12 +97,13 @@ function TipologieHub() {
               {t("seoTipologie.hub.types.eyebrow")}
             </span>
             <h2 className="mt-3 font-serif text-3xl text-ink md:text-4xl">
-              {t("seoTipologie.hub.types.title")}
+              {pick(SEO_1B_UI.hubTipologie.liveH2, language)}
             </h2>
           </div>
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {TIPOLOGIE_SEO.map((tp) => {
               const L = localizeTipologiaSeo(tp, language);
+              const micro = TIPOLOGIA_HUB_COPY[tp.slug];
               return (
                 <Link
                   key={tp.slug}
@@ -111,7 +117,7 @@ function TipologieHub() {
                   </div>
                   <h3 className="mt-3 font-serif text-2xl text-ink">{L.fullName}</h3>
                   <p className="mt-3 text-[0.92rem] leading-relaxed text-[var(--ink-soft)]">
-                    {L.blurb}
+                    {micro ? pick(micro, language) : L.blurb}
                   </p>
                   <span className="mt-5 inline-flex items-center gap-1 text-[0.7rem] uppercase tracking-[0.22em] text-[var(--terracotta)] group-hover:underline">
                     {t("seoTipologie.hub.types.tileSee")} <ArrowRight size={12} />
@@ -124,40 +130,20 @@ function TipologieHub() {
       </section>
 
       <section className="bg-[var(--cream)] py-20">
-        <div className="container-editorial">
-          <div className="mb-10">
-            <span className="text-xs uppercase tracking-[0.24em] text-[var(--terracotta)]">
-              {t("seoTipologie.hub.comuni.eyebrow")}
-            </span>
-            <h2 className="mt-3 font-serif text-3xl text-ink md:text-4xl">
-              {t("seoTipologie.hub.comuni.title")}
-            </h2>
-            <p className="mt-4 max-w-2xl text-[0.95rem] leading-relaxed text-[var(--ink-soft)]">
-              {t("seoTipologie.hub.comuni.body")}
-            </p>
-          </div>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {COMUNE_SEO.map((c) => {
-              const Lc = localizeComuneSeo(c, language);
-              return (
-                <Link
-                  key={c.slug}
-                  to="/case-in-vendita/$comune"
-                  params={{ comune: c.slug }}
-                  className="group rounded-2xl border border-[var(--terracotta)]/15 bg-[var(--warm-ivory)] p-6 transition hover:-translate-y-0.5 hover:shadow-[0_12px_28px_-20px_rgba(36,23,17,0.35)]"
-                >
-                  <div className="flex items-center gap-2 text-[var(--terracotta)]">
-                    <MapPin size={16} strokeWidth={1.5} />
-                    <span className="text-[0.7rem] uppercase tracking-[0.22em]">{t("seoPage.related.tileLabel")}</span>
-                  </div>
-                  <h3 className="mt-3 font-serif text-lg text-ink">{Lc.fullName}</h3>
-                  <span className="mt-3 inline-flex items-center gap-1 text-[0.7rem] uppercase tracking-[0.22em] text-[var(--terracotta)] group-hover:underline">
-                    {t("seoPage.related.tileSee")} <ArrowRight size={12} />
-                  </span>
-                </Link>
-              );
-            })}
-          </div>
+        <div className="container-editorial max-w-3xl">
+          <h2 className="font-serif text-3xl text-ink md:text-4xl">
+            {pick(SEO_1B_UI.hubTipologie.areaH2, language)}
+          </h2>
+          <p className="mt-5 text-[1rem] leading-[1.8] text-[var(--ink-soft)]">
+            {pick(SEO_1B_UI.hubTipologie.areaBody, language)}
+          </p>
+          <Link
+            to="/case-in-vendita"
+            className="mt-6 inline-flex items-center gap-2 text-[0.98rem] text-[var(--terracotta)] underline hover:no-underline"
+          >
+            <MapPin size={15} strokeWidth={1.6} />
+            {pick(SEO_1B_UI.hubTipologie.areaAnchor, language)}
+          </Link>
         </div>
       </section>
 
@@ -165,18 +151,18 @@ function TipologieHub() {
       <section className="container-editorial py-20">
         <div className="rounded-sm bg-ink px-6 py-14 text-center text-cream md:px-16 md:py-20">
           <h2 className="mx-auto max-w-2xl font-serif text-3xl md:text-5xl">
-            {t("seoTipologie.hub.cta.title")}
+            {pick(SEO_1B_UI.hubTipologie.finalH2, language)}
           </h2>
           <p className="mx-auto mt-5 max-w-xl text-[0.95rem] leading-relaxed text-cream/80">
-            {t("seoTipologie.hub.cta.body")}
+            {pick(SEO_1B_UI.hubTipologie.finalBody, language)}
           </p>
           <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
             <Link
-              to="/contatti"
+              to="/trova-casa-lunigiana"
               className="inline-flex items-center gap-2 rounded-sm bg-[var(--terracotta)] px-8 py-4 text-xs uppercase tracking-[0.22em] text-cream transition hover:opacity-90"
             >
               <MessageCircle size={16} strokeWidth={1.8} />
-              {t("seoTipologie.hub.cta.primary")}
+              {pick(SEO_1B_UI.hubTipologie.finalCta, language)}
             </Link>
             <Link
               to="/immobili"

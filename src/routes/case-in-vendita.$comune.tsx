@@ -12,6 +12,7 @@ import {
 } from "@/lib/seo-comuni";
 import { TIPOLOGIE_SEO, localizeTipologiaSeo, propertyMatchesTipologia } from "@/lib/seo-tipologie";
 import { isForSale, propertyMunicipality } from "@/lib/seo-taxonomy";
+import { SEO_1B_UI, getComuneLongform, pick } from "@/lib/seo-editorial";
 import { Compass } from "lucide-react";
 import { trackClick } from "@/lib/analytics";
 import { useLanguage, useT } from "@/lib/i18n/LanguageContext";
@@ -119,6 +120,8 @@ function ComuneSeoPage() {
   const t = useT();
   const L = localizeComuneSeo(comune, language);
   useDocHead(L.metaTitle, L.metaDescription);
+  const longform = getComuneLongform(comune.slug, language);
+  const typesSection = longform?.sections.find((s) => s.id === "types");
   const related = COMUNE_SEO.filter((c) => c.slug !== comune.slug).slice(0, 4);
   const prep = comunePreposition(comune.fullName);
   const populated = populatedTypes
@@ -218,9 +221,9 @@ function ComuneSeoPage() {
 
           {properties.length === 0 ? (
             <div className="mt-12 rounded-2xl border border-[var(--terracotta)]/15 bg-[var(--warm-ivory)] px-8 py-14 text-center">
-              <p className="mx-auto max-w-xl font-serif text-2xl leading-snug text-ink">
+              <h2 className="mx-auto max-w-xl font-serif text-2xl leading-snug text-ink">
                 {fmt("seoComune.empty.title", { name: comune.fullName, a: prep })}
-              </p>
+              </h2>
               <p className="mx-auto mt-4 max-w-xl text-[0.95rem] leading-relaxed text-[var(--ink-soft)]">
                 {t("seoComune.empty.body")}
               </p>
@@ -241,7 +244,10 @@ function ComuneSeoPage() {
               </div>
               {nearbyComuni.length > 0 && (
                 <div className="mt-8">
-                  <p className="text-[0.7rem] uppercase tracking-[0.22em] text-[var(--ink-soft)]">
+                  <h2 className="font-serif text-xl text-ink">
+                    {pick(SEO_1B_UI.comune.nearbyH2, language)}
+                  </h2>
+                  <p className="mt-2 text-[0.8rem] uppercase tracking-[0.18em] text-[var(--ink-soft)]">
                     {t("seoComune.nearby.title")}
                   </p>
                   <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
@@ -294,8 +300,28 @@ function ComuneSeoPage() {
         </div>
       </section>
 
+      {/* LONGFORM EDITORIALE (1B) */}
+      {longform && longform.sections.some((s) => s.id !== "types") && (
+        <section className="bg-[var(--warm-ivory)] py-20">
+          <div className="container-editorial max-w-3xl space-y-14">
+            {longform.sections
+              .filter((s) => s.id !== "types")
+              .map((s) => (
+                <div key={s.h2}>
+                  <h2 className="font-serif text-3xl text-ink md:text-4xl">{s.h2}</h2>
+                  <div className="mt-5 space-y-4 text-[1rem] leading-[1.8] text-[var(--ink-soft)]">
+                    {s.paragraphs.map((p) => (
+                      <p key={p.slice(0, 24)}>{p}</p>
+                    ))}
+                  </div>
+                </div>
+              ))}
+          </div>
+        </section>
+      )}
+
       {/* AUDIENCE */}
-      <section className="bg-[var(--warm-ivory)] py-20">
+      <section className="bg-[var(--cream)] py-20">
         <div className="container-editorial">
           <div className="mx-auto max-w-2xl text-center">
             <span className="text-xs uppercase tracking-[0.24em] text-[var(--terracotta)]">
@@ -309,7 +335,7 @@ function ComuneSeoPage() {
             {L.audience.map((point) => (
               <li
                 key={point}
-                className="flex items-start gap-3 rounded-xl border border-[var(--terracotta)]/15 bg-[var(--cream)] p-5"
+                className="flex items-start gap-3 rounded-xl border border-[var(--terracotta)]/15 bg-[var(--warm-ivory)] p-5"
               >
                 <CheckCircle2
                   size={18}
@@ -370,11 +396,13 @@ function ComuneSeoPage() {
               {t("seoComune.types.eyebrow")}
             </span>
             <h2 className="mt-3 font-serif text-2xl text-ink md:text-3xl">
-              {fmt("seoComune.types.title", { name: comune.fullName, a: prep })}
+              {typesSection?.h2 ?? fmt("seoComune.types.title", { name: comune.fullName, a: prep })}
             </h2>
-            <p className="mt-4 max-w-2xl text-[0.95rem] leading-relaxed text-[var(--ink-soft)]">
-              {t("seoComune.types.body")}
-            </p>
+            <div className="mt-4 max-w-2xl space-y-4 text-[0.98rem] leading-[1.75] text-[var(--ink-soft)]">
+              {(typesSection?.paragraphs ?? [t("seoComune.types.body")]).map((p) => (
+                <p key={p.slice(0, 24)}>{p}</p>
+              ))}
+            </div>
             <div className="mt-6 flex flex-wrap gap-3">
               {populated.map((tp) => {
                 const Lt = localizeTipologiaSeo(tp, language);
@@ -395,6 +423,58 @@ function ComuneSeoPage() {
                 );
               })}
             </div>
+          </div>
+        </section>
+      )}
+
+      {/* CERCHI QUALCOSA DI SPECIFICO? (1B) */}
+      <section className="bg-[var(--warm-ivory)] py-20">
+        <div className="container-editorial max-w-3xl">
+          <h2 className="font-serif text-3xl text-ink md:text-4xl">
+            {pick(SEO_1B_UI.comune.specificH2, language)}
+          </h2>
+          <p className="mt-5 text-[1rem] leading-[1.8] text-[var(--ink-soft)]">
+            {pick(SEO_1B_UI.comune.specificBody, language)}
+          </p>
+          <Link
+            to="/trova-casa-lunigiana"
+            data-track="seo_area_finder_click"
+            onClick={() =>
+              trackClick("seo_area_finder_click", { comune: comune.slug, source: "specific_cta" })
+            }
+            className="mt-8 inline-flex items-center gap-2 rounded-sm bg-[var(--terracotta)] px-8 py-4 text-xs uppercase tracking-[0.22em] text-cream transition hover:opacity-90"
+          >
+            {fmt("seoComune.finder.cta", { name: comune.fullName, a: prep })}
+            <ArrowRight size={14} />
+          </Link>
+        </div>
+      </section>
+
+      {/* FAQ — contenuto HTML, nessun FAQPage JSON-LD (1B) */}
+      {longform && longform.faq.length > 0 && (
+        <section className="bg-[var(--cream)] py-20">
+          <div className="container-editorial max-w-3xl">
+            <h2 className="font-serif text-3xl text-ink md:text-4xl">
+              {pick(SEO_1B_UI.comune.faqH2, language)}
+            </h2>
+            <div className="mt-8 space-y-6">
+              {longform.faq.slice(0, 3).map((f) => (
+                <div
+                  key={f.q}
+                  className="rounded-2xl border border-[var(--terracotta)]/15 bg-[var(--warm-ivory)] p-6"
+                >
+                  <h3 className="font-serif text-xl leading-snug text-ink">{f.q}</h3>
+                  <p className="mt-3 text-[0.98rem] leading-[1.75] text-[var(--ink-soft)]">{f.a}</p>
+                </div>
+              ))}
+            </div>
+            <p className="mt-8 text-[0.95rem] leading-relaxed text-[var(--ink-soft)]">
+              {pick(SEO_1B_UI.comune.territoriLead, language)}{" "}
+              <Link to="/territori" className="text-[var(--terracotta)] underline hover:no-underline">
+                {pick(SEO_1B_UI.comune.territoriAnchor, language)}
+              </Link>
+              .
+            </p>
           </div>
         </section>
       )}
