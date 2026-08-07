@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { MULTI_SELECT_FIELDS, parseMultiSelect, formatEpi } from "@/lib/admin/property-constants";
+import { publishedImagePath, pathFromStorageUrl } from "@/lib/property-image-source";
 
 const SIGNED_TTL = 60 * 60 * 24; // 24h
 
@@ -113,21 +114,6 @@ function deriveCategory(contract: string | null): PublicProperty["category"] {
 
 function isExternalUrl(p: string): boolean {
   return /^https?:\/\//i.test(p);
-}
-
-/**
- * Extract the stable storage path from a stored Supabase URL
- * (`.../object/sign/property-images/<path>?token=...`). Used to know which
- * object a stored `published_image_url` points at, so its transformed
- * variants can be signed and keyed by that same path.
- */
-function pathFromStorageUrl(url: string | null | undefined): string | null {
-  if (!url) return null;
-  const marker = "/property-images/";
-  const at = url.indexOf(marker);
-  if (at === -1) return null;
-  const path = url.slice(at + marker.length).split("?")[0];
-  return path ? decodeURIComponent(path) : null;
 }
 
 async function signMany(paths: string[]): Promise<Record<string, string>> {
@@ -601,31 +587,14 @@ export const listPublishedPropertiesSummary = createServerFn({ method: "GET" }).
   }
   const coverImages = Array.from(coverByProp.values());
 
-  // Sign only paths actually used to render the cover.
+  // Sign only the path that is REALLY rendered as cover (`publishedImagePath`
+  // replica esattamente la logica dell'adapter): firmare un percorso diverso
+  // — es. `published_image_url` che punta all'enhanced mentre la copertina usa
+  // il rendering — produceva varianti non abbinabili e fallback sull'originale.
   const pathsToSign: string[] = [];
   for (const i of coverImages) {
-    // A stored `published_image_url` is still rendered as-is, but we must sign
-    // the object it points at so its 320/800 variants exist for the card.
-    if (i.published_image_url) {
-      const p = pathFromStorageUrl(i.published_image_url);
-      if (p) pathsToSign.push(p);
-      continue;
-    }
-    // pick the one path that resolveBefore/resolveRender will actually read
-    if (i.use_rendered && i.rendered_image_url) {
-      const p = pathFromStorageUrl(i.rendered_image_url);
-      if (p) pathsToSign.push(p);
-      continue;
-    }
-    if (i.use_rendered && i.rendered_storage_path) {
-      pathsToSign.push(i.rendered_storage_path);
-      continue;
-    }
-    if (i.use_enhanced && i.enhanced_storage_path) {
-      pathsToSign.push(i.enhanced_storage_path);
-      continue;
-    }
-    pathsToSign.push(i.storage_path);
+    const p = publishedImagePath(i);
+    if (p) pathsToSign.push(p);
   }
   const [signedMap, variantMaps] = await Promise.all([
     signMany(pathsToSign),

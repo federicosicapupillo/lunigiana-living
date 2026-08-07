@@ -37,6 +37,7 @@ import { Route as AdminAdminImpostazioniRouteImport } from './routes/_admin.admi
 import { Route as AdminAdminIdealistaRouteImport } from './routes/_admin.admin.idealista'
 import { Route as AdminAdminDatiLiveRouteImport } from './routes/_admin.admin.dati-live'
 import { Route as AdminAdminImmobiliIndexRouteImport } from './routes/_admin.admin.immobili.index'
+import { Route as MediaOgImmobiliSplatRouteImport } from './routes/media/og/immobili/$'
 import { Route as ApiPublicIdealistaFeedDotxmlRouteImport } from './routes/api/public/idealista/feed[.]xml'
 import { Route as AdminAdminImmobiliNuovoRouteImport } from './routes/_admin.admin.immobili.nuovo'
 import { Route as AdminAdminImmobiliAssistenteRouteImport } from './routes/_admin.admin.immobili.assistente'
@@ -184,6 +185,11 @@ const AdminAdminImmobiliIndexRoute = AdminAdminImmobiliIndexRouteImport.update({
   path: '/immobili/',
   getParentRoute: () => AdminAdminRoute,
 } as any)
+const MediaOgImmobiliSplatRoute = MediaOgImmobiliSplatRouteImport.update({
+  id: '/media/og/immobili/$',
+  path: '/media/og/immobili/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicIdealistaFeedDotxmlRoute =
   ApiPublicIdealistaFeedDotxmlRouteImport.update({
     id: '/api/public/idealista/feed.xml',
@@ -244,6 +250,7 @@ export interface FileRoutesByFullPath {
   '/admin/immobili/assistente': typeof AdminAdminImmobiliAssistenteRoute
   '/admin/immobili/nuovo': typeof AdminAdminImmobiliNuovoRoute
   '/api/public/idealista/feed.xml': typeof ApiPublicIdealistaFeedDotxmlRoute
+  '/media/og/immobili/$': typeof MediaOgImmobiliSplatRoute
   '/admin/immobili/': typeof AdminAdminImmobiliIndexRoute
   '/admin/immobili/$id/anteprima': typeof AdminAdminImmobiliIdAnteprimaRoute
 }
@@ -276,6 +283,7 @@ export interface FileRoutesByTo {
   '/admin/immobili/assistente': typeof AdminAdminImmobiliAssistenteRoute
   '/admin/immobili/nuovo': typeof AdminAdminImmobiliNuovoRoute
   '/api/public/idealista/feed.xml': typeof ApiPublicIdealistaFeedDotxmlRoute
+  '/media/og/immobili/$': typeof MediaOgImmobiliSplatRoute
   '/admin/immobili': typeof AdminAdminImmobiliIndexRoute
   '/admin/immobili/$id/anteprima': typeof AdminAdminImmobiliIdAnteprimaRoute
 }
@@ -312,6 +320,7 @@ export interface FileRoutesById {
   '/_admin/admin/immobili/assistente': typeof AdminAdminImmobiliAssistenteRoute
   '/_admin/admin/immobili/nuovo': typeof AdminAdminImmobiliNuovoRoute
   '/api/public/idealista/feed.xml': typeof ApiPublicIdealistaFeedDotxmlRoute
+  '/media/og/immobili/$': typeof MediaOgImmobiliSplatRoute
   '/_admin/admin/immobili/': typeof AdminAdminImmobiliIndexRoute
   '/_admin/admin/immobili/$id/anteprima': typeof AdminAdminImmobiliIdAnteprimaRoute
 }
@@ -348,6 +357,7 @@ export interface FileRouteTypes {
     | '/admin/immobili/assistente'
     | '/admin/immobili/nuovo'
     | '/api/public/idealista/feed.xml'
+    | '/media/og/immobili/$'
     | '/admin/immobili/'
     | '/admin/immobili/$id/anteprima'
   fileRoutesByTo: FileRoutesByTo
@@ -380,6 +390,7 @@ export interface FileRouteTypes {
     | '/admin/immobili/assistente'
     | '/admin/immobili/nuovo'
     | '/api/public/idealista/feed.xml'
+    | '/media/og/immobili/$'
     | '/admin/immobili'
     | '/admin/immobili/$id/anteprima'
   id:
@@ -415,6 +426,7 @@ export interface FileRouteTypes {
     | '/_admin/admin/immobili/assistente'
     | '/_admin/admin/immobili/nuovo'
     | '/api/public/idealista/feed.xml'
+    | '/media/og/immobili/$'
     | '/_admin/admin/immobili/'
     | '/_admin/admin/immobili/$id/anteprima'
   fileRoutesById: FileRoutesById
@@ -440,6 +452,7 @@ export interface RootRouteChildren {
   CaseInVenditaLunigianaIndexRoute: typeof CaseInVenditaLunigianaIndexRoute
   CaseInVenditaIndexRoute: typeof CaseInVenditaIndexRoute
   ApiPublicIdealistaFeedDotxmlRoute: typeof ApiPublicIdealistaFeedDotxmlRoute
+  MediaOgImmobiliSplatRoute: typeof MediaOgImmobiliSplatRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -640,6 +653,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAdminImmobiliIndexRouteImport
       parentRoute: typeof AdminAdminRoute
     }
+    '/media/og/immobili/$': {
+      id: '/media/og/immobili/$'
+      path: '/media/og/immobili/$'
+      fullPath: '/media/og/immobili/$'
+      preLoaderRoute: typeof MediaOgImmobiliSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/idealista/feed.xml': {
       id: '/api/public/idealista/feed.xml'
       path: '/api/public/idealista/feed.xml'
@@ -762,6 +782,7 @@ const rootRouteChildren: RootRouteChildren = {
   CaseInVenditaLunigianaIndexRoute: CaseInVenditaLunigianaIndexRoute,
   CaseInVenditaIndexRoute: CaseInVenditaIndexRoute,
   ApiPublicIdealistaFeedDotxmlRoute: ApiPublicIdealistaFeedDotxmlRoute,
+  MediaOgImmobiliSplatRoute: MediaOgImmobiliSplatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

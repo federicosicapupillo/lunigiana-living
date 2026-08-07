@@ -12,3 +12,14 @@ export function propertyParam(p: { slug?: string | null; id: string | number }):
 export function propertyPath(p: { slug?: string | null; id: string | number }): string {
   return `/immobili/${propertyParam(p)}`;
 }
+
+/**
+ * URL stabile dell'immagine Open Graph di un immobile (nessun token, nessuna
+ * signed URL). Servita da `/media/og/immobili/<slug>.jpg`. Per gli immobili
+ * senza slug non esiste una preview dedicata: si usa l'immagine di brand.
+ */
+export function propertyOgImagePath(p: { slug?: string | null; id: string | number }): string {
+  const slug = p.slug?.trim();
+  if (!slug) return "/og/furia-immobiliare.jpg";
+  return `/media/og/immobili/${slug}.jpg`;
+}
