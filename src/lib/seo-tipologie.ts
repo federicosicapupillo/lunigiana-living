@@ -14,6 +14,12 @@
  *    comune-SEO pages) for internal linking.
  */
 import type { PublicProperty } from "@/lib/public-properties.functions";
+import {
+  hasGarden,
+  isAffordableSale,
+  isForSale,
+  typeInWhitelist,
+} from "@/lib/seo-taxonomy";
 
 export type TipologiaSeo = {
   slug: string;
@@ -109,9 +115,9 @@ export const TIPOLOGIE_SEO: TipologiaSeo[] = [
     blurb: "Case in pietra, casali e proprietà di campagna da scegliere con cura.",
     relatedTypes: ["case-indipendenti", "case-con-giardino", "seconde-case"],
     suggestedComuni: ["mulazzo", "filattiera", "zeri", "bagnone"],
-    matches: (p) =>
-      typeMatches(p, ["rustico", "casale", "casa colonica", "fienile", "casa di campagna"]) ||
-      anyKeyword(p, ["rustico", "casale", "casa in pietra", "casa colonica", "borgo", "fienile"]),
+    // Solo property_type strutturato: "borgo" / "casa in pietra" / "centro
+    // storico" NON sono più trigger (facevano entrare appartamenti).
+    matches: (p) => typeInWhitelist(p, "rustici-casali"),
     en: {
       name: "Rustic homes and country houses",
       fullName: "Rustic homes and country houses",
@@ -174,9 +180,9 @@ export const TIPOLOGIE_SEO: TipologiaSeo[] = [
     blurb: "Spazi propri, autonomia e niente condominio.",
     relatedTypes: ["case-con-giardino", "ville", "rustici-casali"],
     suggestedComuni: ["pontremoli", "villafranca-in-lunigiana", "filattiera"],
-    matches: (p) =>
-      typeMatches(p, ["casa indipendente", "indipendente", "semindipendente", "casa singola", "villetta"]) ||
-      anyKeyword(p, ["indipendente", "semindipendente", "ingresso indipendente", "casa singola"]),
+    // Solo property_type strutturato: "ingresso indipendente" nel testo non
+    // trasforma più un appartamento in casa indipendente.
+    matches: (p) => typeInWhitelist(p, "case-indipendenti"),
     en: {
       name: "Independent houses",
       fullName: "Independent houses",
@@ -237,9 +243,9 @@ export const TIPOLOGIE_SEO: TipologiaSeo[] = [
     blurb: "Centri storici, prima casa, investimento o uso turistico.",
     relatedTypes: ["case-economiche", "seconde-case", "case-indipendenti"],
     suggestedComuni: ["pontremoli", "aulla", "villafranca-in-lunigiana", "bagnone"],
-    matches: (p) =>
-      typeMatches(p, ["appartamento", "bilocale", "trilocale", "monolocale", "attico"]) ||
-      anyKeyword(p, ["appartamento", "bilocale", "trilocale", "monolocale", "attico"]),
+    // Solo property_type strutturato (Appartamento / Attico): la parola
+    // "appartamento" nel testo non basta più.
+    matches: (p) => typeInWhitelist(p, "appartamenti"),
     en: {
       name: "Apartments",
       fullName: "Apartments",
@@ -300,9 +306,8 @@ export const TIPOLOGIE_SEO: TipologiaSeo[] = [
     blurb: "Spazi generosi, giardino, privacy e vista.",
     relatedTypes: ["case-indipendenti", "case-con-giardino", "rustici-casali"],
     suggestedComuni: ["pontremoli", "filattiera", "bagnone", "mulazzo"],
-    matches: (p) =>
-      typeMatches(p, ["villa"]) ||
-      anyKeyword(p, ["villa padronale", "villa di campagna", "villa storica"]),
+    // Matching invariato nella sostanza: solo property_type villa.
+    matches: (p) => typeInWhitelist(p, "ville"),
     en: {
       name: "Villas",
       fullName: "Villas",
@@ -363,15 +368,9 @@ export const TIPOLOGIE_SEO: TipologiaSeo[] = [
     blurb: "Spazio esterno, orto, animali e vita all'aperto.",
     relatedTypes: ["case-indipendenti", "ville", "rustici-casali"],
     suggestedComuni: ["filattiera", "bagnone", "mulazzo", "villafranca-in-lunigiana"],
-    matches: (p) => {
-      const h = haystack(p);
-      return (
-        h.includes("giardino") ||
-        h.includes("terreno") ||
-        h.includes("orto") ||
-        h.includes("parco privato")
-      );
-    },
+    // Solo flag strutturato `garden` del DB: "terreno", "orto" o
+    // "giardino condominiale" nel testo non bastano.
+    matches: (p) => hasGarden(p),
     en: {
       name: "Homes with garden",
       fullName: "Homes with garden",
@@ -432,8 +431,8 @@ export const TIPOLOGIE_SEO: TipologiaSeo[] = [
     blurb: "Budget contenuto, piccoli immobili e occasioni da leggere bene.",
     relatedTypes: ["appartamenti", "rustici-casali", "seconde-case"],
     suggestedComuni: ["zeri", "mulazzo", "aulla"],
-    matches: (p) =>
-      typeof p.priceValue === "number" && p.priceValue > 0 && p.priceValue <= 100000,
+    // Vendita + prezzo reale > 0 e <= 100.000 € (prezzi su richiesta esclusi).
+    matches: (p) => isAffordableSale(p),
     en: {
       name: "Affordable homes",
       fullName: "Affordable homes",
@@ -468,7 +467,7 @@ export const TIPOLOGIE_SEO: TipologiaSeo[] = [
     slug: "seconde-case",
     name: "Seconde case",
     fullName: "Seconde case",
-    metaTitle: "Seconde case in Lunigiana in vendita | Furia Immobiliare",
+    metaTitle: "Seconde case in vendita in Lunigiana | Furia Immobiliare",
     metaDescription:
       "Seconde case in vendita in Lunigiana: casa vacanza, borgo, campagna o montagna. Ti aiutiamo a scegliere quella davvero gestibile anche da lontano.",
     subtitle:
@@ -543,7 +542,9 @@ export function filterPropertiesForTipologia<T extends PublicProperty>(
   tipologia: TipologiaSeo,
   properties: T[],
 ): T[] {
-  return properties.filter((p) => tipologia.matches(p)).slice(0, 60);
+  // Tutte le landing tipologiche hanno intento "in vendita": filtro contratto
+  // strutturato prima di qualsiasi altra regola.
+  return properties.filter((p) => isForSale(p) && tipologia.matches(p)).slice(0, 60);
 }
 
 export type TipologiaSeoLocalized = {
