@@ -95,8 +95,9 @@ export const Route = createFileRoute("/immobili/$id")({
         { property: "og:description", content: p.description.slice(0, 200) },
         { property: "og:url", content: canonical },
         { property: "og:image", content: ogImage },
-        { property: "og:image:width", content: "1200" },
-        { property: "og:image:height", content: "630" },
+        // og:image:width/height volutamente omessi: Supabase non effettua
+        // upscaling, quindi alcune cover producono output inferiori a
+        // 1200x630. Dichiarare dimensioni non verificate sarebbe falso.
         { name: "twitter:image", content: ogImage },
         { name: "twitter:card", content: "summary_large_image" },
       ],

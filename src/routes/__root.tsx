@@ -95,8 +95,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       // Immagine social di brand ospitata sul dominio canonico (1200x630,
       // nessun token, nessun dominio preview).
       { property: "og:image", content: "https://furiaimmobiliare.it/og/furia-immobiliare.jpg" },
-      { property: "og:image:width", content: "1200" },
-      { property: "og:image:height", content: "630" },
+      // Nessun og:image:width/height a livello root: i tag verrebbero
+      // concatenati anche alle schede immobile, la cui immagine OG dipende
+      // dalla cover reale (Supabase non effettua upscaling) e non misura
+      // sempre 1200x630. Meglio nessuna dimensione che una dimensione falsa.
       { name: "twitter:image", content: "https://furiaimmobiliare.it/og/furia-immobiliare.jpg" },
     ],
     links: [

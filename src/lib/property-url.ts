@@ -21,5 +21,7 @@ export function propertyPath(p: { slug?: string | null; id: string | number }): 
 export function propertyOgImagePath(p: { slug?: string | null; id: string | number }): string {
   const slug = p.slug?.trim();
   if (!slug) return "/og/furia-immobiliare.jpg";
-  return `/media/og/immobili/${slug}.jpg`;
+  // URL senza estensione: il formato reale dipende dalla cover pubblicata
+  // (JPEG o PNG) e viene dichiarato dal Content-Type della risposta.
+  return `/media/og/immobili/${slug}`;
 }
