@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { MULTI_SELECT_FIELDS, parseMultiSelect, formatEpi } from "@/lib/admin/property-constants";
+import { publishedImagePath, pathFromStorageUrl } from "@/lib/property-image-source";
 
 const SIGNED_TTL = 60 * 60 * 24; // 24h
 
@@ -113,21 +114,6 @@ function deriveCategory(contract: string | null): PublicProperty["category"] {
 
 function isExternalUrl(p: string): boolean {
   return /^https?:\/\//i.test(p);
-}
-
-/**
- * Extract the stable storage path from a stored Supabase URL
- * (`.../object/sign/property-images/<path>?token=...`). Used to know which
- * object a stored `published_image_url` points at, so its transformed
- * variants can be signed and keyed by that same path.
- */
-function pathFromStorageUrl(url: string | null | undefined): string | null {
-  if (!url) return null;
-  const marker = "/property-images/";
-  const at = url.indexOf(marker);
-  if (at === -1) return null;
-  const path = url.slice(at + marker.length).split("?")[0];
-  return path ? decodeURIComponent(path) : null;
 }
 
 async function signMany(paths: string[]): Promise<Record<string, string>> {
