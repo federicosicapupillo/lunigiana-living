@@ -10,7 +10,7 @@
  */
 import { siteUrl } from "@/lib/site-url";
 import type { PublicProperty } from "@/lib/public-properties.functions";
-import { propertyPath } from "@/lib/property-url";
+import { propertyPath, propertyOgImagePath } from "@/lib/property-url";
 
 export const AGENCY_ID = siteUrl("/#agency");
 export const WEBSITE_ID = siteUrl("/#website");
@@ -172,8 +172,9 @@ export function propertyGraph(p: PublicProperty) {
     isPartOf: { "@id": WEBSITE_ID },
     provider: { "@id": AGENCY_ID },
     about: { "@id": `${canonical}#accommodation` },
-    // `image` volutamente omesso: le foto sono servite con URL firmate a
-    // scadenza, non adatte al markup pubblico.
+    // Immagine stabile servita dalla route social interna: nessun token,
+    // nessuna signed URL, nessun UUID nell'URL pubblica.
+    image: [siteUrl(propertyOgImagePath(p))],
     ...(emitOffer
       ? {
           offers: {
