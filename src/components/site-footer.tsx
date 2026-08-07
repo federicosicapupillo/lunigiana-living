@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import logoAsset from "@/assets/furia-logo.png.asset.json";
+import { StaticImage } from "@/components/static-image";
 import { useT } from "@/lib/i18n/LanguageContext";
 
 export function SiteFooter() {
@@ -9,9 +10,14 @@ export function SiteFooter() {
       <div className="container-editorial grid gap-12 py-16 md:grid-cols-4">
         <div className="md:col-span-2">
           <div className="footer-logo-badge">
-            <img
-              src={logoAsset.url}
+            <StaticImage
+              name="furia-logo"
+              fallbackSrc={logoAsset.url}
+              sizes="(max-width: 767px) 130px, 160px"
+              pictureClassName="contents"
               alt="Furia Immobiliare"
+              loading="lazy"
+              decoding="async"
               className="h-auto w-[130px] object-contain md:w-[160px]"
             />
           </div>

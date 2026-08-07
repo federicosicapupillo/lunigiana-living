@@ -23,6 +23,8 @@ import { useLocalizedHead } from "@/hooks/use-localized-head";
 import { localizePropertyDynamic } from "@/lib/i18n/property-localize";
 import { siteUrl } from "@/lib/site-url";
 import { homeGraph } from "@/lib/structured-data";
+import { StaticImage, staticSet } from "@/components/static-image";
+import { preloadImage } from "@/lib/static-image-set";
 
 const AGENCY_FACTS = {
   yearsActive: 18,
@@ -43,12 +45,28 @@ const HOME_DESCRIPTION =
 /** Unico blocco JSON-LD della home: RealEstateAgent + WebSite + WebPage. */
 const HOME_JSONLD = homeGraph(HOME_TITLE, HOME_DESCRIPTION);
 
+/** Maps the server-selected hero variant to its derived variant set key. */
+function heroSetName(variant?: HomeHeroVariant): string {
+  if (variant === "elena_cometa") return "elena-furia";
+  if (variant === "pontremoli_historic_center") return "pontremoli-hero-centro-storico";
+  return "hero-tramonto-ulivi";
+}
+
+/** `sizes` used both by the hero <picture> and by its preload, so they match. */
+function heroSizes(variant?: HomeHeroVariant): string {
+  return variant === "elena_cometa" ? "(max-width: 768px) 92vw, 45vw" : "100vw";
+}
+
 export const Route = createFileRoute("/")({
   loader: async () => {
     const [props, hero] = await Promise.all([listPublishedPropertiesSummary(), getHomeHeroVariant()]);
     return { ...props, heroVariant: hero.variant };
   },
-  head: () => ({
+  head: ({ loaderData }) => {
+    const variant = (loaderData as { heroVariant?: HomeHeroVariant } | undefined)?.heroVariant;
+    const heroName = heroSetName(variant);
+    const heroSet = staticSet(heroName);
+    return {
     meta: [
       { title: HOME_TITLE },
       { name: "description", content: HOME_DESCRIPTION },
@@ -58,7 +76,7 @@ export const Route = createFileRoute("/")({
     ],
     links: [
       { rel: "canonical", href: siteUrl("/") },
-      { rel: "preload", as: "image", href: heroTramontoVignetiAsset.url, fetchPriority: "high" },
+      ...(heroSet ? [preloadImage(heroSet, heroSizes(variant))] : []),
     ],
     scripts: [
       {
@@ -66,7 +84,8 @@ export const Route = createFileRoute("/")({
         children: JSON.stringify(HOME_JSONLD),
       },
     ],
-  }),
+    };
+  },
   component: Index,
 });
 
@@ -143,8 +162,11 @@ function Index() {
             </div>
             <div className="md:col-span-6 lg:col-span-6">
               <div className="relative mx-auto aspect-[4/5] w-full max-w-md overflow-hidden rounded-sm shadow-2xl md:max-w-none">
-                <img
-                  src={heroElenaCometa.url}
+                <StaticImage
+                  name="elena-furia"
+                  fallbackSrc={heroElenaCometa.url}
+                  sizes={heroSizes("elena_cometa")}
+                  pictureClassName="contents"
                   alt={heroAlt}
                   fetchPriority="high"
                   decoding="async"
@@ -163,8 +185,11 @@ function Index() {
         </section>
       ) : (
       <section className="relative isolate -mt-20 flex min-h-[88svh] items-end overflow-hidden sm:min-h-[92svh] md:min-h-[100svh]">
-        <img
-          src={heroSrc}
+        <StaticImage
+          name={heroSetName(heroVariant)}
+          fallbackSrc={heroSrc}
+          sizes={heroSizes(heroVariant)}
+          pictureClassName="contents"
           alt={heroAlt}
           width={1920}
           height={1080}
@@ -374,17 +399,25 @@ function Index() {
 
           <div className="mt-10 grid gap-px overflow-hidden rounded-sm bg-cream/10 sm:mt-14 md:grid-cols-3">
             {[
-                { name: "Pontremoli", img: territoryPontremoli.url, body: t("home.territories.t1.body") },
-                { name: "Bagnone", img: territoryBagnone.url, body: t("home.territories.t2.body") },
-                { name: "Zeri", img: territoryZeri.url, body: t("home.territories.t3.body") },
+                { name: "Pontremoli", set: "pontremoli-lunigiana-v2", img: territoryPontremoli.url, body: t("home.territories.t1.body") },
+                { name: "Bagnone", set: "bagnone-lunigiana", img: territoryBagnone.url, body: t("home.territories.t2.body") },
+                { name: "Zeri", set: "zeri-lunigiana", img: territoryZeri.url, body: t("home.territories.t3.body") },
             ].map((terr) => (
               <Link
                 key={terr.name}
                 to="/territori"
                 className="group relative block aspect-[16/10] overflow-hidden bg-ink md:aspect-[4/5]"
               >
-                <img src={terr.img} alt={terr.name} loading="lazy" decoding="async"
-                  className="absolute inset-0 h-full w-full object-cover opacity-70 transition-all duration-700 group-hover:scale-105 group-hover:opacity-90" />
+                <StaticImage
+                  name={terr.set}
+                  fallbackSrc={terr.img}
+                  sizes="(max-width: 767px) 100vw, 33vw"
+                  pictureClassName="contents"
+                  alt={terr.name}
+                  loading="lazy"
+                  decoding="async"
+                  className="absolute inset-0 h-full w-full object-cover opacity-70 transition-all duration-700 group-hover:scale-105 group-hover:opacity-90"
+                />
                 <div className="ink-overlay absolute inset-0" />
                 <div className="absolute inset-x-0 bottom-0 p-6 sm:p-8">
                   <div className="font-serif text-2xl text-cream sm:text-3xl">{terr.name}</div>

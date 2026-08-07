@@ -660,7 +660,7 @@ function PropertyDetail() {
                     : "opacity-70 hover:opacity-100 hover:ring-1 hover:ring-primary/40"
                 }`}
               >
-                <WatermarkedImage src={img.thumb(g, p.imageVariants)} alt="" loading="lazy" sizes="160px" watermark={false} className="h-full w-full object-cover transition-transform duration-300 hover:scale-105" />
+                <WatermarkedImage src={img.micro(g, p.imageVariants)} alt="" loading="lazy" sizes="96px" watermark={false} className="h-full w-full object-cover transition-transform duration-300 hover:scale-105" />
                 {p.galleryRenderingFlags?.[g] ? (
                   <span className="pointer-events-none absolute left-1 top-1 inline-flex items-center gap-1 rounded-sm border border-primary/25 bg-background/85 px-1.5 py-0.5 text-[9px] font-medium uppercase tracking-wider text-ink/80 backdrop-blur">
                     <Sparkles size={9} className="text-primary" /> {t("detail.renderingBadgeShort")}

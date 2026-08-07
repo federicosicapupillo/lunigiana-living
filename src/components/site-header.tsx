@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import logoAsset from "@/assets/furia-logo.png.asset.json";
+import { StaticImage } from "@/components/static-image";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { useT } from "@/lib/i18n/LanguageContext";
 
@@ -21,9 +22,14 @@ export function SiteHeader() {
     <header className="sticky top-0 z-40 border-b border-warm-border/50 bg-warm-cream/85 backdrop-blur-md">
       <div className="container-editorial flex h-20 items-center sm:h-[84px] md:h-[88px] lg:h-[96px]">
         <Link to="/" className="group flex shrink-0 items-center" aria-label="Furia Immobiliare — Home">
-          <img
-            src={logoAsset.url}
+          <StaticImage
+            name="furia-logo"
+            fallbackSrc={logoAsset.url}
+            sizes="(max-width: 640px) 128px, 160px"
+            pictureClassName="contents"
             alt="Furia Immobiliare"
+            loading="eager"
+            decoding="async"
             className="h-16 w-auto object-contain sm:h-[72px] md:h-[76px] lg:h-[82px]"
           />
         </Link>

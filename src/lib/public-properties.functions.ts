@@ -13,12 +13,14 @@ const SIGNED_TTL = 60 * 60 * 24; // 24h
  * remain untouched and are still used by A3 download, AI render and
  * enhancement flows (which sign their own URLs).
  */
-export type ImageVariants = { card?: string; hero?: string; thumb?: string };
+export type ImageVariants = { card?: string; hero?: string; thumb?: string; micro?: string };
 
 const VARIANT_OPTS = {
   card:  { width:  800, quality: 75, resize: "cover"   as const },
   hero:  { width: 1600, quality: 78, resize: "contain" as const },
   thumb: { width:  320, quality: 65, resize: "cover"   as const },
+  // Gallery strip thumbnails render at ~85x64 CSS: 192px covers DPR 2 exactly.
+  micro: { width:  192, quality: 65, resize: "cover"   as const },
 };
 type VariantKey = keyof typeof VARIANT_OPTS;
 
@@ -301,7 +303,8 @@ function adapt(
     if (variantMaps.card?.[path])  v.card  = variantMaps.card[path];
     if (variantMaps.hero?.[path])  v.hero  = variantMaps.hero[path];
     if (variantMaps.thumb?.[path]) v.thumb = variantMaps.thumb[path];
-    if (v.card || v.hero || v.thumb) imageVariants[path] = v;
+    if (variantMaps.micro?.[path]) v.micro = variantMaps.micro[path];
+    if (v.card || v.hero || v.thumb || v.micro) imageVariants[path] = v;
   };
   for (const i of sortedImages) {
     attach(i.storage_path);
@@ -531,7 +534,7 @@ export const getPublishedProperty = createServerFn({ method: "GET" })
     ]);
     const [signedMap, variantMaps] = await Promise.all([
       signMany(allPaths),
-      signVariants(allPaths, ["card", "hero", "thumb"]),
+      signVariants(allPaths, ["card", "hero", "thumb", "micro"]),
     ]);
 
     return { property: adapt(propRow, images, features, description, signedMap, variantMaps) };

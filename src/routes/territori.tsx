@@ -12,6 +12,8 @@ import { useT } from "@/lib/i18n/LanguageContext";
 import { useLocalizedHead } from "@/hooks/use-localized-head";
 import { LeadMagnetBlock } from "@/components/lead-magnet-block";
 import { siteUrl } from "@/lib/site-url";
+import { StaticImage, staticSet } from "@/components/static-image";
+import { preloadImage } from "@/lib/static-image-set";
 
 const imageBySlug: Record<string, string> = {
   pontremoli: pontremoliAsset.url,
@@ -22,6 +24,19 @@ const imageBySlug: Record<string, string> = {
   mulazzo: mulazzoAsset.url,
 };
 
+/** Derived variant-set key per borgo (originals kept as fallback). */
+const setBySlug: Record<string, string> = {
+  pontremoli: "pontremoli-lunigiana-v2",
+  bagnone: "bagnone-lunigiana",
+  zeri: "zeri-lunigiana",
+  villafranca: "villafranca-lunigiana",
+  filattiera: "filattiera-lunigiana",
+  mulazzo: "mulazzo-lunigiana",
+};
+
+const TERR_HERO_SET = "lunigiana-hero-tramonto";
+const TERR_HERO_SIZES = "100vw";
+
 export const Route = createFileRoute("/territori")({
   head: () => ({
     meta: [
@@ -31,7 +46,10 @@ export const Route = createFileRoute("/territori")({
       { property: "og:description", content: "Sei borghi, sei atmosfere. Una guida sincera alla Lunigiana, scritta da chi questa terra la abita e la racconta ogni giorno." },
       { property: "og:url", content: siteUrl("/territori") },
     ],
-    links: [{ rel: "canonical", href: siteUrl("/territori") }],
+    links: [
+      { rel: "canonical", href: siteUrl("/territori") },
+      ...(staticSet(TERR_HERO_SET) ? [preloadImage(staticSet(TERR_HERO_SET)!, TERR_HERO_SIZES)] : []),
+    ],
   }),
   component: TerritoriPage,
 });
@@ -42,7 +60,17 @@ function TerritoriPage() {
   return (
     <>
       <section className="relative isolate -mt-20 flex min-h-[80svh] items-end overflow-hidden">
-        <img src={heroAsset.url} alt="Paesaggio della Lunigiana al tramonto" className="absolute inset-0 -z-10 h-full w-full object-cover" />
+        <StaticImage
+          name={TERR_HERO_SET}
+          fallbackSrc={heroAsset.url}
+          sizes={TERR_HERO_SIZES}
+          pictureClassName="contents"
+          alt="Paesaggio della Lunigiana al tramonto"
+          loading="eager"
+          fetchPriority="high"
+          decoding="async"
+          className="absolute inset-0 -z-10 h-full w-full object-cover"
+        />
         <div className="hero-gradient absolute inset-0 -z-10" />
         <div className="absolute inset-0 -z-10 bg-gradient-to-r from-ink/75 via-ink/45 to-ink/15" />
         <div className="absolute inset-x-0 bottom-0 -z-10 h-1/2 bg-gradient-to-t from-ink/70 to-transparent" />
@@ -126,10 +154,14 @@ function TerritoriPage() {
                   className={`grid gap-10 md:grid-cols-12 md:items-center ${i % 2 ? "md:[&>figure]:order-2" : ""}`}
                 >
                   <figure className="overflow-hidden rounded-sm shadow-[0_18px_40px_-24px_rgba(36,23,17,0.35)] md:col-span-7">
-                    <img
-                      src={imageBySlug[terr.slug]}
+                    <StaticImage
+                      name={setBySlug[terr.slug]}
+                      fallbackSrc={imageBySlug[terr.slug]}
+                      sizes="(max-width: 767px) 100vw, 58vw"
+                      pictureClassName="contents"
                       alt={terr.name}
                       loading="lazy"
+                      decoding="async"
                       className="aspect-[5/4] w-full object-cover md:aspect-[4/3]"
                     />
                   </figure>

@@ -21,11 +21,12 @@
  * `fetchPriority` and `sizes` — those work regardless of transforms.
  */
 
-export type ImgPreset = "card" | "thumb" | "hero" | "original";
-export type ImageVariants = { card?: string; hero?: string; thumb?: string };
+export type ImgPreset = "card" | "thumb" | "micro" | "hero" | "original";
+export type ImageVariants = { card?: string; hero?: string; thumb?: string; micro?: string };
 export type VariantsMap = Record<string, ImageVariants> | undefined;
 
 export const PRESET_WIDTHS = {
+  micro: 192,
   thumb: 320,
   card: 800,
   hero: 1600,
@@ -83,6 +84,8 @@ export function imgSrcSet(url: string, presets: ImgPreset[], variants?: Variants
 export const img = {
   card: (u: string, v?: VariantsMap) => imgVariant(u, "card", v),
   thumb: (u: string, v?: VariantsMap) => imgVariant(u, "thumb", v),
+  /** ~192px preset for gallery strip thumbnails (85x64 CSS at DPR 2). */
+  micro: (u: string, v?: VariantsMap) => imgVariant(u, "micro", v) || imgVariant(u, "thumb", v),
   hero: (u: string, v?: VariantsMap) => imgVariant(u, "hero", v),
   srcSet: imgSrcSet,
 };
