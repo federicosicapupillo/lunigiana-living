@@ -34,6 +34,7 @@ export const Route = createFileRoute("/media/og/immobili/$slug.jpg")({
       GET: async ({ params }) => {
         const raw = (params.slug ?? "").trim();
         const slug = raw.replace(/\.(jpg|jpeg)$/i, "");
+        console.log("[media/og] slug", JSON.stringify({ raw, slug }));
         if (!slug || !SLUG_RE.test(slug)) {
           return new Response("Not found", { status: 404 });
         }
