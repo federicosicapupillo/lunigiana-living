@@ -30,7 +30,7 @@ import { COMMERCIAL_HIGHLIGHT_EN } from "@/lib/admin/property-constants";
 import { img, imgSrcSet } from "@/lib/image-url";
 import { trackEvent, trackClick } from "@/lib/analytics";
 import { siteUrl } from "@/lib/site-url";
-import { propertyPath } from "@/lib/property-url";
+import { propertyPath, propertyOgImagePath } from "@/lib/property-url";
 import { propertyGraph } from "@/lib/structured-data";
 
 function truncateTitle(s: string, max = 60): string {
