@@ -399,17 +399,25 @@ function Index() {
 
           <div className="mt-10 grid gap-px overflow-hidden rounded-sm bg-cream/10 sm:mt-14 md:grid-cols-3">
             {[
-                { name: "Pontremoli", img: territoryPontremoli.url, body: t("home.territories.t1.body") },
-                { name: "Bagnone", img: territoryBagnone.url, body: t("home.territories.t2.body") },
-                { name: "Zeri", img: territoryZeri.url, body: t("home.territories.t3.body") },
+                { name: "Pontremoli", set: "pontremoli-lunigiana-v2", img: territoryPontremoli.url, body: t("home.territories.t1.body") },
+                { name: "Bagnone", set: "bagnone-lunigiana", img: territoryBagnone.url, body: t("home.territories.t2.body") },
+                { name: "Zeri", set: "zeri-lunigiana", img: territoryZeri.url, body: t("home.territories.t3.body") },
             ].map((terr) => (
               <Link
                 key={terr.name}
                 to="/territori"
                 className="group relative block aspect-[16/10] overflow-hidden bg-ink md:aspect-[4/5]"
               >
-                <img src={terr.img} alt={terr.name} loading="lazy" decoding="async"
-                  className="absolute inset-0 h-full w-full object-cover opacity-70 transition-all duration-700 group-hover:scale-105 group-hover:opacity-90" />
+                <StaticImage
+                  name={terr.set}
+                  fallbackSrc={terr.img}
+                  sizes="(max-width: 767px) 100vw, 33vw"
+                  pictureClassName="contents"
+                  alt={terr.name}
+                  loading="lazy"
+                  decoding="async"
+                  className="absolute inset-0 h-full w-full object-cover opacity-70 transition-all duration-700 group-hover:scale-105 group-hover:opacity-90"
+                />
                 <div className="ink-overlay absolute inset-0" />
                 <div className="absolute inset-x-0 bottom-0 p-6 sm:p-8">
                   <div className="font-serif text-2xl text-cream sm:text-3xl">{terr.name}</div>
