@@ -37,7 +37,7 @@ import { Route as AdminAdminImpostazioniRouteImport } from './routes/_admin.admi
 import { Route as AdminAdminIdealistaRouteImport } from './routes/_admin.admin.idealista'
 import { Route as AdminAdminDatiLiveRouteImport } from './routes/_admin.admin.dati-live'
 import { Route as AdminAdminImmobiliIndexRouteImport } from './routes/_admin.admin.immobili.index'
-import { Route as MediaOgImmobiliSlugRouteImport } from './routes/media/og/immobili/$slug'
+import { Route as MediaOgImmobiliSlugDotjpgRouteImport } from './routes/media/og/immobili/$slug[.]jpg'
 import { Route as ApiPublicIdealistaFeedDotxmlRouteImport } from './routes/api/public/idealista/feed[.]xml'
 import { Route as AdminAdminImmobiliNuovoRouteImport } from './routes/_admin.admin.immobili.nuovo'
 import { Route as AdminAdminImmobiliAssistenteRouteImport } from './routes/_admin.admin.immobili.assistente'
@@ -185,11 +185,12 @@ const AdminAdminImmobiliIndexRoute = AdminAdminImmobiliIndexRouteImport.update({
   path: '/immobili/',
   getParentRoute: () => AdminAdminRoute,
 } as any)
-const MediaOgImmobiliSlugRoute = MediaOgImmobiliSlugRouteImport.update({
-  id: '/media/og/immobili/$slug',
-  path: '/media/og/immobili/$slug',
-  getParentRoute: () => rootRouteImport,
-} as any)
+const MediaOgImmobiliSlugDotjpgRoute =
+  MediaOgImmobiliSlugDotjpgRouteImport.update({
+    id: '/media/og/immobili/$slug.jpg',
+    path: '/media/og/immobili/$slug.jpg',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicIdealistaFeedDotxmlRoute =
   ApiPublicIdealistaFeedDotxmlRouteImport.update({
     id: '/api/public/idealista/feed.xml',
@@ -250,7 +251,7 @@ export interface FileRoutesByFullPath {
   '/admin/immobili/assistente': typeof AdminAdminImmobiliAssistenteRoute
   '/admin/immobili/nuovo': typeof AdminAdminImmobiliNuovoRoute
   '/api/public/idealista/feed.xml': typeof ApiPublicIdealistaFeedDotxmlRoute
-  '/media/og/immobili/$slug': typeof MediaOgImmobiliSlugRoute
+  '/media/og/immobili/$slug.jpg': typeof MediaOgImmobiliSlugDotjpgRoute
   '/admin/immobili/': typeof AdminAdminImmobiliIndexRoute
   '/admin/immobili/$id/anteprima': typeof AdminAdminImmobiliIdAnteprimaRoute
 }
@@ -283,7 +284,7 @@ export interface FileRoutesByTo {
   '/admin/immobili/assistente': typeof AdminAdminImmobiliAssistenteRoute
   '/admin/immobili/nuovo': typeof AdminAdminImmobiliNuovoRoute
   '/api/public/idealista/feed.xml': typeof ApiPublicIdealistaFeedDotxmlRoute
-  '/media/og/immobili/$slug': typeof MediaOgImmobiliSlugRoute
+  '/media/og/immobili/$slug.jpg': typeof MediaOgImmobiliSlugDotjpgRoute
   '/admin/immobili': typeof AdminAdminImmobiliIndexRoute
   '/admin/immobili/$id/anteprima': typeof AdminAdminImmobiliIdAnteprimaRoute
 }
@@ -320,7 +321,7 @@ export interface FileRoutesById {
   '/_admin/admin/immobili/assistente': typeof AdminAdminImmobiliAssistenteRoute
   '/_admin/admin/immobili/nuovo': typeof AdminAdminImmobiliNuovoRoute
   '/api/public/idealista/feed.xml': typeof ApiPublicIdealistaFeedDotxmlRoute
-  '/media/og/immobili/$slug': typeof MediaOgImmobiliSlugRoute
+  '/media/og/immobili/$slug.jpg': typeof MediaOgImmobiliSlugDotjpgRoute
   '/_admin/admin/immobili/': typeof AdminAdminImmobiliIndexRoute
   '/_admin/admin/immobili/$id/anteprima': typeof AdminAdminImmobiliIdAnteprimaRoute
 }
@@ -357,7 +358,7 @@ export interface FileRouteTypes {
     | '/admin/immobili/assistente'
     | '/admin/immobili/nuovo'
     | '/api/public/idealista/feed.xml'
-    | '/media/og/immobili/$slug'
+    | '/media/og/immobili/$slug.jpg'
     | '/admin/immobili/'
     | '/admin/immobili/$id/anteprima'
   fileRoutesByTo: FileRoutesByTo
@@ -390,7 +391,7 @@ export interface FileRouteTypes {
     | '/admin/immobili/assistente'
     | '/admin/immobili/nuovo'
     | '/api/public/idealista/feed.xml'
-    | '/media/og/immobili/$slug'
+    | '/media/og/immobili/$slug.jpg'
     | '/admin/immobili'
     | '/admin/immobili/$id/anteprima'
   id:
@@ -426,7 +427,7 @@ export interface FileRouteTypes {
     | '/_admin/admin/immobili/assistente'
     | '/_admin/admin/immobili/nuovo'
     | '/api/public/idealista/feed.xml'
-    | '/media/og/immobili/$slug'
+    | '/media/og/immobili/$slug.jpg'
     | '/_admin/admin/immobili/'
     | '/_admin/admin/immobili/$id/anteprima'
   fileRoutesById: FileRoutesById
@@ -452,7 +453,7 @@ export interface RootRouteChildren {
   CaseInVenditaLunigianaIndexRoute: typeof CaseInVenditaLunigianaIndexRoute
   CaseInVenditaIndexRoute: typeof CaseInVenditaIndexRoute
   ApiPublicIdealistaFeedDotxmlRoute: typeof ApiPublicIdealistaFeedDotxmlRoute
-  MediaOgImmobiliSlugRoute: typeof MediaOgImmobiliSlugRoute
+  MediaOgImmobiliSlugDotjpgRoute: typeof MediaOgImmobiliSlugDotjpgRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -653,11 +654,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAdminImmobiliIndexRouteImport
       parentRoute: typeof AdminAdminRoute
     }
-    '/media/og/immobili/$slug': {
-      id: '/media/og/immobili/$slug'
-      path: '/media/og/immobili/$slug'
-      fullPath: '/media/og/immobili/$slug'
-      preLoaderRoute: typeof MediaOgImmobiliSlugRouteImport
+    '/media/og/immobili/$slug.jpg': {
+      id: '/media/og/immobili/$slug.jpg'
+      path: '/media/og/immobili/$slug.jpg'
+      fullPath: '/media/og/immobili/$slug.jpg'
+      preLoaderRoute: typeof MediaOgImmobiliSlugDotjpgRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/idealista/feed.xml': {
@@ -782,8 +783,18 @@ const rootRouteChildren: RootRouteChildren = {
   CaseInVenditaLunigianaIndexRoute: CaseInVenditaLunigianaIndexRoute,
   CaseInVenditaIndexRoute: CaseInVenditaIndexRoute,
   ApiPublicIdealistaFeedDotxmlRoute: ApiPublicIdealistaFeedDotxmlRoute,
-  MediaOgImmobiliSlugRoute: MediaOgImmobiliSlugRoute,
+  MediaOgImmobiliSlugDotjpgRoute: MediaOgImmobiliSlugDotjpgRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
