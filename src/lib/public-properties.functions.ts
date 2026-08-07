@@ -67,6 +67,10 @@ export type PublicProperty = {
     onDetail: boolean;
     onFlyer: boolean;
   } | null;
+  /** Comune (municipality) as stored in the DB — structured taxonomy source. */
+  municipality: string | null;
+  /** Structured garden flag from the DB — primary source for the garden landing. */
+  garden: boolean;
   category: "vendita" | "affitto" | "scelti-per-voi";
   featured: boolean;
   tag?: string;
@@ -200,6 +204,7 @@ type PropertyRow = {
   short_notes: string | null;
   panoramic_view: boolean;
   historic_property: boolean;
+  garden: boolean;
   featured: boolean;
   energy_class: string | null;
   energy_performance_index_status: string | null;
@@ -397,6 +402,8 @@ function adapt(
     highlights,
     commercialHighlights: ch,
     occasione,
+    municipality: p.municipality,
+    garden: !!p.garden,
     category: deriveCategory(p.contract_type),
     featured: !!p.featured,
     tag: buildTag(p),
@@ -417,7 +424,7 @@ export const listPublishedProperties = createServerFn({ method: "GET" }).handler
   const { data: props, error } = await supabaseAdmin
     .from("properties")
     .select(
-      "id, slug, reference_code, title, title_en, subtitle_en, summary_en, location_description_en, municipality, area_zone, price, price_on_request, property_type, contract_type, size_sqm, bedrooms, bathrooms, floors, short_notes, panoramic_view, historic_property, featured, homepage_order, featured_at, energy_class, energy_performance_index_status, energy_performance_index_value, commercial_highlights, occasione_settings, created_at",
+      "id, slug, reference_code, title, title_en, subtitle_en, summary_en, location_description_en, municipality, area_zone, price, price_on_request, property_type, contract_type, size_sqm, bedrooms, bathrooms, floors, short_notes, panoramic_view, historic_property, garden, featured, homepage_order, featured_at, energy_class, energy_performance_index_status, energy_performance_index_value, commercial_highlights, occasione_settings, created_at",
     )
     .eq("status", "published")
     .order("homepage_order", { ascending: true, nullsFirst: false })
@@ -492,7 +499,7 @@ export const getPublishedProperty = createServerFn({ method: "GET" })
     const query = supabaseAdmin
       .from("properties")
     .select(
-      "id, slug, reference_code, title, title_en, subtitle_en, summary_en, location_description_en, municipality, area_zone, price, price_on_request, property_type, contract_type, size_sqm, bedrooms, bathrooms, floors, short_notes, panoramic_view, historic_property, featured, energy_class, energy_performance_index_status, energy_performance_index_value, commercial_highlights, occasione_settings, created_at",
+      "id, slug, reference_code, title, title_en, subtitle_en, summary_en, location_description_en, municipality, area_zone, price, price_on_request, property_type, contract_type, size_sqm, bedrooms, bathrooms, floors, short_notes, panoramic_view, historic_property, garden, featured, energy_class, energy_performance_index_status, energy_performance_index_value, commercial_highlights, occasione_settings, created_at",
     )
       .eq("status", "published");
     // La colonna `id` è UUID: confrontarla con uno slug testuale genera un
@@ -551,7 +558,7 @@ export const listPublishedPropertiesSummary = createServerFn({ method: "GET" }).
   const { data: props, error } = await supabaseAdmin
     .from("properties")
     .select(
-      "id, slug, reference_code, title, title_en, subtitle_en, summary_en, location_description_en, municipality, area_zone, price, price_on_request, property_type, contract_type, size_sqm, bedrooms, bathrooms, floors, short_notes, panoramic_view, historic_property, featured, homepage_order, featured_at, energy_class, energy_performance_index_status, energy_performance_index_value, commercial_highlights, occasione_settings, created_at",
+      "id, slug, reference_code, title, title_en, subtitle_en, summary_en, location_description_en, municipality, area_zone, price, price_on_request, property_type, contract_type, size_sqm, bedrooms, bathrooms, floors, short_notes, panoramic_view, historic_property, garden, featured, homepage_order, featured_at, energy_class, energy_performance_index_status, energy_performance_index_value, commercial_highlights, occasione_settings, created_at",
     )
     .eq("status", "published")
     .order("homepage_order", { ascending: true, nullsFirst: false })
