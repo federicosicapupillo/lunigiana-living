@@ -3,7 +3,16 @@ import { ArrowRight, CheckCircle2, ChevronRight, MapPin, MessageCircle } from "l
 import { PropertyCard } from "@/components/property-card";
 import { whatsappUrl } from "@/components/whatsapp-float";
 import { listPublishedPropertiesSummary, type PublicProperty } from "@/lib/public-properties.functions";
-import { COMUNE_SEO, getComuneSeo, localizeComuneSeo, municipalityMatches } from "@/lib/seo-comuni";
+import {
+  COMUNE_SEO,
+  comunePreposition,
+  getComuneSeo,
+  localizeComuneSeo,
+  municipalityMatches,
+} from "@/lib/seo-comuni";
+import { TIPOLOGIE_SEO, localizeTipologiaSeo, propertyMatchesTipologia } from "@/lib/seo-tipologie";
+import { isForSale, propertyMunicipality } from "@/lib/seo-taxonomy";
+import { Compass } from "lucide-react";
 import { trackClick } from "@/lib/analytics";
 import { useLanguage, useT } from "@/lib/i18n/LanguageContext";
 import { useDocHead } from "@/hooks/use-localized-head";
@@ -16,12 +25,21 @@ export const Route = createFileRoute("/case-in-vendita/$comune")({
     const comune = getComuneSeo(params.comune);
     if (!comune) throw notFound();
     const { properties } = await listPublishedPropertiesSummary();
-    const matched = properties.filter((p) => {
-      // p.location is "<municipality> · <area_zone>" — match on the leading part.
-      const head = (p.location || "").split("·")[0]?.trim();
-      return municipalityMatches(comune, head);
-    });
-    return { comune, properties: matched };
+    const inComune = (c: typeof comune, p: (typeof properties)[number]) =>
+      municipalityMatches(c, propertyMunicipality(p));
+    // Landing con intento "in vendita": solo immobili realmente in vendita
+    // (contract_type strutturato). Le locazioni restano nel catalogo /immobili.
+    const forSale = properties.filter(isForSale);
+    const matched = forSale.filter((p) => inComune(comune, p));
+    // Tipologie realmente popolate in questo comune (nuova tassonomia).
+    const populatedTypes = TIPOLOGIE_SEO.filter((tp) =>
+      matched.some((p) => propertyMatchesTipologia(tp, p)),
+    ).map((tp) => tp.slug);
+    // Comuni vicini con inventario reale, per il fallback inventory = 0.
+    const nearby = COMUNE_SEO.filter(
+      (c) => c.slug !== comune.slug && forSale.some((p) => inComune(c, p)),
+    ).map((c) => c.slug);
+    return { comune, properties: matched, populatedTypes, nearby };
   },
   head: ({ params, loaderData }) => {
     const comune = loaderData?.comune ?? getComuneSeo(params.comune);
@@ -29,8 +47,9 @@ export const Route = createFileRoute("/case-in-vendita/$comune")({
       return { meta: [{ title: "Pagina non trovata — Furia Immobiliare" }] };
     }
     const url = siteUrl(`/case-in-vendita/${comune.slug}`);
-    const title = `Case in vendita a ${comune.fullName} | Furia Immobiliare`;
-    const description = `Scopri case, appartamenti e immobili di carattere a ${comune.fullName} con Furia Immobiliare. Ti guidiamo nella scelta della casa giusta in Lunigiana.`;
+    const prep = comunePreposition(comune.fullName);
+    const title = `Case in vendita ${prep} ${comune.fullName} | Furia Immobiliare`;
+    const description = `Scopri case, appartamenti e immobili di carattere ${prep} ${comune.fullName} con Furia Immobiliare. Ti guidiamo nella scelta della casa giusta in Lunigiana.`;
     const items = loaderData?.properties ?? [];
     const breadcrumbLd = {
       "@context": "https://schema.org",
@@ -90,15 +109,25 @@ export const Route = createFileRoute("/case-in-vendita/$comune")({
 });
 
 function ComuneSeoPage() {
-  const { comune, properties } = Route.useLoaderData() as {
+  const { comune, properties, populatedTypes, nearby } = Route.useLoaderData() as {
     comune: (typeof COMUNE_SEO)[number];
     properties: PublicProperty[];
+    populatedTypes: string[];
+    nearby: string[];
   };
   const { language } = useLanguage();
   const t = useT();
   const L = localizeComuneSeo(comune, language);
   useDocHead(L.metaTitle, L.metaDescription);
   const related = COMUNE_SEO.filter((c) => c.slug !== comune.slug).slice(0, 4);
+  const prep = comunePreposition(comune.fullName);
+  const populated = populatedTypes
+    .map((slug) => TIPOLOGIE_SEO.find((tp) => tp.slug === slug))
+    .filter((tp): tp is (typeof TIPOLOGIE_SEO)[number] => !!tp);
+  const nearbyComuni = nearby
+    .map((slug) => getComuneSeo(slug))
+    .filter((c): c is NonNullable<ReturnType<typeof getComuneSeo>> => !!c)
+    .slice(0, 4);
   const waMsg =
     language === "en"
       ? `Hi Elena, I'm looking for a home in ${comune.fullName}. Could you help me?`
@@ -133,7 +162,7 @@ function ComuneSeoPage() {
             <span className="text-xs uppercase tracking-[0.24em]">{t("seoPage.areaLabel")}</span>
           </div>
           <h1 className="mt-3 max-w-3xl font-serif text-4xl leading-tight text-ink md:text-6xl">
-            {fmt("seoComune.h1", { name: comune.fullName })}
+            {fmt("seoComune.h1", { name: comune.fullName, a: prep })}
           </h1>
           <p className="mt-6 max-w-2xl text-base leading-relaxed text-[var(--ink-soft)]">
             {L.subtitle}
@@ -170,8 +199,13 @@ function ComuneSeoPage() {
               </span>
               <h2 className="mt-2 font-serif text-2xl text-ink md:text-3xl">
                 {properties.length > 0
-                  ? fmt(properties.length === 1 ? "seoComune.props.count.one" : "seoComune.props.count.many", { n: properties.length, name: comune.fullName })
-                  : fmt("seoComune.props.fallback", { name: comune.fullName })}
+                  ? fmt(
+                      properties.length === 1
+                        ? "seoComune.props.count.one"
+                        : "seoComune.props.count.many",
+                      { n: properties.length, name: comune.fullName, a: prep },
+                    )
+                  : fmt("seoComune.props.fallback", { name: comune.fullName, a: prep })}
               </h2>
             </div>
             <Link
@@ -185,8 +219,45 @@ function ComuneSeoPage() {
           {properties.length === 0 ? (
             <div className="mt-12 rounded-2xl border border-[var(--terracotta)]/15 bg-[var(--warm-ivory)] px-8 py-14 text-center">
               <p className="mx-auto max-w-xl font-serif text-2xl leading-snug text-ink">
-                {t("seoPage.empty.title")}
+                {fmt("seoComune.empty.title", { name: comune.fullName, a: prep })}
               </p>
+              <p className="mx-auto mt-4 max-w-xl text-[0.95rem] leading-relaxed text-[var(--ink-soft)]">
+                {t("seoComune.empty.body")}
+              </p>
+              <div className="mt-6">
+                <Link
+                  to="/trova-casa-lunigiana"
+                  data-track="seo_area_finder_click"
+                  onClick={() =>
+                    trackClick("seo_area_finder_click", {
+                      comune: comune.slug,
+                      source: "empty_state",
+                    })
+                  }
+                  className="inline-flex items-center gap-2 text-[0.95rem] text-[var(--terracotta)] underline hover:no-underline"
+                >
+                  {t("seoComune.empty.finder")} <ArrowRight size={14} />
+                </Link>
+              </div>
+              {nearbyComuni.length > 0 && (
+                <div className="mt-8">
+                  <p className="text-[0.7rem] uppercase tracking-[0.22em] text-[var(--ink-soft)]">
+                    {t("seoComune.nearby.title")}
+                  </p>
+                  <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
+                    {nearbyComuni.map((c) => (
+                      <Link
+                        key={c.slug}
+                        to="/case-in-vendita/$comune"
+                        params={{ comune: c.slug }}
+                        className="rounded-full border border-[var(--terracotta)]/25 bg-[var(--cream)] px-4 py-2 text-[0.85rem] text-ink transition hover:border-[var(--terracotta)]"
+                      >
+                        {t("seoComuni.hub.tileSee")} {c.name}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
               <Link
                 to="/contatti"
                 data-track="seo_area_contact_click"
@@ -258,7 +329,7 @@ function ComuneSeoPage() {
       <section className="container-editorial py-20">
         <div className="rounded-sm bg-ink px-6 py-14 text-center text-cream md:px-16 md:py-20">
           <h2 className="mx-auto max-w-2xl font-serif text-3xl md:text-5xl">
-            {fmt("seoComune.cta.title", { name: comune.fullName })}
+            {fmt("seoComune.cta.title", { name: comune.fullName, a: prep })}
           </h2>
           <p className="mx-auto mt-5 max-w-xl text-[0.95rem] leading-relaxed text-cream/80">
             {t("seoComune.cta.body")}
@@ -290,6 +361,43 @@ function ComuneSeoPage() {
           </div>
         </div>
       </section>
+
+      {/* TIPOLOGIE REALMENTE POPOLATE IN QUESTO COMUNE */}
+      {populated.length > 0 && (
+        <section className="bg-[var(--cream)] pb-20">
+          <div className="container-editorial">
+            <span className="text-xs uppercase tracking-[0.24em] text-[var(--terracotta)]">
+              {t("seoComune.types.eyebrow")}
+            </span>
+            <h2 className="mt-3 font-serif text-2xl text-ink md:text-3xl">
+              {fmt("seoComune.types.title", { name: comune.fullName, a: prep })}
+            </h2>
+            <p className="mt-4 max-w-2xl text-[0.95rem] leading-relaxed text-[var(--ink-soft)]">
+              {t("seoComune.types.body")}
+            </p>
+            <div className="mt-6 flex flex-wrap gap-3">
+              {populated.map((tp) => {
+                const Lt = localizeTipologiaSeo(tp, language);
+                return (
+                  <Link
+                    key={tp.slug}
+                    to="/case-in-vendita-lunigiana/$tipologia"
+                    params={{ tipologia: tp.slug }}
+                    data-track="seo_area_type_click"
+                    onClick={() =>
+                      trackClick("seo_area_type_click", { comune: comune.slug, to: tp.slug })
+                    }
+                    className="inline-flex items-center gap-2 rounded-full border border-[var(--terracotta)]/25 bg-[var(--warm-ivory)] px-4 py-2 text-[0.88rem] text-ink transition hover:border-[var(--terracotta)]"
+                  >
+                    <Compass size={14} strokeWidth={1.6} className="text-[var(--terracotta)]" />
+                    {Lt.fullName}
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* RELATED AREAS + LINKS */}
       <section className="bg-[var(--warm-ivory)] py-20">
