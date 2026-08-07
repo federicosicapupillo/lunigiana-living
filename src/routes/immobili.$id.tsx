@@ -12,6 +12,9 @@ import { WatermarkedImage } from "@/components/watermarked-image";
 import { Skeleton } from "@/components/ui/skeleton";
 import { BeforeAfterSlider } from "@/components/before-after-slider";
 import { whatsappUrl } from "@/components/whatsapp-float";
+import { COMUNE_SEO, comunePreposition, municipalityMatches } from "@/lib/seo-comuni";
+import { TIPOLOGIE_SEO, localizeTipologiaSeo } from "@/lib/seo-tipologie";
+import { isForSale, primaryTipologiaSlug, propertyMunicipality } from "@/lib/seo-taxonomy";
 import { useLanguage, useT } from "@/lib/i18n/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 import { sendLeadNotification } from "@/lib/lead-notify.functions";
@@ -289,6 +292,15 @@ function PropertyDetail() {
   const whyPoints = useMemo(() => buildWhyPoints(p, lang), [p, lang]);
   const idealFor = useMemo(() => buildIdealFor(p, t), [p, t]);
   const contextText = useMemo(() => contextFor(p.location, lang), [p.location, lang]);
+  // Internal linking semantico: solo per immobili realmente in vendita e solo
+  // verso la landing comunale esistente + UNA tipologia primaria deterministica.
+  const saleOnly = isForSale(p);
+  const comuneSeo = saleOnly
+    ? COMUNE_SEO.find((c) => municipalityMatches(c, propertyMunicipality(p)))
+    : undefined;
+  const primaryTipologia = saleOnly
+    ? TIPOLOGIE_SEO.find((tp) => tp.slug === primaryTipologiaSlug(p))
+    : undefined;
   const contactRef = useRef<HTMLDivElement | null>(null);
   const scrollToContact = () => {
     contactRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -995,6 +1007,54 @@ function PropertyDetail() {
           </div>
         </aside>
       </section>
+
+      {/* INTERNAL LINKING — risalita semantica (solo immobili in vendita) */}
+      {(comuneSeo || primaryTipologia) && (
+        <section className="container-editorial mt-16 mb-8 sm:mt-20">
+          <div className="rounded-sm border border-border bg-muted/40 px-6 py-7">
+            <span className="eyebrow">{t("detail.internalLinks.eyebrow")}</span>
+            <div className="mt-4 flex flex-wrap gap-3">
+              {comuneSeo && (
+                <Link
+                  to="/case-in-vendita/$comune"
+                  params={{ comune: comuneSeo.slug }}
+                  data-track="property_detail_comune_link_click"
+                  onClick={() =>
+                    trackClick("property_detail_comune_link_click", {
+                      property_code: p.reference,
+                      comune: comuneSeo.slug,
+                    })
+                  }
+                  className="inline-flex items-center gap-2 rounded-full border border-primary/40 px-4 py-2 text-[0.9rem] text-ink transition hover:border-primary"
+                >
+                  {t("detail.moreInComune")
+                    .replace("{a}", comunePreposition(comuneSeo.fullName))
+                    .replace("{name}", comuneSeo.fullName)}
+                </Link>
+              )}
+              {primaryTipologia && (
+                <Link
+                  to="/case-in-vendita-lunigiana/$tipologia"
+                  params={{ tipologia: primaryTipologia.slug }}
+                  data-track="property_detail_type_link_click"
+                  onClick={() =>
+                    trackClick("property_detail_type_link_click", {
+                      property_code: p.reference,
+                      tipologia: primaryTipologia.slug,
+                    })
+                  }
+                  className="inline-flex items-center gap-2 rounded-full border border-primary/40 px-4 py-2 text-[0.9rem] text-ink transition hover:border-primary"
+                >
+                  {t("detail.moreInType").replace(
+                    "{type}",
+                    localizeTipologiaSeo(primaryTipologia, language).fullName.toLowerCase(),
+                  )}
+                </Link>
+              )}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Sticky mobile CTA bar */}
       <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 px-3 py-2 backdrop-blur md:hidden">

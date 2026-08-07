@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, MapPin } from "lucide-react";
+import { ArrowRight, ChevronRight, MapPin } from "lucide-react";
 import { COMUNE_SEO, localizeComuneSeo } from "@/lib/seo-comuni";
 import { siteUrl } from "@/lib/site-url";
 import { useLanguage, useT } from "@/lib/i18n/LanguageContext";
@@ -8,9 +8,17 @@ import { useDocHead } from "@/hooks/use-localized-head";
 export const Route = createFileRoute("/case-in-vendita/")({
   head: () => {
     const url = siteUrl("/case-in-vendita");
-    const title = "Case in vendita in Lunigiana — comuni e zone | Furia Immobiliare";
+    const title = "Case in vendita in Lunigiana per comune | Furia Immobiliare";
     const description =
       "Esplora le case in vendita per comune in Lunigiana: Pontremoli, Bagnone, Mulazzo, Filattiera, Villafranca, Zeri, Aulla. Una guida locale per scegliere la zona giusta.";
+    const breadcrumbLd = {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Home", item: siteUrl("/") },
+        { "@type": "ListItem", position: 2, name: "Case in vendita in Lunigiana per comune", item: url },
+      ],
+    };
     return {
       meta: [
         { title },
@@ -20,6 +28,7 @@ export const Route = createFileRoute("/case-in-vendita/")({
         { property: "og:url", content: url },
       ],
       links: [{ rel: "canonical", href: url }],
+      scripts: [{ type: "application/ld+json", children: JSON.stringify(breadcrumbLd) }],
     };
   },
   component: CaseInVenditaIndex,
@@ -33,6 +42,16 @@ function CaseInVenditaIndex() {
     <>
       <section className="bg-[var(--cream)] pb-12 pt-28 md:pt-36">
         <div className="container-editorial">
+          <nav
+            aria-label="Breadcrumb"
+            className="mb-8 flex flex-wrap items-center gap-1 text-xs uppercase tracking-[0.18em] text-[var(--ink-soft)]"
+          >
+            <Link to="/" className="hover:text-[var(--terracotta)]">
+              {t("seoPage.crumb.home")}
+            </Link>
+            <ChevronRight size={12} className="opacity-50" />
+            <span className="text-ink">{t("seoHub.crumb.current.comuni")}</span>
+          </nav>
           <span className="text-xs uppercase tracking-[0.24em] text-[var(--terracotta)]">
             {t("seoComuni.hub.eyebrow")}
           </span>
@@ -41,6 +60,14 @@ function CaseInVenditaIndex() {
           </h1>
           <p className="mt-6 max-w-2xl text-base leading-relaxed text-[var(--ink-soft)]">
             {t("seoComuni.hub.lead")}
+          </p>
+          <p className="mt-5">
+            <Link
+              to="/trova-casa-lunigiana"
+              className="inline-flex items-center gap-2 text-[0.95rem] text-[var(--terracotta)] underline hover:no-underline"
+            >
+              {t("seoHub.finder.link")} <ArrowRight size={14} />
+            </Link>
           </p>
         </div>
       </section>

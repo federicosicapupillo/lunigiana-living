@@ -49,8 +49,8 @@ export const Route = createFileRoute("/immobili/")({
   loader: () => listPublishedPropertiesSummary(),
   head: () => ({
     meta: [
-      { title: "Immobili in vendita in Lunigiana — Furia Immobiliare" },
-      { name: "description", content: "Case, ville, rustici e appartamenti in vendita in Lunigiana: Pontremoli, Villafranca, Filattiera, Mulazzo, Bagnone, Zeri." },
+      { title: "Immobili in Lunigiana | Ricerca e filtri | Furia Immobiliare" },
+      { name: "description", content: "Catalogo completo degli immobili in Lunigiana con ricerca e filtri: vendita e affitto a Pontremoli, Villafranca, Filattiera, Mulazzo, Bagnone, Zeri." },
       { property: "og:title", content: "Immobili in Lunigiana — Furia Immobiliare" },
       { property: "og:description", content: "Una selezione curata di immobili in tutta la Lunigiana." },
       { property: "og:url", content: siteUrl("/immobili") },

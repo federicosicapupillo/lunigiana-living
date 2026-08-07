@@ -358,3 +358,10 @@ export function localizeComuneSeo(c: ComuneSeo, lang: "it" | "en"): ComuneSeoLoc
     metaDescription: `Scopri case, appartamenti e immobili di carattere a ${c.fullName} con Furia Immobiliare. Ti guidiamo nella scelta della casa giusta in Lunigiana.`,
   };
 }
+/**
+ * Preposizione italiana corretta davanti al nome del comune:
+ * "a Pontremoli" ma "ad Aulla" (nomi che iniziano per vocale).
+ */
+export function comunePreposition(name: string): string {
+  return /^[aeiouàèéìòóù]/i.test(name.trim()) ? "ad" : "a";
+}
