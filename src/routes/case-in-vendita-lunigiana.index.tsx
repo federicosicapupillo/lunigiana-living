@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, Compass, MapPin, MessageCircle } from "lucide-react";
+import { ArrowRight, ChevronRight, Compass, MapPin, MessageCircle } from "lucide-react";
 import { TIPOLOGIE_SEO, localizeTipologiaSeo } from "@/lib/seo-tipologie";
 import { COMUNE_SEO, localizeComuneSeo } from "@/lib/seo-comuni";
 import { siteUrl } from "@/lib/site-url";
@@ -9,7 +9,7 @@ import { useDocHead } from "@/hooks/use-localized-head";
 export const Route = createFileRoute("/case-in-vendita-lunigiana/")({
   head: () => {
     const url = siteUrl("/case-in-vendita-lunigiana");
-    const title = "Case in vendita in Lunigiana — per tipologia | Furia Immobiliare";
+    const title = "Case in vendita in Lunigiana per tipologia | Furia Immobiliare";
     const description =
       "Cerca case in vendita in Lunigiana per tipologia: rustici e casali, case indipendenti, appartamenti, ville, case con giardino, case economiche, seconde case.";
     const breadcrumbLd = {
@@ -17,7 +17,12 @@ export const Route = createFileRoute("/case-in-vendita-lunigiana/")({
       "@type": "BreadcrumbList",
       itemListElement: [
         { "@type": "ListItem", position: 1, name: "Home", item: siteUrl("/") },
-        { "@type": "ListItem", position: 2, name: "Case in vendita in Lunigiana", item: url },
+        {
+          "@type": "ListItem",
+          position: 2,
+          name: "Case in vendita in Lunigiana per tipologia",
+          item: url,
+        },
       ],
     };
     return {
@@ -46,6 +51,16 @@ function TipologieHub() {
     <>
       <section className="bg-[var(--cream)] pb-12 pt-28 md:pt-36">
         <div className="container-editorial">
+          <nav
+            aria-label="Breadcrumb"
+            className="mb-8 flex flex-wrap items-center gap-1 text-xs uppercase tracking-[0.18em] text-[var(--ink-soft)]"
+          >
+            <Link to="/" className="hover:text-[var(--terracotta)]">
+              {t("seoPage.crumb.home")}
+            </Link>
+            <ChevronRight size={12} className="opacity-50" />
+            <span className="text-ink">{t("seoHub.crumb.current.tipologie")}</span>
+          </nav>
           <span className="text-xs uppercase tracking-[0.24em] text-[var(--terracotta)]">
             {t("seoTipologie.hub.eyebrow")}
           </span>
@@ -58,6 +73,14 @@ function TipologieHub() {
               {t("seoTipologie.hub.lead.byComune")}
             </Link>
             .
+          </p>
+          <p className="mt-5">
+            <Link
+              to="/trova-casa-lunigiana"
+              className="inline-flex items-center gap-2 text-[0.95rem] text-[var(--terracotta)] underline hover:no-underline"
+            >
+              {t("seoHub.finder.link")} <ArrowRight size={14} />
+            </Link>
           </p>
         </div>
       </section>
