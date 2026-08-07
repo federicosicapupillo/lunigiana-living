@@ -23,6 +23,8 @@ import { useLocalizedHead } from "@/hooks/use-localized-head";
 import { localizePropertyDynamic } from "@/lib/i18n/property-localize";
 import { siteUrl } from "@/lib/site-url";
 import { homeGraph } from "@/lib/structured-data";
+import { StaticImage, staticSet } from "@/components/static-image";
+import { preloadImage } from "@/lib/static-image-set";
 
 const AGENCY_FACTS = {
   yearsActive: 18,
