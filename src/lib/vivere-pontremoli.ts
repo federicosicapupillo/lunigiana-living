@@ -12,7 +12,7 @@
  */
 
 export const VP_META = {
-  title: "Vivere a Pontremoli: guida per chi vuole trasferirsi | Furia Immobiliare",
+  title: "Vivere a Pontremoli: guida per trasferirsi | Furia Immobiliare",
   description:
     "Vivere a Pontremoli, in Lunigiana: come orientarsi tra centro storico, zone residenziali e frazioni prima di trasferirsi o comprare casa, spiegato da chi lavora qui.",
   h1: "Vivere a Pontremoli: cosa sapere prima di scegliere casa",
