@@ -43,6 +43,18 @@ const HOME_DESCRIPTION =
 /** Unico blocco JSON-LD della home: RealEstateAgent + WebSite + WebPage. */
 const HOME_JSONLD = homeGraph(HOME_TITLE, HOME_DESCRIPTION);
 
+/** Maps the server-selected hero variant to its derived variant set key. */
+function heroSetName(variant?: HomeHeroVariant): string {
+  if (variant === "elena_cometa") return "elena-furia";
+  if (variant === "pontremoli_historic_center") return "pontremoli-hero-centro-storico";
+  return "hero-tramonto-ulivi";
+}
+
+/** `sizes` used both by the hero <picture> and by its preload, so they match. */
+function heroSizes(variant?: HomeHeroVariant): string {
+  return variant === "elena_cometa" ? "(max-width: 768px) 92vw, 45vw" : "100vw";
+}
+
 export const Route = createFileRoute("/")({
   loader: async () => {
     const [props, hero] = await Promise.all([listPublishedPropertiesSummary(), getHomeHeroVariant()]);
