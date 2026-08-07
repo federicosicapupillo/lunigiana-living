@@ -65,16 +65,24 @@ export const Route = createFileRoute("/media/og/immobili/$")({
           )
           .eq("property_id", prop.id)
           .order("is_cover", { ascending: false })
-          .order("sort_order", { ascending: true })
-          .limit(1);
+          .order("sort_order", { ascending: true });
 
-        const cover = images?.[0];
-        // Vincolo di appartenenza: la riga arriva dalla query filtrata per
+        // Vincolo di appartenenza: le righe arrivano dalla query filtrata per
         // property_id e il percorso deve iniziare con l'id dell'immobile.
-        const path = cover ? publishedImagePath(cover) : null;
-        if (!cover || !path || cover.property_id !== prop.id || !path.startsWith(`${prop.id}/`)) {
-          return fallbackRedirect();
+        // Supabase Image Transformations conserva il formato d'origine: per
+        // garantire `image/jpeg` ai crawler social usiamo la prima immagine
+        // pubblicata in formato JPEG (la copertina nella quasi totalità dei
+        // casi), altrimenti l'immagine di brand statica.
+        let path: string | null = null;
+        for (const row of images ?? []) {
+          if (row.property_id !== prop.id) continue;
+          const p = publishedImagePath(row);
+          if (!p || !p.startsWith(`${prop.id}/`)) continue;
+          if (!/\.jpe?g$/i.test(p)) continue;
+          path = p;
+          break;
         }
+        if (!path) return fallbackRedirect();
 
         const { data: signed, error: signError } = await supabaseAdmin.storage
           .from("property-images")
