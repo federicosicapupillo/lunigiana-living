@@ -1,3 +1,4 @@
+import { COMUNE_SEO } from "@/lib/seo-comuni";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import heroAsset from "@/assets/real/lunigiana-hero-tramonto.png.asset.json";
 import pontremoliAsset from "@/assets/real/pontremoli-lunigiana-v2.png.asset.json";
@@ -36,6 +37,24 @@ const setBySlug: Record<string, string> = {
 
 const TERR_HERO_SET = "lunigiana-hero-tramonto";
 const TERR_HERO_SIZES = "100vw";
+
+/**
+ * Mappa il borgo editoriale di /territori sulla landing comunale
+ * corrispondente, quando esiste. `null` = nessuna landing dedicata.
+ */
+function comuneSlugFor(territorySlug: string): string | null {
+  const map: Record<string, string> = {
+    pontremoli: "pontremoli",
+    bagnone: "bagnone",
+    zeri: "zeri",
+    villafranca: "villafranca-in-lunigiana",
+    filattiera: "filattiera",
+    mulazzo: "mulazzo",
+  };
+  return COMUNE_SEO.some((c) => c.slug === map[territorySlug])
+    ? (map[territorySlug] ?? null)
+    : null;
+}
 
 export const Route = createFileRoute("/territori")({
   head: () => ({
@@ -172,13 +191,24 @@ function TerritoriPage() {
                     </h3>
                     <div className="mt-5 h-px w-12 bg-warm-border" />
                     <p className="mt-5 text-base leading-relaxed text-foreground/80">{t(`terr.t.${terr.slug}.body`)}</p>
-                    <Link
-                      to="/immobili"
-                      className="group mt-7 inline-flex items-center gap-2 rounded-sm border border-primary/60 px-5 py-2.5 text-[0.7rem] uppercase tracking-[0.22em] text-primary transition hover:bg-primary hover:text-primary-foreground"
-                    >
-                      {t("terr.borghi.cta")} {terr.name}
-                      <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
-                    </Link>
+                    {comuneSlugFor(terr.slug) ? (
+                      <Link
+                        to="/case-in-vendita/$comune"
+                        params={{ comune: comuneSlugFor(terr.slug)! }}
+                        className="group mt-7 inline-flex items-center gap-2 rounded-sm border border-primary/60 px-5 py-2.5 text-[0.7rem] uppercase tracking-[0.22em] text-primary transition hover:bg-primary hover:text-primary-foreground"
+                      >
+                        {t("terr.borghi.cta")} {terr.name}
+                        <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
+                      </Link>
+                    ) : (
+                      <Link
+                        to="/immobili"
+                        className="group mt-7 inline-flex items-center gap-2 rounded-sm border border-primary/60 px-5 py-2.5 text-[0.7rem] uppercase tracking-[0.22em] text-primary transition hover:bg-primary hover:text-primary-foreground"
+                      >
+                        {t("terr.borghi.cta")} {terr.name}
+                        <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
+                      </Link>
+                    )}
                   </div>
                 </article>
               </div>
