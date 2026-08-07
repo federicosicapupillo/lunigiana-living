@@ -162,8 +162,11 @@ function Index() {
             </div>
             <div className="md:col-span-6 lg:col-span-6">
               <div className="relative mx-auto aspect-[4/5] w-full max-w-md overflow-hidden rounded-sm shadow-2xl md:max-w-none">
-                <img
-                  src={heroElenaCometa.url}
+                <StaticImage
+                  name="elena-furia"
+                  fallbackSrc={heroElenaCometa.url}
+                  sizes={heroSizes("elena_cometa")}
+                  pictureClassName="contents"
                   alt={heroAlt}
                   fetchPriority="high"
                   decoding="async"
