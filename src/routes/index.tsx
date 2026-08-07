@@ -48,7 +48,11 @@ export const Route = createFileRoute("/")({
     const [props, hero] = await Promise.all([listPublishedPropertiesSummary(), getHomeHeroVariant()]);
     return { ...props, heroVariant: hero.variant };
   },
-  head: () => ({
+  head: ({ loaderData }) => {
+    const variant = (loaderData as { heroVariant?: HomeHeroVariant } | undefined)?.heroVariant;
+    const heroName = heroSetName(variant);
+    const heroSet = staticSet(heroName);
+    return {
     meta: [
       { title: HOME_TITLE },
       { name: "description", content: HOME_DESCRIPTION },
@@ -58,6 +62,7 @@ export const Route = createFileRoute("/")({
     ],
     links: [
       { rel: "canonical", href: siteUrl("/") },
+      ...(heroSet ? [preloadImage(heroSet, heroSizes(variant))] : []),
     ],
     scripts: [
       {
@@ -65,7 +70,8 @@ export const Route = createFileRoute("/")({
         children: JSON.stringify(HOME_JSONLD),
       },
     ],
-  }),
+    };
+  },
   component: Index,
 });
 
