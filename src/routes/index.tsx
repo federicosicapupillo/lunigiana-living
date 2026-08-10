@@ -137,7 +137,7 @@ function Index() {
             <div className="md:col-span-6 lg:col-span-6">
               <span className="eyebrow text-primary">{t("home.eyebrow")}</span>
               <h1 className="mt-4 font-serif text-[2.4rem] leading-[1.05] text-ink sm:text-5xl sm:leading-[1.02] md:text-6xl lg:text-7xl">
-                {t("home.hero.title1")}<br />
+                {t("home.hero.title1")}{" "}<br />
                 <em className="font-normal italic">{t("home.hero.title2")}</em>
               </h1>
               <p className="mt-5 max-w-xl text-sm leading-relaxed text-foreground/80 sm:text-base md:text-lg">
@@ -205,7 +205,7 @@ function Index() {
           <div className="max-w-3xl">
             <span className="eyebrow text-cream/90">{t("home.eyebrow")}</span>
             <h1 className="mt-4 font-serif text-[2.4rem] leading-[1.05] text-cream sm:text-5xl sm:leading-[1.02] md:text-7xl">
-              {t("home.hero.title1")}<br />
+              {t("home.hero.title1")}{" "}<br />
               <em className="font-normal italic text-cream/95">{t("home.hero.title2")}</em>
             </h1>
             <p className="mt-5 max-w-xl text-sm leading-relaxed text-cream/85 sm:text-base md:text-lg">
@@ -259,7 +259,7 @@ function Index() {
         <div className="md:col-span-5">
           <span className="eyebrow">{t("home.brand.eyebrow")}</span>
           <h2 className="mt-4 font-serif text-3xl leading-tight text-ink sm:text-4xl md:text-5xl">
-            {t("home.brand.title1")}<br />{t("home.brand.title2")}
+            {t("home.brand.title1")}{" "}<br />{t("home.brand.title2")}
           </h2>
         </div>
         <div className="space-y-5 text-base leading-relaxed text-foreground/85 md:col-span-6 md:col-start-7">
@@ -347,7 +347,7 @@ function Index() {
           <div className="md:col-span-5">
             <span className="eyebrow">{t("home.lead.eyebrow")}</span>
             <h2 className="mt-3 font-serif text-3xl leading-tight text-ink sm:text-4xl md:text-5xl">
-              {t("home.lead.title1")}<br />{t("home.lead.title2")}
+              {t("home.lead.title1")}{" "}<br />{t("home.lead.title2")}
             </h2>
             <p className="mt-5 max-w-md text-base leading-relaxed text-foreground/80">
               {t("home.lead.subtitle")}
@@ -436,7 +436,7 @@ function Index() {
           <div className="md:col-span-5">
             <span className="eyebrow">{t("home.services.eyebrow")}</span>
             <h2 className="mt-3 font-serif text-3xl leading-tight text-ink sm:text-4xl md:text-5xl">
-              {t("home.services.title1")}<br />{t("home.services.title2")}
+              {t("home.services.title1")}{" "}<br />{t("home.services.title2")}
             </h2>
             <p className="mt-5 max-w-md text-base leading-relaxed text-foreground/75">
               {t("home.services.lead")}
@@ -469,7 +469,7 @@ function Index() {
         <div className="relative overflow-hidden rounded-sm bg-secondary px-6 py-14 text-center text-cream sm:px-8 sm:py-20 md:px-16 md:py-28 mt-16 sm:mt-20">
           <span className="eyebrow text-cream/80">{t("home.finalCta.eyebrow")}</span>
           <h2 className="mx-auto mt-4 max-w-3xl font-serif text-3xl leading-tight sm:text-4xl md:text-6xl">
-            {t("home.finalCta.title1")}<br />
+            {t("home.finalCta.title1")}{" "}<br />
             <em className="font-normal italic">{t("home.finalCta.title2")}</em>
           </h2>
           <p className="mx-auto mt-5 max-w-xl text-sm leading-relaxed text-cream/85 sm:text-base">

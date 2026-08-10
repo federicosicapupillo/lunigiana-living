@@ -30,7 +30,7 @@ function ChiSiamoPage() {
         <div className="md:col-span-6 lg:col-span-7">
           <span className="eyebrow">{t("chi.eyebrow")}</span>
           <h1 className="mt-4 font-serif text-4xl leading-[1.05] text-ink md:text-6xl lg:text-7xl">
-            {t("chi.title1")}<br />
+            {t("chi.title1")}{" "}<br />
             {t("chi.title2")}
           </h1>
           <div className="mt-8 space-y-4 text-base leading-relaxed text-foreground/85">

@@ -29,7 +29,7 @@ function ContattiPage() {
         <div className="md:col-span-5">
           <span className="eyebrow">{t("contatti.eyebrow")}</span>
           <h1 className="mt-3 font-serif text-5xl leading-tight text-ink md:text-6xl">
-            {t("contatti.title1")}<br />{t("contatti.title2")}
+            {t("contatti.title1")}{" "}<br />{t("contatti.title2")}
           </h1>
           <p className="mt-6 text-base leading-relaxed text-foreground/80">
             {t("contatti.lead")}
@@ -40,14 +40,14 @@ function ContattiPage() {
               <MapPin size={18} className="mt-0.5 text-primary" />
               <div>
                 <div className="eyebrow text-[0.65rem]">{t("contatti.agency")}</div>
-                <div className="mt-1 text-foreground/85">Furia Immobiliare di Furia Elena<br />Via Pirandello 7<br />54027 Pontremoli (MS)</div>
+                <div className="mt-1 text-foreground/85">Furia Immobiliare di Furia Elena{" "}<br />Via Pirandello 7{" "}<br />54027 Pontremoli (MS)</div>
               </div>
             </li>
             <li className="flex items-start gap-4">
               <Phone size={18} className="mt-0.5 text-primary" />
               <div>
                 <div className="eyebrow text-[0.65rem]">{t("contatti.phone")}</div>
-                <div className="mt-1 text-foreground/85">0187 830229<br />320 7019985</div>
+                <div className="mt-1 text-foreground/85">0187 830229{" "}<br />320 7019985</div>
               </div>
             </li>
             <li className="flex items-start gap-4">
