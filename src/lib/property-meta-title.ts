@@ -108,23 +108,67 @@ function trimDangling(s: string): string {
   return fixPunctuationSpacing(words.join(" "));
 }
 
-/** Accorcia il nucleo togliendo parole intere dalla coda (mai ellissi). */
-function shortenByWords(core: string, budget: number): string {
-  // 1) prova a tenere solo la prima frase compiuta (prima di "." o ",").
-  const firstClause = fixPunctuationSpacing(core.split(/[.;]|,\s/)[0] ?? core);
-  if (
-    firstClause.length <= budget &&
-    firstClause.split(" ").length >= MIN_CORE_WORDS
-  ) {
-    return trimDangling(firstClause);
+/**
+ * Accorcia il nucleo eliminando SOLO interi segmenti finali (separati da
+ * virgola, punto, punto e virgola o " e "): mai parole isolate, così una
+ * caratteristica non resta mutila ("centro storico" -> "centro").
+ * Se nemmeno il primo segmento rientra nel budget, lo si conserva integro:
+ * meglio un title un po' più lungo che un dato tagliato.
+ */
+function shortenByClauses(core: string, budget: number): string {
+  const parts = core
+    .split(/(?:\s*[.;]\s*|,\s*|\s+e\s+)/)
+    .map((s) => s.trim())
+    .filter(Boolean);
+  if (parts.length === 0) return core;
+
+  const seps: string[] = [];
+  let rest = core;
+  for (let i = 0; i < parts.length - 1; i++) {
+    const idx = rest.indexOf(parts[i]!) + parts[i]!.length;
+    const after = rest.slice(idx);
+    const m = after.match(/^(?:\s*[.;]\s*|,\s*|\s+e\s+)/);
+    seps.push(m ? m[0] : " ");
+    rest = after.slice(m ? m[0].length : 0);
   }
-  const words = core.split(" ");
-  let out = core;
-  while (out.length > budget && words.length > MIN_CORE_WORDS) {
-    words.pop();
-    out = trimDangling(words.join(" "));
+
+  for (let keep = parts.length; keep >= 1; keep--) {
+    let out = parts[0]!;
+    for (let i = 1; i < keep; i++) out += `${seps[i - 1] ?? " "}${parts[i]}`;
+    out = trimDangling(fixPunctuationSpacing(collapse(out)));
+    if (out.length <= budget || keep === 1) return out;
   }
-  return trimDangling(fixPunctuationSpacing(out));
+  return core;
+}
+
+/**
+ * Parole comuni che, se maiuscole a metà titolo, vengono riportate in
+ * minuscolo per una capitalizzazione italiana naturale. Nomi propri e
+ * toponimi non compaiono in questa lista e restano invariati.
+ */
+const COMMON_LOWER = new Set([
+  "appartamento", "attico", "villa", "villetta", "casa", "casetta", "rustico",
+  "casale", "loft", "monolocale", "bilocale", "trilocale", "quadrilocale",
+  "indipendente", "semindipendente", "bifamiliare", "trifamiliare",
+  "giardino", "garage", "cantina", "terrazza", "terrazzo", "balcone",
+  "terreno", "orto", "vista", "corte", "parco", "laghetto", "posto", "auto",
+  "centro", "storico", "arredato", "ristrutturato", "panoramica", "nobile",
+  "collina", "campagna", "borgo", "prestigio", "costruzione", "nuova",
+]);
+
+function naturalItalianCase(s: string): string {
+  const words = s.split(" ");
+  return words
+    .map((w, i) => {
+      if (i === 0) return w;
+      const bare = w.replace(/[^\p{L}]/gu, "");
+      if (!bare) return w;
+      if (COMMON_LOWER.has(bare.toLowerCase()) && /^\p{Lu}/u.test(bare)) {
+        return w.replace(bare, bare.toLowerCase());
+      }
+      return w;
+    })
+    .join(" ");
 }
 
 /**
@@ -145,6 +189,7 @@ export function buildPropertyMetaTitle(p: MetaTitleInput, max = TARGET_MAX): str
   core = normalizeSpelling(core);
   core = fixPunctuationSpacing(collapse(core));
   if (!core) core = (p.type ?? "Immobile").toString().trim() || "Immobile";
+  core = naturalItalianCase(core);
   core = capitalizeFirst(core);
 
   // Il comune viene sempre mostrato: se già presente nel nucleo non lo si
@@ -155,7 +200,7 @@ export function buildPropertyMetaTitle(p: MetaTitleInput, max = TARGET_MAX): str
   const full = `${core}${fixed}`;
   if (full.length <= max) return full;
 
-  // Si accorcia solo il nucleo descrittivo, per parole intere.
+  // Si accorcia solo il nucleo descrittivo, per segmenti interi.
   const budget = max - fixed.length;
-  return `${shortenByWords(core, budget)}${fixed}`;
+  return `${shortenByClauses(core, budget)}${fixed}`;
 }
