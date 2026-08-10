@@ -7,7 +7,7 @@
  *   (municipality, oppure testa di location): nessuna deduzione, nessuna invenzione;
  * - nessuna ellissi né parola tagliata a metà, nessun doppio spazio;
  * - tipologia / caratteristica distintiva preservata;
- * - espressioni promozionali debate ("Investimento!", "Occasione!") rimosse;
+ * - espressioni promozionali deboli ("Investimento!", "Occasione!") rimosse;
  * - codice immobile e brand sempre visibili;
  * - lunghezza preferita ~60-70 caratteri, ma il comune non viene mai sacrificato.
  *
