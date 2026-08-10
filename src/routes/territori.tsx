@@ -59,10 +59,10 @@ function comuneSlugFor(territorySlug: string): string | null {
 export const Route = createFileRoute("/territori")({
   head: () => ({
     meta: [
-      { title: "Vivere in Lunigiana — Borghi, paesaggi e atmosfere | Furia Immobiliare" },
-      { name: "description", content: "Pontremoli, Villafranca, Bagnone, Filattiera, Mulazzo, Zeri: una guida ai borghi della Lunigiana per scegliere con consapevolezza dove vivere o comprare casa." },
-      { property: "og:title", content: "Vivere in Lunigiana — Furia Immobiliare" },
-      { property: "og:description", content: "Sei borghi, sei atmosfere. Una guida sincera alla Lunigiana, scritta da chi questa terra la abita e la racconta ogni giorno." },
+      { title: "Territori della Lunigiana: comuni e zone | Furia Immobiliare" },
+      { name: "description", content: "Pontremoli, Villafranca, Bagnone, Filattiera, Mulazzo, Zeri: i territori della Lunigiana, comune per comune, per capire zone, atmosfere e dove cercare casa." },
+      { property: "og:title", content: "Territori della Lunigiana: comuni e zone | Furia Immobiliare" },
+      { property: "og:description", content: "Sei comuni, sei atmosfere: una mappa dei territori della Lunigiana scritta da chi questa terra la abita e la racconta ogni giorno." },
       { property: "og:url", content: siteUrl("/territori") },
     ],
     links: [
