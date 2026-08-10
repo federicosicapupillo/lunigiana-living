@@ -75,15 +75,40 @@ function capitalizeFirst(s: string): string {
   return s ? s.charAt(0).toUpperCase() + s.slice(1) : s;
 }
 
+/** Parole di collegamento che non possono chiudere un titolo. */
+const DANGLING = new Set([
+  "con", "e", "di", "a", "in", "da", "per", "del", "della", "dei", "delle",
+  "al", "alla", "il", "lo", "la", "le", "i", "gli", "un", "una", "su", "tra",
+]);
+
+/** Rimuove connettori o punteggiatura orfani in coda. */
+function trimDangling(s: string): string {
+  const words = s.split(" ");
+  while (words.length > 1) {
+    const last = words[words.length - 1]!.replace(/[,.;:!?]+$/, "");
+    if (DANGLING.has(last.toLowerCase())) words.pop();
+    else break;
+  }
+  return fixPunctuationSpacing(words.join(" "));
+}
+
 /** Accorcia il nucleo togliendo parole intere dalla coda (mai ellissi). */
 function shortenByWords(core: string, budget: number): string {
+  // 1) prova a tenere solo la prima frase compiuta (prima di "." o ",").
+  const firstClause = fixPunctuationSpacing(core.split(/[.;]|,\s/)[0] ?? core);
+  if (
+    firstClause.length <= budget &&
+    firstClause.split(" ").length >= MIN_CORE_WORDS
+  ) {
+    return trimDangling(firstClause);
+  }
   const words = core.split(" ");
   let out = core;
   while (out.length > budget && words.length > MIN_CORE_WORDS) {
     words.pop();
-    out = words.join(" ");
+    out = trimDangling(words.join(" "));
   }
-  return fixPunctuationSpacing(out);
+  return trimDangling(fixPunctuationSpacing(out));
 }
 
 /**
