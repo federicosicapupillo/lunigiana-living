@@ -486,6 +486,31 @@ function ComuneSeoPage() {
                 : zone, frazioni e vita quotidiana prima di scegliere casa.
               </p>
             )}
+            <p className="mt-4 text-[0.95rem] leading-relaxed text-[var(--ink-soft)]">
+              {language === "en" ? (
+                <>
+                  If you are weighing up the area before the property, our guide to{" "}
+                  <Link
+                    to="/vivere-in-lunigiana"
+                    className="text-[var(--terracotta)] underline hover:no-underline"
+                  >
+                    living in Lunigiana
+                  </Link>{" "}
+                  compares services, connections and everyday life across the valley.
+                </>
+              ) : (
+                <>
+                  Se prima della casa state valutando la zona, la guida su{" "}
+                  <Link
+                    to="/vivere-in-lunigiana"
+                    className="text-[var(--terracotta)] underline hover:no-underline"
+                  >
+                    vivere in Lunigiana
+                  </Link>{" "}
+                  mette a confronto servizi, collegamenti e vita quotidiana nella valle.
+                </>
+              )}
+            </p>
           </div>
         </section>
       )}
