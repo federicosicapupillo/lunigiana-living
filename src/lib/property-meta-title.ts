@@ -38,6 +38,10 @@ const CORE_OVERRIDES: Record<string, string> = {
   "P-538": "Appartamento 140 mq con terrazza",
   // P-329: historic_property = true, size_sqm 78
   "P-329": "Appartamento storico 78 mq",
+  // P-533: condition = "Da ultimare" (da rifinire), size_sqm 110
+  "P-533": "Appartamento da rifinire 110 mq",
+  // P-543: size_sqm 135, panoramic_view = true
+  "P-543": "Appartamento 135 mq con vista",
 };
 
 const TARGET_MAX = 70;
