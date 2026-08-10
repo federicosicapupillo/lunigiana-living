@@ -265,6 +265,25 @@ function Index() {
         <div className="space-y-5 text-base leading-relaxed text-foreground/85 md:col-span-6 md:col-start-7">
           <p>{t("home.brand.p1")}</p>
           <p>{t("home.brand.p2")}</p>
+          <p>
+            {language === "en" ? (
+              <>
+                Still deciding whether this valley is right for you? Read our guide to{" "}
+                <Link to="/vivere-in-lunigiana" className="text-primary underline hover:no-underline">
+                  living in Lunigiana
+                </Link>
+                .
+              </>
+            ) : (
+              <>
+                Non avete ancora deciso se questa valle è quella giusta? Leggete la guida su{" "}
+                <Link to="/vivere-in-lunigiana" className="text-primary underline hover:no-underline">
+                  vivere in Lunigiana
+                </Link>
+                .
+              </>
+            )}
+          </p>
           <Link
             to="/chi-siamo"
             className="group inline-flex items-center gap-2 pt-4 text-sm uppercase tracking-[0.2em] text-primary underline decoration-primary/40 decoration-1 underline-offset-[6px] transition-colors hover:text-[color:var(--terracotta-hover)] hover:decoration-[color:var(--terracotta-hover)]"
