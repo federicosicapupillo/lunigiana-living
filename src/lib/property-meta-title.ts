@@ -109,34 +109,34 @@ function trimDangling(s: string): string {
 }
 
 /**
- * Accorcia il nucleo eliminando SOLO interi segmenti finali (separati da
- * virgola, punto, punto e virgola o " e "): mai parole isolate, così una
+ * Confine dei segmenti: punteggiatura, " e ", " con ", " da ".
+ * Si eliminano solo interi segmenti finali, mai parole isolate: così una
  * caratteristica non resta mutila ("centro storico" -> "centro").
- * Se nemmeno il primo segmento rientra nel budget, lo si conserva integro:
- * meglio un title un po' più lungo che un dato tagliato.
+ */
+const SEGMENT_RE = /(\s*[.;]\s*|,\s*|\s+e\s+|\s+con\s+|\s+da\s+)/;
+
+/** Un nucleo di una sola parola è troppo povero: non si scende sotto. */
+const MIN_KEPT_WORDS = 2;
+
+/**
+ * Accorcia il nucleo togliendo interi segmenti finali. Se nessuna variante
+ * rientra nel budget senza impoverire il titolo, il nucleo resta integro:
+ * meglio un title leggermente più lungo che un dato tagliato o generico.
  */
 function shortenByClauses(core: string, budget: number): string {
-  const parts = core
-    .split(/(?:\s*[.;]\s*|,\s*|\s+e\s+)/)
-    .map((s) => s.trim())
-    .filter(Boolean);
-  if (parts.length === 0) return core;
-
+  const tokens = core.split(SEGMENT_RE).filter((s) => s !== "");
+  // tokens: [seg, sep, seg, sep, seg, ...]
+  const parts: string[] = [];
   const seps: string[] = [];
-  let rest = core;
-  for (let i = 0; i < parts.length - 1; i++) {
-    const idx = rest.indexOf(parts[i]!) + parts[i]!.length;
-    const after = rest.slice(idx);
-    const m = after.match(/^(?:\s*[.;]\s*|,\s*|\s+e\s+)/);
-    seps.push(m ? m[0] : " ");
-    rest = after.slice(m ? m[0].length : 0);
-  }
+  tokens.forEach((tk, i) => (i % 2 === 0 ? parts.push(tk.trim()) : seps.push(tk)));
+  if (parts.length <= 1) return core;
 
-  for (let keep = parts.length; keep >= 1; keep--) {
+  for (let keep = parts.length - 1; keep >= 1; keep--) {
     let out = parts[0]!;
     for (let i = 1; i < keep; i++) out += `${seps[i - 1] ?? " "}${parts[i]}`;
     out = trimDangling(fixPunctuationSpacing(collapse(out)));
-    if (out.length <= budget || keep === 1) return out;
+    if (out.split(" ").length < MIN_KEPT_WORDS) break;
+    if (out.length <= budget) return out;
   }
   return core;
 }
