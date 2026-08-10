@@ -86,7 +86,8 @@ function trimDangling(s: string): string {
   const words = s.split(" ");
   while (words.length > 1) {
     const last = words[words.length - 1]!.replace(/[,.;:!?]+$/, "");
-    if (DANGLING.has(last.toLowerCase())) words.pop();
+    // "posto" da solo è un troncamento di "posto auto": non può chiudere.
+    if (DANGLING.has(last.toLowerCase()) || last.toLowerCase() === "posto") words.pop();
     else break;
   }
   return fixPunctuationSpacing(words.join(" "));
