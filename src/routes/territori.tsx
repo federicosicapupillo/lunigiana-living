@@ -301,6 +301,17 @@ function TerritoriPage() {
               {t("terr.linkBlock.byComune")}
             </Link>
           </div>
+          <p className="mx-auto mt-8 max-w-2xl text-[0.95rem] leading-relaxed text-foreground/75">
+            Se state ancora valutando il territorio, la guida su{" "}
+            <Link
+              to="/vivere-in-lunigiana"
+              className="text-primary underline hover:no-underline"
+            >
+              vivere in Lunigiana
+            </Link>{" "}
+            mette a confronto comuni, servizi, collegamenti e aspetti da considerare prima di
+            scegliere casa.
+          </p>
         </div>
       </section>
     </>
