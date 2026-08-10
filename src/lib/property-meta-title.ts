@@ -24,6 +24,26 @@ export type MetaTitleInput = {
   reference?: string | null;
 };
 
+/**
+ * Nuclei descrittivi espliciti per schede il cui titolo gestionale è
+ * identico a quello di un'altra scheda dello stesso comune.
+ * Ogni valore è ricavato ESCLUSIVAMENTE dai dati reali del record
+ * (size_sqm, garage, terrace, historic_property): nessuna caratteristica
+ * inventata, comune/codice/brand restano gestiti dalla funzione principale.
+ */
+const CORE_OVERRIDES: Record<string, string> = {
+  // P-453: size_sqm 83, garage = true
+  "P-453": "Appartamento 83 mq con garage",
+  // P-538: size_sqm 140, terrace = true
+  "P-538": "Appartamento 140 mq con terrazza",
+  // P-329: historic_property = true, size_sqm 78
+  "P-329": "Appartamento storico 78 mq",
+  // P-533: condition = "Da ultimare" (da rifinire), size_sqm 110
+  "P-533": "Appartamento da rifinire 110 mq",
+  // P-543: size_sqm 135, panoramic_view = true
+  "P-543": "Appartamento 135 mq con vista",
+};
+
 const TARGET_MAX = 70;
 /** Parole minime da preservare nel nucleo descrittivo (tipologia + tratto). */
 const MIN_CORE_WORDS = 3;
@@ -186,7 +206,8 @@ export function buildPropertyMetaTitle(p: MetaTitleInput, max = TARGET_MAX): str
   const suffix = ` | ${BRAND}`;
   const refPart = ref ? ` — ${ref}` : "";
 
-  let core = fixPunctuationSpacing(collapse((p.title ?? "").toString()));
+  const override = CORE_OVERRIDES[ref.replace(/\s+/g, "").toUpperCase()];
+  let core = fixPunctuationSpacing(collapse((override ?? p.title ?? "").toString()));
   core = stripMunicipality(core, muni);
   core = core.replace(/\s*\(\s*MS\s*\)\s*/gi, " ");
   core = collapse(core).replace(WEAK_PROMO, "");
@@ -202,7 +223,9 @@ export function buildPropertyMetaTitle(p: MetaTitleInput, max = TARGET_MAX): str
   const fixed = `${place}${refPart}${suffix}`;
 
   const full = `${core}${fixed}`;
-  if (full.length <= max) return full;
+  // I nuclei espliciti non vengono accorciati: perderebbero la
+  // caratteristica che li rende semanticamente distinti.
+  if (full.length <= max || override) return full;
 
   // Si accorcia solo il nucleo descrittivo, per segmenti interi.
   const budget = max - fixed.length;
