@@ -8,7 +8,7 @@ const it: Dict = {
   // Header / Nav
   "nav.home": "Home",
   "nav.immobili": "Immobili",
-  "nav.territori": "Vivere in Lunigiana",
+  "nav.territori": "Territori",
   "nav.servizi": "Servizi",
   "nav.chiSiamo": "Chi siamo",
   "nav.contatti": "Contatti",
@@ -368,7 +368,7 @@ const it: Dict = {
   "chi.outro.body": "Raccontaci cosa immagini: ti aiuteremo a trovare il luogo giusto.",
 
   // Territori
-  "terr.hero.eyebrow": "Vivere in Lunigiana",
+  "terr.hero.eyebrow": "I territori della Lunigiana",
   "terr.hero.title1": "Una terra di confine,",
   "terr.hero.title2": "tre regioni, una luce sola.",
   "terr.hero.lead": "La Lunigiana non è un'idea di Toscana, né di Liguria, né di Emilia. È il punto in cui le tre si incontrano e diventano qualcos'altro: castelli, fiumi, pievi e borghi vivi, dove la casa è ancora una scelta di vita e non solo un investimento.",
@@ -487,8 +487,8 @@ const it: Dict = {
   "seo.chi.desc": "Dietro Furia Immobiliare c'è Elena: un volto, una voce e una presenza costante per chi sceglie casa in Lunigiana.",
   "seo.servizi.title": "Servizi — Furia Immobiliare in Lunigiana",
   "seo.servizi.desc": "Ricerca su misura, consulenza, valutazioni, assistenza alla vendita e accompagnamento all'acquisto in Lunigiana.",
-  "seo.territori.title": "Vivere in Lunigiana — Borghi, paesaggi e atmosfere | Furia Immobiliare",
-  "seo.territori.desc": "Pontremoli, Villafranca, Bagnone, Filattiera, Mulazzo, Zeri: una guida ai borghi della Lunigiana.",
+  "seo.territori.title": "Territori della Lunigiana: comuni e zone | Furia Immobiliare",
+  "seo.territori.desc": "Pontremoli, Villafranca, Bagnone, Filattiera, Mulazzo, Zeri: i territori della Lunigiana, comune per comune.",
   "seo.contatti.title": "Contatti — Furia Immobiliare, Pontremoli",
   "seo.contatti.desc": "Scrivici o vienici a trovare in agenzia a Pontremoli. Siamo qui per aiutarti a trovare il tuo posto in Lunigiana.",
   "seo.immobili.title": "Immobili in Lunigiana | Ricerca e filtri | Furia Immobiliare",
@@ -760,7 +760,7 @@ const en: Dict = {
   // Header / Nav
   "nav.home": "Home",
   "nav.immobili": "Properties",
-  "nav.territori": "Living in Lunigiana",
+  "nav.territori": "Territories",
   "nav.servizi": "Services",
   "nav.chiSiamo": "About us",
   "nav.contatti": "Contact",
@@ -1137,7 +1137,7 @@ const en: Dict = {
   "chi.outro.body": "Tell us what you imagine: we'll help you find the right place.",
 
   // Territori
-  "terr.hero.eyebrow": "Living in Lunigiana",
+  "terr.hero.eyebrow": "The territories of Lunigiana",
   "terr.hero.title1": "A borderland,",
   "terr.hero.title2": "three regions, one light.",
   "terr.hero.lead": "Lunigiana isn't an idea of Tuscany, Liguria or Emilia. It's where the three meet and become something else: castles, rivers, parishes and living villages, where a home is still a life choice and not just an investment.",
@@ -1256,8 +1256,8 @@ const en: Dict = {
   "seo.chi.desc": "Behind Furia Immobiliare is Elena: a face, a voice and a constant presence for those choosing a home in Lunigiana.",
   "seo.servizi.title": "Services — Furia Immobiliare in Lunigiana",
   "seo.servizi.desc": "Tailored search, consulting, valuations, sales support and buyer guidance in Lunigiana.",
-  "seo.territori.title": "Living in Lunigiana — Villages, landscapes, atmospheres | Furia Immobiliare",
-  "seo.territori.desc": "Pontremoli, Villafranca, Bagnone, Filattiera, Mulazzo, Zeri: a guide to the villages of Lunigiana.",
+  "seo.territori.title": "Lunigiana territories: towns and areas | Furia Immobiliare",
+  "seo.territori.desc": "Pontremoli, Villafranca, Bagnone, Filattiera, Mulazzo, Zeri: the territories of Lunigiana, town by town.",
   "seo.contatti.title": "Contact — Furia Immobiliare, Pontremoli",
   "seo.contatti.desc": "Write to us or visit our office in Pontremoli. We're here to help you find your place in Lunigiana.",
   "seo.immobili.title": "Properties for sale in Lunigiana — Furia Immobiliare",
