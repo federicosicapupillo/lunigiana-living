@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as VivereInLunigianaRouteImport } from './routes/vivere-in-lunigiana'
 import { Route as VivereAPontremoliRouteImport } from './routes/vivere-a-pontremoli'
 import { Route as Vendite2DotaspRouteImport } from './routes/vendite2[.]asp'
 import { Route as TrovaCasaLunigianaRouteImport } from './routes/trova-casa-lunigiana'
@@ -45,6 +46,11 @@ import { Route as AdminAdminImmobiliAssistenteRouteImport } from './routes/_admi
 import { Route as AdminAdminImmobiliIdRouteImport } from './routes/_admin.admin.immobili.$id'
 import { Route as AdminAdminImmobiliIdAnteprimaRouteImport } from './routes/_admin.admin.immobili.$id.anteprima'
 
+const VivereInLunigianaRoute = VivereInLunigianaRouteImport.update({
+  id: '/vivere-in-lunigiana',
+  path: '/vivere-in-lunigiana',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const VivereAPontremoliRoute = VivereAPontremoliRouteImport.update({
   id: '/vivere-a-pontremoli',
   path: '/vivere-a-pontremoli',
@@ -240,6 +246,7 @@ export interface FileRoutesByFullPath {
   '/trova-casa-lunigiana': typeof TrovaCasaLunigianaRoute
   '/vendite2.asp': typeof Vendite2DotaspRoute
   '/vivere-a-pontremoli': typeof VivereAPontremoliRoute
+  '/vivere-in-lunigiana': typeof VivereInLunigianaRoute
   '/admin': typeof AdminAdminRouteWithChildren
   '/admin/login': typeof AdminLoginRoute
   '/case-in-vendita-lunigiana/$tipologia': typeof CaseInVenditaLunigianaTipologiaRoute
@@ -275,6 +282,7 @@ export interface FileRoutesByTo {
   '/trova-casa-lunigiana': typeof TrovaCasaLunigianaRoute
   '/vendite2.asp': typeof Vendite2DotaspRoute
   '/vivere-a-pontremoli': typeof VivereAPontremoliRoute
+  '/vivere-in-lunigiana': typeof VivereInLunigianaRoute
   '/admin/login': typeof AdminLoginRoute
   '/case-in-vendita-lunigiana/$tipologia': typeof CaseInVenditaLunigianaTipologiaRoute
   '/case-in-vendita/$comune': typeof CaseInVenditaComuneRoute
@@ -312,6 +320,7 @@ export interface FileRoutesById {
   '/trova-casa-lunigiana': typeof TrovaCasaLunigianaRoute
   '/vendite2.asp': typeof Vendite2DotaspRoute
   '/vivere-a-pontremoli': typeof VivereAPontremoliRoute
+  '/vivere-in-lunigiana': typeof VivereInLunigianaRoute
   '/_admin/admin': typeof AdminAdminRouteWithChildren
   '/admin/login': typeof AdminLoginRoute
   '/case-in-vendita-lunigiana/$tipologia': typeof CaseInVenditaLunigianaTipologiaRoute
@@ -350,6 +359,7 @@ export interface FileRouteTypes {
     | '/trova-casa-lunigiana'
     | '/vendite2.asp'
     | '/vivere-a-pontremoli'
+    | '/vivere-in-lunigiana'
     | '/admin'
     | '/admin/login'
     | '/case-in-vendita-lunigiana/$tipologia'
@@ -385,6 +395,7 @@ export interface FileRouteTypes {
     | '/trova-casa-lunigiana'
     | '/vendite2.asp'
     | '/vivere-a-pontremoli'
+    | '/vivere-in-lunigiana'
     | '/admin/login'
     | '/case-in-vendita-lunigiana/$tipologia'
     | '/case-in-vendita/$comune'
@@ -421,6 +432,7 @@ export interface FileRouteTypes {
     | '/trova-casa-lunigiana'
     | '/vendite2.asp'
     | '/vivere-a-pontremoli'
+    | '/vivere-in-lunigiana'
     | '/_admin/admin'
     | '/admin/login'
     | '/case-in-vendita-lunigiana/$tipologia'
@@ -459,6 +471,7 @@ export interface RootRouteChildren {
   TrovaCasaLunigianaRoute: typeof TrovaCasaLunigianaRoute
   Vendite2DotaspRoute: typeof Vendite2DotaspRoute
   VivereAPontremoliRoute: typeof VivereAPontremoliRoute
+  VivereInLunigianaRoute: typeof VivereInLunigianaRoute
   AdminLoginRoute: typeof AdminLoginRoute
   CaseInVenditaLunigianaTipologiaRoute: typeof CaseInVenditaLunigianaTipologiaRoute
   CaseInVenditaComuneRoute: typeof CaseInVenditaComuneRoute
@@ -470,6 +483,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/vivere-in-lunigiana': {
+      id: '/vivere-in-lunigiana'
+      path: '/vivere-in-lunigiana'
+      fullPath: '/vivere-in-lunigiana'
+      preLoaderRoute: typeof VivereInLunigianaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/vivere-a-pontremoli': {
       id: '/vivere-a-pontremoli'
       path: '/vivere-a-pontremoli'
@@ -797,6 +817,7 @@ const rootRouteChildren: RootRouteChildren = {
   TrovaCasaLunigianaRoute: TrovaCasaLunigianaRoute,
   Vendite2DotaspRoute: Vendite2DotaspRoute,
   VivereAPontremoliRoute: VivereAPontremoliRoute,
+  VivereInLunigianaRoute: VivereInLunigianaRoute,
   AdminLoginRoute: AdminLoginRoute,
   CaseInVenditaLunigianaTipologiaRoute: CaseInVenditaLunigianaTipologiaRoute,
   CaseInVenditaComuneRoute: CaseInVenditaComuneRoute,
