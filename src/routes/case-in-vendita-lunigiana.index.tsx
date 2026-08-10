@@ -144,6 +144,16 @@ function TipologieHub() {
             <MapPin size={15} strokeWidth={1.6} />
             {pick(SEO_1B_UI.hubTipologie.areaAnchor, language)}
           </Link>
+          <p className="mt-6 text-[0.95rem] leading-relaxed text-[var(--ink-soft)]">
+            Prima di scegliere la zona può essere utile la guida su{" "}
+            <Link
+              to="/vivere-in-lunigiana"
+              className="text-[var(--terracotta)] underline hover:no-underline"
+            >
+              vivere in Lunigiana
+            </Link>
+            .
+          </p>
         </div>
       </section>
 
