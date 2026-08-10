@@ -295,7 +295,11 @@ function ViverePontremoliPage() {
             <Link to="/territori" className="text-[var(--terracotta)] underline hover:no-underline">
               guida ai territori della Lunigiana
             </Link>{" "}
-            è il punto di partenza.
+            è il punto di partenza, mentre la guida su{" "}
+            <Link to="/vivere-in-lunigiana" className="text-[var(--terracotta)] underline hover:no-underline">
+              vivere in Lunigiana
+            </Link>{" "}
+            allarga il confronto all&apos;intero comprensorio.
           </p>
         </div>
       </section>
