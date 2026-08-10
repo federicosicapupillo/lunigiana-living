@@ -59,10 +59,10 @@ function comuneSlugFor(territorySlug: string): string | null {
 export const Route = createFileRoute("/territori")({
   head: () => ({
     meta: [
-      { title: "Vivere in Lunigiana — Borghi, paesaggi e atmosfere | Furia Immobiliare" },
-      { name: "description", content: "Pontremoli, Villafranca, Bagnone, Filattiera, Mulazzo, Zeri: una guida ai borghi della Lunigiana per scegliere con consapevolezza dove vivere o comprare casa." },
-      { property: "og:title", content: "Vivere in Lunigiana — Furia Immobiliare" },
-      { property: "og:description", content: "Sei borghi, sei atmosfere. Una guida sincera alla Lunigiana, scritta da chi questa terra la abita e la racconta ogni giorno." },
+      { title: "Territori della Lunigiana: comuni e zone | Furia Immobiliare" },
+      { name: "description", content: "Pontremoli, Villafranca, Bagnone, Filattiera, Mulazzo, Zeri: i territori della Lunigiana, comune per comune, per capire zone, atmosfere e dove cercare casa." },
+      { property: "og:title", content: "Territori della Lunigiana: comuni e zone | Furia Immobiliare" },
+      { property: "og:description", content: "Sei comuni, sei atmosfere: una mappa dei territori della Lunigiana scritta da chi questa terra la abita e la racconta ogni giorno." },
       { property: "og:url", content: siteUrl("/territori") },
     ],
     links: [
@@ -96,7 +96,7 @@ function TerritoriPage() {
         <div className="container-editorial pb-20 pt-32">
           <span className="eyebrow text-cream/85">{t("terr.hero.eyebrow")}</span>
           <h1 className="mt-4 max-w-3xl font-serif text-5xl leading-[1.05] text-cream md:text-7xl">
-            {t("terr.hero.title1")}<br /><em className="font-normal italic">{t("terr.hero.title2")}</em>
+            {t("terr.hero.title1")}{" "}<br /><em className="font-normal italic">{t("terr.hero.title2")}</em>
           </h1>
           <p className="mt-6 max-w-2xl text-lg leading-relaxed text-cream/85 md:text-xl">
             {t("terr.hero.lead")}
@@ -109,7 +109,7 @@ function TerritoriPage() {
           <div className="md:col-span-5">
             <span className="eyebrow">{t("terr.place.eyebrow")}</span>
             <h2 className="mt-3 font-serif text-4xl text-ink md:text-5xl">
-              {t("terr.place.title1")}<br /><em className="italic">{t("terr.place.title2")}</em>
+              {t("terr.place.title1")}{" "}<br /><em className="italic">{t("terr.place.title2")}</em>
             </h2>
             <p className="mt-6 text-sm uppercase tracking-[0.2em] text-muted-foreground">
               {t("terr.place.subtitle")}
@@ -156,7 +156,7 @@ function TerritoriPage() {
         <div className="container-editorial pb-16 md:pb-20">
           <span className="eyebrow">{t("terr.borghi.eyebrow")}</span>
           <h2 className="mt-3 max-w-3xl font-serif text-4xl text-ink md:text-5xl">
-            {t("terr.borghi.title1")}<br /><em className="italic">{t("terr.borghi.title2")}</em>
+            {t("terr.borghi.title1")}{" "}<br /><em className="italic">{t("terr.borghi.title2")}</em>
           </h2>
           <p className="mt-6 max-w-2xl text-base leading-relaxed text-foreground/80">
             {t("terr.borghi.lead")}
@@ -233,7 +233,7 @@ function TerritoriPage() {
           <div className="md:col-span-5">
             <span className="eyebrow">{t("terr.market.eyebrow")}</span>
             <h2 className="mt-3 font-serif text-4xl text-ink md:text-5xl">
-              {t("terr.market.title1")}<br /><em className="italic">{t("terr.market.title2")}</em>
+              {t("terr.market.title1")}{" "}<br /><em className="italic">{t("terr.market.title2")}</em>
             </h2>
             <div className="mt-8 h-px w-16 bg-warm-border" />
           </div>
@@ -255,7 +255,7 @@ function TerritoriPage() {
         <div className="container-editorial max-w-3xl text-center">
           <span className="eyebrow text-cream/70">{t("terr.cta.eyebrow")}</span>
           <h2 className="mt-4 font-serif text-4xl leading-tight md:text-5xl">
-            {t("terr.cta.title1")}<br />
+            {t("terr.cta.title1")}{" "}<br />
             <em className="italic">{t("terr.cta.title2")}</em>
           </h2>
           <p className="mx-auto mt-6 max-w-xl text-base leading-relaxed text-cream/80">
