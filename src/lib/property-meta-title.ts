@@ -1,14 +1,15 @@
 /**
  * Helper centralizzato per il <title> HTML delle schede immobile.
  *
- * Obiettivi (BLOCCO SEO 4A):
- * - nessuna ellissi né parola tagliata a metà;
- * - nessun doppio spazio, nessuno spazio prima della punteggiatura;
- * - nessuna ripetizione evidente del comune;
- * - tipologia e caratteristica distintiva preservate;
- * - codice immobile sempre visibile;
- * - brand "Furia Immobiliare" mai troncato;
- * - lunghezza preferibilmente entro ~60-65 caratteri.
+ * Obiettivi (BLOCCO SEO 4A — integrazione):
+ * - schema orientativo: "[Immobile o caratteristica] a [Comune] — [Codice] | Brand";
+ * - il comune è SEMPRE presente e proviene solo dai dati reali dell'immobile
+ *   (municipality, oppure testa di location): nessuna deduzione, nessuna invenzione;
+ * - nessuna ellissi né parola tagliata a metà, nessun doppio spazio;
+ * - tipologia / caratteristica distintiva preservata;
+ * - espressioni promozionali debate ("Investimento!", "Occasione!") rimosse;
+ * - codice immobile e brand sempre visibili;
+ * - lunghezza preferita ~60-70 caratteri, ma il comune non viene mai sacrificato.
  *
  * Nessun dato immobiliare viene modificato: la pulizia è solo presentazionale.
  */
@@ -23,9 +24,23 @@ export type MetaTitleInput = {
   reference?: string | null;
 };
 
-const TARGET_MAX = 65;
+const TARGET_MAX = 70;
 /** Parole minime da preservare nel nucleo descrittivo (tipologia + tratto). */
 const MIN_CORE_WORDS = 3;
+
+/** Espressioni promozionali deboli, rimosse dal nucleo descrittivo. */
+const WEAK_PROMO =
+  /^(?:investimento|occasione|occasione unica|affare|affarone|imperdibile|da vedere|novità|nuovo annuncio|opportunità|super occasione)\s*[!.:,–—-]*\s*/i;
+
+/** Normalizzazioni ortografiche minime (nessun dato inventato). */
+function normalizeSpelling(s: string): string {
+  return s
+    // "35mq" -> "35 mq", "120m2" -> "120 mq"
+    .replace(/(\d)\s*(?:mq|m2|m²)\b/gi, "$1 mq")
+    .replace(/\btrifamigliare\b/gi, (m) => (m[0] === "T" ? "Trifamiliare" : "trifamiliare"))
+    .replace(/\bbifamigliare\b/gi, (m) => (m[0] === "B" ? "Bifamiliare" : "bifamiliare"))
+    .replace(/\bplurifamigliare\b/gi, (m) => (m[0] === "P" ? "Plurifamiliare" : "plurifamiliare"));
+}
 
 function collapse(s: string): string {
   return s.replace(/\s+/g, " ").trim();
@@ -126,25 +141,21 @@ export function buildPropertyMetaTitle(p: MetaTitleInput, max = TARGET_MAX): str
   let core = fixPunctuationSpacing(collapse((p.title ?? "").toString()));
   core = stripMunicipality(core, muni);
   core = core.replace(/\s*\(\s*MS\s*\)\s*/gi, " ");
+  core = collapse(core).replace(WEAK_PROMO, "");
+  core = normalizeSpelling(core);
   core = fixPunctuationSpacing(collapse(core));
   if (!core) core = (p.type ?? "Immobile").toString().trim() || "Immobile";
   core = capitalizeFirst(core);
 
+  // Il comune viene sempre mostrato: se già presente nel nucleo non lo si
+  // ripete, altrimenti si aggiunge " a <Comune>". Mai omesso per lunghezza.
   const place = muni && !new RegExp(`\\b${escapeRe(muni)}\\b`, "i").test(core) ? ` a ${muni}` : "";
+  const fixed = `${place}${refPart}${suffix}`;
 
-  const full = `${core}${place}${refPart}${suffix}`;
+  const full = `${core}${fixed}`;
   if (full.length <= max) return full;
 
-  // 1) prova a togliere il comune (resta nella description e nell'H1)
-  const noPlace = `${core}${refPart}${suffix}`;
-  if (noPlace.length <= max) return noPlace;
-
-  // 2) accorcia il nucleo per parole intere, mantenendo comune se possibile
-  const budgetWithPlace = max - (place.length + refPart.length + suffix.length);
-  const shortWithPlace = shortenByWords(core, budgetWithPlace);
-  const candidate = `${shortWithPlace}${place}${refPart}${suffix}`;
-  if (candidate.length <= max) return candidate;
-
-  const budget = max - (refPart.length + suffix.length);
-  return `${shortenByWords(core, budget)}${refPart}${suffix}`;
+  // Si accorcia solo il nucleo descrittivo, per parole intere.
+  const budget = max - fixed.length;
+  return `${shortenByWords(core, budget)}${fixed}`;
 }
