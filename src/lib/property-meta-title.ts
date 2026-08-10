@@ -131,14 +131,18 @@ function shortenByClauses(core: string, budget: number): string {
   tokens.forEach((tk, i) => (i % 2 === 0 ? parts.push(tk.trim()) : seps.push(tk)));
   if (parts.length <= 1) return core;
 
+  // Variante più corta ancora accettabile (>= MIN_KEPT_WORDS parole):
+  // usata come fallback quando nessuna variante rientra nel budget.
+  let shortestValid: string | null = null;
   for (let keep = parts.length - 1; keep >= 1; keep--) {
     let out = parts[0]!;
     for (let i = 1; i < keep; i++) out += `${seps[i - 1] ?? " "}${parts[i]}`;
     out = trimDangling(fixPunctuationSpacing(collapse(out)));
     if (out.split(" ").length < MIN_KEPT_WORDS) break;
     if (out.length <= budget) return out;
+    shortestValid = out;
   }
-  return core;
+  return shortestValid ?? core;
 }
 
 /**
