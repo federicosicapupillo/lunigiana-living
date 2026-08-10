@@ -35,13 +35,7 @@ import { trackEvent, trackClick } from "@/lib/analytics";
 import { siteUrl } from "@/lib/site-url";
 import { propertyPath, propertyOgImagePath } from "@/lib/property-url";
 import { propertyGraph } from "@/lib/structured-data";
-
-function truncateTitle(s: string, max = 60): string {
-  if (s.length <= max) return s;
-  const cut = s.slice(0, max - 1);
-  const lastSpace = cut.lastIndexOf(" ");
-  return (lastSpace > 30 ? cut.slice(0, lastSpace) : cut).trimEnd() + "…";
-}
+import { buildPropertyMetaTitle } from "@/lib/property-meta-title";
 
 export const Route = createFileRoute("/immobili/$id")({
   loader: async ({ params }) => {
@@ -88,8 +82,13 @@ export const Route = createFileRoute("/immobili/$id")({
     const canonical = siteUrl(propertyPath(p));
     // URL immagine social stabile (nessun token, dominio canonico).
     const ogImage = siteUrl(propertyOgImagePath(p));
-    const rawTitle = `${p.title} a ${p.location} — ${p.reference} | Furia Immobiliare`;
-    const title = truncateTitle(rawTitle, 60);
+    const title = buildPropertyMetaTitle({
+      title: p.title,
+      type: p.type,
+      municipality: p.municipality,
+      location: p.location,
+      reference: p.reference,
+    });
     return {
       meta: [
         { title },
