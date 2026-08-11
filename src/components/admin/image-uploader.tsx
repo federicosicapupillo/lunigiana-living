@@ -725,7 +725,7 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
                     </span>
                   )}
                 </div>
-                <div className="grid gap-2 sm:grid-cols-3">
+                <div className="grid items-start gap-2 sm:grid-cols-3">
                   {/* Originale — always shown */}
                   <VersionCard
                     label="Originale"
