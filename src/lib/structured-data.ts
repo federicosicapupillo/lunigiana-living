@@ -175,13 +175,13 @@ export function propertyGraph(p: PublicProperty) {
     // quindi `numberOfRooms` è volutamente omesso.
     ...(p.rooms && p.rooms > 0 ? { numberOfBedrooms: p.rooms } : {}),
     ...(p.bathrooms && p.bathrooms > 0 ? { numberOfBathroomsTotal: p.bathrooms } : {}),
-    ...(p.energyClass
+    ...(normalizeEnergyClassForJsonLd(p.energyClass)
       ? {
           additionalProperty: [
             {
               "@type": "PropertyValue",
               name: "Classe energetica",
-              value: p.energyClass,
+              value: normalizeEnergyClassForJsonLd(p.energyClass),
             },
           ],
         }
