@@ -3,6 +3,7 @@ import { ArrowRight, ChevronRight, Compass, MapPin, MessageCircle } from "lucide
 import { TIPOLOGIE_SEO, localizeTipologiaSeo } from "@/lib/seo-tipologie";
 import { HUB_TIPOLOGIE_INTRO, SEO_1B_UI, TIPOLOGIA_HUB_COPY, pick } from "@/lib/seo-editorial";
 import { siteUrl } from "@/lib/site-url";
+import { collectionPageGraph } from "@/lib/structured-data";
 import { useLanguage, useT } from "@/lib/i18n/LanguageContext";
 import { useDocHead } from "@/hooks/use-localized-head";
 
@@ -12,19 +13,17 @@ export const Route = createFileRoute("/case-in-vendita-lunigiana/")({
     const title = "Case in vendita in Lunigiana per tipologia | Furia Immobiliare";
     const description =
       "Cerca case in vendita in Lunigiana per tipologia: rustici e casali, case indipendenti, appartamenti, ville, case con giardino, case economiche, seconde case.";
-    const breadcrumbLd = {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      itemListElement: [
-        { "@type": "ListItem", position: 1, name: "Home", item: siteUrl("/") },
-        {
-          "@type": "ListItem",
-          position: 2,
-          name: "Case in vendita in Lunigiana per tipologia",
-          item: url,
-        },
+    // Hub: elenca landing per tipologia, non immobili → nessun ItemList.
+    const ld = collectionPageGraph({
+      canonical: url,
+      name: title,
+      description,
+      items: [],
+      breadcrumb: [
+        { name: "Home", item: siteUrl("/") },
+        { name: "Case in vendita in Lunigiana per tipologia", item: url },
       ],
-    };
+    });
     return {
       meta: [
         { title },
@@ -36,7 +35,7 @@ export const Route = createFileRoute("/case-in-vendita-lunigiana/")({
       ],
       links: [{ rel: "canonical", href: url }],
       scripts: [
-        { type: "application/ld+json", children: JSON.stringify(breadcrumbLd) },
+        { type: "application/ld+json", children: JSON.stringify(ld) },
       ],
     };
   },
