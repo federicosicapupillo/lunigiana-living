@@ -16,11 +16,11 @@ const SIGNED_TTL = 60 * 60 * 24; // 24h
 export type ImageVariants = { card?: string; hero?: string; thumb?: string; micro?: string };
 
 const VARIANT_OPTS = {
-  card:  { width:  800, quality: 75, resize: "contain" as const },
+  card:  { width:  800, quality: 75, resize: "cover"   as const },
   hero:  { width: 1600, quality: 78, resize: "contain" as const },
-  thumb: { width:  320, quality: 65, resize: "contain" as const },
+  thumb: { width:  320, quality: 65, resize: "cover"   as const },
   // Gallery strip thumbnails render at ~85x64 CSS: 192px covers DPR 2 exactly.
-  micro: { width:  192, quality: 65, resize: "contain" as const },
+  micro: { width:  192, quality: 65, resize: "cover"   as const },
 };
 type VariantKey = keyof typeof VARIANT_OPTS;
 
