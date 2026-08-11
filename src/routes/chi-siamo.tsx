@@ -6,18 +6,31 @@ import { trackClick } from "@/lib/analytics";
 import { GOOGLE_REVIEWS_URL } from "@/components/reviews-trust-block";
 import { Star, ArrowRight } from "lucide-react";
 import { siteUrl } from "@/lib/site-url";
+import { institutionalGraph } from "@/lib/structured-data";
 
 export const Route = createFileRoute("/chi-siamo")({
-  head: () => ({
+  head: () => {
+    const url = siteUrl("/chi-siamo");
+    const ld = institutionalGraph({
+      canonical: url,
+      type: "AboutPage",
+      name: "Chi siamo — Furia Immobiliare, Pontremoli",
+      description:
+        "Dietro Furia Immobiliare c'è Elena: un volto, una voce e una presenza costante per chi sceglie casa in Lunigiana.",
+      includeAgency: true,
+    });
+    return {
     meta: [
       { title: "Chi siamo — Furia Immobiliare, Pontremoli" },
       { name: "description", content: "Dietro Furia Immobiliare c'è Elena: un volto, una voce e una presenza costante per chi sceglie casa in Lunigiana. Consulenze personalizzate e assistenza completa." },
       { property: "og:title", content: "Chi siamo — Furia Immobiliare" },
       { property: "og:description", content: "Crediamo che una casa non sia solo metri quadri, ma un pezzo di vita. Mettiamo al centro le persone prima degli immobili." },
-      { property: "og:url", content: siteUrl("/chi-siamo") },
+      { property: "og:url", content: url },
     ],
-    links: [{ rel: "canonical", href: siteUrl("/chi-siamo") }],
-  }),
+    links: [{ rel: "canonical", href: url }],
+    scripts: [{ type: "application/ld+json", children: JSON.stringify(ld) }],
+    };
+  },
   component: ChiSiamoPage,
 });
 
