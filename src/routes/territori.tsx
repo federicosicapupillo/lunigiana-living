@@ -13,6 +13,7 @@ import { useT } from "@/lib/i18n/LanguageContext";
 import { useLocalizedHead } from "@/hooks/use-localized-head";
 import { LeadMagnetBlock } from "@/components/lead-magnet-block";
 import { siteUrl } from "@/lib/site-url";
+import { institutionalGraph } from "@/lib/structured-data";
 import { StaticImage, staticSet } from "@/components/static-image";
 import { preloadImage } from "@/lib/static-image-set";
 
@@ -57,19 +58,30 @@ function comuneSlugFor(territorySlug: string): string | null {
 }
 
 export const Route = createFileRoute("/territori")({
-  head: () => ({
+  head: () => {
+    const url = siteUrl("/territori");
+    const ld = institutionalGraph({
+      canonical: url,
+      type: "WebPage",
+      name: "Territori della Lunigiana: comuni e zone | Furia Immobiliare",
+      description:
+        "Pontremoli, Villafranca, Bagnone, Filattiera, Mulazzo, Zeri: i territori della Lunigiana, comune per comune, per capire zone, atmosfere e dove cercare casa.",
+    });
+    return {
     meta: [
       { title: "Territori della Lunigiana: comuni e zone | Furia Immobiliare" },
       { name: "description", content: "Pontremoli, Villafranca, Bagnone, Filattiera, Mulazzo, Zeri: i territori della Lunigiana, comune per comune, per capire zone, atmosfere e dove cercare casa." },
       { property: "og:title", content: "Territori della Lunigiana: comuni e zone | Furia Immobiliare" },
       { property: "og:description", content: "Sei comuni, sei atmosfere: una mappa dei territori della Lunigiana scritta da chi questa terra la abita e la racconta ogni giorno." },
-      { property: "og:url", content: siteUrl("/territori") },
+      { property: "og:url", content: url },
     ],
     links: [
-      { rel: "canonical", href: siteUrl("/territori") },
+      { rel: "canonical", href: url },
       ...(staticSet(TERR_HERO_SET) ? [preloadImage(staticSet(TERR_HERO_SET)!, TERR_HERO_SIZES)] : []),
     ],
-  }),
+    scripts: [{ type: "application/ld+json", children: JSON.stringify(ld) }],
+    };
+  },
   component: TerritoriPage,
 });
 

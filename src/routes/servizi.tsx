@@ -24,21 +24,33 @@ import { trackClick } from "@/lib/analytics";
 import { LeadMagnetBlock } from "@/components/lead-magnet-block";
 import { ReviewsTrustBlock } from "@/components/reviews-trust-block";
 import { siteUrl } from "@/lib/site-url";
+import { institutionalGraph } from "@/lib/structured-data";
 
 const WA_URL =
   "https://wa.me/393207019985?text=Ciao%20Elena,%20vorrei%20ricevere%20un%20primo%20orientamento%20sui%20vostri%20servizi.";
 
 export const Route = createFileRoute("/servizi")({
-  head: () => ({
+  head: () => {
+    const url = siteUrl("/servizi");
+    const ld = institutionalGraph({
+      canonical: url,
+      type: "WebPage",
+      name: "Servizi — Furia Immobiliare in Lunigiana",
+      description:
+        "Ricerca su misura, consulenza, valutazioni, assistenza alla vendita e accompagnamento all'acquisto in Lunigiana.",
+    });
+    return {
     meta: [
       { title: "Servizi — Furia Immobiliare in Lunigiana" },
       { name: "description", content: "Ricerca su misura, consulenza, valutazioni, assistenza alla vendita e accompagnamento all'acquisto in Lunigiana." },
       { property: "og:title", content: "Servizi — Furia Immobiliare" },
       { property: "og:description", content: "Un servizio sartoriale, una conoscenza locale." },
-      { property: "og:url", content: siteUrl("/servizi") },
+      { property: "og:url", content: url },
     ],
-    links: [{ rel: "canonical", href: siteUrl("/servizi") }],
-  }),
+    links: [{ rel: "canonical", href: url }],
+    scripts: [{ type: "application/ld+json", children: JSON.stringify(ld) }],
+    };
+  },
   component: ServiziPage,
 });
 

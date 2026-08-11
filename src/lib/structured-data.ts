@@ -15,6 +15,40 @@ import { propertyPath, propertyOgImagePath } from "@/lib/property-url";
 export const AGENCY_ID = siteUrl("/#agency");
 export const WEBSITE_ID = siteUrl("/#website");
 
+/**
+ * Classi energetiche ammesse nel JSON-LD. I valori presenti in banca dati che
+ * non rappresentano una classe reale (es. "Classe", "In fase di rilascio")
+ * restano visibili nel contenuto della pagina ma NON vengono dichiarati come
+ * dato strutturato. Nessuna normalizzazione "creativa": confronto esatto
+ * previa rimozione di spazi e differenze di maiuscole.
+ */
+const ENERGY_CLASS_ALLOWED = new Map<string, string>(
+  [
+    "A4",
+    "A3",
+    "A2",
+    "A1",
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+    "F",
+    "G",
+    "Esente",
+    "Esente da APE",
+  ].map((v) => [v.toLowerCase().replace(/\s+/g, " "), v]),
+);
+
+/** Restituisce la classe energetica se pubblicabile come dato strutturato. */
+export function normalizeEnergyClassForJsonLd(
+  value: string | null | undefined,
+): string | null {
+  if (!value) return null;
+  const key = value.trim().replace(/\s+/g, " ").toLowerCase();
+  return ENERGY_CLASS_ALLOWED.get(key) ?? null;
+}
+
 /** Nodo agenzia (dati verificati: NAP reale dell'agenzia di Pontremoli). */
 export const agencyNode = {
   "@type": "RealEstateAgent",
@@ -80,6 +114,97 @@ export function homeGraph(title: string, description: string) {
   };
 }
 
+/**
+ * Nodo compatto dell'agenzia: STESSO `@id` del nodo canonico della home,
+ * nessun dato diverso (sottoinsieme verificato di `agencyNode`). Non crea una
+ * seconda entità.
+ */
+const agencyCompactNode = {
+  "@type": agencyNode["@type"],
+  "@id": AGENCY_ID,
+  name: agencyNode.name,
+  url: agencyNode.url,
+  telephone: agencyNode.telephone,
+  email: agencyNode.email,
+  address: agencyNode.address,
+};
+
+/**
+ * Grafo di una pagina istituzionale (WebPage / AboutPage / ContactPage).
+ * `includeAgency` inserisce il nodo compatto dell'agenzia con `@id` canonico.
+ */
+export function institutionalGraph(opts: {
+  canonical: string;
+  type: "WebPage" | "AboutPage" | "ContactPage";
+  name: string;
+  description?: string;
+  includeAgency?: boolean;
+}) {
+  const { canonical, type, name, description, includeAgency } = opts;
+  const page: Record<string, unknown> = {
+    ...webPageNode(canonical, name, description),
+    "@type": type,
+    ...(includeAgency
+      ? { about: { "@id": AGENCY_ID }, mainEntity: { "@id": AGENCY_ID } }
+      : {}),
+  };
+  return {
+    "@context": "https://schema.org",
+    "@graph": [page, ...(includeAgency ? [agencyCompactNode] : [])],
+  };
+}
+
+/**
+ * Grafo di una pagina che elenca realmente immobili: CollectionPage con
+ * `ItemList` come `mainEntity`, ordine e URL identici all'elenco SSR visibile.
+ * Il breadcrumb va passato solo se già visibile all'utente.
+ */
+export function collectionPageGraph(opts: {
+  canonical: string;
+  name: string;
+  description?: string;
+  items: { url: string; name: string }[];
+  breadcrumb?: { name: string; item: string }[];
+}) {
+  const { canonical, name, description, items, breadcrumb } = opts;
+  const listId = `${canonical}#itemlist`;
+  const breadcrumbId = `${canonical}#breadcrumb`;
+  const page: Record<string, unknown> = {
+    ...webPageNode(canonical, name, description),
+    "@type": "CollectionPage",
+    ...(items.length > 0 ? { mainEntity: { "@id": listId } } : {}),
+    ...(breadcrumb && breadcrumb.length > 0 ? { breadcrumb: { "@id": breadcrumbId } } : {}),
+  };
+  const nodes: Record<string, unknown>[] = [page];
+  if (items.length > 0) {
+    nodes.push({
+      "@type": "ItemList",
+      "@id": listId,
+      numberOfItems: items.length,
+      itemListOrder: "https://schema.org/ItemListOrderAscending",
+      itemListElement: items.map((it, i) => ({
+        "@type": "ListItem",
+        position: i + 1,
+        url: it.url,
+        name: it.name,
+      })),
+    });
+  }
+  if (breadcrumb && breadcrumb.length > 0) {
+    nodes.push({
+      "@type": "BreadcrumbList",
+      "@id": breadcrumbId,
+      itemListElement: breadcrumb.map((b, i) => ({
+        "@type": "ListItem",
+        position: i + 1,
+        name: b.name,
+        item: b.item,
+      })),
+    });
+  }
+  return { "@context": "https://schema.org", "@graph": nodes };
+}
+
 /** Tipizzazione dell'immobile fisico a partire dalla tipologia testuale. */
 export function accommodationType(type: string | null | undefined): "Apartment" | "House" | "Residence" {
   const t = (type ?? "").toLowerCase();
@@ -141,13 +266,13 @@ export function propertyGraph(p: PublicProperty) {
     // quindi `numberOfRooms` è volutamente omesso.
     ...(p.rooms && p.rooms > 0 ? { numberOfBedrooms: p.rooms } : {}),
     ...(p.bathrooms && p.bathrooms > 0 ? { numberOfBathroomsTotal: p.bathrooms } : {}),
-    ...(p.energyClass
+    ...(normalizeEnergyClassForJsonLd(p.energyClass)
       ? {
           additionalProperty: [
             {
               "@type": "PropertyValue",
               name: "Classe energetica",
-              value: p.energyClass,
+              value: normalizeEnergyClassForJsonLd(p.energyClass),
             },
           ],
         }

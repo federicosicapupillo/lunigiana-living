@@ -9,10 +9,20 @@ import type { Language } from "@/lib/i18n/translations";
 import { useLocalizedHead } from "@/hooks/use-localized-head";
 import { trackEvent } from "@/lib/analytics";
 import { siteUrl } from "@/lib/site-url";
+import { institutionalGraph } from "@/lib/structured-data";
 import { whatsappUrl } from "@/components/whatsapp-float";
 
 export const Route = createFileRoute("/trova-casa-lunigiana")({
-  head: () => ({
+  head: () => {
+    const url = siteUrl("/trova-casa-lunigiana");
+    const ld = institutionalGraph({
+      canonical: url,
+      type: "WebPage",
+      name: "Trova la tua casa ideale in Lunigiana — Furia Immobiliare",
+      description:
+        "Rispondi a poche domande: Elena riceverà un profilo chiaro della casa che immagini e potrà aiutarti a capire quali immobili sono davvero adatti a te.",
+    });
+    return {
     meta: [
       { title: "Trova la tua casa ideale in Lunigiana — Furia Immobiliare" },
       {
@@ -26,11 +36,13 @@ export const Route = createFileRoute("/trova-casa-lunigiana")({
         content:
           "Percorso guidato per descrivere la casa che cerchi in Lunigiana. Ti risponde Elena personalmente.",
       },
-      { property: "og:url", content: siteUrl("/trova-casa-lunigiana") },
+      { property: "og:url", content: url },
       { property: "og:type", content: "website" },
     ],
-    links: [{ rel: "canonical", href: siteUrl("/trova-casa-lunigiana") }],
-  }),
+    links: [{ rel: "canonical", href: url }],
+    scripts: [{ type: "application/ld+json", children: JSON.stringify(ld) }],
+    };
+  },
   component: TrovaCasaPage,
 });
 
