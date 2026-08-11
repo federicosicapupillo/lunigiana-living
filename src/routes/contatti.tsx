@@ -5,18 +5,31 @@ import { whatsappUrl } from "@/components/whatsapp-float";
 import { LeadForm } from "@/components/lead-form";
 import { useT } from "@/lib/i18n/LanguageContext";
 import { siteUrl } from "@/lib/site-url";
+import { institutionalGraph } from "@/lib/structured-data";
 
 export const Route = createFileRoute("/contatti")({
-  head: () => ({
+  head: () => {
+    const url = siteUrl("/contatti");
+    const ld = institutionalGraph({
+      canonical: url,
+      type: "ContactPage",
+      name: "Contatti — Furia Immobiliare, Pontremoli",
+      description:
+        "Scrivici o vienici a trovare in agenzia a Pontremoli. Siamo qui per aiutarti a trovare il tuo posto in Lunigiana.",
+      includeAgency: true,
+    });
+    return {
     meta: [
       { title: "Contatti — Furia Immobiliare, Pontremoli" },
       { name: "description", content: "Scrivici o vienici a trovare in agenzia a Pontremoli. Siamo qui per aiutarti a trovare il tuo posto in Lunigiana." },
       { property: "og:title", content: "Contatti — Furia Immobiliare" },
       { property: "og:description", content: "Parla con la nostra agenzia di Pontremoli." },
-      { property: "og:url", content: siteUrl("/contatti") },
+      { property: "og:url", content: url },
     ],
-    links: [{ rel: "canonical", href: siteUrl("/contatti") }],
-  }),
+    links: [{ rel: "canonical", href: url }],
+    scripts: [{ type: "application/ld+json", children: JSON.stringify(ld) }],
+    };
+  },
   component: ContattiPage,
 });
 
