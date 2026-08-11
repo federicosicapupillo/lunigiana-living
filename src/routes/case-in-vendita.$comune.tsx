@@ -20,6 +20,7 @@ import { useDocHead } from "@/hooks/use-localized-head";
 import { localizePropertyDynamic } from "@/lib/i18n/property-localize";
 import { siteUrl } from "@/lib/site-url";
 import { propertyPath } from "@/lib/property-url";
+import { collectionPageGraph } from "@/lib/structured-data";
 
 export const Route = createFileRoute("/case-in-vendita/$comune")({
   loader: async ({ params }) => {
@@ -52,25 +53,17 @@ export const Route = createFileRoute("/case-in-vendita/$comune")({
     const title = `Case in vendita ${prep} ${comune.fullName} | Furia Immobiliare`;
     const description = `Scopri case, appartamenti e immobili di carattere ${prep} ${comune.fullName} con Furia Immobiliare. Ti guidiamo nella scelta della casa giusta in Lunigiana.`;
     const items = loaderData?.properties ?? [];
-    const breadcrumbLd = {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      itemListElement: [
-        { "@type": "ListItem", position: 1, name: "Home", item: siteUrl("/") },
-        { "@type": "ListItem", position: 2, name: "Case in vendita", item: siteUrl("/case-in-vendita") },
-        { "@type": "ListItem", position: 3, name: comune.fullName, item: url },
+    const ld = collectionPageGraph({
+      canonical: url,
+      name: title,
+      description,
+      items: items.map((p) => ({ url: siteUrl(propertyPath(p)), name: p.title })),
+      breadcrumb: [
+        { name: "Home", item: siteUrl("/") },
+        { name: "Case in vendita", item: siteUrl("/case-in-vendita") },
+        { name: comune.fullName, item: url },
       ],
-    };
-    const itemListLd = {
-      "@context": "https://schema.org",
-      "@type": "ItemList",
-      itemListElement: items.slice(0, 25).map((p, i) => ({
-        "@type": "ListItem",
-        position: i + 1,
-        url: siteUrl(propertyPath(p)),
-        name: p.title,
-      })),
-    };
+    });
     return {
       meta: [
         { title },
@@ -81,12 +74,7 @@ export const Route = createFileRoute("/case-in-vendita/$comune")({
         { property: "og:type", content: "website" },
       ],
       links: [{ rel: "canonical", href: url }],
-      scripts: [
-        { type: "application/ld+json", children: JSON.stringify(breadcrumbLd) },
-        ...(items.length > 0
-          ? [{ type: "application/ld+json", children: JSON.stringify(itemListLd) }]
-          : []),
-      ],
+      scripts: [{ type: "application/ld+json", children: JSON.stringify(ld) }],
     };
   },
   errorComponent: ({ error }) => (
