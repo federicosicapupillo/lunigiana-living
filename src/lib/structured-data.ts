@@ -114,6 +114,97 @@ export function homeGraph(title: string, description: string) {
   };
 }
 
+/**
+ * Nodo compatto dell'agenzia: STESSO `@id` del nodo canonico della home,
+ * nessun dato diverso (sottoinsieme verificato di `agencyNode`). Non crea una
+ * seconda entità.
+ */
+const agencyCompactNode = {
+  "@type": agencyNode["@type"],
+  "@id": AGENCY_ID,
+  name: agencyNode.name,
+  url: agencyNode.url,
+  telephone: agencyNode.telephone,
+  email: agencyNode.email,
+  address: agencyNode.address,
+};
+
+/**
+ * Grafo di una pagina istituzionale (WebPage / AboutPage / ContactPage).
+ * `includeAgency` inserisce il nodo compatto dell'agenzia con `@id` canonico.
+ */
+export function institutionalGraph(opts: {
+  canonical: string;
+  type: "WebPage" | "AboutPage" | "ContactPage";
+  name: string;
+  description?: string;
+  includeAgency?: boolean;
+}) {
+  const { canonical, type, name, description, includeAgency } = opts;
+  const page: Record<string, unknown> = {
+    ...webPageNode(canonical, name, description),
+    "@type": type,
+    ...(includeAgency
+      ? { about: { "@id": AGENCY_ID }, mainEntity: { "@id": AGENCY_ID } }
+      : {}),
+  };
+  return {
+    "@context": "https://schema.org",
+    "@graph": [page, ...(includeAgency ? [agencyCompactNode] : [])],
+  };
+}
+
+/**
+ * Grafo di una pagina che elenca realmente immobili: CollectionPage con
+ * `ItemList` come `mainEntity`, ordine e URL identici all'elenco SSR visibile.
+ * Il breadcrumb va passato solo se già visibile all'utente.
+ */
+export function collectionPageGraph(opts: {
+  canonical: string;
+  name: string;
+  description?: string;
+  items: { url: string; name: string }[];
+  breadcrumb?: { name: string; item: string }[];
+}) {
+  const { canonical, name, description, items, breadcrumb } = opts;
+  const listId = `${canonical}#itemlist`;
+  const breadcrumbId = `${canonical}#breadcrumb`;
+  const page: Record<string, unknown> = {
+    ...webPageNode(canonical, name, description),
+    "@type": "CollectionPage",
+    ...(items.length > 0 ? { mainEntity: { "@id": listId } } : {}),
+    ...(breadcrumb && breadcrumb.length > 0 ? { breadcrumb: { "@id": breadcrumbId } } : {}),
+  };
+  const nodes: Record<string, unknown>[] = [page];
+  if (items.length > 0) {
+    nodes.push({
+      "@type": "ItemList",
+      "@id": listId,
+      numberOfItems: items.length,
+      itemListOrder: "https://schema.org/ItemListOrderAscending",
+      itemListElement: items.map((it, i) => ({
+        "@type": "ListItem",
+        position: i + 1,
+        url: it.url,
+        name: it.name,
+      })),
+    });
+  }
+  if (breadcrumb && breadcrumb.length > 0) {
+    nodes.push({
+      "@type": "BreadcrumbList",
+      "@id": breadcrumbId,
+      itemListElement: breadcrumb.map((b, i) => ({
+        "@type": "ListItem",
+        position: i + 1,
+        name: b.name,
+        item: b.item,
+      })),
+    });
+  }
+  return { "@context": "https://schema.org", "@graph": nodes };
+}
+
 /** Tipizzazione dell'immobile fisico a partire dalla tipologia testuale. */
 export function accommodationType(type: string | null | undefined): "Apartment" | "House" | "Residence" {
   const t = (type ?? "").toLowerCase();
