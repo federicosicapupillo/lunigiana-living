@@ -3,6 +3,7 @@ import { ArrowRight, ChevronRight, Compass, MapPin } from "lucide-react";
 import { COMUNE_SEO, localizeComuneSeo } from "@/lib/seo-comuni";
 import { COMUNE_HUB_COPY, HUB_COMUNI_INTRO, SEO_1B_UI, pick } from "@/lib/seo-editorial";
 import { siteUrl } from "@/lib/site-url";
+import { collectionPageGraph } from "@/lib/structured-data";
 import { useLanguage, useT } from "@/lib/i18n/LanguageContext";
 import { useDocHead } from "@/hooks/use-localized-head";
 
@@ -12,14 +13,17 @@ export const Route = createFileRoute("/case-in-vendita/")({
     const title = "Case in vendita in Lunigiana per comune | Furia Immobiliare";
     const description =
       "Esplora le case in vendita per comune in Lunigiana: Pontremoli, Bagnone, Mulazzo, Filattiera, Villafranca, Zeri, Aulla. Una guida locale per scegliere la zona giusta.";
-    const breadcrumbLd = {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      itemListElement: [
-        { "@type": "ListItem", position: 1, name: "Home", item: siteUrl("/") },
-        { "@type": "ListItem", position: 2, name: "Case in vendita in Lunigiana per comune", item: url },
+    // Hub: elenca landing comunali, non immobili → nessun ItemList di immobili.
+    const ld = collectionPageGraph({
+      canonical: url,
+      name: title,
+      description,
+      items: [],
+      breadcrumb: [
+        { name: "Home", item: siteUrl("/") },
+        { name: "Case in vendita in Lunigiana per comune", item: url },
       ],
-    };
+    });
     return {
       meta: [
         { title },
@@ -29,7 +33,7 @@ export const Route = createFileRoute("/case-in-vendita/")({
         { property: "og:url", content: url },
       ],
       links: [{ rel: "canonical", href: url }],
-      scripts: [{ type: "application/ld+json", children: JSON.stringify(breadcrumbLd) }],
+      scripts: [{ type: "application/ld+json", children: JSON.stringify(ld) }],
     };
   },
   component: CaseInVenditaIndex,
