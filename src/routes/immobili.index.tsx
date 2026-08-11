@@ -13,6 +13,8 @@ import { useLocalizedHead } from "@/hooks/use-localized-head";
 import { localizePropertyDynamic } from "@/lib/i18n/property-localize";
 import { TIPOLOGIE_SEO, localizeTipologiaSeo } from "@/lib/seo-tipologie";
 import { siteUrl } from "@/lib/site-url";
+import { collectionPageGraph } from "@/lib/structured-data";
+import { propertyPath } from "@/lib/property-url";
 
 // Tutti i parametri sono opzionali: se assenti dalla URL restano assenti
 // (nessuna query string vuota generata dalla normalizzazione del router).
@@ -47,16 +49,30 @@ export const Route = createFileRoute("/immobili/")({
   validateSearch: zodValidator(searchSchema),
   search: { middlewares: [stripSearchParams(EMPTY_SEARCH)] },
   loader: () => listPublishedPropertiesSummary(),
-  head: () => ({
+  head: ({ loaderData }) => {
+    const url = siteUrl("/immobili");
+    const title = "Immobili in Lunigiana | Ricerca e filtri | Furia Immobiliare";
+    const description =
+      "Catalogo completo degli immobili in Lunigiana con ricerca e filtri: vendita e affitto a Pontremoli, Villafranca, Filattiera, Mulazzo, Bagnone, Zeri.";
+    // L'elenco SSR della pagina canonica (senza filtri) è il catalogo completo
+    // restituito dal loader: nessuna paginazione, nessun troncamento.
+    const items = (loaderData?.properties ?? []).map((p) => ({
+      url: siteUrl(propertyPath(p)),
+      name: p.title,
+    }));
+    const ld = collectionPageGraph({ canonical: url, name: title, description, items });
+    return {
     meta: [
-      { title: "Immobili in Lunigiana | Ricerca e filtri | Furia Immobiliare" },
-      { name: "description", content: "Catalogo completo degli immobili in Lunigiana con ricerca e filtri: vendita e affitto a Pontremoli, Villafranca, Filattiera, Mulazzo, Bagnone, Zeri." },
+      { title },
+      { name: "description", content: description },
       { property: "og:title", content: "Immobili in Lunigiana — Furia Immobiliare" },
       { property: "og:description", content: "Una selezione curata di immobili in tutta la Lunigiana." },
-      { property: "og:url", content: siteUrl("/immobili") },
+      { property: "og:url", content: url },
     ],
-    links: [{ rel: "canonical", href: siteUrl("/immobili") }],
-  }),
+    links: [{ rel: "canonical", href: url }],
+    scripts: [{ type: "application/ld+json", children: JSON.stringify(ld) }],
+    };
+  },
   errorComponent: ({ error }) => (
     <div className="container-editorial py-32 text-center">
       <p className="text-muted-foreground">Errore nel caricamento: {error.message}</p>
