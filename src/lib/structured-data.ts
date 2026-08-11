@@ -15,6 +15,40 @@ import { propertyPath, propertyOgImagePath } from "@/lib/property-url";
 export const AGENCY_ID = siteUrl("/#agency");
 export const WEBSITE_ID = siteUrl("/#website");
 
+/**
+ * Classi energetiche ammesse nel JSON-LD. I valori presenti in banca dati che
+ * non rappresentano una classe reale (es. "Classe", "In fase di rilascio")
+ * restano visibili nel contenuto della pagina ma NON vengono dichiarati come
+ * dato strutturato. Nessuna normalizzazione "creativa": confronto esatto
+ * previa rimozione di spazi e differenze di maiuscole.
+ */
+const ENERGY_CLASS_ALLOWED = new Map<string, string>(
+  [
+    "A4",
+    "A3",
+    "A2",
+    "A1",
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+    "F",
+    "G",
+    "Esente",
+    "Esente da APE",
+  ].map((v) => [v.toLowerCase().replace(/\s+/g, " "), v]),
+);
+
+/** Restituisce la classe energetica se pubblicabile come dato strutturato. */
+export function normalizeEnergyClassForJsonLd(
+  value: string | null | undefined,
+): string | null {
+  if (!value) return null;
+  const key = value.trim().replace(/\s+/g, " ").toLowerCase();
+  return ENERGY_CLASS_ALLOWED.get(key) ?? null;
+}
+
 /** Nodo agenzia (dati verificati: NAP reale dell'agenzia di Pontremoli). */
 export const agencyNode = {
   "@type": "RealEstateAgent",
