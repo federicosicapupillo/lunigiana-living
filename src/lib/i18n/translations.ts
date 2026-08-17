@@ -255,6 +255,9 @@ const it: Dict = {
   "list.intro": "Filtra per categoria o comune per trovare il tuo posto.",
   "list.count.available": "Immobili disponibili",
   "list.empty": "Nessun immobile trovato per questa ricerca.",
+  "list.noneInComune.title": "Non abbiamo ancora immobili a {comune}",
+  "list.noneInComune.body":
+    "Ma puoi scoprire altre case disponibili in Lunigiana e nella provincia di Massa-Carrara: qui sotto trovi le nostre proposte del momento.",
   "list.notFound": "Non trovi quello che cerchi?",
 
   // Servizi
@@ -1007,6 +1010,9 @@ const en: Dict = {
   "list.intro": "real properties from our archive. Filter by category or location to find your place.",
   "list.count.available": "properties available",
   "list.empty": "No properties found for this search.",
+  "list.noneInComune.title": "We don't have properties in {comune} yet",
+  "list.noneInComune.body":
+    "You can still explore other homes available across Lunigiana and the Massa-Carrara province — our current selection is below.",
   "list.notFound": "Can't find what you're looking for?",
 
   // Servizi
