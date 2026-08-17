@@ -11,6 +11,7 @@
 import { siteUrl } from "@/lib/site-url";
 import type { PublicProperty } from "@/lib/public-properties.functions";
 import { propertyPath, propertyOgImagePath } from "@/lib/property-url";
+import { OFFICIAL_SAME_AS } from "@/lib/social-links";
 
 export const AGENCY_ID = siteUrl("/#agency");
 export const WEBSITE_ID = siteUrl("/#website");
@@ -77,6 +78,7 @@ export const agencyNode = {
     "Aulla",
   ],
   memberOf: { "@type": "Organization", name: "FIAIP" },
+  sameAs: [...OFFICIAL_SAME_AS],
 };
 
 export const websiteNode = {

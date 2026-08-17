@@ -22,6 +22,14 @@ const it: Dict = {
   "footer.adminArea": "Area riservata",
   "footer.rights": "Tutti i diritti riservati.",
 
+  // Social
+  "social.ig.title": "Seguici su Instagram",
+  "social.ig.body":
+    "Scopri in anteprima nuove case, video, open house e storie dalla Lunigiana.",
+  "social.ig.cta": "Segui",
+  "social.ig.follow": "Seguici su Instagram",
+  "social.ig.aria": "Segui Furia Immobiliare su Instagram",
+
   // CTA generic
   "cta.viewProperties": "Vedi gli immobili",
   "cta.discoverProperties": "Scopri gli immobili",
@@ -781,6 +789,14 @@ const en: Dict = {
   "footer.navigate": "Navigate",
   "footer.adminArea": "Admin area",
   "footer.rights": "All rights reserved.",
+
+  // Social
+  "social.ig.title": "Follow us on Instagram",
+  "social.ig.body":
+    "See new homes first, plus videos, open houses and stories from Lunigiana.",
+  "social.ig.cta": "Follow",
+  "social.ig.follow": "Follow us on Instagram",
+  "social.ig.aria": "Follow Furia Immobiliare on Instagram",
 
   // CTA generic
   "cta.viewProperties": "View properties",

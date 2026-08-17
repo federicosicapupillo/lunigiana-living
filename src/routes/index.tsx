@@ -15,7 +15,9 @@ import { LeadForm } from "@/components/lead-form";
 import { GuidedChoiceSection } from "@/components/guided-choice";
 import { LeadMagnetBlock } from "@/components/lead-magnet-block";
 import { ReviewsTrustBlock } from "@/components/reviews-trust-block";
-import { ArrowRight, Compass, KeyRound, Sparkles, ShieldCheck, MapPin, Home as HomeIcon } from "lucide-react";
+import { ArrowRight, Compass, KeyRound, Sparkles, ShieldCheck, MapPin, Home as HomeIcon, Instagram } from "lucide-react";
+import { INSTAGRAM_URL, INSTAGRAM_HANDLE } from "@/lib/social-links";
+import { trackClick } from "@/lib/analytics";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useLanguage, useT } from "@/lib/i18n/LanguageContext";
@@ -510,6 +512,31 @@ function Index() {
               {t("home.finalCta.formBtn")}
             </Link>
           </div>
+        </div>
+      </section>
+
+      {/* INSTAGRAM — CTA discreta, nessuno script o feed di Meta */}
+      <section className="container-editorial pb-20 sm:pb-28">
+        <div className="flex flex-col items-start gap-5 rounded-sm border border-border bg-sand/40 px-6 py-8 sm:px-8 md:flex-row md:items-center md:justify-between">
+          <div className="max-w-xl">
+            <h2 className="flex items-center gap-2 font-serif text-2xl text-ink">
+              <Instagram size={20} aria-hidden="true" />
+              {t("social.ig.title")}
+            </h2>
+            <p className="mt-2 text-sm leading-relaxed text-foreground/75">
+              {t("social.ig.body")}
+            </p>
+          </div>
+          <a
+            href={INSTAGRAM_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={t("social.ig.aria")}
+            onClick={() => trackClick("instagram_profile_click", { source: "homepage_cta" })}
+            className="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-sm border border-ink px-6 py-3 text-xs uppercase tracking-[0.22em] text-ink transition hover:bg-ink hover:text-cream focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
+          >
+            {t("social.ig.cta")} {INSTAGRAM_HANDLE}
+          </a>
         </div>
       </section>
     </>
