@@ -41,7 +41,32 @@ export const Route = createFileRoute("/case-in-vendita/$comune")({
     const nearby = COMUNE_SEO.filter(
       (c) => c.slug !== comune.slug && forSale.some((p) => inComune(c, p)),
     ).map((c) => c.slug);
-    return { comune, properties: matched, populatedTypes, nearby };
+    // Alternative reali solo quando il comune non ha immobili attivi.
+    // Selezione deterministica (nessuna casualità SSR/client): scorriamo i
+    // comuni della Lunigiana nell'ordine editoriale di COMUNE_SEO e, dentro
+    // ciascuno, ordiniamo per data di inserimento discendente. Massimo 6,
+    // nessun duplicato, solo immobili pubblicati e in vendita.
+    const alternatives: typeof matched = [];
+    if (matched.length === 0) {
+      const seen = new Set<string | number>();
+      for (const c of COMUNE_SEO) {
+        if (c.slug === comune.slug) continue;
+        const inC = forSale
+          .filter((p) => inComune(c, p))
+          .sort(
+            (a, b) =>
+              new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime(),
+          );
+        for (const p of inC) {
+          if (alternatives.length >= 6) break;
+          if (seen.has(p.id)) continue;
+          seen.add(p.id);
+          alternatives.push(p);
+        }
+        if (alternatives.length >= 6) break;
+      }
+    }
+    return { comune, properties: matched, populatedTypes, nearby, alternatives };
   },
   head: ({ params, loaderData }) => {
     const comune = loaderData?.comune ?? getComuneSeo(params.comune);
@@ -53,11 +78,21 @@ export const Route = createFileRoute("/case-in-vendita/$comune")({
     const title = `Case in vendita ${prep} ${comune.fullName} | Furia Immobiliare`;
     const description = `Scopri case, appartamenti e immobili di carattere ${prep} ${comune.fullName} con Furia Immobiliare. Ti guidiamo nella scelta della casa giusta in Lunigiana.`;
     const items = loaderData?.properties ?? [];
+    // L'ItemList descrive esclusivamente le card effettivamente visibili:
+    // quando il comune non ha immobili, sono le alternative dei comuni vicini
+    // (con il loro comune reale nel nome).
+    const visible = items.length > 0 ? items : (loaderData?.alternatives ?? []);
     const ld = collectionPageGraph({
       canonical: url,
       name: title,
       description,
-      items: items.map((p) => ({ url: siteUrl(propertyPath(p)), name: p.title })),
+      items: visible.map((p) => ({
+        url: siteUrl(propertyPath(p)),
+        name:
+          items.length > 0
+            ? p.title
+            : `${p.title} — ${propertyMunicipality(p) || p.location}`,
+      })),
       breadcrumb: [
         { name: "Home", item: siteUrl("/") },
         { name: "Case in vendita", item: siteUrl("/case-in-vendita") },
@@ -98,11 +133,12 @@ export const Route = createFileRoute("/case-in-vendita/$comune")({
 });
 
 function ComuneSeoPage() {
-  const { comune, properties, populatedTypes, nearby } = Route.useLoaderData() as {
+  const { comune, properties, populatedTypes, nearby, alternatives } = Route.useLoaderData() as {
     comune: (typeof COMUNE_SEO)[number];
     properties: PublicProperty[];
     populatedTypes: string[];
     nearby: string[];
+    alternatives: PublicProperty[];
   };
   const { language } = useLanguage();
   const t = useT();
@@ -208,7 +244,13 @@ function ComuneSeoPage() {
           </div>
 
           {properties.length === 0 ? (
+            <>
             <div className="mt-12 rounded-2xl border border-[var(--terracotta)]/15 bg-[var(--warm-ivory)] px-8 py-14 text-center">
+              <p className="mx-auto max-w-xl text-[0.8rem] uppercase tracking-[0.2em] text-[var(--terracotta)]">
+                {language === "en"
+                  ? `No properties currently available in ${comune.fullName}`
+                  : `Al momento non ci sono immobili disponibili ${prep} ${comune.fullName}`}
+              </p>
               <h2 className="mx-auto max-w-xl font-serif text-2xl leading-snug text-ink">
                 {fmt("seoComune.empty.title", { name: comune.fullName, a: prep })}
               </h2>
@@ -266,6 +308,35 @@ function ComuneSeoPage() {
                 {t("seoPage.tellMeWhatYouSeek")}
               </Link>
             </div>
+            {alternatives.length > 0 && (
+              <div className="mt-16">
+                <div className="border-b border-[var(--terracotta)]/20 pb-5">
+                  <h2 className="font-serif text-2xl text-ink md:text-3xl">
+                    {language === "en"
+                      ? "Properties available nearby"
+                      : "Immobili disponibili nelle vicinanze"}
+                  </h2>
+                  <p className="mt-3 max-w-2xl text-[0.95rem] leading-relaxed text-[var(--ink-soft)]">
+                    {language === "en"
+                      ? `These homes are not located in ${comune.fullName}: each card shows the municipality where the property actually is.`
+                      : `Questi immobili non si trovano ${prep} ${comune.fullName}: ogni scheda indica il comune in cui l'immobile è realmente situato.`}
+                  </p>
+                </div>
+                <div className="mt-10 grid gap-12 md:grid-cols-2 lg:grid-cols-3">
+                  {alternatives.map((p) => (
+                    <div key={p.id}>
+                      <p className="mb-3 inline-flex items-center gap-1.5 rounded-full border border-[var(--terracotta)]/25 bg-[var(--warm-ivory)] px-3 py-1 text-[0.7rem] uppercase tracking-[0.18em] text-[var(--ink-soft)]">
+                        <MapPin size={12} strokeWidth={1.6} className="text-[var(--terracotta)]" />
+                        {language === "en" ? "Municipality of" : "Comune di"}{" "}
+                        {propertyMunicipality(p) || p.location}
+                      </p>
+                      <PropertyCard p={localizePropertyDynamic(p, language)} />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            </>
           ) : (
             <div
               className="mt-12 grid gap-12 md:grid-cols-2 lg:grid-cols-3"

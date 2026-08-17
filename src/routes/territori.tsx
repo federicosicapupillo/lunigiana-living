@@ -238,6 +238,33 @@ function TerritoriPage() {
             </div>
           );
         })}
+
+        {/* AULLA — landing dedicata, senza scheda editoriale nel racconto borghi */}
+        <div className="bg-warm-soft border-t border-warm-border/60">
+          <div className="container-editorial py-14 md:py-16">
+            <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+              <div className="max-w-2xl">
+                <div className="eyebrow">Aulla</div>
+                <h3 className="mt-3 font-serif text-2xl leading-tight text-ink md:text-3xl">
+                  Il nodo di collegamento della bassa Lunigiana
+                </h3>
+                <p className="mt-4 text-base leading-relaxed text-foreground/80">
+                  Vicina al casello autostradale e servita dalla ferrovia, Aulla è la scelta
+                  naturale per chi cerca servizi quotidiani e spostamenti rapidi verso costa
+                  ligure, Toscana e fondovalle.
+                </p>
+              </div>
+              <Link
+                to="/case-in-vendita/$comune"
+                params={{ comune: "aulla" }}
+                className="group inline-flex shrink-0 items-center gap-2 self-start rounded-sm border border-primary/60 px-5 py-2.5 text-[0.7rem] uppercase tracking-[0.22em] text-primary transition hover:bg-primary hover:text-primary-foreground md:self-auto"
+              >
+                {t("terr.borghi.cta")} Aulla
+                <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
+              </Link>
+            </div>
+          </div>
+        </div>
       </section>
 
       <section className="bg-warm-cream">
