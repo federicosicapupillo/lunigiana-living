@@ -1,7 +1,10 @@
 import { Link } from "@tanstack/react-router";
+import { Instagram } from "lucide-react";
 import logoAsset from "@/assets/furia-logo.png.asset.json";
 import { StaticImage } from "@/components/static-image";
 import { useT } from "@/lib/i18n/LanguageContext";
+import { INSTAGRAM_URL } from "@/lib/social-links";
+import { trackClick } from "@/lib/analytics";
 
 export function SiteFooter() {
   const t = useT();
@@ -35,6 +38,17 @@ export function SiteFooter() {
             <li>Cell. 320 7019985</li>
             <li>furiaimmobiliare@libero.it</li>
           </ul>
+          <a
+            href={INSTAGRAM_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={t("social.ig.aria")}
+            onClick={() => trackClick("instagram_profile_click", { source: "footer" })}
+            className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-sm border border-cream/40 px-4 py-2.5 text-sm text-cream transition hover:bg-cream hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cream"
+          >
+            <Instagram size={18} aria-hidden="true" />
+            {t("social.ig.follow")}
+          </a>
         </div>
 
         <div>
