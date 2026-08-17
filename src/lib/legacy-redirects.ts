@@ -71,6 +71,9 @@ export const LEGACY_STATIC_REDIRECTS: Readonly<Record<string, string>> = {
   "/chi_siamo.asp": "/chi-siamo",
   "/contattaci.asp": "/contatti",
   "/vendite2.asp": "/case-in-vendita",
+  // Unica pagina legacy degli affitti con traffico organico residuo (GSC):
+  // destinazione = catalogo immobili filtrato sul contratto di locazione.
+  "/affitti.asp": "/immobili?contract=affitto",
 };
 
 export type LegacyPropertyResolution =
