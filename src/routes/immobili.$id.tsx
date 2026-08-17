@@ -1032,6 +1032,20 @@ function PropertyDetail() {
               </span>
               {t("detail.waBtn")}
             </a>
+            <a
+              href={shareHref}
+              target="_blank"
+              rel="nofollow noopener noreferrer"
+              aria-label={t("detail.shareWhatsappAria")}
+              data-track="property_share_whatsapp"
+              onClick={() => trackShare("contact_card")}
+              className="mt-3 flex w-full items-center justify-center gap-2 rounded-sm border border-dashed border-ink/30 bg-background px-6 py-3.5 text-xs uppercase tracking-[0.22em] text-ink transition hover:border-ink/60 hover:bg-muted/60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+            >
+              <Share2 size={14} className="text-[#1f8a4c]" /> {t("detail.shareWhatsapp")}
+            </a>
+            <p className="mt-2 text-center text-[0.72rem] leading-relaxed text-muted-foreground">
+              {t("detail.shareWhatsappHint")}
+            </p>
           </div>
         </aside>
       </section>
