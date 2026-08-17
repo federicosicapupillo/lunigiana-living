@@ -42,28 +42,36 @@ export const Route = createFileRoute("/case-in-vendita/$comune")({
       (c) => c.slug !== comune.slug && forSale.some((p) => inComune(c, p)),
     ).map((c) => c.slug);
     // Alternative reali solo quando il comune non ha immobili attivi.
-    // Selezione deterministica (nessuna casualità SSR/client): scorriamo i
-    // comuni della Lunigiana nell'ordine editoriale di COMUNE_SEO e, dentro
-    // ciascuno, ordiniamo per data di inserimento discendente. Massimo 6,
-    // nessun duplicato, solo immobili pubblicati e in vendita.
+    // Selezione deterministica (nessuna casualità SSR/client): comuni della
+    // Lunigiana nell'ordine editoriale di COMUNE_SEO, immobili ordinati per
+    // data discendente, distribuzione round-robin (max 2 per comune per giro)
+    // così da rappresentare più località. Massimo 6, nessun duplicato, solo
+    // immobili pubblicati e in vendita.
     const alternatives: typeof matched = [];
     if (matched.length === 0) {
-      const seen = new Set<string | number>();
-      for (const c of COMUNE_SEO) {
-        if (c.slug === comune.slug) continue;
-        const inC = forSale
+      const MAX = 6;
+      const buckets = COMUNE_SEO.filter((c) => c.slug !== comune.slug).map((c) =>
+        forSale
           .filter((p) => inComune(c, p))
           .sort(
             (a, b) =>
               new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime(),
-          );
-        for (const p of inC) {
-          if (alternatives.length >= 6) break;
-          if (seen.has(p.id)) continue;
+          ),
+      );
+      const seen = new Set<string | number>();
+      let round = 0;
+      while (alternatives.length < MAX && round < MAX) {
+        let added = false;
+        for (const bucket of buckets) {
+          const p = bucket[round];
+          if (!p || seen.has(p.id)) continue;
           seen.add(p.id);
           alternatives.push(p);
+          added = true;
+          if (alternatives.length >= MAX) break;
         }
-        if (alternatives.length >= 6) break;
+        if (!added) break;
+        round += 1;
       }
     }
     return { comune, properties: matched, populatedTypes, nearby, alternatives };
@@ -86,13 +94,15 @@ export const Route = createFileRoute("/case-in-vendita/$comune")({
       canonical: url,
       name: title,
       description,
-      items: visible.map((p) => ({
-        url: siteUrl(propertyPath(p)),
-        name:
-          items.length > 0
-            ? p.title
-            : `${p.title} — ${propertyMunicipality(p) || p.location}`,
-      })),
+      items: visible.map((p) => {
+        const muni = propertyMunicipality(p) || p.location || "";
+        const needsMuni =
+          items.length === 0 && muni && !p.title.toLowerCase().includes(muni.toLowerCase());
+        return {
+          url: siteUrl(propertyPath(p)),
+          name: needsMuni ? `${p.title} — ${muni}` : p.title,
+        };
+      }),
       breadcrumb: [
         { name: "Home", item: siteUrl("/") },
         { name: "Case in vendita", item: siteUrl("/case-in-vendita") },
