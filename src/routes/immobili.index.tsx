@@ -50,17 +50,34 @@ export const Route = createFileRoute("/immobili/")({
   validateSearch: zodValidator(searchSchema),
   search: { middlewares: [stripSearchParams(EMPTY_SEARCH)] },
   loader: () => listPublishedPropertiesSummary(),
-  head: ({ loaderData }) => {
+  head: ({ loaderData, match }) => {
     const url = siteUrl("/immobili");
     const title = "Immobili in Lunigiana | Ricerca e filtri | Furia Immobiliare";
     const description =
       "Catalogo completo degli immobili in Lunigiana con ricerca e filtri: vendita e affitto a Pontremoli, Villafranca, Filattiera, Mulazzo, Bagnone, Zeri.";
+    // Le URL con query parameter non sono landing autonome (canonical verso
+    // /immobili): se un filtro è attivo l'elenco visibile è un sottoinsieme,
+    // quindi l'ItemList viene omessa invece di dichiarare un catalogo diverso.
+    const search = (match?.search ?? {}) as Record<string, string | undefined>;
+    const hasActiveFilter = [
+      "contract",
+      "featured",
+      "type",
+      "comune",
+      "price_min",
+      "price_max",
+      "size",
+      "rooms",
+      "features",
+    ].some((k) => (search[k] ?? "") !== "");
     // L'elenco SSR della pagina canonica (senza filtri) è il catalogo completo
     // restituito dal loader: nessuna paginazione, nessun troncamento.
-    const items = (loaderData?.properties ?? []).map((p) => ({
-      url: siteUrl(propertyPath(p)),
-      name: p.title,
-    }));
+    const items = hasActiveFilter
+      ? []
+      : (loaderData?.properties ?? []).map((p) => ({
+          url: siteUrl(propertyPath(p)),
+          name: p.title,
+        }));
     const ld = collectionPageGraph({ canonical: url, name: title, description, items });
     return {
     meta: [
