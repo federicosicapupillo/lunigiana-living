@@ -3,7 +3,7 @@ import { getPublishedProperty, isUuid, type PublicProperty } from "@/lib/public-
 import { getLocalizedProperty } from "@/lib/property-i18n.functions";
 import {
   ArrowLeft, ChevronLeft, ChevronRight, MapPin, Maximize2, BedDouble, Bath, Building2,
-  Sparkles, Zap, Leaf, MessageCircle, Mail, Check, Share2,
+  Sparkles, Zap, Leaf, MessageCircle, Mail, Check,
 } from "lucide-react";
 import { useEffect, useMemo, useState, useRef, type FormEvent } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -12,7 +12,7 @@ import { WatermarkedImage } from "@/components/watermarked-image";
 import { Skeleton } from "@/components/ui/skeleton";
 import { BeforeAfterSlider } from "@/components/before-after-slider";
 import { whatsappUrl } from "@/components/whatsapp-float";
-import { propertyShareWhatsappUrl, isPricePublic } from "@/lib/property-share";
+import { PropertyShareButton } from "@/components/property-share-button";
 import { COMUNE_SEO, comunePreposition, municipalityMatches } from "@/lib/seo-comuni";
 import { TIPOLOGIE_SEO, localizeTipologiaSeo } from "@/lib/seo-tipologie";
 import { isForSale, primaryTipologiaSlug, propertyMunicipality } from "@/lib/seo-taxonomy";
@@ -479,20 +479,15 @@ function PropertyDetail() {
   const waHref = whatsappUrl(waMessage);
   // Condivisione utente → amico: nessun numero destinatario, URL canonico,
   // prezzo incluso solo se pubblico nella scheda.
-  const shareHref = propertyShareWhatsappUrl(
-    { id: p.id, slug: p.slug, reference: p.reference, title, location: p.location, price: p.price, priceValue: p.priceValue },
-    { intro: t("share.wa.intro"), outro: t("share.wa.outro") },
-    priceLabel,
-  );
-  const trackShare = (source: string) =>
-    trackClick("property_share_whatsapp", {
-      source,
-      property_code: p.reference,
-      slug: p.slug ?? "",
-      page: propertyPath({ id: p.id, slug: p.slug }),
-      price_public: isPricePublic({ id: p.id, title, priceValue: p.priceValue }),
-      language,
-    });
+  const shareProperty = {
+    id: p.id,
+    slug: p.slug,
+    reference: p.reference,
+    title,
+    location: p.location,
+    price: p.price,
+    priceValue: p.priceValue,
+  };
 
   return (
     <article className="pb-32 md:pb-24">
@@ -564,18 +559,12 @@ function PropertyDetail() {
             >
               <MessageCircle size={14} className="text-[#1f8a4c]" /> {t("detail.heroWhatsapp")}
             </a>
-            <a
-              href={shareHref}
-              target="_blank"
-              rel="nofollow noopener noreferrer"
-              aria-label={t("detail.shareWhatsappAria")}
-              title={t("detail.shareWhatsappHint")}
-              data-track="property_share_whatsapp"
-              onClick={() => trackShare("hero")}
-              className="inline-flex items-center gap-2 rounded-sm border border-dashed border-ink/25 bg-muted/50 px-5 py-3 text-xs uppercase tracking-[0.2em] text-ink transition hover:border-ink/50 hover:bg-muted focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-            >
-              <Share2 size={14} className="text-[#1f8a4c]" /> {t("detail.shareWhatsapp")}
-            </a>
+            <PropertyShareButton
+              property={shareProperty}
+              priceLabel={priceLabel}
+              source="hero"
+              className="inline-flex min-h-11 items-center gap-2 rounded-sm border border-dashed border-ink/25 bg-muted/50 px-5 py-3 text-xs uppercase tracking-[0.2em] text-ink transition hover:border-ink/50 hover:bg-muted focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+            />
           </div>
         </div>
       </header>
@@ -1032,19 +1021,14 @@ function PropertyDetail() {
               </span>
               {t("detail.waBtn")}
             </a>
-            <a
-              href={shareHref}
-              target="_blank"
-              rel="nofollow noopener noreferrer"
-              aria-label={t("detail.shareWhatsappAria")}
-              data-track="property_share_whatsapp"
-              onClick={() => trackShare("contact_card")}
-              className="mt-3 flex w-full items-center justify-center gap-2 rounded-sm border border-dashed border-ink/30 bg-background px-6 py-3.5 text-xs uppercase tracking-[0.22em] text-ink transition hover:border-ink/60 hover:bg-muted/60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-            >
-              <Share2 size={14} className="text-[#1f8a4c]" /> {t("detail.shareWhatsapp")}
-            </a>
+            <PropertyShareButton
+              property={shareProperty}
+              priceLabel={priceLabel}
+              source="contact_card"
+              className="mt-3 flex min-h-11 w-full items-center justify-center gap-2 rounded-sm border border-dashed border-ink/30 bg-background px-6 py-3.5 text-xs uppercase tracking-[0.22em] text-ink transition hover:border-ink/60 hover:bg-muted/60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+            />
             <p className="mt-2 text-center text-[0.72rem] leading-relaxed text-muted-foreground">
-              {t("detail.shareWhatsappHint")}
+              {t("detail.shareHint")}
             </p>
           </div>
         </aside>

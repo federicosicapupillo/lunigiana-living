@@ -12,7 +12,6 @@ import {
 import { useT } from "@/lib/i18n/LanguageContext";
 import { trackClick } from "@/lib/analytics";
 import {
-  buildPropertyShareMessage,
   isPricePublic,
   propertyCanonicalUrl,
   propertyShareFacebookUrl,
@@ -63,7 +62,6 @@ export function PropertyShareButton({
 
   const labels = { intro: t("share.wa.intro"), outro: t("share.wa.outro") };
   const canonical = propertyCanonicalUrl(property);
-  const message = buildPropertyShareMessage(property, labels, priceLabel);
 
   const track = (method: ShareMethod) =>
     trackClick("property_share", {
@@ -197,9 +195,6 @@ export function PropertyShareButton({
               </button>
             </li>
           </ul>
-          <p className="mt-1 text-[0.72rem] leading-relaxed text-muted-foreground">
-            {message.split("\n").filter(Boolean).slice(1, 2).join("")}
-          </p>
         </DialogContent>
       </Dialog>
     </>
