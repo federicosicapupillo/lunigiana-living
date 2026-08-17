@@ -1,8 +1,8 @@
 /**
- * Condivisione immobile via WhatsApp (utente → amico).
+ * Condivisione universale di un immobile (utente → chiunque).
  *
- * - Nessun numero destinatario: si usa `https://wa.me/?text=...`, quindi è
- *   l'utente a scegliere contatto o gruppo.
+ * - Priorità alla Web Share API; i link qui sotto sono il fallback.
+ * - Nessun SDK, plugin o script esterno (nessun Meta SDK).
  * - Nessun dato personale raccolto o salvato.
  * - L'URL condiviso è SEMPRE l'URL canonico pubblico costruito da
  *   `siteUrl(propertyPath(p))`: mai preview, mai signed URL, mai query
@@ -66,4 +66,31 @@ export function propertyShareWhatsappUrl(
   priceLabel?: string | null,
 ): string {
   return `https://wa.me/?text=${encodeURIComponent(buildPropertyShareMessage(p, labels, priceLabel))}`;
+}
+
+/** Link mailto: oggetto = titolo immobile, corpo = messaggio completo. */
+export function propertyShareMailtoUrl(
+  p: ShareableProperty,
+  labels: ShareMessageLabels,
+  priceLabel?: string | null,
+  subject?: string,
+): string {
+  const subj = (subject ?? p.title).trim();
+  const body = buildPropertyShareMessage(p, labels, priceLabel);
+  return `mailto:?subject=${encodeURIComponent(subj)}&body=${encodeURIComponent(body)}`;
+}
+
+/** Facebook Share Dialog pubblico (nessun SDK Meta). */
+export function propertyShareFacebookUrl(p: ShareableProperty): string {
+  return `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(propertyCanonicalUrl(p))}`;
+}
+
+/** Telegram share (URL canonico + testo breve). */
+export function propertyShareTelegramUrl(
+  p: ShareableProperty,
+  labels: ShareMessageLabels,
+  priceLabel?: string | null,
+): string {
+  const text = buildPropertyShareMessage(p, labels, priceLabel);
+  return `https://t.me/share/url?url=${encodeURIComponent(propertyCanonicalUrl(p))}&text=${encodeURIComponent(text)}`;
 }
