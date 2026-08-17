@@ -6,12 +6,7 @@ import { PROPERTY_TYPES } from "@/lib/admin/property-constants";
 import { useT } from "@/lib/i18n/LanguageContext";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { localizeType, localizeAmenity } from "@/lib/i18n/property-localize";
-
-const COMUNI_FALLBACK = [
-  "Pontremoli","Bagnone","Villafranca in Lunigiana","Mulazzo","Filattiera",
-  "Licciana Nardi","Aulla","Fivizzano","Fosdinovo","Zeri","Tresana",
-  "Podenzana","Comano","Casola in Lunigiana",
-];
+import { buildComuniOptions } from "@/lib/comuni-ms";
 
 const SIZE_RANGE_KEYS: { key: string; value: string }[] = [
   { key: "filter.anySize", value: "" },
@@ -199,7 +194,9 @@ export function PropertySearchBar({
     };
   }, [featOpen]);
 
-  const comuniList = comuni && comuni.length ? comuni : COMUNI_FALLBACK;
+  // Mostra sempre tutti i comuni della provincia di Massa-Carrara,
+  // anche quelli senza immobili disponibili al momento.
+  const comuniList = useMemo(() => buildComuniOptions(comuni ?? []), [(comuni ?? []).join("|")]);
 
   const isRent = state.contract === "affitto";
   const priceMinOpts = isRent ? rentMinOptsList : priceMinOptsList;

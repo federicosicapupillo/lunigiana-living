@@ -15,6 +15,7 @@ import { TIPOLOGIE_SEO, localizeTipologiaSeo } from "@/lib/seo-tipologie";
 import { siteUrl } from "@/lib/site-url";
 import { collectionPageGraph } from "@/lib/structured-data";
 import { propertyPath } from "@/lib/property-url";
+import { comuneKey, normalizeComune } from "@/lib/comuni-ms";
 
 // Tutti i parametri sono opzionali: se assenti dalla URL restano assenti
 // (nessuna query string vuota generata dalla normalizzazione del router).
@@ -124,13 +125,8 @@ function ImmobiliPage() {
       Array.from(
         new Set(
           allProperties
-            .map((p) =>
-              (p.location || "")
-                // rimuove descrizioni di zona importate dal gestionale
-                // es. "Pontremoli zona residenziale" -> "Pontremoli"
-                .replace(/\s*[-–,]?\s*(zona|localit[aà]|frazione|loc\.?)\b.*$/i, "")
-                .trim(),
-            )
+            // Normalizza i nomi (punti finali, spazi, maiuscole, accenti, zone)
+            .map((p) => normalizeComune(p.municipality || p.location))
             .filter(Boolean),
         ),
       ).sort((a, b) => a.localeCompare(b, "it")),
@@ -151,8 +147,8 @@ function ImmobiliPage() {
     ? urlSearch.features.split(",").map((s: string) => s.trim().toLowerCase()).filter(Boolean)
     : [];
 
-  const filtered = useMemo(() => {
-    let list = allProperties;
+  const applyFilters = (source: PublicProperty[], withComune: boolean) => {
+    let list = source;
 
     if (urlSearch.contract === "vendita" || urlSearch.contract === "affitto") {
       list = list.filter((p) => p.category === urlSearch.contract);
@@ -165,9 +161,11 @@ function ImmobiliPage() {
       const t = urlSearch.type.toLowerCase();
       list = list.filter((p) => (p.type || "").toLowerCase().includes(t));
     }
-    if (urlSearch.comune) {
-      const c = urlSearch.comune.toLowerCase();
-      list = list.filter((p) => (p.location || "").toLowerCase().includes(c));
+    if (withComune && urlSearch.comune) {
+      const c = comuneKey(urlSearch.comune);
+      list = list.filter(
+        (p) => comuneKey(p.municipality || p.location) === c,
+      );
     }
     const priceLo = urlSearch.price_min ? Number(urlSearch.price_min) : null;
     const priceHi = urlSearch.price_max ? Number(urlSearch.price_max) : null;
@@ -213,7 +211,21 @@ function ImmobiliPage() {
     if (sort === "size-asc") sorted.sort((a, b) => (a.sqm ?? Infinity) - (b.sqm ?? Infinity));
     if (sort === "size-desc") sorted.sort((a, b) => (b.sqm ?? -1) - (a.sqm ?? -1));
     return sorted;
-  }, [allProperties, sort, urlSearch.contract, urlSearch.featured, urlSearch.type, urlSearch.comune, urlSearch.price_min, urlSearch.price_max, urlSearch.size, urlSearch.rooms, urlSearch.features]);
+  };
+
+  const filtered = useMemo(
+    () => applyFilters(allProperties, true),
+    [allProperties, sort, urlSearch.contract, urlSearch.featured, urlSearch.type, urlSearch.comune, urlSearch.price_min, urlSearch.price_max, urlSearch.size, urlSearch.rooms, urlSearch.features],
+  );
+
+  // Nessun immobile nel comune scelto: proponiamo le altre disponibilità.
+  const fallbackList = useMemo(
+    () => (urlSearch.comune && filtered.length === 0 ? applyFilters(allProperties, false) : []),
+    [filtered.length, allProperties, sort, urlSearch.contract, urlSearch.featured, urlSearch.type, urlSearch.comune, urlSearch.price_min, urlSearch.price_max, urlSearch.size, urlSearch.rooms, urlSearch.features],
+  );
+  const comuneLabel = normalizeComune(urlSearch.comune);
+  const showFallback = fallbackList.length > 0;
+  const visible = filtered.length > 0 ? filtered : showFallback ? fallbackList : [];
 
   return (
     <>
@@ -254,7 +266,18 @@ function ImmobiliPage() {
           </p>
         </div>
 
-        {filtered.length === 0 ? (
+        {showFallback && (
+          <div className="mb-12 rounded-sm border border-warm-border bg-warm-ivory/70 px-6 py-7 text-center sm:px-10">
+            <h2 className="font-serif text-2xl text-ink sm:text-3xl">
+              {t("list.noneInComune.title").replace("{comune}", comuneLabel)}
+            </h2>
+            <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-foreground/75">
+              {t("list.noneInComune.body")}
+            </p>
+          </div>
+        )}
+
+        {visible.length === 0 ? (
           <div className="py-24 text-center">
             <p className="font-serif text-2xl text-muted-foreground">
               {t("list.empty")}
@@ -262,7 +285,7 @@ function ImmobiliPage() {
           </div>
         ) : (
           <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-3">
-            {filtered.map((p) => (
+            {visible.map((p) => (
               <PropertyCard key={p.id} p={localizedById.get(p.id) ?? localizePropertyDynamic(p, language)} />
             ))}
           </div>
