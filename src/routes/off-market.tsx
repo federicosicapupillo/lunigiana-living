@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, ChevronRight, KeyRound, Lock, Search, ShieldCheck } from "lucide-react";
-import offMarketHero from "@/assets/real/off-market-hero.png.asset.json";
+import offMarketHero from "@/assets/real/off-market-hero-v2.png.asset.json";
 import { OffMarketForm } from "@/components/off-market-forms";
 import { trackClick, trackEvent } from "@/lib/analytics";
 import { siteUrl } from "@/lib/site-url";
