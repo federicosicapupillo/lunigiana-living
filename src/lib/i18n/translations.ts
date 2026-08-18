@@ -15,6 +15,11 @@ const it: Dict = {
   "offmarket.teaser.body":
     "Alcuni proprietari preferiscono vendere con discrezione. Con Furia Off Market puoi registrare una ricerca riservata o valutare una vendita riservata.",
   "offmarket.teaser.cta": "Scopri Furia Off Market",
+  "home.offmarket.eyebrow": "Furia Off Market",
+  "home.offmarket.title": "Non tutte le case si vedono.",
+  "home.offmarket.body":
+    "Alcuni immobili vengono proposti in modo riservato, fuori dai normali portali.",
+  "home.offmarket.cta": "Scopri l'Off Market",
   "nav.chiSiamo": "Chi siamo",
   "nav.contatti": "Contatti",
   "nav.openMenu": "Apri menu",
