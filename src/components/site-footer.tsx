@@ -42,12 +42,15 @@ export function SiteFooter() {
             href={INSTAGRAM_URL}
             target="_blank"
             rel="noopener noreferrer"
-            aria-label={t("social.ig.aria")}
+            aria-label="Instagram Furia Immobiliare"
             onClick={() => trackClick("instagram_profile_click", { source: "footer" })}
-            className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-sm border border-cream/40 px-4 py-2.5 text-sm text-cream transition hover:bg-cream hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cream"
+            className="mt-5 inline-flex h-11 w-11 items-center justify-center rounded-sm text-cream transition-transform duration-200 ease-out focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cream md:hover:scale-105"
           >
-            <Instagram size={18} aria-hidden="true" />
-            {t("social.ig.follow")}
+            <Instagram
+              aria-label="Instagram Furia Immobiliare"
+              role="img"
+              className="h-8 w-8 md:h-9 md:w-9"
+            />
           </a>
         </div>
 
