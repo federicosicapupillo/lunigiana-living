@@ -11,6 +11,7 @@ const NAV_ITEMS = [
   { to: "/immobili", key: "nav.immobili" },
   { to: "/territori", key: "nav.territori" },
   { to: "/servizi", key: "nav.servizi" },
+  { to: "/off-market", key: "nav.offMarket" },
   { to: "/chi-siamo", key: "nav.chiSiamo" },
   { to: "/contatti", key: "nav.contatti" },
 ] as const;
