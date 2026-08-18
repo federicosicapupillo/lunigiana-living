@@ -915,9 +915,9 @@ const en: Dict = {
     "Some owners prefer to sell discreetly. With Furia Off Market you can register a confidential search or explore a confidential sale.",
   "offmarket.teaser.cta": "Discover Furia Off Market",
   "home.offmarket.eyebrow": "Furia Off Market",
-  "home.offmarket.title": "Not every home is on show.",
+  "home.offmarket.title": "Some properties never reach the open market.",
   "home.offmarket.body":
-    "Some properties are offered discreetly, away from the usual property portals.",
+    "Some properties are offered discreetly, outside the traditional property portals.",
   "home.offmarket.cta": "Discover Off Market",
   "nav.chiSiamo": "About us",
   "nav.contatti": "Contact",
