@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as VivereInLunigianaRouteImport } from './routes/vivere-in-lunigiana'
 import { Route as VivereAPontremoliRouteImport } from './routes/vivere-a-pontremoli'
 import { Route as Vendite2DotaspRouteImport } from './routes/vendite2[.]asp'
+import { Route as ValutaCasaRouteImport } from './routes/valuta-casa'
 import { Route as TrovaCasaLunigianaRouteImport } from './routes/trova-casa-lunigiana'
 import { Route as TerritoriRouteImport } from './routes/territori'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
@@ -61,6 +62,11 @@ const VivereAPontremoliRoute = VivereAPontremoliRouteImport.update({
 const Vendite2DotaspRoute = Vendite2DotaspRouteImport.update({
   id: '/vendite2.asp',
   path: '/vendite2.asp',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ValutaCasaRoute = ValutaCasaRouteImport.update({
+  id: '/valuta-casa',
+  path: '/valuta-casa',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TrovaCasaLunigianaRoute = TrovaCasaLunigianaRouteImport.update({
@@ -258,6 +264,7 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/territori': typeof TerritoriRoute
   '/trova-casa-lunigiana': typeof TrovaCasaLunigianaRoute
+  '/valuta-casa': typeof ValutaCasaRoute
   '/vendite2.asp': typeof Vendite2DotaspRoute
   '/vivere-a-pontremoli': typeof VivereAPontremoliRoute
   '/vivere-in-lunigiana': typeof VivereInLunigianaRoute
@@ -296,6 +303,7 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/territori': typeof TerritoriRoute
   '/trova-casa-lunigiana': typeof TrovaCasaLunigianaRoute
+  '/valuta-casa': typeof ValutaCasaRoute
   '/vendite2.asp': typeof Vendite2DotaspRoute
   '/vivere-a-pontremoli': typeof VivereAPontremoliRoute
   '/vivere-in-lunigiana': typeof VivereInLunigianaRoute
@@ -336,6 +344,7 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/territori': typeof TerritoriRoute
   '/trova-casa-lunigiana': typeof TrovaCasaLunigianaRoute
+  '/valuta-casa': typeof ValutaCasaRoute
   '/vendite2.asp': typeof Vendite2DotaspRoute
   '/vivere-a-pontremoli': typeof VivereAPontremoliRoute
   '/vivere-in-lunigiana': typeof VivereInLunigianaRoute
@@ -377,6 +386,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/territori'
     | '/trova-casa-lunigiana'
+    | '/valuta-casa'
     | '/vendite2.asp'
     | '/vivere-a-pontremoli'
     | '/vivere-in-lunigiana'
@@ -415,6 +425,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/territori'
     | '/trova-casa-lunigiana'
+    | '/valuta-casa'
     | '/vendite2.asp'
     | '/vivere-a-pontremoli'
     | '/vivere-in-lunigiana'
@@ -454,6 +465,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/territori'
     | '/trova-casa-lunigiana'
+    | '/valuta-casa'
     | '/vendite2.asp'
     | '/vivere-a-pontremoli'
     | '/vivere-in-lunigiana'
@@ -495,6 +507,7 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TerritoriRoute: typeof TerritoriRoute
   TrovaCasaLunigianaRoute: typeof TrovaCasaLunigianaRoute
+  ValutaCasaRoute: typeof ValutaCasaRoute
   Vendite2DotaspRoute: typeof Vendite2DotaspRoute
   VivereAPontremoliRoute: typeof VivereAPontremoliRoute
   VivereInLunigianaRoute: typeof VivereInLunigianaRoute
@@ -528,6 +541,13 @@ declare module '@tanstack/react-router' {
       path: '/vendite2.asp'
       fullPath: '/vendite2.asp'
       preLoaderRoute: typeof Vendite2DotaspRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/valuta-casa': {
+      id: '/valuta-casa'
+      path: '/valuta-casa'
+      fullPath: '/valuta-casa'
+      preLoaderRoute: typeof ValutaCasaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/trova-casa-lunigiana': {
@@ -857,6 +877,7 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TerritoriRoute: TerritoriRoute,
   TrovaCasaLunigianaRoute: TrovaCasaLunigianaRoute,
+  ValutaCasaRoute: ValutaCasaRoute,
   Vendite2DotaspRoute: Vendite2DotaspRoute,
   VivereAPontremoliRoute: VivereAPontremoliRoute,
   VivereInLunigianaRoute: VivereInLunigianaRoute,
