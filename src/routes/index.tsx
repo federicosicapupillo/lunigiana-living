@@ -14,6 +14,7 @@ import { getHomeHeroVariant, type HomeHeroVariant } from "@/lib/site-settings.fu
 import { LeadForm } from "@/components/lead-form";
 import { GuidedChoiceSection } from "@/components/guided-choice";
 import { OffMarketTeaser } from "@/components/off-market-teaser";
+import { HeroOffMarketCard } from "@/components/hero-off-market-card";
 import { LeadMagnetBlock } from "@/components/lead-magnet-block";
 import { ReviewsTrustBlock } from "@/components/reviews-trust-block";
 import { ArrowRight, Compass, KeyRound, Sparkles, ShieldCheck, MapPin, Home as HomeIcon, Instagram } from "lucide-react";
@@ -162,6 +163,9 @@ function Index() {
                   {t("cta.talkToElena")}
                 </a>
               </div>
+              <div className="mt-8 max-w-md md:hidden">
+                <HeroOffMarketCard tone="light" />
+              </div>
             </div>
             <div className="md:col-span-6 lg:col-span-6">
               <div className="relative mx-auto aspect-[4/5] w-full max-w-md overflow-hidden rounded-sm shadow-2xl md:max-w-none">
@@ -182,6 +186,9 @@ function Index() {
                     {t("home.hero.elenaCaption")}
                   </div>
                 </div>
+              </div>
+              <div className="mx-auto mt-6 hidden w-full max-w-md md:block md:max-w-none">
+                <HeroOffMarketCard tone="light" />
               </div>
             </div>
           </div>
@@ -205,6 +212,8 @@ function Index() {
         <div className="hero-gradient absolute inset-0 -z-10" />
 
         <div className="container-editorial w-full pb-12 pt-32 sm:pb-16 sm:pt-40 md:pb-24">
+          <div className="md:grid md:grid-cols-12 md:items-end md:gap-10">
+            <div className="md:col-span-7 lg:col-span-7">
           <div className="max-w-3xl">
             <span className="eyebrow text-cream/90">{t("home.eyebrow")}</span>
             <h1 className="mt-4 font-serif text-[2.4rem] leading-[1.05] text-cream sm:text-5xl sm:leading-[1.02] md:text-7xl">
@@ -231,6 +240,11 @@ function Index() {
             >
               {t("cta.talkToElenaWA")}
             </a>
+          </div>
+            </div>
+            <div className="mt-8 md:col-span-5 md:mt-0 lg:col-span-4 lg:col-start-9">
+              <HeroOffMarketCard tone="dark" />
+            </div>
           </div>
         </div>
       </section>
