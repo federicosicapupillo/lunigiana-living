@@ -2,11 +2,17 @@ import { useLanguage } from "@/lib/i18n/LanguageContext";
 import type { Language } from "@/lib/i18n/translations";
 import { trackClick } from "@/lib/analytics";
 
+const FLAGS: Record<Language, { flag: string; label: string }> = {
+  it: { flag: "🇮🇹", label: "Italiano" },
+  en: { flag: "🇬🇧", label: "English" },
+};
+
 export function LanguageSwitcher({ className = "" }: { className?: string }) {
   const { language, setLanguage } = useLanguage();
 
-  const btn = (lang: Language, label: string) => {
+  const btn = (lang: Language) => {
     const active = language === lang;
+    const { flag, label } = FLAGS[lang];
     return (
       <button
         key={lang}
@@ -22,24 +28,26 @@ export function LanguageSwitcher({ className = "" }: { className?: string }) {
         }}
         aria-pressed={active}
         aria-label={`Switch language to ${label}`}
-        className={`px-1.5 text-[0.72rem] font-medium uppercase tracking-[0.18em] transition-colors ${
-          active ? "text-terracotta" : "text-ink-soft hover:text-terracotta"
+        title={label}
+        className={`inline-flex h-7 w-7 items-center justify-center rounded-sm text-lg leading-none transition-all duration-200 ${
+          active
+            ? "opacity-100 ring-1 ring-terracotta/60"
+            : "opacity-60 hover:opacity-100 hover:ring-1 hover:ring-ink/15"
         }`}
       >
-        {label}
+        <span aria-hidden>{flag}</span>
       </button>
     );
   };
 
   return (
     <div
-      className={`inline-flex items-center gap-0.5 ${className}`}
+      className={`inline-flex items-center gap-1.5 ${className}`}
       role="group"
       aria-label="Language switcher"
     >
-      {btn("it", "IT")}
-      <span aria-hidden className="text-warm-border">|</span>
-      {btn("en", "EN")}
+      {btn("it")}
+      {btn("en")}
     </div>
   );
 }
