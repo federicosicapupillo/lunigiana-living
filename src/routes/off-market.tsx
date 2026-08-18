@@ -74,11 +74,9 @@ function OffMarketPage() {
     <>
       {/* HERO */}
       <section className="relative isolate overflow-hidden">
-        <StaticImage
-          name="hero-tramonto-ulivi"
-          fallbackSrc={heroTramontoUlivi.url}
+        <img
+          src={offMarketHero.url}
           sizes="100vw"
-          pictureClassName="contents"
           alt="Colline della Lunigiana al tramonto, in Toscana"
           width={1920}
           height={1080}
