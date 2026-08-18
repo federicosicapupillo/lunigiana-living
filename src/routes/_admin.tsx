@@ -1,5 +1,6 @@
 import { createFileRoute, Outlet, Link, useNavigate } from "@tanstack/react-router";
 import { useAdmin } from "@/hooks/use-admin";
+import { useNewLeadsCount } from "@/hooks/use-new-leads-count";
 import { supabase } from "@/integrations/supabase/client";
 import { LogOut, LayoutDashboard, Home, Settings, Inbox, Share2, Database } from "lucide-react";
 import { Loader2 } from "lucide-react";
@@ -12,6 +13,7 @@ export const Route = createFileRoute("/_admin")({
 function AdminLayout() {
   const { loading, session, isAdmin } = useAdmin();
   const navigate = useNavigate();
+  const newLeads = useNewLeadsCount(!loading && !!session && isAdmin);
 
   useEffect(() => {
     if (!loading && (!session || !isAdmin)) {
@@ -51,10 +53,26 @@ function AdminLayout() {
               </Link>
               <Link
                 to="/admin/richieste"
-                className="flex items-center gap-2 text-muted-foreground transition hover:text-ink"
+                className="relative flex items-center gap-2 text-muted-foreground transition hover:text-ink"
                 activeProps={{ className: "text-ink" }}
               >
-                <Inbox size={15} /> Richieste
+                <span className="relative flex items-center">
+                  <Inbox size={15} />
+                  {newLeads > 0 && (
+                    <span
+                      aria-hidden="true"
+                      className="absolute -right-2 -top-2 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[0.6rem] font-semibold leading-none text-primary-foreground shadow-sm"
+                    >
+                      {newLeads > 99 ? "99+" : newLeads}
+                    </span>
+                  )}
+                </span>
+                Richieste
+                {newLeads > 0 && (
+                  <span className="sr-only">
+                    {newLeads} {newLeads === 1 ? "nuova richiesta" : "nuove richieste"}
+                  </span>
+                )}
               </Link>
               <Link
                 to="/admin/idealista"
