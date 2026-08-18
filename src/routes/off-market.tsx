@@ -1,8 +1,7 @@
 import { useEffect } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, ChevronRight, KeyRound, Lock, Search, ShieldCheck } from "lucide-react";
-import heroTramontoUlivi from "@/assets/real/hero-tramonto-ulivi.png.asset.json";
-import { StaticImage } from "@/components/static-image";
+import offMarketHero from "@/assets/real/off-market-hero.png.asset.json";
 import { OffMarketForm } from "@/components/off-market-forms";
 import { trackClick, trackEvent } from "@/lib/analytics";
 import { siteUrl } from "@/lib/site-url";
@@ -75,11 +74,9 @@ function OffMarketPage() {
     <>
       {/* HERO */}
       <section className="relative isolate overflow-hidden">
-        <StaticImage
-          name="hero-tramonto-ulivi"
-          fallbackSrc={heroTramontoUlivi.url}
+        <img
+          src={offMarketHero.url}
           sizes="100vw"
-          pictureClassName="contents"
           alt="Colline della Lunigiana al tramonto, in Toscana"
           width={1920}
           height={1080}
