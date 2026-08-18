@@ -11,6 +11,10 @@ const it: Dict = {
   "nav.territori": "Territori",
   "nav.servizi": "Servizi",
   "nav.offMarket": "Off Market",
+  "offmarket.teaser.title": "Non tutte le case in vendita sono online",
+  "offmarket.teaser.body":
+    "Alcuni proprietari preferiscono vendere con discrezione. Con Furia Off Market puoi registrare una ricerca riservata o valutare una vendita riservata.",
+  "offmarket.teaser.cta": "Scopri Furia Off Market",
   "nav.chiSiamo": "Chi siamo",
   "nav.contatti": "Contatti",
   "nav.openMenu": "Apri menu",
@@ -788,6 +792,10 @@ const en: Dict = {
   "nav.territori": "Territories",
   "nav.servizi": "Services",
   "nav.offMarket": "Off Market",
+  "offmarket.teaser.title": "Not every home for sale is listed online",
+  "offmarket.teaser.body":
+    "Some owners prefer to sell discreetly. With Furia Off Market you can register a confidential search or explore a confidential sale.",
+  "offmarket.teaser.cta": "Discover Furia Off Market",
   "nav.chiSiamo": "About us",
   "nav.contatti": "Contact",
   "nav.openMenu": "Open menu",
