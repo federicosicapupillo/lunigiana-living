@@ -13,6 +13,7 @@ import { getLocalizedProperties } from "@/lib/property-i18n.functions";
 import { getHomeHeroVariant, type HomeHeroVariant } from "@/lib/site-settings.functions";
 import { LeadForm } from "@/components/lead-form";
 import { GuidedChoiceSection } from "@/components/guided-choice";
+import { OffMarketTeaser } from "@/components/off-market-teaser";
 import { LeadMagnetBlock } from "@/components/lead-magnet-block";
 import { ReviewsTrustBlock } from "@/components/reviews-trust-block";
 import { ArrowRight, Compass, KeyRound, Sparkles, ShieldCheck, MapPin, Home as HomeIcon, Instagram } from "lucide-react";
@@ -299,6 +300,7 @@ function Index() {
 
       {/* GUIDED CHOICE */}
       <GuidedChoiceSection />
+      <OffMarketTeaser source="home" />
 
       {/* GUIDED SEARCH — discreet CTA to /trova-casa-lunigiana */}
       <section className="section-cream py-10 sm:py-14">

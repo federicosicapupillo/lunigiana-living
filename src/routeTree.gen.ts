@@ -16,6 +16,7 @@ import { Route as TrovaCasaLunigianaRouteImport } from './routes/trova-casa-luni
 import { Route as TerritoriRouteImport } from './routes/territori'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ServiziRouteImport } from './routes/servizi'
+import { Route as OffMarketRouteImport } from './routes/off-market'
 import { Route as IndexDotaspRouteImport } from './routes/index[.]asp'
 import { Route as ImmobiliRouteImport } from './routes/immobili'
 import { Route as ContattiRouteImport } from './routes/contatti'
@@ -80,6 +81,11 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
 const ServiziRoute = ServiziRouteImport.update({
   id: '/servizi',
   path: '/servizi',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OffMarketRoute = OffMarketRouteImport.update({
+  id: '/off-market',
+  path: '/off-market',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexDotaspRoute = IndexDotaspRouteImport.update({
@@ -247,6 +253,7 @@ export interface FileRoutesByFullPath {
   '/contatti': typeof ContattiRoute
   '/immobili': typeof ImmobiliRouteWithChildren
   '/index.asp': typeof IndexDotaspRoute
+  '/off-market': typeof OffMarketRoute
   '/servizi': typeof ServiziRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/territori': typeof TerritoriRoute
@@ -284,6 +291,7 @@ export interface FileRoutesByTo {
   '/contattaci.asp': typeof ContattaciDotaspRoute
   '/contatti': typeof ContattiRoute
   '/index.asp': typeof IndexDotaspRoute
+  '/off-market': typeof OffMarketRoute
   '/servizi': typeof ServiziRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/territori': typeof TerritoriRoute
@@ -323,6 +331,7 @@ export interface FileRoutesById {
   '/contatti': typeof ContattiRoute
   '/immobili': typeof ImmobiliRouteWithChildren
   '/index.asp': typeof IndexDotaspRoute
+  '/off-market': typeof OffMarketRoute
   '/servizi': typeof ServiziRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/territori': typeof TerritoriRoute
@@ -363,6 +372,7 @@ export interface FileRouteTypes {
     | '/contatti'
     | '/immobili'
     | '/index.asp'
+    | '/off-market'
     | '/servizi'
     | '/sitemap.xml'
     | '/territori'
@@ -400,6 +410,7 @@ export interface FileRouteTypes {
     | '/contattaci.asp'
     | '/contatti'
     | '/index.asp'
+    | '/off-market'
     | '/servizi'
     | '/sitemap.xml'
     | '/territori'
@@ -438,6 +449,7 @@ export interface FileRouteTypes {
     | '/contatti'
     | '/immobili'
     | '/index.asp'
+    | '/off-market'
     | '/servizi'
     | '/sitemap.xml'
     | '/territori'
@@ -478,6 +490,7 @@ export interface RootRouteChildren {
   ContattiRoute: typeof ContattiRoute
   ImmobiliRoute: typeof ImmobiliRouteWithChildren
   IndexDotaspRoute: typeof IndexDotaspRoute
+  OffMarketRoute: typeof OffMarketRoute
   ServiziRoute: typeof ServiziRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TerritoriRoute: typeof TerritoriRoute
@@ -543,6 +556,13 @@ declare module '@tanstack/react-router' {
       path: '/servizi'
       fullPath: '/servizi'
       preLoaderRoute: typeof ServiziRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/off-market': {
+      id: '/off-market'
+      path: '/off-market'
+      fullPath: '/off-market'
+      preLoaderRoute: typeof OffMarketRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/index.asp': {
@@ -832,6 +852,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContattiRoute: ContattiRoute,
   ImmobiliRoute: ImmobiliRouteWithChildren,
   IndexDotaspRoute: IndexDotaspRoute,
+  OffMarketRoute: OffMarketRoute,
   ServiziRoute: ServiziRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TerritoriRoute: TerritoriRoute,

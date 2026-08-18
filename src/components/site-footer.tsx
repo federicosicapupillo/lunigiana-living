@@ -64,6 +64,7 @@ export function SiteFooter() {
             <li><Link to="/trova-casa-lunigiana" className="hover:text-cream">{t("footer.guided")}</Link></li>
             <li><Link to="/territori" className="hover:text-cream">{t("nav.territori")}</Link></li>
             <li><Link to="/servizi" className="hover:text-cream">{t("nav.servizi")}</Link></li>
+            <li><Link to="/off-market" className="hover:text-cream">{t("nav.offMarket")}</Link></li>
             <li><Link to="/chi-siamo" className="hover:text-cream">{t("nav.chiSiamo")}</Link></li>
             <li><Link to="/contatti" className="hover:text-cream">{t("nav.contatti")}</Link></li>
             <li><Link to="/admin/login" className="hover:text-cream">{t("footer.adminArea")}</Link></li>

@@ -22,6 +22,7 @@ import { useT } from "@/lib/i18n/LanguageContext";
 import { useLocalizedHead } from "@/hooks/use-localized-head";
 import { trackClick } from "@/lib/analytics";
 import { LeadMagnetBlock } from "@/components/lead-magnet-block";
+import { OffMarketTeaser } from "@/components/off-market-teaser";
 import { ReviewsTrustBlock } from "@/components/reviews-trust-block";
 import { siteUrl } from "@/lib/site-url";
 import { institutionalGraph } from "@/lib/structured-data";
@@ -273,7 +274,9 @@ function ServiziPage() {
         </div>
       </section>
 
-      {/* FINAL CTA */}
+      {/* OFF MARKET TEASER */}
+      <OffMarketTeaser source="servizi" />
+
       <section className="container-editorial pb-32 pt-8">
         <div className="mb-12">
           <ReviewsTrustBlock variant="compact" source="servizi" className="rounded-2xl bg-[var(--warm-ivory)] py-14 sm:py-16" />
