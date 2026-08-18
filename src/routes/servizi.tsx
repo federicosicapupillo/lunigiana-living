@@ -122,7 +122,7 @@ function ServiziPage() {
                 {t("srv.hero.ctaBuy")}
               </Link>
               <Link
-                to="/contatti"
+                to="/valuta-casa"
                 data-track="services_cta_valuation"
                 onClick={() => trackClick("services_cta_valuation", { source: "hero" })}
                 className="inline-block rounded-sm border border-ink/30 bg-transparent px-8 py-4 text-xs uppercase tracking-[0.22em] text-ink transition hover:border-[var(--terracotta)] hover:text-[var(--terracotta)]"
@@ -185,7 +185,7 @@ function ServiziPage() {
           </div>
           <div className="mt-12 flex justify-center">
             <Link
-              to="/contatti"
+              to="/valuta-casa"
               data-track="services_cta_valuation"
               onClick={() => trackClick("services_cta_valuation", { source: "sell_section" })}
               className="inline-block rounded-sm bg-ink px-8 py-4 text-xs uppercase tracking-[0.22em] text-cream transition hover:bg-[var(--terracotta)]"

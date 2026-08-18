@@ -65,6 +65,7 @@ export type Database = {
         Row: {
           budget_range: string | null
           created_at: string
+          details: Json | null
           email: string
           full_name: string
           id: string
@@ -73,6 +74,7 @@ export type Database = {
           preferred_area: string | null
           privacy_accepted: boolean
           property_type: string | null
+          source: string | null
           source_page: string | null
           status: Database["public"]["Enums"]["lead_status"]
           updated_at: string
@@ -80,6 +82,7 @@ export type Database = {
         Insert: {
           budget_range?: string | null
           created_at?: string
+          details?: Json | null
           email: string
           full_name: string
           id?: string
@@ -88,6 +91,7 @@ export type Database = {
           preferred_area?: string | null
           privacy_accepted?: boolean
           property_type?: string | null
+          source?: string | null
           source_page?: string | null
           status?: Database["public"]["Enums"]["lead_status"]
           updated_at?: string
@@ -95,6 +99,7 @@ export type Database = {
         Update: {
           budget_range?: string | null
           created_at?: string
+          details?: Json | null
           email?: string
           full_name?: string
           id?: string
@@ -103,6 +108,7 @@ export type Database = {
           preferred_area?: string | null
           privacy_accepted?: boolean
           property_type?: string | null
+          source?: string | null
           source_page?: string | null
           status?: Database["public"]["Enums"]["lead_status"]
           updated_at?: string
