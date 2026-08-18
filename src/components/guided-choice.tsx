@@ -24,7 +24,7 @@ export function GuidedChoiceSection() {
       title: t("home.guided.card2.title"),
       body: t("home.guided.card2.body"),
       cta: t("home.guided.card2.cta"),
-      href: "/contatti",
+      href: "/valuta-casa",
       track: "guided_choice_sell",
     },
     {
