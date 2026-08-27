@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as VivereInLunigianaRouteImport } from './routes/vivere-in-lunigiana'
 import { Route as VivereAPontremoliRouteImport } from './routes/vivere-a-pontremoli'
 import { Route as Vendite2DotaspRouteImport } from './routes/vendite2[.]asp'
+import { Route as VenditeDotaspRouteImport } from './routes/vendite[.]asp'
 import { Route as ValutaCasaRouteImport } from './routes/valuta-casa'
 import { Route as TrovaCasaLunigianaRouteImport } from './routes/trova-casa-lunigiana'
 import { Route as TerritoriRouteImport } from './routes/territori'
@@ -20,12 +21,14 @@ import { Route as ServiziRouteImport } from './routes/servizi'
 import { Route as OffMarketRouteImport } from './routes/off-market'
 import { Route as IndexDotaspRouteImport } from './routes/index[.]asp'
 import { Route as ImmobiliRouteImport } from './routes/immobili'
+import { Route as Elenco_annunciDotaspRouteImport } from './routes/elenco_annunci[.]asp'
 import { Route as ContattiRouteImport } from './routes/contatti'
 import { Route as ContattaciDotaspRouteImport } from './routes/contattaci[.]asp'
 import { Route as Chi_siamoDotaspRouteImport } from './routes/chi_siamo[.]asp'
 import { Route as ChiSiamoRouteImport } from './routes/chi-siamo'
 import { Route as AnnuncioDotaspRouteImport } from './routes/annuncio[.]asp'
 import { Route as AffittiDotaspRouteImport } from './routes/affitti[.]asp'
+import { Route as AffittiResidenzialiCaseVacanzeDotaspRouteImport } from './routes/affitti-residenziali-case-vacanze[.]asp'
 import { Route as AdminRouteImport } from './routes/_admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ImmobiliIndexRouteImport } from './routes/immobili.index'
@@ -62,6 +65,11 @@ const VivereAPontremoliRoute = VivereAPontremoliRouteImport.update({
 const Vendite2DotaspRoute = Vendite2DotaspRouteImport.update({
   id: '/vendite2.asp',
   path: '/vendite2.asp',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VenditeDotaspRoute = VenditeDotaspRouteImport.update({
+  id: '/vendite.asp',
+  path: '/vendite.asp',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ValutaCasaRoute = ValutaCasaRouteImport.update({
@@ -104,6 +112,11 @@ const ImmobiliRoute = ImmobiliRouteImport.update({
   path: '/immobili',
   getParentRoute: () => rootRouteImport,
 } as any)
+const Elenco_annunciDotaspRoute = Elenco_annunciDotaspRouteImport.update({
+  id: '/elenco_annunci.asp',
+  path: '/elenco_annunci.asp',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ContattiRoute = ContattiRouteImport.update({
   id: '/contatti',
   path: '/contatti',
@@ -134,6 +147,12 @@ const AffittiDotaspRoute = AffittiDotaspRouteImport.update({
   path: '/affitti.asp',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AffittiResidenzialiCaseVacanzeDotaspRoute =
+  AffittiResidenzialiCaseVacanzeDotaspRouteImport.update({
+    id: '/affitti-residenziali-case-vacanze.asp',
+    path: '/affitti-residenziali-case-vacanze.asp',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AdminRoute = AdminRouteImport.update({
   id: '/_admin',
   getParentRoute: () => rootRouteImport,
@@ -251,12 +270,14 @@ const AdminAdminImmobiliIdAnteprimaRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/affitti-residenziali-case-vacanze.asp': typeof AffittiResidenzialiCaseVacanzeDotaspRoute
   '/affitti.asp': typeof AffittiDotaspRoute
   '/annuncio.asp': typeof AnnuncioDotaspRoute
   '/chi-siamo': typeof ChiSiamoRoute
   '/chi_siamo.asp': typeof Chi_siamoDotaspRoute
   '/contattaci.asp': typeof ContattaciDotaspRoute
   '/contatti': typeof ContattiRoute
+  '/elenco_annunci.asp': typeof Elenco_annunciDotaspRoute
   '/immobili': typeof ImmobiliRouteWithChildren
   '/index.asp': typeof IndexDotaspRoute
   '/off-market': typeof OffMarketRoute
@@ -265,6 +286,7 @@ export interface FileRoutesByFullPath {
   '/territori': typeof TerritoriRoute
   '/trova-casa-lunigiana': typeof TrovaCasaLunigianaRoute
   '/valuta-casa': typeof ValutaCasaRoute
+  '/vendite.asp': typeof VenditeDotaspRoute
   '/vendite2.asp': typeof Vendite2DotaspRoute
   '/vivere-a-pontremoli': typeof VivereAPontremoliRoute
   '/vivere-in-lunigiana': typeof VivereInLunigianaRoute
@@ -291,12 +313,14 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/affitti-residenziali-case-vacanze.asp': typeof AffittiResidenzialiCaseVacanzeDotaspRoute
   '/affitti.asp': typeof AffittiDotaspRoute
   '/annuncio.asp': typeof AnnuncioDotaspRoute
   '/chi-siamo': typeof ChiSiamoRoute
   '/chi_siamo.asp': typeof Chi_siamoDotaspRoute
   '/contattaci.asp': typeof ContattaciDotaspRoute
   '/contatti': typeof ContattiRoute
+  '/elenco_annunci.asp': typeof Elenco_annunciDotaspRoute
   '/index.asp': typeof IndexDotaspRoute
   '/off-market': typeof OffMarketRoute
   '/servizi': typeof ServiziRoute
@@ -304,6 +328,7 @@ export interface FileRoutesByTo {
   '/territori': typeof TerritoriRoute
   '/trova-casa-lunigiana': typeof TrovaCasaLunigianaRoute
   '/valuta-casa': typeof ValutaCasaRoute
+  '/vendite.asp': typeof VenditeDotaspRoute
   '/vendite2.asp': typeof Vendite2DotaspRoute
   '/vivere-a-pontremoli': typeof VivereAPontremoliRoute
   '/vivere-in-lunigiana': typeof VivereInLunigianaRoute
@@ -331,12 +356,14 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_admin': typeof AdminRouteWithChildren
+  '/affitti-residenziali-case-vacanze.asp': typeof AffittiResidenzialiCaseVacanzeDotaspRoute
   '/affitti.asp': typeof AffittiDotaspRoute
   '/annuncio.asp': typeof AnnuncioDotaspRoute
   '/chi-siamo': typeof ChiSiamoRoute
   '/chi_siamo.asp': typeof Chi_siamoDotaspRoute
   '/contattaci.asp': typeof ContattaciDotaspRoute
   '/contatti': typeof ContattiRoute
+  '/elenco_annunci.asp': typeof Elenco_annunciDotaspRoute
   '/immobili': typeof ImmobiliRouteWithChildren
   '/index.asp': typeof IndexDotaspRoute
   '/off-market': typeof OffMarketRoute
@@ -345,6 +372,7 @@ export interface FileRoutesById {
   '/territori': typeof TerritoriRoute
   '/trova-casa-lunigiana': typeof TrovaCasaLunigianaRoute
   '/valuta-casa': typeof ValutaCasaRoute
+  '/vendite.asp': typeof VenditeDotaspRoute
   '/vendite2.asp': typeof Vendite2DotaspRoute
   '/vivere-a-pontremoli': typeof VivereAPontremoliRoute
   '/vivere-in-lunigiana': typeof VivereInLunigianaRoute
@@ -373,12 +401,14 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/affitti-residenziali-case-vacanze.asp'
     | '/affitti.asp'
     | '/annuncio.asp'
     | '/chi-siamo'
     | '/chi_siamo.asp'
     | '/contattaci.asp'
     | '/contatti'
+    | '/elenco_annunci.asp'
     | '/immobili'
     | '/index.asp'
     | '/off-market'
@@ -387,6 +417,7 @@ export interface FileRouteTypes {
     | '/territori'
     | '/trova-casa-lunigiana'
     | '/valuta-casa'
+    | '/vendite.asp'
     | '/vendite2.asp'
     | '/vivere-a-pontremoli'
     | '/vivere-in-lunigiana'
@@ -413,12 +444,14 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/affitti-residenziali-case-vacanze.asp'
     | '/affitti.asp'
     | '/annuncio.asp'
     | '/chi-siamo'
     | '/chi_siamo.asp'
     | '/contattaci.asp'
     | '/contatti'
+    | '/elenco_annunci.asp'
     | '/index.asp'
     | '/off-market'
     | '/servizi'
@@ -426,6 +459,7 @@ export interface FileRouteTypes {
     | '/territori'
     | '/trova-casa-lunigiana'
     | '/valuta-casa'
+    | '/vendite.asp'
     | '/vendite2.asp'
     | '/vivere-a-pontremoli'
     | '/vivere-in-lunigiana'
@@ -452,12 +486,14 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_admin'
+    | '/affitti-residenziali-case-vacanze.asp'
     | '/affitti.asp'
     | '/annuncio.asp'
     | '/chi-siamo'
     | '/chi_siamo.asp'
     | '/contattaci.asp'
     | '/contatti'
+    | '/elenco_annunci.asp'
     | '/immobili'
     | '/index.asp'
     | '/off-market'
@@ -466,6 +502,7 @@ export interface FileRouteTypes {
     | '/territori'
     | '/trova-casa-lunigiana'
     | '/valuta-casa'
+    | '/vendite.asp'
     | '/vendite2.asp'
     | '/vivere-a-pontremoli'
     | '/vivere-in-lunigiana'
@@ -494,12 +531,14 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRouteWithChildren
+  AffittiResidenzialiCaseVacanzeDotaspRoute: typeof AffittiResidenzialiCaseVacanzeDotaspRoute
   AffittiDotaspRoute: typeof AffittiDotaspRoute
   AnnuncioDotaspRoute: typeof AnnuncioDotaspRoute
   ChiSiamoRoute: typeof ChiSiamoRoute
   Chi_siamoDotaspRoute: typeof Chi_siamoDotaspRoute
   ContattaciDotaspRoute: typeof ContattaciDotaspRoute
   ContattiRoute: typeof ContattiRoute
+  Elenco_annunciDotaspRoute: typeof Elenco_annunciDotaspRoute
   ImmobiliRoute: typeof ImmobiliRouteWithChildren
   IndexDotaspRoute: typeof IndexDotaspRoute
   OffMarketRoute: typeof OffMarketRoute
@@ -508,6 +547,7 @@ export interface RootRouteChildren {
   TerritoriRoute: typeof TerritoriRoute
   TrovaCasaLunigianaRoute: typeof TrovaCasaLunigianaRoute
   ValutaCasaRoute: typeof ValutaCasaRoute
+  VenditeDotaspRoute: typeof VenditeDotaspRoute
   Vendite2DotaspRoute: typeof Vendite2DotaspRoute
   VivereAPontremoliRoute: typeof VivereAPontremoliRoute
   VivereInLunigianaRoute: typeof VivereInLunigianaRoute
@@ -541,6 +581,13 @@ declare module '@tanstack/react-router' {
       path: '/vendite2.asp'
       fullPath: '/vendite2.asp'
       preLoaderRoute: typeof Vendite2DotaspRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/vendite.asp': {
+      id: '/vendite.asp'
+      path: '/vendite.asp'
+      fullPath: '/vendite.asp'
+      preLoaderRoute: typeof VenditeDotaspRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/valuta-casa': {
@@ -599,6 +646,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ImmobiliRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/elenco_annunci.asp': {
+      id: '/elenco_annunci.asp'
+      path: '/elenco_annunci.asp'
+      fullPath: '/elenco_annunci.asp'
+      preLoaderRoute: typeof Elenco_annunciDotaspRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/contatti': {
       id: '/contatti'
       path: '/contatti'
@@ -639,6 +693,13 @@ declare module '@tanstack/react-router' {
       path: '/affitti.asp'
       fullPath: '/affitti.asp'
       preLoaderRoute: typeof AffittiDotaspRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/affitti-residenziali-case-vacanze.asp': {
+      id: '/affitti-residenziali-case-vacanze.asp'
+      path: '/affitti-residenziali-case-vacanze.asp'
+      fullPath: '/affitti-residenziali-case-vacanze.asp'
+      preLoaderRoute: typeof AffittiResidenzialiCaseVacanzeDotaspRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_admin': {
@@ -864,12 +925,15 @@ const ImmobiliRouteWithChildren = ImmobiliRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRouteWithChildren,
+  AffittiResidenzialiCaseVacanzeDotaspRoute:
+    AffittiResidenzialiCaseVacanzeDotaspRoute,
   AffittiDotaspRoute: AffittiDotaspRoute,
   AnnuncioDotaspRoute: AnnuncioDotaspRoute,
   ChiSiamoRoute: ChiSiamoRoute,
   Chi_siamoDotaspRoute: Chi_siamoDotaspRoute,
   ContattaciDotaspRoute: ContattaciDotaspRoute,
   ContattiRoute: ContattiRoute,
+  Elenco_annunciDotaspRoute: Elenco_annunciDotaspRoute,
   ImmobiliRoute: ImmobiliRouteWithChildren,
   IndexDotaspRoute: IndexDotaspRoute,
   OffMarketRoute: OffMarketRoute,
@@ -878,6 +942,7 @@ const rootRouteChildren: RootRouteChildren = {
   TerritoriRoute: TerritoriRoute,
   TrovaCasaLunigianaRoute: TrovaCasaLunigianaRoute,
   ValutaCasaRoute: ValutaCasaRoute,
+  VenditeDotaspRoute: VenditeDotaspRoute,
   Vendite2DotaspRoute: Vendite2DotaspRoute,
   VivereAPontremoliRoute: VivereAPontremoliRoute,
   VivereInLunigianaRoute: VivereInLunigianaRoute,
