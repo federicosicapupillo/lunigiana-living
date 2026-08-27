@@ -1,61 +1,47 @@
-## Obiettivo
-Rendere la pagina `/immobili/$id` più chiara, persuasiva e veloce. Aggiungere sezioni editoriali "Perché è interessante", "Ideale per", "Il contesto", box contatto rafforzato e CTA sticky mobile. Ottimizzare le immagini su tutto il sito (card, dettaglio, miniature) tramite una utility centralizzata.
+# Audit tecnico SEO / AEO / GEO — Furia Immobiliare (sola lettura)
 
-## Cosa NON tocchiamo
-Backend admin, schema DB, policy RLS, upload, cartello A3 (`window-flyer-dialog.tsx`), generazione rendering, traduzioni esistenti, form contatti del componente `LeadForm`, `occasione_settings`.
+Nessun file modificato. Sotto: cosa è già corretto, cosa va migliorato, con gravità, file e modifica consigliata.
 
-## Parte 1 — Nuove sezioni nella pagina dettaglio
+## Già corretto (OK)
 
-File: `src/routes/immobili.$id.tsx`, `src/lib/i18n/translations.ts`.
+- **robots.txt** — `User-agent: *` + `Allow: /` + `Sitemap:` sul dominio canonico. Nessun `Disallow: /`, quindi OAI-SearchBot, PerplexityBot, Bingbot, Google-Extended non sono bloccati. (`public/robots.txt`)
+- **llms.txt presente** con descrizione dell'agenzia e indice di pagine. (`public/llms.txt`)
+- **sitemap dinamica SSR** con hub comuni, hub tipologie, pagine editoriali, `/valuta-casa`, `/off-market` e tutte le schede immobile pubblicate. (`src/routes/sitemap[.]xml.ts`)
+- **SSR/crawlability**: TanStack Start con render server-side; contenuti e JSON-LD emessi in `head()` lato server.
+- **Canonical assoluti** su tutte le pagine pubbliche (home, immobili, hub comuni/tipologie, editoriali, servizi, contatti, chi siamo, off-market, valuta-casa) tramite `siteUrl()`. (`src/lib/site-url.ts`)
+- **Legacy .asp**: 301 per `/index.asp`, `/chi_siamo.asp`, `/contattaci.asp`, `/vendite2.asp`, `/affitti.asp`; `annuncio.asp?ID_immobile=` con mapping ID→slug, 410 per rimossi, 404 per sospesi; validazione anti open-redirect. (`src/lib/legacy-redirects.ts`)
+- **URL immobili slug-based** con 301 dagli ID vecchi. (`src/lib/property-url.ts`, `src/routes/immobili.$id.tsx`)
+- **JSON-LD**: `RealEstateAgent` + `WebSite` + `WebPage` in home, `CollectionPage` + `ItemList` sugli elenchi (omesso quando ci sono filtri attivi), `RealEstateListing` + `Accommodation` + `Offer` (solo vendita, solo prezzo numerico) + `BreadcrumbList` sulle schede. `@id` coerenti = una sola entità agenzia. (`src/lib/structured-data.ts`)
+- **NAP verificato e coerente** (Via Pirandello 7, Pontremoli 54027 MS, +39 0187 830229, email), `areaServed`, `memberOf: FIAIP`.
+- **Nessun `og:image:width/height` falso**; immagine OG di brand su dominio canonico; nessuna signed URL con token nel markup.
+- **Aree admin** con `noindex,nofollow` su login, richieste, impostazioni, immobili (index/nuovo/$id), assistente.
+- **Pagine editoriali conversazionali** già presenti: `/vivere-a-pontremoli`, `/vivere-in-lunigiana`, hub comuni/tipologie con FAQ HTML.
 
-1. **Hero** — invariato strutturalmente (codice, tipo, titolo, comune, prezzo, badge Occasione già presenti). Aggiunta due CTA inline visibili sotto il prezzo: "Richiedi informazioni" (scroll al form) + "WhatsApp".
-2. **Blocco "In sintesi"** — già presente come *Quick facts* a 4 colonne. Lo ampliamo a 8 voci condizionali (superficie, locali, camere, bagni, piano, classe energetica, IPE, contratto). Nascondiamo le voci senza dato invece di mostrare "—".
-3. **Blocco "Perché è interessante"** — nuovo. Genera 2-4 bullet leggibili a partire da: `commercialHighlights`, `panoramicView`, `historicProperty`, `garden`, `terrace`, `centro storico` (parole chiave su location), prezzo competitivo. Solo regole locali, niente AI call.
-4. **Blocco "Ideale per"** — nuovo. Chip leggeri derivati dal campo `highlights.target` se presente, altrimenti inferenza basata su tipologia + dimensioni + giardino.
-5. **Descrizione migliorata** — sanitizziamo l'output: rimuoviamo `**` non chiusi e marker markdown rotti, normalizziamo doppi spazi, paragrafiamo su doppia newline mantenendo `whitespace-pre-line`. Nessuna modifica al contenuto in DB.
-6. **Blocco "Il contesto"** — nuovo. Mostra `p.locationDescription` se presente in DB; altrimenti fallback statico per i comuni più comuni della Lunigiana (Pontremoli, Bagnone, Filattiera, Mulazzo, Villafranca, Zeri, Aulla, Fivizzano) mappato in IT/EN.
-7. **Box contatto rafforzato** — restyling della aside: nuovo headline "Vuoi capire se questa casa fa per te?", testo "Scrivi a Elena…", CTA primaria + WhatsApp. Form invariato.
-8. **CTA sticky mobile** — barra fissa in basso solo `< md`: "WhatsApp" + "Info" (scroll al form). Padding-bottom su `<article>` per non coprire il footer.
-9. **i18n** — nuove chiavi sia IT sia EN:
-   - `detail.whyTitle`, `detail.idealForTitle`, `detail.contextTitle`
-   - `detail.contactStrongTitle`, `detail.contactStrongBody`, `detail.contactStrongCta`
-   - `detail.mobileInfo`, `detail.mobileWa`
-   - `detail.idealFamilies`, `detail.idealSecondHome`, `detail.idealVacation`, `detail.idealInvestment`, `detail.idealNature`, `detail.idealQuiet`
+## Da migliorare
 
-## Parte 2 — Ottimizzazione immagini
+| # | Problema | Gravità | File | Modifica consigliata |
+|---|---|---|---|---|
+| 1 | `<html lang="en">` hardcoded nello shell SSR: tutto il sito italiano viene dichiarato inglese ai crawler e ai motori AI (la correzione via `document.documentElement.lang` avviene solo dopo l'hydration). | **Critica** | `src/routes/__root.tsx` | Impostare `lang="it"` nello shell. |
+| 2 | Multilingua senza URL dedicate: IT/EN condividono la stessa URL e il cambio lingua è solo client-side. La versione EN non è indicizzabile né citabile, e non esistono `hreflang` né `og:locale`. | **Alta** | `src/lib/i18n/*`, route pubbliche | Decidere: (a) prefisso `/en/` con canonical+hreflang reciproci, oppure (b) dichiarare esplicitamente il sito monolingua IT e trattare EN come comodità UI. Senza (a) non c'è visibilità EN. |
+| 3 | Nessuna dichiarazione esplicita per i crawler AI in robots.txt. L'accesso è già consentito dal wildcard, ma blocchi espliciti riducono il rischio di regressioni future e rendono l'intento verificabile. | Bassa | `public/robots.txt` | Aggiungere blocchi espliciti `OAI-SearchBot`, `ChatGPT-User`, `PerplexityBot`, `Google-Extended`, `ClaudeBot`, `Bingbot` con `Allow: /`. |
+| 4 | `llms.txt` non aggiornato: mancano `/off-market`, `/valuta-casa`, `/vivere-a-pontremoli`, `/vivere-in-lunigiana` — proprio le pagine più utili alle query conversazionali. | Media | `public/llms.txt` | Aggiungere le voci mancanti e una riga NAP (indirizzo, telefono, email) per il grounding dei motori AI. |
+| 5 | Nessun `FAQPage` JSON-LD, per scelta documentata, benché le FAQ HTML esistano su hub comuni ed editoriali. Le risposte non sono estraibili come dato strutturato. | Media | `src/lib/seo-editorial.ts`, hub e pagine editoriali | Emettere `FAQPage` solo dove le domande/risposte sono già visibili in pagina, con testo identico al DOM. |
+| 6 | `sameAs` contiene solo Instagram: consolidamento entità debole per i motori AI (nessun Google Business Profile, Facebook, FIAIP, pagina portali). | Media | `src/lib/social-links.ts` | Aggiungere solo profili realmente esistenti e verificati dall'agenzia. |
+| 7 | Alcune route admin senza `noindex`: dati-live, idealista, anteprima immobile, dashboard admin index. | Media | `src/routes/_admin.admin.dati-live.tsx`, `_admin.admin.idealista.tsx`, `_admin.admin.immobili.$id.anteprima.tsx`, `_admin.admin.index.tsx` | Aggiungere `robots: noindex,nofollow` (idealmente nel layout `_admin.admin.tsx`) + `Disallow: /admin` in robots.txt. |
+| 8 | Endpoint tecnici crawlabili: feed Idealista pubblico e route immagini OG. Rischio di indicizzazione di URL non-pagina e di contenuto duplicato dei dati immobili. | Media | `public/robots.txt`, `src/routes/api/public/idealista/feed[.]xml.ts`, `src/routes/media/og/immobili/$.ts` | `Disallow: /api/`, `Disallow: /media/og/` in robots.txt e header `X-Robots-Tag: noindex` sul feed. |
+| 9 | Nessun consolidamento www/non-www a livello applicativo: `furiaimmobiliare.it`, `www.furiaimmobiliare.it`, `furia.cap-ann-one.life` e i domini `lovable.app` possono servire lo stesso contenuto. I canonical assoluti mitigano ma non eliminano il duplicato. | **Alta** | livello hosting/dominio | Impostare un 301 host-level verso l'host canonico e verificare che i domini alternativi redirigano invece di servire copie. |
+| 10 | `/immobili` con query string è raggiungibile e linkata (es. redirect `/affitti.asp` → `/immobili?contract=affitto`): il canonical punta alla versione pulita, corretto, ma sono URL indicizzabili senza contenuto proprio. | Bassa | `src/routes/immobili.index.tsx` | Valutare `noindex,follow` sulle varianti con filtri attivi, mantenendo il canonical. |
+| 11 | Sitemap senza `lastmod`: nessuna segnalazione di freschezza sulle schede immobile. | Bassa | `src/routes/sitemap[.]xml.ts` | Aggiungere `lastmod` solo da un timestamp reale per riga (es. `updated_at`); mai la data di generazione. |
+| 12 | Prezzi delle locazioni assenti dai dati strutturati (scelta corretta) ma nessun segnale alternativo di disponibilità/contatto per gli affitti. | Bassa | `src/lib/structured-data.ts` | Valutare `Offer` senza `price` con `availability` + `seller`, oppure lasciare invariato. |
 
-File nuovo: `src/lib/image-url.ts`. File toccati: `src/lib/public-properties.functions.ts` (server-side transform), `src/components/property-card.tsx`, `src/routes/immobili.$id.tsx`, `src/components/watermarked-image.tsx`.
+## Priorità di intervento suggerita
 
-1. **Utility `image-url.ts`** — wrapper che, dato un URL signed di Supabase, costruisce varianti con `?width=…&quality=…&resize=contain`. Supabase Image Transformations sono disponibili sui signed URL: basta appendere i parametri (l'edge li ignora se non supportati, quindi fallback sicuro). Funzioni esposte:
-   - `imgVariant(url, preset)` con preset `card | thumb | hero | renderHero | original`
-   - `imgSrcSet(url, widths)` per generare `srcSet`
-2. **Server-side transform sui signed URL** in `public-properties.functions.ts` — passiamo `transform: { width: 1600, quality: 75 }` al `createSignedUrls` per la gallery, abbattendo il peso al primo download. La firma è valida solo per i parametri firmati: quindi generiamo l'URL "originale" come oggi e, in più, esponiamo `gallery` con varianti pre-computate `{ src, srcSet, thumbSrc }`. Alternativa più sicura: lasciare il signed URL invariato e applicare le trasformazioni client-side appendendo i query param (Supabase Image Transformations accetta query param firmati o no a seconda della config; verifichiamo con un fetch di test in dev — se restituisce immagine ridotta usiamo la via client, altrimenti aggiungiamo `transform` nel createSignedUrl).
-3. **Responsive `<img>`** — `WatermarkedImage` accetta già `sizes`; aggiungiamo prop `srcSet`. Card immobile: `sizes="(max-width:768px) 100vw, 33vw"` + srcSet 400/600/800. Hero dettaglio: srcSet 800/1200/1600 con `fetchPriority="high"`. Thumbnails: src=160w.
-4. **Lazy loading intelligente** — gallery thumbs già `loading="lazy"`. Sezione rendering già `loading="lazy"`. Hero invariata `fetchPriority="high"`.
-5. **Skeleton & no layout shift** — la hero ha già `Skeleton`. Aggiungiamo `aspect-[4/3]` esplicito alle card e alle thumbnails (già presenti). Verifichiamo CLS.
-6. **Quality**: preset hero quality 80, card quality 75, thumb quality 60.
+1. `lang="it"` nello shell SSR (#1).
+2. Consolidamento host canonico (#9).
+3. Decisione strategica sul multilingua EN (#2).
+4. Igiene crawl: admin/api/media + robots AI + llms.txt (#3, #4, #7, #8).
+5. Rafforzamento entità e FAQ strutturate (#5, #6).
 
-## Cosa NON cambia nel pipeline immagini
-- `WatermarkedImage` resta il componente di rendering: nessuna modifica al watermark.
-- A3 (`window-flyer-dialog.tsx`): continua a usare gli URL originali (preset `original`).
-- Rendering AI: usano gli stessi signed URL, nessuna ricompressione.
-- Schema DB invariato.
+## Note tecniche
 
-## Rischi e mitigazioni
-- **Supabase Image Transformations non attive sul piano** → l'append di `?width=&quality=` viene ignorato e si serve l'originale: nessuna rottura, solo nessuna velocizzazione. Fallback safe.
-- **Signed URL con transform** richiede `transform` passato a `createSignedUrl` ed è bloccato dalla firma se aggiunto client-side. Strategia: prima provare client-side append; se in produzione non funziona, secondo step server-side (richiede refactoring di `public-properties.functions.ts` ma è isolato).
-- **Layout shift** sulla nuova sezione "Perché è interessante" se condizionale → impostiamo regole `min-h` solo quando ha contenuto, niente placeholder se vuota.
-- **CTA sticky mobile** può coprire il chat-bubble WhatsApp già presente (`WhatsAppFloat`): nascondiamo `WhatsAppFloat` sulla pagina dettaglio mobile per non duplicare.
-
-## File modificati
-- `src/lib/image-url.ts` (nuovo)
-- `src/lib/i18n/translations.ts` (aggiunte chiavi IT/EN)
-- `src/routes/immobili.$id.tsx` (nuove sezioni, sticky CTA, hero CTA, descrizione sanitizzata, in-sintesi ampliato)
-- `src/components/property-card.tsx` (srcSet + sizes)
-- `src/components/watermarked-image.tsx` (accetta srcSet)
-
-## Verifica finale
-1. Typecheck/build automatico
-2. Test visivo desktop + mobile di una scheda con: foto chiare, foto scure, descrizione lunga, descrizione corta, presenza/assenza badge Occasione, presenza/assenza rendering
-3. Controllo che A3 dialog continui a usare immagini originali full quality
-4. Controllo console per errori di img onError
+Verificato per lettura diretta di: `public/robots.txt`, `public/llms.txt`, `src/routes/sitemap[.]xml.ts`, `src/lib/site-url.ts`, `src/lib/structured-data.ts`, `src/lib/social-links.ts`, `src/lib/legacy-redirects.ts`, `src/routes/__root.tsx`, `src/hooks/use-localized-head.ts`, `src/server.ts` e tutte le route pubbliche e admin (grep su `canonical`, `robots`, `hreflang`, `FAQPage`). Nessun dato esterno usato: il comportamento reale di www/non-www e dei domini alternativi va confermato con una verifica live, non deducibile dal codice.
