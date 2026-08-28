@@ -292,27 +292,62 @@ function AiBenchmarkPage() {
       <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <Kpi
           label={`Score run ${runDate}`}
-          value={`${stats.score} / ${stats.maxScore}`}
-          delta={previous ? stats.score - previous.score : null}
+          value={`${stats.score} / ${MAX_SCORE_TOTAL}`}
+          delta={overallDelta(stats.score, previous?.score ?? 0)}
+          deltaNote={deltaNote}
         />
-        <Kpi label="Furia presente (≥1)" value={`${stats.presentPct}%`} delta={previous ? stats.presentPct - previous.presentPct : null} />
-        <Kpi label="Raccomandata (≥2)" value={`${stats.recommendedPct}%`} delta={previous ? stats.recommendedPct - previous.recommendedPct : null} />
-        <Kpi label="Citata (=3)" value={`${stats.citedPct}%`} delta={previous ? stats.citedPct - previous.citedPct : null} />
-        {AI_PLATFORMS.map((p) => (
-          <Kpi
-            key={p.key}
-            label={`${p.label} — score`}
-            value={`${stats.byPlatform[p.key].score} / ${stats.byPlatform[p.key].count * MAX_SCORE}`}
-            delta={previous ? stats.byPlatform[p.key].score - previous.byPlatform[p.key].score : null}
-          />
-        ))}
+        <Kpi
+          label="Test completati"
+          value={`${stats.total} / ${EXPECTED_TESTS_TOTAL}`}
+          delta={null}
+          deltaNote={`${stats.completionPct}% del benchmark`}
+        />
+        <Kpi
+          label="Furia presente (≥1)"
+          value={`${stats.presentPct}%`}
+          delta={overallDelta(stats.presentPct, previous?.presentPct ?? 0)}
+          deltaNote={pctNote}
+        />
+        <Kpi
+          label="Raccomandata (≥2)"
+          value={`${stats.recommendedPct}%`}
+          delta={overallDelta(stats.recommendedPct, previous?.recommendedPct ?? 0)}
+          deltaNote={pctNote}
+        />
+        <Kpi
+          label="Citata (=3)"
+          value={`${stats.citedPct}%`}
+          delta={overallDelta(stats.citedPct, previous?.citedPct ?? 0)}
+          deltaNote={pctNote}
+        />
+        {AI_PLATFORMS.map((p) => {
+          const cur = stats.byPlatform[p.key];
+          const prv = previous?.byPlatform[p.key];
+          const platformComparable = !!prv && cur.complete && prv.complete;
+          return (
+            <Kpi
+              key={p.key}
+              label={`${p.label} — score`}
+              value={`${cur.score} / ${MAX_SCORE_PER_PLATFORM}`}
+              delta={platformComparable ? cur.score - prv.score : null}
+              deltaNote={
+                platformComparable
+                  ? undefined
+                  : `${cur.count} / ${EXPECTED_TESTS_PER_PLATFORM} test — Δ non confrontabile`
+              }
+            />
+          );
+        })}
       </section>
 
-      {previous === null && (
-        <p className="text-xs text-muted-foreground">
-          Nessun run precedente disponibile: i delta compaiono dal secondo benchmark.
-        </p>
-      )}
+      <p className="text-xs text-muted-foreground">
+        Presenza, raccomandazione e citazione sono calcolate <strong>sui test completati</strong>
+        {stats.total === 0 ? " — nessun test registrato per questo run." : "."} Il benchmark completo
+        è {EXPECTED_TESTS_TOTAL} test ({EXPECTED_TESTS_PER_PLATFORM} prompt × {AI_PLATFORMS.length}{" "}
+        piattaforme), massimo {MAX_SCORE_TOTAL} punti. I delta compaiono solo quando il run corrente e
+        quello precedente sono entrambi completi ({EXPECTED_TESTS_TOTAL}/{EXPECTED_TESTS_TOTAL}).
+      </p>
+
 
       {loading ? (
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
