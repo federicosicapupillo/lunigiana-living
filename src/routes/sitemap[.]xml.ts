@@ -37,6 +37,7 @@ export const Route = createFileRoute("/sitemap.xml")({
           "/osservatorio-immobiliare-lunigiana",
           "/quanto-vale-casa-pontremoli",
           "/come-vendere-casa-lunigiana",
+          "/seconda-casa-lunigiana",
 
 
           "/vivere-in-lunigiana",
