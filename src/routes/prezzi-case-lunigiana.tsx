@@ -480,8 +480,20 @@ function PrezziLunigianaPage() {
               >
                 dove comprare casa in Lunigiana
               </Link>{" "}
-              affianca a ogni quotazione una lettura pratica del territorio.
+              affianca a ogni quotazione una lettura pratica del territorio. Le stesse quotazioni,
+              insieme alla fotografia aggregata del nostro portafoglio e alla metodologia completa,
+              sono raccolte nell&apos;{" "}
+              <Link
+                to="/osservatorio-immobiliare-lunigiana"
+                data-track="pz_to_osservatorio_click"
+                onClick={() => trackClick("pz_to_osservatorio_click", { source: "prezzi_lunigiana" })}
+                className="text-[var(--terracotta)] underline hover:no-underline"
+              >
+                Osservatorio Immobiliare Lunigiana
+              </Link>
+              .
             </p>
+
 
           </div>
         </div>

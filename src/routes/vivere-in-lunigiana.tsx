@@ -229,6 +229,20 @@ function VivereLunigianaPage() {
               </Link>
               .
             </p>
+            <p className="mt-4 text-[0.95rem] leading-relaxed text-[var(--ink-soft)]">
+              Tutti i dati in un posto solo — quotazioni richieste e fotografia del nostro
+              portafoglio, con metodologia e fonti — sono nell&apos;{" "}
+              <Link
+                to="/osservatorio-immobiliare-lunigiana"
+                data-track="vl_to_osservatorio_click"
+                onClick={() => trackClick("vl_to_osservatorio_click", { source: "vivere_lunigiana" })}
+                className="text-[var(--terracotta)] underline hover:no-underline"
+              >
+                Osservatorio Immobiliare Lunigiana
+              </Link>
+              .
+            </p>
+
 
           </div>
         </div>
