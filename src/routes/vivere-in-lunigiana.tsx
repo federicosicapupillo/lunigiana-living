@@ -217,6 +217,17 @@ function VivereLunigianaPage() {
               , comune per comune.
             </p>
             <p className="mt-4 text-[0.95rem] leading-relaxed text-[var(--ink-soft)]">
+              Se invece possiedi già una casa qui e stai pensando di venderla, la guida su{" "}
+              <Link
+                to="/come-vendere-casa-lunigiana"
+                onClick={() => trackClick("vl_to_vendere_click", { source: "vivere_lunigiana" })}
+                className="text-[var(--terracotta)] underline hover:no-underline"
+              >
+                come vendere casa in Lunigiana
+              </Link>{" "}
+              spiega i passaggi e cosa conviene controllare prima di iniziare.
+            </p>
+            <p className="mt-4 text-[0.95rem] leading-relaxed text-[var(--ink-soft)]">
               Per capire quale comune si adatta meglio al tuo modo di vivere — servizi, collegamenti,
               borgo o fondovalle — abbiamo raccolto tutto nella guida su{" "}
               <Link
