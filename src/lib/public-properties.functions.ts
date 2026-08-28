@@ -624,3 +624,24 @@ export const listPublishedPropertiesSummary = createServerFn({ method: "GET" }).
   });
   return { properties: result };
 });
+/**
+ * Righe minime per la sitemap: solo slug/id e il timestamp reale di ultima
+ * modifica (`properties.updated_at`). Nessuna immagine, nessuna firma URL.
+ */
+export const listPublishedPropertySitemapRows = createServerFn({ method: "GET" }).handler(
+  async () => {
+    const { data, error } = await supabaseAdmin
+      .from("properties")
+      .select("id, slug, updated_at")
+      .eq("status", "published")
+      .order("updated_at", { ascending: false });
+    if (error) throw new Error(error.message);
+    return {
+      rows: (data ?? []).map((r) => ({
+        id: r.id as string,
+        slug: (r.slug ?? null) as string | null,
+        updatedAt: (r.updated_at ?? null) as string | null,
+      })),
+    };
+  },
+);
