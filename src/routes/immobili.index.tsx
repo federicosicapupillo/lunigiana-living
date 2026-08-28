@@ -70,6 +70,8 @@ export const Route = createFileRoute("/immobili/")({
       "rooms",
       "features",
     ].some((k) => (search[k] ?? "") !== "");
+    // Anche il solo ordinamento produce una variante non canonica della lista.
+    const hasQuery = hasActiveFilter || (search["sort"] ?? "") !== "";
     // L'elenco SSR della pagina canonica (senza filtri) è il catalogo completo
     // restituito dal loader: nessuna paginazione, nessun troncamento.
     const items = hasActiveFilter
@@ -83,6 +85,9 @@ export const Route = createFileRoute("/immobili/")({
     meta: [
       { title },
       { name: "description", content: description },
+      // Le viste filtrate/ordinate restano crawlabili (follow) ma non
+      // indicizzabili: la landing canonica è /immobili.
+      ...(hasQuery ? [{ name: "robots", content: "noindex,follow" }] : []),
       { property: "og:title", content: "Immobili in Lunigiana — Furia Immobiliare" },
       { property: "og:description", content: "Una selezione curata di immobili in tutta la Lunigiana." },
       { property: "og:url", content: url },
