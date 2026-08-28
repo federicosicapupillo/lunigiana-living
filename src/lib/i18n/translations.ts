@@ -838,6 +838,8 @@ const it: Dict = {
   "om.seller.p4": "Possibilità di valutare successivamente anche il mercato pubblico",
   "om.seller.cta": "Parliamone in modo riservato",
   "om.seller.formNote": "Nessuna pubblicazione online: solo un primo confronto riservato sulla tua situazione.",
+  "om.seller.guide.pre": "Se vuoi prima un quadro dei passaggi e dei documenti, leggi la guida su",
+  "om.seller.guide.link": "come vendere casa in Lunigiana",
   "om.principle.claim": "Prima match. Poi, se serve, mercato.",
   "om.principle.body": "Per alcuni immobili possiamo iniziare verificando le richieste già presenti nel nostro network. Se la strategia Off Market non è quella più adatta, valuteremo insieme una commercializzazione tradizionale.",
   "om.faq.title": "Domande frequenti",
