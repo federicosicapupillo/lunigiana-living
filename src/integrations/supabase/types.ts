@@ -14,6 +14,60 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_visibility_checks: {
+        Row: {
+          category: string
+          cited_url: string | null
+          competitors: string[]
+          created_at: string
+          created_by: string | null
+          furia_position: number | null
+          id: string
+          notes: string | null
+          platform: string
+          prompt_key: string
+          prompt_text: string
+          result_status: string
+          run_date: string
+          score: number
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          cited_url?: string | null
+          competitors?: string[]
+          created_at?: string
+          created_by?: string | null
+          furia_position?: number | null
+          id?: string
+          notes?: string | null
+          platform: string
+          prompt_key: string
+          prompt_text: string
+          result_status: string
+          run_date?: string
+          score: number
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          cited_url?: string | null
+          competitors?: string[]
+          created_at?: string
+          created_by?: string | null
+          furia_position?: number | null
+          id?: string
+          notes?: string | null
+          platform?: string
+          prompt_key?: string
+          prompt_text?: string
+          result_status?: string
+          run_date?: string
+          score?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       idealista_publish_logs: {
         Row: {
           created_at: string

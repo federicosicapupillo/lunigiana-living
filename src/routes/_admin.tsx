@@ -2,7 +2,7 @@ import { createFileRoute, Outlet, Link, useNavigate } from "@tanstack/react-rout
 import { useAdmin } from "@/hooks/use-admin";
 import { useNewLeadsCount } from "@/hooks/use-new-leads-count";
 import { supabase } from "@/integrations/supabase/client";
-import { LogOut, LayoutDashboard, Home, Settings, Inbox, Share2, Database } from "lucide-react";
+import { LogOut, LayoutDashboard, Home, Settings, Inbox, Share2, Database, Sparkles } from "lucide-react";
 import { Loader2 } from "lucide-react";
 import { useEffect } from "react";
 
@@ -87,6 +87,13 @@ function AdminLayout() {
                 activeProps={{ className: "text-ink" }}
               >
                 <Database size={15} /> Dati live
+              </Link>
+              <Link
+                to="/admin/seo-ai-benchmark"
+                className="flex items-center gap-2 text-muted-foreground transition hover:text-ink"
+                activeProps={{ className: "text-ink" }}
+              >
+                <Sparkles size={15} /> AI Visibility
               </Link>
               <Link
                 to="/admin/impostazioni"
