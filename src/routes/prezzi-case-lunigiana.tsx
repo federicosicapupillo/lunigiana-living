@@ -515,8 +515,8 @@ function PrezziLunigianaPage() {
               I valori comune per comune provengono da {PZ_SOURCE.externalName}, rilevazione{" "}
               {PZ_SOURCE.externalPeriod}, e riguardano i quattordici comuni della Lunigiana. Sono
               prezzi medi <strong className="font-medium text-ink">richiesti</strong> dagli annunci
-              in vendita: descrivono l&apos;offerta pubblicata, non i prezzi finali degli atti
-              notarili, che non sono pubblici in forma disaggregata.
+              in vendita: descrivono l&apos;offerta pubblicata, non i prezzi finali effettivamente
+              conclusi nelle compravendite.
             </p>
             <p>
               I dati sul portafoglio derivano dal nostro database immobili, con estrazione al 28
