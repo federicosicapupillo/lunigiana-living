@@ -1812,6 +1812,8 @@ const en: Dict = {
   "om.seller.p4": "Option to move to the open market later",
   "om.seller.cta": "Let's talk privately",
   "om.seller.formNote": "Nothing published online: simply a first confidential conversation about your situation.",
+  "om.seller.guide.pre": "If you'd like an overview of the steps and paperwork first, read our guide on",
+  "om.seller.guide.link": "how to sell a house in Lunigiana",
   "om.principle.claim": "Match first. Open market if needed.",
   "om.principle.body": "For some properties, we can begin by checking existing buyer requirements within our network. If an Off-Market strategy isn't the best option, we'll assess a traditional public launch together.",
   "om.faq.title": "Frequently asked questions",
