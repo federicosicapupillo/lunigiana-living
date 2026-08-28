@@ -27,6 +27,7 @@ import { Route as IndexDotaspRouteImport } from './routes/index[.]asp'
 import { Route as ImmobiliRouteImport } from './routes/immobili'
 import { Route as Elenco_annunciDotaspRouteImport } from './routes/elenco_annunci[.]asp'
 import { Route as DoveComprareCasaLunigianaRouteImport } from './routes/dove-comprare-casa-lunigiana'
+import { Route as ContattiDotaspRouteImport } from './routes/contatti[.]asp'
 import { Route as ContattiRouteImport } from './routes/contatti'
 import { Route as ContattaciDotaspRouteImport } from './routes/contattaci[.]asp'
 import { Route as ComeVendereCasaLunigianaRouteImport } from './routes/come-vendere-casa-lunigiana'
@@ -152,6 +153,11 @@ const DoveComprareCasaLunigianaRoute =
     path: '/dove-comprare-casa-lunigiana',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ContattiDotaspRoute = ContattiDotaspRouteImport.update({
+  id: '/contatti.asp',
+  path: '/contatti.asp',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ContattiRoute = ContattiRouteImport.update({
   id: '/contatti',
   path: '/contatti',
@@ -325,6 +331,7 @@ export interface FileRoutesByFullPath {
   '/come-vendere-casa-lunigiana': typeof ComeVendereCasaLunigianaRoute
   '/contattaci.asp': typeof ContattaciDotaspRoute
   '/contatti': typeof ContattiRoute
+  '/contatti.asp': typeof ContattiDotaspRoute
   '/dove-comprare-casa-lunigiana': typeof DoveComprareCasaLunigianaRoute
   '/elenco_annunci.asp': typeof Elenco_annunciDotaspRoute
   '/immobili': typeof ImmobiliRouteWithChildren
@@ -375,6 +382,7 @@ export interface FileRoutesByTo {
   '/come-vendere-casa-lunigiana': typeof ComeVendereCasaLunigianaRoute
   '/contattaci.asp': typeof ContattaciDotaspRoute
   '/contatti': typeof ContattiRoute
+  '/contatti.asp': typeof ContattiDotaspRoute
   '/dove-comprare-casa-lunigiana': typeof DoveComprareCasaLunigianaRoute
   '/elenco_annunci.asp': typeof Elenco_annunciDotaspRoute
   '/index.asp': typeof IndexDotaspRoute
@@ -425,6 +433,7 @@ export interface FileRoutesById {
   '/come-vendere-casa-lunigiana': typeof ComeVendereCasaLunigianaRoute
   '/contattaci.asp': typeof ContattaciDotaspRoute
   '/contatti': typeof ContattiRoute
+  '/contatti.asp': typeof ContattiDotaspRoute
   '/dove-comprare-casa-lunigiana': typeof DoveComprareCasaLunigianaRoute
   '/elenco_annunci.asp': typeof Elenco_annunciDotaspRoute
   '/immobili': typeof ImmobiliRouteWithChildren
@@ -477,6 +486,7 @@ export interface FileRouteTypes {
     | '/come-vendere-casa-lunigiana'
     | '/contattaci.asp'
     | '/contatti'
+    | '/contatti.asp'
     | '/dove-comprare-casa-lunigiana'
     | '/elenco_annunci.asp'
     | '/immobili'
@@ -527,6 +537,7 @@ export interface FileRouteTypes {
     | '/come-vendere-casa-lunigiana'
     | '/contattaci.asp'
     | '/contatti'
+    | '/contatti.asp'
     | '/dove-comprare-casa-lunigiana'
     | '/elenco_annunci.asp'
     | '/index.asp'
@@ -576,6 +587,7 @@ export interface FileRouteTypes {
     | '/come-vendere-casa-lunigiana'
     | '/contattaci.asp'
     | '/contatti'
+    | '/contatti.asp'
     | '/dove-comprare-casa-lunigiana'
     | '/elenco_annunci.asp'
     | '/immobili'
@@ -628,6 +640,7 @@ export interface RootRouteChildren {
   ComeVendereCasaLunigianaRoute: typeof ComeVendereCasaLunigianaRoute
   ContattaciDotaspRoute: typeof ContattaciDotaspRoute
   ContattiRoute: typeof ContattiRoute
+  ContattiDotaspRoute: typeof ContattiDotaspRoute
   DoveComprareCasaLunigianaRoute: typeof DoveComprareCasaLunigianaRoute
   Elenco_annunciDotaspRoute: typeof Elenco_annunciDotaspRoute
   ImmobiliRoute: typeof ImmobiliRouteWithChildren
@@ -781,6 +794,13 @@ declare module '@tanstack/react-router' {
       path: '/dove-comprare-casa-lunigiana'
       fullPath: '/dove-comprare-casa-lunigiana'
       preLoaderRoute: typeof DoveComprareCasaLunigianaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contatti.asp': {
+      id: '/contatti.asp'
+      path: '/contatti.asp'
+      fullPath: '/contatti.asp'
+      preLoaderRoute: typeof ContattiDotaspRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contatti': {
@@ -1080,6 +1100,7 @@ const rootRouteChildren: RootRouteChildren = {
   ComeVendereCasaLunigianaRoute: ComeVendereCasaLunigianaRoute,
   ContattaciDotaspRoute: ContattaciDotaspRoute,
   ContattiRoute: ContattiRoute,
+  ContattiDotaspRoute: ContattiDotaspRoute,
   DoveComprareCasaLunigianaRoute: DoveComprareCasaLunigianaRoute,
   Elenco_annunciDotaspRoute: Elenco_annunciDotaspRoute,
   ImmobiliRoute: ImmobiliRouteWithChildren,
