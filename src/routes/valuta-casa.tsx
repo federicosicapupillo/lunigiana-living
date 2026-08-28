@@ -442,6 +442,16 @@ function ValutaCasaPage() {
             {t("val.intro")}
           </p>
           <p className="mt-3 text-[0.8rem] text-foreground/60">{t("val.free")}</p>
+          <p className="mt-3 text-[0.8rem] text-foreground/60">
+            {t("val.guide.pre")}{" "}
+            <Link
+              to="/quanto-vale-casa-pontremoli"
+              className="text-primary underline hover:no-underline"
+            >
+              {t("val.guide.link")}
+            </Link>
+            .
+          </p>
         </div>
 
         <div className="mt-10 rounded-md border border-warm-border/70 bg-warm-cream p-5 shadow-sm sm:p-8">
