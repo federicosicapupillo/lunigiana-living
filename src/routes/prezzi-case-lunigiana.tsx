@@ -134,8 +134,9 @@ function PrezziLunigianaPage() {
             </p>
             <p>
               In pratica, chi cerca casa qui si muove più spesso per budget complessivo che per
-              metro quadro. Nel nostro portafoglio la casa mediana in vendita è chiesta{" "}
-              {eur(PZ_FURIA.prezzoMediano)}, e {PZ_FASCE[0].count} immobili su {PZ_FURIA.conPrezzo}{" "}
+              metro quadro. Nel nostro portafoglio il prezzo mediano richiesto degli immobili in
+              vendita è {eur(PZ_FURIA.prezzoMediano)}, e {PZ_FASCE[0].count} immobili su{" "}
+              {PZ_FURIA.conPrezzo}
               stanno sotto i 100.000 €. Qui sotto trovate i dati comune per comune, cosa significano
               davvero e cosa si trova oggi con budget diversi.
             </p>
