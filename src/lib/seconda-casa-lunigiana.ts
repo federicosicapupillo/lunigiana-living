@@ -16,7 +16,7 @@ export const SC_META = {
   h1: "Seconda casa in Lunigiana: dove comprare e cosa valutare nel 2026",
   title: "Seconda casa in Lunigiana 2026: dove comprare e cosa valutare",
   description:
-    "Seconda casa in Lunigiana nel 2026: come scegliere il comune in base all'uso reale della casa, prezzi medi richiesti dei 14 comuni, costi di mantenimento e checklist prima della proposta.",
+    "Seconda casa in Lunigiana nel 2026: come scegliere in base all'uso reale della casa, prezzi medi richiesti dei 14 comuni e costi di mantenimento.",
   isoDate: "2026-08-28",
   updatedLabel: "Guida aggiornata ad agosto 2026",
 } as const;
