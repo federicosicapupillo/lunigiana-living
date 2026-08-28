@@ -21,7 +21,12 @@ export const QV_META = {
   isoDate: "2026-08-28",
 } as const;
 
-/** Dato pubblico esterno: quotazioni RICHIESTE, luglio 2026. */
+/**
+ * Dato pubblico esterno: quotazioni RICHIESTE, luglio 2026.
+ * Il conteggio annunci (annunciPortale) è il numero mostrato dal portale al
+ * momento della verifica del 28 agosto 2026, distinto dalla rilevazione dei
+ * prezzi (periodo).
+ */
 export const QV_PUBBLICO = {
   eurM2Medio: 866,
   varYoY: 0.81,
@@ -30,6 +35,7 @@ export const QV_PUBBLICO = {
   annunciPortale: 200,
   periodo: "luglio 2026",
   confrontoPeriodo: "luglio 2025",
+  annunciDataLabel: "verifica 28 agosto 2026",
   fonteNome: "Immobiliare.it — mercato immobiliare di Pontremoli",
   fonteUrl: "https://www.immobiliare.it/mercato-immobiliare/toscana/pontremoli/",
 } as const;
