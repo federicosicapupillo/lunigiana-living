@@ -26,6 +26,7 @@ import { Route as OffMarketRouteImport } from './routes/off-market'
 import { Route as IndexDotaspRouteImport } from './routes/index[.]asp'
 import { Route as ImmobiliRouteImport } from './routes/immobili'
 import { Route as Elenco_annunciDotaspRouteImport } from './routes/elenco_annunci[.]asp'
+import { Route as Dove_siamoDotaspRouteImport } from './routes/dove_siamo[.]asp'
 import { Route as DoveComprareCasaLunigianaRouteImport } from './routes/dove-comprare-casa-lunigiana'
 import { Route as ContattiDotaspRouteImport } from './routes/contatti[.]asp'
 import { Route as ContattiRouteImport } from './routes/contatti'
@@ -145,6 +146,11 @@ const ImmobiliRoute = ImmobiliRouteImport.update({
 const Elenco_annunciDotaspRoute = Elenco_annunciDotaspRouteImport.update({
   id: '/elenco_annunci.asp',
   path: '/elenco_annunci.asp',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const Dove_siamoDotaspRoute = Dove_siamoDotaspRouteImport.update({
+  id: '/dove_siamo.asp',
+  path: '/dove_siamo.asp',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DoveComprareCasaLunigianaRoute =
@@ -333,6 +339,7 @@ export interface FileRoutesByFullPath {
   '/contatti': typeof ContattiRoute
   '/contatti.asp': typeof ContattiDotaspRoute
   '/dove-comprare-casa-lunigiana': typeof DoveComprareCasaLunigianaRoute
+  '/dove_siamo.asp': typeof Dove_siamoDotaspRoute
   '/elenco_annunci.asp': typeof Elenco_annunciDotaspRoute
   '/immobili': typeof ImmobiliRouteWithChildren
   '/index.asp': typeof IndexDotaspRoute
@@ -384,6 +391,7 @@ export interface FileRoutesByTo {
   '/contatti': typeof ContattiRoute
   '/contatti.asp': typeof ContattiDotaspRoute
   '/dove-comprare-casa-lunigiana': typeof DoveComprareCasaLunigianaRoute
+  '/dove_siamo.asp': typeof Dove_siamoDotaspRoute
   '/elenco_annunci.asp': typeof Elenco_annunciDotaspRoute
   '/index.asp': typeof IndexDotaspRoute
   '/off-market': typeof OffMarketRoute
@@ -435,6 +443,7 @@ export interface FileRoutesById {
   '/contatti': typeof ContattiRoute
   '/contatti.asp': typeof ContattiDotaspRoute
   '/dove-comprare-casa-lunigiana': typeof DoveComprareCasaLunigianaRoute
+  '/dove_siamo.asp': typeof Dove_siamoDotaspRoute
   '/elenco_annunci.asp': typeof Elenco_annunciDotaspRoute
   '/immobili': typeof ImmobiliRouteWithChildren
   '/index.asp': typeof IndexDotaspRoute
@@ -488,6 +497,7 @@ export interface FileRouteTypes {
     | '/contatti'
     | '/contatti.asp'
     | '/dove-comprare-casa-lunigiana'
+    | '/dove_siamo.asp'
     | '/elenco_annunci.asp'
     | '/immobili'
     | '/index.asp'
@@ -539,6 +549,7 @@ export interface FileRouteTypes {
     | '/contatti'
     | '/contatti.asp'
     | '/dove-comprare-casa-lunigiana'
+    | '/dove_siamo.asp'
     | '/elenco_annunci.asp'
     | '/index.asp'
     | '/off-market'
@@ -589,6 +600,7 @@ export interface FileRouteTypes {
     | '/contatti'
     | '/contatti.asp'
     | '/dove-comprare-casa-lunigiana'
+    | '/dove_siamo.asp'
     | '/elenco_annunci.asp'
     | '/immobili'
     | '/index.asp'
@@ -642,6 +654,7 @@ export interface RootRouteChildren {
   ContattiRoute: typeof ContattiRoute
   ContattiDotaspRoute: typeof ContattiDotaspRoute
   DoveComprareCasaLunigianaRoute: typeof DoveComprareCasaLunigianaRoute
+  Dove_siamoDotaspRoute: typeof Dove_siamoDotaspRoute
   Elenco_annunciDotaspRoute: typeof Elenco_annunciDotaspRoute
   ImmobiliRoute: typeof ImmobiliRouteWithChildren
   IndexDotaspRoute: typeof IndexDotaspRoute
@@ -787,6 +800,13 @@ declare module '@tanstack/react-router' {
       path: '/elenco_annunci.asp'
       fullPath: '/elenco_annunci.asp'
       preLoaderRoute: typeof Elenco_annunciDotaspRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dove_siamo.asp': {
+      id: '/dove_siamo.asp'
+      path: '/dove_siamo.asp'
+      fullPath: '/dove_siamo.asp'
+      preLoaderRoute: typeof Dove_siamoDotaspRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dove-comprare-casa-lunigiana': {
@@ -1102,6 +1122,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContattiRoute: ContattiRoute,
   ContattiDotaspRoute: ContattiDotaspRoute,
   DoveComprareCasaLunigianaRoute: DoveComprareCasaLunigianaRoute,
+  Dove_siamoDotaspRoute: Dove_siamoDotaspRoute,
   Elenco_annunciDotaspRoute: Elenco_annunciDotaspRoute,
   ImmobiliRoute: ImmobiliRouteWithChildren,
   IndexDotaspRoute: IndexDotaspRoute,
