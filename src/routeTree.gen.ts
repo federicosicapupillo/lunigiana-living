@@ -17,6 +17,7 @@ import { Route as ValutaCasaRouteImport } from './routes/valuta-casa'
 import { Route as TrovaCasaLunigianaRouteImport } from './routes/trova-casa-lunigiana'
 import { Route as TerritoriRouteImport } from './routes/territori'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as ServiziDotaspRouteImport } from './routes/servizi[.]asp'
 import { Route as ServiziRouteImport } from './routes/servizi'
 import { Route as SecondaCasaLunigianaRouteImport } from './routes/seconda-casa-lunigiana'
 import { Route as QuantoValeCasaPontremoliRouteImport } from './routes/quanto-vale-casa-pontremoli'
@@ -99,6 +100,11 @@ const TerritoriRoute = TerritoriRouteImport.update({
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ServiziDotaspRoute = ServiziDotaspRouteImport.update({
+  id: '/servizi.asp',
+  path: '/servizi.asp',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ServiziRoute = ServiziRouteImport.update({
@@ -349,6 +355,7 @@ export interface FileRoutesByFullPath {
   '/quanto-vale-casa-pontremoli': typeof QuantoValeCasaPontremoliRoute
   '/seconda-casa-lunigiana': typeof SecondaCasaLunigianaRoute
   '/servizi': typeof ServiziRoute
+  '/servizi.asp': typeof ServiziDotaspRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/territori': typeof TerritoriRoute
   '/trova-casa-lunigiana': typeof TrovaCasaLunigianaRoute
@@ -400,6 +407,7 @@ export interface FileRoutesByTo {
   '/quanto-vale-casa-pontremoli': typeof QuantoValeCasaPontremoliRoute
   '/seconda-casa-lunigiana': typeof SecondaCasaLunigianaRoute
   '/servizi': typeof ServiziRoute
+  '/servizi.asp': typeof ServiziDotaspRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/territori': typeof TerritoriRoute
   '/trova-casa-lunigiana': typeof TrovaCasaLunigianaRoute
@@ -453,6 +461,7 @@ export interface FileRoutesById {
   '/quanto-vale-casa-pontremoli': typeof QuantoValeCasaPontremoliRoute
   '/seconda-casa-lunigiana': typeof SecondaCasaLunigianaRoute
   '/servizi': typeof ServiziRoute
+  '/servizi.asp': typeof ServiziDotaspRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/territori': typeof TerritoriRoute
   '/trova-casa-lunigiana': typeof TrovaCasaLunigianaRoute
@@ -507,6 +516,7 @@ export interface FileRouteTypes {
     | '/quanto-vale-casa-pontremoli'
     | '/seconda-casa-lunigiana'
     | '/servizi'
+    | '/servizi.asp'
     | '/sitemap.xml'
     | '/territori'
     | '/trova-casa-lunigiana'
@@ -558,6 +568,7 @@ export interface FileRouteTypes {
     | '/quanto-vale-casa-pontremoli'
     | '/seconda-casa-lunigiana'
     | '/servizi'
+    | '/servizi.asp'
     | '/sitemap.xml'
     | '/territori'
     | '/trova-casa-lunigiana'
@@ -610,6 +621,7 @@ export interface FileRouteTypes {
     | '/quanto-vale-casa-pontremoli'
     | '/seconda-casa-lunigiana'
     | '/servizi'
+    | '/servizi.asp'
     | '/sitemap.xml'
     | '/territori'
     | '/trova-casa-lunigiana'
@@ -664,6 +676,7 @@ export interface RootRouteChildren {
   QuantoValeCasaPontremoliRoute: typeof QuantoValeCasaPontremoliRoute
   SecondaCasaLunigianaRoute: typeof SecondaCasaLunigianaRoute
   ServiziRoute: typeof ServiziRoute
+  ServiziDotaspRoute: typeof ServiziDotaspRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TerritoriRoute: typeof TerritoriRoute
   TrovaCasaLunigianaRoute: typeof TrovaCasaLunigianaRoute
@@ -737,6 +750,13 @@ declare module '@tanstack/react-router' {
       path: '/sitemap.xml'
       fullPath: '/sitemap.xml'
       preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/servizi.asp': {
+      id: '/servizi.asp'
+      path: '/servizi.asp'
+      fullPath: '/servizi.asp'
+      preLoaderRoute: typeof ServiziDotaspRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/servizi': {
@@ -1132,6 +1152,7 @@ const rootRouteChildren: RootRouteChildren = {
   QuantoValeCasaPontremoliRoute: QuantoValeCasaPontremoliRoute,
   SecondaCasaLunigianaRoute: SecondaCasaLunigianaRoute,
   ServiziRoute: ServiziRoute,
+  ServiziDotaspRoute: ServiziDotaspRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TerritoriRoute: TerritoriRoute,
   TrovaCasaLunigianaRoute: TrovaCasaLunigianaRoute,
