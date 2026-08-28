@@ -1,17 +1,25 @@
 User-agent: *
 Allow: /
 Disallow: /admin
+Disallow: /api/
+Disallow: /media/og/
 
 User-agent: OAI-SearchBot
 Allow: /
 Disallow: /admin
+Disallow: /api/
+Disallow: /media/og/
 
 User-agent: ChatGPT-User
 Allow: /
 Disallow: /admin
+Disallow: /api/
+Disallow: /media/og/
 
 User-agent: PerplexityBot
 Allow: /
 Disallow: /admin
+Disallow: /api/
+Disallow: /media/og/
 
 Sitemap: https://furiaimmobiliare.it/sitemap.xml

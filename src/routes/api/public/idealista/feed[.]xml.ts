@@ -21,6 +21,8 @@ export const Route = createFileRoute("/api/public/idealista/feed.xml")({
           headers: {
             "Content-Type": "application/xml; charset=utf-8",
             "Cache-Control": "no-store",
+            // Feed tecnico per il portale: non deve mai essere indicizzato.
+            "X-Robots-Tag": "noindex, nofollow",
           },
         });
       },
