@@ -105,21 +105,27 @@ export function parseCompetitors(raw: string): string[] {
 
 export type RunStats = {
   runDate: string;
+  /** Test effettivamente registrati (max 60). */
   total: number;
   score: number;
+  /** Massimo teorico fisso del benchmark completo (180). */
   maxScore: number;
+  /** true solo quando tutti i 60 test attesi sono registrati. */
+  complete: boolean;
+  completionPct: number;
+  /** Percentuali calcolate SOLO sui test completati. */
   presentPct: number;
   recommendedPct: number;
   citedPct: number;
-  byPlatform: Record<AiPlatform, { count: number; score: number }>;
+  byPlatform: Record<AiPlatform, { count: number; score: number; complete: boolean }>;
 };
 
 export function computeRunStats(runDate: string, rows: AiCheckRow[]): RunStats {
   const byPlatform = {
-    chatgpt: { count: 0, score: 0 },
-    perplexity: { count: 0, score: 0 },
-    gemini: { count: 0, score: 0 },
-  } as Record<AiPlatform, { count: number; score: number }>;
+    chatgpt: { count: 0, score: 0, complete: false },
+    perplexity: { count: 0, score: 0, complete: false },
+    gemini: { count: 0, score: 0, complete: false },
+  } as Record<AiPlatform, { count: number; score: number; complete: boolean }>;
   let score = 0;
   let present = 0;
   let recommended = 0;
@@ -135,19 +141,25 @@ export function computeRunStats(runDate: string, rows: AiCheckRow[]): RunStats {
       p.score += r.score;
     }
   }
+  for (const p of AI_PLATFORMS) {
+    byPlatform[p.key].complete = byPlatform[p.key].count >= EXPECTED_TESTS_PER_PLATFORM;
+  }
   const total = rows.length;
   const pct = (n: number) => (total > 0 ? Math.round((n / total) * 100) : 0);
   return {
     runDate,
     total,
     score,
-    maxScore: total * MAX_SCORE,
+    maxScore: MAX_SCORE_TOTAL,
+    complete: total >= EXPECTED_TESTS_TOTAL,
+    completionPct: Math.round((Math.min(total, EXPECTED_TESTS_TOTAL) / EXPECTED_TESTS_TOTAL) * 100),
     presentPct: pct(present),
     recommendedPct: pct(recommended),
     citedPct: pct(cited),
     byPlatform,
   };
 }
+
 
 export function toCsv(rows: AiCheckRow[]): string {
   const header = [
