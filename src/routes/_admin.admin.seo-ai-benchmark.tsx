@@ -109,10 +109,10 @@ function AiBenchmarkPage() {
             competitors: (row.competitors ?? []).join(", "),
             notes: row.notes ?? "",
             saving: false,
-            dirty: false,
             existing: true,
           }
         : emptyDraft();
+
     }
     setDrafts(next);
   }, [allRows, runDate, platform]);
