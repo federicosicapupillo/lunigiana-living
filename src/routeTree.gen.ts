@@ -18,6 +18,7 @@ import { Route as TrovaCasaLunigianaRouteImport } from './routes/trova-casa-luni
 import { Route as TerritoriRouteImport } from './routes/territori'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ServiziRouteImport } from './routes/servizi'
+import { Route as QuantoValeCasaPontremoliRouteImport } from './routes/quanto-vale-casa-pontremoli'
 import { Route as PrezziCaseLunigianaRouteImport } from './routes/prezzi-case-lunigiana'
 import { Route as OsservatorioImmobiliareLunigianaRouteImport } from './routes/osservatorio-immobiliare-lunigiana'
 import { Route as OffMarketRouteImport } from './routes/off-market'
@@ -101,6 +102,12 @@ const ServiziRoute = ServiziRouteImport.update({
   path: '/servizi',
   getParentRoute: () => rootRouteImport,
 } as any)
+const QuantoValeCasaPontremoliRoute =
+  QuantoValeCasaPontremoliRouteImport.update({
+    id: '/quanto-vale-casa-pontremoli',
+    path: '/quanto-vale-casa-pontremoli',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const PrezziCaseLunigianaRoute = PrezziCaseLunigianaRouteImport.update({
   id: '/prezzi-case-lunigiana',
   path: '/prezzi-case-lunigiana',
@@ -311,6 +318,7 @@ export interface FileRoutesByFullPath {
   '/off-market': typeof OffMarketRoute
   '/osservatorio-immobiliare-lunigiana': typeof OsservatorioImmobiliareLunigianaRoute
   '/prezzi-case-lunigiana': typeof PrezziCaseLunigianaRoute
+  '/quanto-vale-casa-pontremoli': typeof QuantoValeCasaPontremoliRoute
   '/servizi': typeof ServiziRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/territori': typeof TerritoriRoute
@@ -357,6 +365,7 @@ export interface FileRoutesByTo {
   '/off-market': typeof OffMarketRoute
   '/osservatorio-immobiliare-lunigiana': typeof OsservatorioImmobiliareLunigianaRoute
   '/prezzi-case-lunigiana': typeof PrezziCaseLunigianaRoute
+  '/quanto-vale-casa-pontremoli': typeof QuantoValeCasaPontremoliRoute
   '/servizi': typeof ServiziRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/territori': typeof TerritoriRoute
@@ -405,6 +414,7 @@ export interface FileRoutesById {
   '/off-market': typeof OffMarketRoute
   '/osservatorio-immobiliare-lunigiana': typeof OsservatorioImmobiliareLunigianaRoute
   '/prezzi-case-lunigiana': typeof PrezziCaseLunigianaRoute
+  '/quanto-vale-casa-pontremoli': typeof QuantoValeCasaPontremoliRoute
   '/servizi': typeof ServiziRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/territori': typeof TerritoriRoute
@@ -454,6 +464,7 @@ export interface FileRouteTypes {
     | '/off-market'
     | '/osservatorio-immobiliare-lunigiana'
     | '/prezzi-case-lunigiana'
+    | '/quanto-vale-casa-pontremoli'
     | '/servizi'
     | '/sitemap.xml'
     | '/territori'
@@ -500,6 +511,7 @@ export interface FileRouteTypes {
     | '/off-market'
     | '/osservatorio-immobiliare-lunigiana'
     | '/prezzi-case-lunigiana'
+    | '/quanto-vale-casa-pontremoli'
     | '/servizi'
     | '/sitemap.xml'
     | '/territori'
@@ -547,6 +559,7 @@ export interface FileRouteTypes {
     | '/off-market'
     | '/osservatorio-immobiliare-lunigiana'
     | '/prezzi-case-lunigiana'
+    | '/quanto-vale-casa-pontremoli'
     | '/servizi'
     | '/sitemap.xml'
     | '/territori'
@@ -596,6 +609,7 @@ export interface RootRouteChildren {
   OffMarketRoute: typeof OffMarketRoute
   OsservatorioImmobiliareLunigianaRoute: typeof OsservatorioImmobiliareLunigianaRoute
   PrezziCaseLunigianaRoute: typeof PrezziCaseLunigianaRoute
+  QuantoValeCasaPontremoliRoute: typeof QuantoValeCasaPontremoliRoute
   ServiziRoute: typeof ServiziRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TerritoriRoute: typeof TerritoriRoute
@@ -677,6 +691,13 @@ declare module '@tanstack/react-router' {
       path: '/servizi'
       fullPath: '/servizi'
       preLoaderRoute: typeof ServiziRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/quanto-vale-casa-pontremoli': {
+      id: '/quanto-vale-casa-pontremoli'
+      path: '/quanto-vale-casa-pontremoli'
+      fullPath: '/quanto-vale-casa-pontremoli'
+      preLoaderRoute: typeof QuantoValeCasaPontremoliRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/prezzi-case-lunigiana': {
@@ -1024,6 +1045,7 @@ const rootRouteChildren: RootRouteChildren = {
   OffMarketRoute: OffMarketRoute,
   OsservatorioImmobiliareLunigianaRoute: OsservatorioImmobiliareLunigianaRoute,
   PrezziCaseLunigianaRoute: PrezziCaseLunigianaRoute,
+  QuantoValeCasaPontremoliRoute: QuantoValeCasaPontremoliRoute,
   ServiziRoute: ServiziRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TerritoriRoute: TerritoriRoute,

@@ -299,7 +299,12 @@ function ViverePontremoliPage() {
             <Link to="/vivere-in-lunigiana" className="text-[var(--terracotta)] underline hover:no-underline">
               vivere in Lunigiana
             </Link>{" "}
-            allarga il confronto all&apos;intero comprensorio.
+            allarga il confronto all&apos;intero comprensorio. Se invece possiedi già una casa qui,
+            la pagina su{" "}
+            <Link to="/quanto-vale-casa-pontremoli" className="text-[var(--terracotta)] underline hover:no-underline">
+              quanto vale una casa a Pontremoli
+            </Link>{" "}
+            spiega quali elementi spostano davvero il prezzo richiesto.
           </p>
         </div>
       </section>
