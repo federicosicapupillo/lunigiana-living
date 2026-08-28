@@ -156,9 +156,9 @@ function ComeVendereCasaPage() {
               I sette passaggi, dall&apos;idea al rogito
             </h2>
             <p className="mt-5 text-[1rem] leading-[1.8] text-[var(--ink-soft)]">
-              L&apos;ordine conta più di quanto sembri: molti problemi nascono dall&apos;aver fatto
-              una cosa giusta nel momento sbagliato. I tempi, invece, dipendono da immobile, zona e
-              momento: non esiste una durata media che valga per tutti.
+              L&apos;ordine conta più di quanto sembri: le complicazioni possono nascere anche
+              dall&apos;aver fatto una cosa giusta nel momento sbagliato. I tempi, invece, dipendono
+              da immobile, zona e momento: non esiste una durata media che valga per tutti.
             </p>
           </div>
 
@@ -229,17 +229,18 @@ function ComeVendereCasaPage() {
           <div className="mt-5 space-y-4 text-[1rem] leading-[1.8] text-[var(--ink-soft)]">
             <p>
               Non perché qui ci sia qualcosa di diverso dal resto d&apos;Italia, ma per la varietà
-              degli immobili. In poche settimane possiamo trovarci davanti a una casa di borgo con i
-              muri in pietra, a un edificio storico nel centro di Pontremoli, a un rustico con
-              terreno e piccoli fabbricati accessori, a un appartamento ristrutturato di recente e a
+              degli immobili. Nel territorio si incontrano tipologie molto diverse: una casa di
+              borgo con i muri in pietra, un edificio storico nel centro di Pontremoli, un rustico
+              con terreno e piccoli fabbricati accessori, un appartamento ristrutturato di recente,
               una casa rimasta come era negli anni Settanta.
             </p>
             <p>
               Immobili così diversi hanno storie documentali diverse: passaggi di successione,
               interventi realizzati in epoche differenti, corti e orti censiti a parte,
-              fabbricati accessori nati con destinazioni cambiate nel tempo. Ricostruire con calma
-              consistenza, particelle e interventi non è un adempimento burocratico: è quello che
-              permette di rispondere con precisione quando un acquirente fa domande.
+              fabbricati accessori la cui documentazione e consistenza vanno ricostruite con
+              attenzione quando necessario. Ricostruire con calma consistenza, particelle e
+              interventi non è un adempimento burocratico: è quello che permette di rispondere con
+              precisione quando un acquirente fa domande.
             </p>
             <p>
               Il momento giusto per farlo è prima di iniziare le visite, non dopo aver ricevuto una
@@ -381,8 +382,10 @@ function ComeVendereCasaPage() {
           <div className="mt-5 space-y-4 text-[1rem] leading-[1.8] text-[var(--ink-soft)]">
             <p>
               In termini semplici: chi vuole comprare formula una proposta, con un prezzo e delle
-              condizioni. Se la proposta viene accettata, le parti sono impegnate e si entra in una
-              fase con effetti giuridici veri.
+              condizioni. Una proposta accettata può produrre effetti vincolanti in base al suo
+              contenuto, alle condizioni previste e alle modalità con cui l&apos;accettazione viene
+              comunicata. Per questo è una fase da gestire con attenzione e con i professionisti
+              coinvolti.
             </p>
             <p>
               Da lì il percorso può passare per un contratto preliminare — l&apos;accordo scritto
@@ -392,9 +395,10 @@ function ComeVendereCasaPage() {
             </p>
             <p>
               Si chiude davanti al notaio, con il rogito. Il notaio svolge le proprie verifiche,
-              comprese quelle catastali e ipotecarie, e nell&apos;atto trovano posto i dati
-              catastali e il riferimento alle planimetrie con la dichiarazione di conformità allo
-              stato di fatto.
+              comprese quelle catastali e ipotecarie. Negli atti di trasferimento delle unità
+              immobiliari urbane, nei casi previsti dalla disciplina applicabile, vengono indicati
+              i dati catastali e il riferimento alle planimetrie e sono rese le dichiarazioni o
+              attestazioni richieste sulla conformità catastale.
             </p>
             <p>
               Contenuti, termini e conseguenze di ogni passaggio vanno verificati con il notaio e
