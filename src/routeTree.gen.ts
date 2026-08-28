@@ -17,6 +17,7 @@ import { Route as ValutaCasaRouteImport } from './routes/valuta-casa'
 import { Route as TrovaCasaLunigianaRouteImport } from './routes/trova-casa-lunigiana'
 import { Route as TerritoriRouteImport } from './routes/territori'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as ServiziDotaspRouteImport } from './routes/servizi[.]asp'
 import { Route as ServiziRouteImport } from './routes/servizi'
 import { Route as SecondaCasaLunigianaRouteImport } from './routes/seconda-casa-lunigiana'
 import { Route as QuantoValeCasaPontremoliRouteImport } from './routes/quanto-vale-casa-pontremoli'
@@ -26,7 +27,9 @@ import { Route as OffMarketRouteImport } from './routes/off-market'
 import { Route as IndexDotaspRouteImport } from './routes/index[.]asp'
 import { Route as ImmobiliRouteImport } from './routes/immobili'
 import { Route as Elenco_annunciDotaspRouteImport } from './routes/elenco_annunci[.]asp'
+import { Route as Dove_siamoDotaspRouteImport } from './routes/dove_siamo[.]asp'
 import { Route as DoveComprareCasaLunigianaRouteImport } from './routes/dove-comprare-casa-lunigiana'
+import { Route as ContattiDotaspRouteImport } from './routes/contatti[.]asp'
 import { Route as ContattiRouteImport } from './routes/contatti'
 import { Route as ContattaciDotaspRouteImport } from './routes/contattaci[.]asp'
 import { Route as ComeVendereCasaLunigianaRouteImport } from './routes/come-vendere-casa-lunigiana'
@@ -99,6 +102,11 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ServiziDotaspRoute = ServiziDotaspRouteImport.update({
+  id: '/servizi.asp',
+  path: '/servizi.asp',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ServiziRoute = ServiziRouteImport.update({
   id: '/servizi',
   path: '/servizi',
@@ -146,12 +154,22 @@ const Elenco_annunciDotaspRoute = Elenco_annunciDotaspRouteImport.update({
   path: '/elenco_annunci.asp',
   getParentRoute: () => rootRouteImport,
 } as any)
+const Dove_siamoDotaspRoute = Dove_siamoDotaspRouteImport.update({
+  id: '/dove_siamo.asp',
+  path: '/dove_siamo.asp',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DoveComprareCasaLunigianaRoute =
   DoveComprareCasaLunigianaRouteImport.update({
     id: '/dove-comprare-casa-lunigiana',
     path: '/dove-comprare-casa-lunigiana',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ContattiDotaspRoute = ContattiDotaspRouteImport.update({
+  id: '/contatti.asp',
+  path: '/contatti.asp',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ContattiRoute = ContattiRouteImport.update({
   id: '/contatti',
   path: '/contatti',
@@ -325,7 +343,9 @@ export interface FileRoutesByFullPath {
   '/come-vendere-casa-lunigiana': typeof ComeVendereCasaLunigianaRoute
   '/contattaci.asp': typeof ContattaciDotaspRoute
   '/contatti': typeof ContattiRoute
+  '/contatti.asp': typeof ContattiDotaspRoute
   '/dove-comprare-casa-lunigiana': typeof DoveComprareCasaLunigianaRoute
+  '/dove_siamo.asp': typeof Dove_siamoDotaspRoute
   '/elenco_annunci.asp': typeof Elenco_annunciDotaspRoute
   '/immobili': typeof ImmobiliRouteWithChildren
   '/index.asp': typeof IndexDotaspRoute
@@ -335,6 +355,7 @@ export interface FileRoutesByFullPath {
   '/quanto-vale-casa-pontremoli': typeof QuantoValeCasaPontremoliRoute
   '/seconda-casa-lunigiana': typeof SecondaCasaLunigianaRoute
   '/servizi': typeof ServiziRoute
+  '/servizi.asp': typeof ServiziDotaspRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/territori': typeof TerritoriRoute
   '/trova-casa-lunigiana': typeof TrovaCasaLunigianaRoute
@@ -375,7 +396,9 @@ export interface FileRoutesByTo {
   '/come-vendere-casa-lunigiana': typeof ComeVendereCasaLunigianaRoute
   '/contattaci.asp': typeof ContattaciDotaspRoute
   '/contatti': typeof ContattiRoute
+  '/contatti.asp': typeof ContattiDotaspRoute
   '/dove-comprare-casa-lunigiana': typeof DoveComprareCasaLunigianaRoute
+  '/dove_siamo.asp': typeof Dove_siamoDotaspRoute
   '/elenco_annunci.asp': typeof Elenco_annunciDotaspRoute
   '/index.asp': typeof IndexDotaspRoute
   '/off-market': typeof OffMarketRoute
@@ -384,6 +407,7 @@ export interface FileRoutesByTo {
   '/quanto-vale-casa-pontremoli': typeof QuantoValeCasaPontremoliRoute
   '/seconda-casa-lunigiana': typeof SecondaCasaLunigianaRoute
   '/servizi': typeof ServiziRoute
+  '/servizi.asp': typeof ServiziDotaspRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/territori': typeof TerritoriRoute
   '/trova-casa-lunigiana': typeof TrovaCasaLunigianaRoute
@@ -425,7 +449,9 @@ export interface FileRoutesById {
   '/come-vendere-casa-lunigiana': typeof ComeVendereCasaLunigianaRoute
   '/contattaci.asp': typeof ContattaciDotaspRoute
   '/contatti': typeof ContattiRoute
+  '/contatti.asp': typeof ContattiDotaspRoute
   '/dove-comprare-casa-lunigiana': typeof DoveComprareCasaLunigianaRoute
+  '/dove_siamo.asp': typeof Dove_siamoDotaspRoute
   '/elenco_annunci.asp': typeof Elenco_annunciDotaspRoute
   '/immobili': typeof ImmobiliRouteWithChildren
   '/index.asp': typeof IndexDotaspRoute
@@ -435,6 +461,7 @@ export interface FileRoutesById {
   '/quanto-vale-casa-pontremoli': typeof QuantoValeCasaPontremoliRoute
   '/seconda-casa-lunigiana': typeof SecondaCasaLunigianaRoute
   '/servizi': typeof ServiziRoute
+  '/servizi.asp': typeof ServiziDotaspRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/territori': typeof TerritoriRoute
   '/trova-casa-lunigiana': typeof TrovaCasaLunigianaRoute
@@ -477,7 +504,9 @@ export interface FileRouteTypes {
     | '/come-vendere-casa-lunigiana'
     | '/contattaci.asp'
     | '/contatti'
+    | '/contatti.asp'
     | '/dove-comprare-casa-lunigiana'
+    | '/dove_siamo.asp'
     | '/elenco_annunci.asp'
     | '/immobili'
     | '/index.asp'
@@ -487,6 +516,7 @@ export interface FileRouteTypes {
     | '/quanto-vale-casa-pontremoli'
     | '/seconda-casa-lunigiana'
     | '/servizi'
+    | '/servizi.asp'
     | '/sitemap.xml'
     | '/territori'
     | '/trova-casa-lunigiana'
@@ -527,7 +557,9 @@ export interface FileRouteTypes {
     | '/come-vendere-casa-lunigiana'
     | '/contattaci.asp'
     | '/contatti'
+    | '/contatti.asp'
     | '/dove-comprare-casa-lunigiana'
+    | '/dove_siamo.asp'
     | '/elenco_annunci.asp'
     | '/index.asp'
     | '/off-market'
@@ -536,6 +568,7 @@ export interface FileRouteTypes {
     | '/quanto-vale-casa-pontremoli'
     | '/seconda-casa-lunigiana'
     | '/servizi'
+    | '/servizi.asp'
     | '/sitemap.xml'
     | '/territori'
     | '/trova-casa-lunigiana'
@@ -576,7 +609,9 @@ export interface FileRouteTypes {
     | '/come-vendere-casa-lunigiana'
     | '/contattaci.asp'
     | '/contatti'
+    | '/contatti.asp'
     | '/dove-comprare-casa-lunigiana'
+    | '/dove_siamo.asp'
     | '/elenco_annunci.asp'
     | '/immobili'
     | '/index.asp'
@@ -586,6 +621,7 @@ export interface FileRouteTypes {
     | '/quanto-vale-casa-pontremoli'
     | '/seconda-casa-lunigiana'
     | '/servizi'
+    | '/servizi.asp'
     | '/sitemap.xml'
     | '/territori'
     | '/trova-casa-lunigiana'
@@ -628,7 +664,9 @@ export interface RootRouteChildren {
   ComeVendereCasaLunigianaRoute: typeof ComeVendereCasaLunigianaRoute
   ContattaciDotaspRoute: typeof ContattaciDotaspRoute
   ContattiRoute: typeof ContattiRoute
+  ContattiDotaspRoute: typeof ContattiDotaspRoute
   DoveComprareCasaLunigianaRoute: typeof DoveComprareCasaLunigianaRoute
+  Dove_siamoDotaspRoute: typeof Dove_siamoDotaspRoute
   Elenco_annunciDotaspRoute: typeof Elenco_annunciDotaspRoute
   ImmobiliRoute: typeof ImmobiliRouteWithChildren
   IndexDotaspRoute: typeof IndexDotaspRoute
@@ -638,6 +676,7 @@ export interface RootRouteChildren {
   QuantoValeCasaPontremoliRoute: typeof QuantoValeCasaPontremoliRoute
   SecondaCasaLunigianaRoute: typeof SecondaCasaLunigianaRoute
   ServiziRoute: typeof ServiziRoute
+  ServiziDotaspRoute: typeof ServiziDotaspRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TerritoriRoute: typeof TerritoriRoute
   TrovaCasaLunigianaRoute: typeof TrovaCasaLunigianaRoute
@@ -713,6 +752,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/servizi.asp': {
+      id: '/servizi.asp'
+      path: '/servizi.asp'
+      fullPath: '/servizi.asp'
+      preLoaderRoute: typeof ServiziDotaspRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/servizi': {
       id: '/servizi'
       path: '/servizi'
@@ -776,11 +822,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof Elenco_annunciDotaspRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dove_siamo.asp': {
+      id: '/dove_siamo.asp'
+      path: '/dove_siamo.asp'
+      fullPath: '/dove_siamo.asp'
+      preLoaderRoute: typeof Dove_siamoDotaspRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dove-comprare-casa-lunigiana': {
       id: '/dove-comprare-casa-lunigiana'
       path: '/dove-comprare-casa-lunigiana'
       fullPath: '/dove-comprare-casa-lunigiana'
       preLoaderRoute: typeof DoveComprareCasaLunigianaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contatti.asp': {
+      id: '/contatti.asp'
+      path: '/contatti.asp'
+      fullPath: '/contatti.asp'
+      preLoaderRoute: typeof ContattiDotaspRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contatti': {
@@ -1080,7 +1140,9 @@ const rootRouteChildren: RootRouteChildren = {
   ComeVendereCasaLunigianaRoute: ComeVendereCasaLunigianaRoute,
   ContattaciDotaspRoute: ContattaciDotaspRoute,
   ContattiRoute: ContattiRoute,
+  ContattiDotaspRoute: ContattiDotaspRoute,
   DoveComprareCasaLunigianaRoute: DoveComprareCasaLunigianaRoute,
+  Dove_siamoDotaspRoute: Dove_siamoDotaspRoute,
   Elenco_annunciDotaspRoute: Elenco_annunciDotaspRoute,
   ImmobiliRoute: ImmobiliRouteWithChildren,
   IndexDotaspRoute: IndexDotaspRoute,
@@ -1090,6 +1152,7 @@ const rootRouteChildren: RootRouteChildren = {
   QuantoValeCasaPontremoliRoute: QuantoValeCasaPontremoliRoute,
   SecondaCasaLunigianaRoute: SecondaCasaLunigianaRoute,
   ServiziRoute: ServiziRoute,
+  ServiziDotaspRoute: ServiziDotaspRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TerritoriRoute: TerritoriRoute,
   TrovaCasaLunigianaRoute: TrovaCasaLunigianaRoute,
