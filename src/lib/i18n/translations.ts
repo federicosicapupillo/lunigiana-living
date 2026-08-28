@@ -911,6 +911,8 @@ const it: Dict = {
   "val.free": "La richiesta è gratuita e non comporta alcun impegno.",
   "val.guide.pre": "Se la casa è a Pontremoli, può essere utile leggere prima",
   "val.guide.link": "quanto vale una casa a Pontremoli nel 2026",
+  "val.sellguide.pre": "Se vuoi capire prima come funziona una vendita, leggi la guida su",
+  "val.sellguide.link": "come vendere casa in Lunigiana",
   "val.progress.step": "Passo",
   "val.progress.of": "di",
   "val.cta.next": "Continua",
