@@ -471,8 +471,18 @@ function PrezziLunigianaPage() {
               >
                 trova casa in Lunigiana
               </Link>
-              .
+              . Per confrontare i comuni anche su servizi, collegamenti e stile di vita, la guida su{" "}
+              <Link
+                to="/dove-comprare-casa-lunigiana"
+                data-track="pz_to_dove_click"
+                onClick={() => trackClick("pz_to_dove_click", { source: "prezzi_lunigiana" })}
+                className="text-[var(--terracotta)] underline hover:no-underline"
+              >
+                dove comprare casa in Lunigiana
+              </Link>{" "}
+              affianca a ogni quotazione una lettura pratica del territorio.
             </p>
+
           </div>
         </div>
       </section>
