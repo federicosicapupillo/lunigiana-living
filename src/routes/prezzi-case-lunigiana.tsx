@@ -18,13 +18,13 @@ import { trackClick } from "@/lib/analytics";
 
 const PAGE_URL = siteUrl("/prezzi-case-lunigiana");
 
-const eur = (n: number) => `${n.toLocaleString("it-IT")} €`;
-const eurM2 = (n: number) => `${n.toLocaleString("it-IT")} €/m²`;
+// Formattazione italiana esplicita: il runtime SSR non garantisce i dati ICU
+// per it-IT, quindi evitiamo toLocaleString e differenze SSR/client.
+const itNum = (n: number) => Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+const eur = (n: number) => `${itNum(n)} €`;
+const eurM2 = (n: number) => `${itNum(n)} €/m²`;
 const pct = (n: number) =>
-  `${n > 0 ? "+" : n < 0 ? "−" : ""}${Math.abs(n).toLocaleString("it-IT", {
-    minimumFractionDigits: 1,
-    maximumFractionDigits: 1,
-  })}%`;
+  `${n > 0 ? "+" : n < 0 ? "−" : ""}${Math.abs(n).toFixed(1).replace(".", ",")}%`;
 
 export const Route = createFileRoute("/prezzi-case-lunigiana")({
   head: () => {
