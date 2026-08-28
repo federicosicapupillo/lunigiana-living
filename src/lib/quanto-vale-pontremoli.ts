@@ -21,7 +21,12 @@ export const QV_META = {
   isoDate: "2026-08-28",
 } as const;
 
-/** Dato pubblico esterno: quotazioni RICHIESTE, luglio 2026. */
+/**
+ * Dato pubblico esterno: quotazioni RICHIESTE, luglio 2026.
+ * Il conteggio annunci (annunciPortale) è il numero mostrato dal portale al
+ * momento della verifica del 28 agosto 2026, distinto dalla rilevazione dei
+ * prezzi (periodo).
+ */
 export const QV_PUBBLICO = {
   eurM2Medio: 866,
   varYoY: 0.81,
@@ -30,6 +35,7 @@ export const QV_PUBBLICO = {
   annunciPortale: 200,
   periodo: "luglio 2026",
   confrontoPeriodo: "luglio 2025",
+  annunciDataLabel: "verifica 28 agosto 2026",
   fonteNome: "Immobiliare.it — mercato immobiliare di Pontremoli",
   fonteUrl: "https://www.immobiliare.it/mercato-immobiliare/toscana/pontremoli/",
 } as const;
@@ -63,7 +69,7 @@ export const QV_FATTORI: QvFattore[] = [
   },
   {
     title: "Posizione: centro, frazione, campagna",
-    body: "Il centro storico, i quartieri residenziali e le frazioni più isolate hanno domande diverse. Contano i servizi raggiungibili a piedi, la strada di accesso e com'è arrivarci d'inverno.",
+    body: "Il centro storico, i quartieri residenziali e le frazioni più isolate hanno domande diverse. Contano i servizi, l'accessibilità e le caratteristiche della microzona.",
   },
   {
     title: "Piano e ascensore",
@@ -71,7 +77,7 @@ export const QV_FATTORI: QvFattore[] = [
   },
   {
     title: "Vista, luce ed esposizione",
-    body: "Vista aperta sulla valle, luce per buona parte della giornata ed esposizione riparata sono tra le caratteristiche più richieste, e si notano subito nelle visite.",
+    body: "Vista aperta sulla valle, luce per buona parte della giornata ed esposizione riparata possono incidere sull'interesse di chi visita, e si notano subito nelle visite.",
   },
   {
     title: "Esterni: terrazzo, corte, giardino",
@@ -79,7 +85,7 @@ export const QV_FATTORI: QvFattore[] = [
   },
   {
     title: "Garage e parcheggio",
-    body: "A Pontremoli il posto auto è un tema concreto. Garage, box o parcheggio pertinenziale sono un vantaggio reale, soprattutto vicino al centro.",
+    body: "La presenza di garage, box o parcheggio pertinenziale può incidere sull'interesse, soprattutto vicino al centro.",
   },
   {
     title: "Distribuzione interna",
@@ -95,7 +101,7 @@ export const QV_FATTORI: QvFattore[] = [
   },
   {
     title: "Domanda per quella tipologia",
-    body: "Un bilocale in centro, una casa di borgo e una villetta con giardino non hanno lo stesso numero di persone in cerca. La domanda effettiva pesa sui tempi e sul posizionamento.",
+    body: "Un bilocale in centro, una casa di borgo e una villetta con giardino parlano a pubblici diversi e possono avere livelli di domanda differenti. Questo incide sui tempi e sul posizionamento.",
   },
 ];
 
@@ -109,11 +115,11 @@ export const QV_METODO: QvPasso[] = [
   },
   {
     title: "Scendiamo alla microzona",
-    body: "A Pontremoli il valore cambia da via a via e da frazione a frazione. Il ragionamento va fatto sulla zona specifica, non sulla media del comune.",
+    body: "A Pontremoli il posizionamento può cambiare tra centro, quartieri e frazioni. Il ragionamento va fatto sulla microzona specifica, non sulla media del comune.",
   },
   {
     title: "Pesiamo le caratteristiche reali",
-    body: "Esterni, piano, vista, garage, distribuzione, impianti: le caratteristiche che spostano davvero l'interesse vanno considerate una per una.",
+    body: "Esterni, piano, vista, garage, distribuzione, impianti: le caratteristiche che possono incidere sull'interesse vanno considerate una per una.",
   },
   {
     title: "Verifichiamo stato e documenti",
