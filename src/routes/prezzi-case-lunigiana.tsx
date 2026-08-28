@@ -130,12 +130,13 @@ function PrezziLunigianaPage() {
               La Lunigiana non ha un prezzo solo. Nella rilevazione di {PZ_SOURCE.externalPeriod}{" "}
               i prezzi medi richiesti nei quattordici comuni della valle vanno da circa{" "}
               {eurM2(min.eurM2)} a {min.nome} a circa {eurM2(max.eurM2)} a {max.nome}: quasi il
-              triplo, all&apos;interno dello stesso territorio e a mezz&apos;ora di auto di distanza.
+              triplo, all&apos;interno dello stesso territorio.
             </p>
             <p>
               In pratica, chi cerca casa qui si muove più spesso per budget complessivo che per
-              metro quadro. Nel nostro portafoglio la casa mediana in vendita è chiesta{" "}
-              {eur(PZ_FURIA.prezzoMediano)}, e {PZ_FASCE[0].count} immobili su {PZ_FURIA.conPrezzo}{" "}
+              metro quadro. Nel nostro portafoglio il prezzo mediano richiesto degli immobili in
+              vendita è {eur(PZ_FURIA.prezzoMediano)}, e {PZ_FASCE[0].count} immobili su{" "}
+              {PZ_FURIA.conPrezzo}
               stanno sotto i 100.000 €. Qui sotto trovate i dati comune per comune, cosa significano
               davvero e cosa si trova oggi con budget diversi.
             </p>
@@ -204,10 +205,9 @@ function PrezziLunigianaPage() {
 
           <div className="mt-8 max-w-3xl space-y-4 text-[1rem] leading-[1.8] text-[var(--ink-soft)]">
             <p>
-              La parte più economica della valle è quella appenninica e interna: Zeri, Filattiera,
-              Casola in Lunigiana, Mulazzo e Tresana restano sotto gli 810 €/m². Le quotazioni più
-              alte si concentrano invece verso il fondovalle e il confine ligure: Fosdinovo,
-              con {eurM2(1713)}, e Aulla, con {eurM2(1229)}, sono i due valori più alti del gruppo.
+              Tra i valori più bassi del gruppo compaiono Zeri, Filattiera, Casola in Lunigiana,
+              Mulazzo e Tresana. I due valori più alti sono invece Fosdinovo, con {eurM2(1713)},
+              e Aulla, con {eurM2(1229)}.
             </p>
             <p>
               Le variazioni annue vanno lette con prudenza: in comuni piccoli bastano pochi annunci
@@ -259,7 +259,7 @@ function PrezziLunigianaPage() {
             <p className="mt-5 text-[1rem] leading-[1.8] text-[var(--ink-soft)]">
               Questa è la fotografia del portafoglio Furia al 28 agosto 2026, non del mercato
               dell&apos;intera Lunigiana: sono gli immobili in vendita che seguiamo direttamente,
-              esclusa Massa. Dà però un&apos;idea concreta di cosa circola davvero e a che cifre.
+              esclusa Massa. Dà però un&apos;idea concreta del tipo di offerta che seguiamo direttamente e delle fasce di prezzo presenti nel nostro portafoglio.
             </p>
           </div>
 
@@ -316,7 +316,7 @@ function PrezziLunigianaPage() {
           </div>
           <p className="mt-6 max-w-3xl text-[0.95rem] leading-relaxed text-[var(--ink-soft)]">
             È disponibilità attuale: cambia ogni volta che un immobile viene venduto o entra in
-            portafoglio. L&apos;elenco aggiornato in tempo reale è nella pagina{" "}
+            portafoglio. L&apos;elenco aggiornato è nella pagina{" "}
             <Link
               to="/immobili"
               data-track="pz_to_immobili_click"
@@ -452,9 +452,11 @@ function PrezziLunigianaPage() {
             <p>
               Il prezzo più basso, però, non è automaticamente la scelta migliore. Zeri è splendida
               e autentica, ma è montagna vera: distanze maggiori, inverni impegnativi, meno servizi
-              a portata di mano. Casola e Comano guardano al versante appenninico dell&apos;alta
-              valle del Taverone, con logiche diverse dal fondovalle. In generale, dove il valore è
-              più basso c&apos;è più spesso da ristrutturare, e la spesa si sposta dall&apos;acquisto
+              a portata di mano. Comano si trova nella valle del Taverone, mentre Casola in
+              Lunigiana è nell&apos;alto corso dell&apos;Aulella, tra Appennino e Alpi Apuane: due aree
+              con caratteristiche proprie rispetto al fondovalle. In generale, il prezzo richiesto
+              più basso può riflettere lo stato dell&apos;immobile, la posizione e la necessità di
+              lavori, quindi va valutato caso per caso: a volte la spesa si sposta dall&apos;acquisto
               ai lavori.
             </p>
             <p>
@@ -513,8 +515,8 @@ function PrezziLunigianaPage() {
               I valori comune per comune provengono da {PZ_SOURCE.externalName}, rilevazione{" "}
               {PZ_SOURCE.externalPeriod}, e riguardano i quattordici comuni della Lunigiana. Sono
               prezzi medi <strong className="font-medium text-ink">richiesti</strong> dagli annunci
-              in vendita: descrivono l&apos;offerta pubblicata, non i prezzi finali degli atti
-              notarili, che non sono pubblici in forma disaggregata.
+              in vendita: descrivono l&apos;offerta pubblicata, non i prezzi finali effettivamente
+              conclusi nelle compravendite.
             </p>
             <p>
               I dati sul portafoglio derivano dal nostro database immobili, con estrazione al 28
@@ -533,7 +535,7 @@ function PrezziLunigianaPage() {
               <a
                 href={PZ_SOURCE.externalUrl}
                 target="_blank"
-                rel="noopener nofollow"
+                rel="noopener"
                 className="inline-flex items-center gap-1 text-[var(--terracotta)] underline hover:no-underline"
               >
                 Immobiliare.it, mercato immobiliare provincia di Massa-Carrara

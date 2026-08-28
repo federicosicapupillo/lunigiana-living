@@ -16,7 +16,7 @@ export const PZ_META = {
   h1: "Quanto costa comprare casa in Lunigiana nel 2026?",
   title: "Prezzi case in Lunigiana 2026: quanto costa comprare | Furia Immobiliare",
   description:
-    "Prezzi delle case in Lunigiana nel 2026, comune per comune: quotazioni richieste, fasce di budget e fotografia degli immobili Furia disponibili oggi.",
+    "Prezzi delle case in Lunigiana nel 2026, comune per comune: quotazioni richieste, fasce di budget e fotografia del portafoglio Furia al 28 agosto 2026.",
   updatedLabel: "Aggiornato al 28 agosto 2026",
   isoDate: "2026-08-28",
 } as const;
@@ -34,7 +34,7 @@ export type ComunePrezzo = {
   nome: string;
   /** Prezzo medio richiesto in vendita, €/m², luglio 2026. */
   eurM2: number;
-  /** Variazione rispetto a luglio 2025, in punti percentuali. */
+  /** Variazione percentuale rispetto a luglio 2025. */
   varYoY: number;
   /** Slug della pagina comune, se esiste una landing dedicata. */
   slug?: string;
@@ -161,7 +161,7 @@ export const PZ_CONSIGLI: { title: string; body: string }[] = [
   {
     title: "Controllate la conformità urbanistica e catastale",
     body:
-      "Ampliamenti, tettoie e cambi d'uso non sanati sono la causa più frequente di trattative che si fermano. È una verifica da fare prima della proposta, non dopo.",
+      "Ampliamenti, tettoia e cambi d'uso non sanati sono una causa frequente di trattative che si fermano. È una verifica da fare prima della proposta, non dopo.",
   },
   {
     title: "Considerate i costi ricorrenti",
