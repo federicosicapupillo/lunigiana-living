@@ -348,8 +348,8 @@ function ComeVendereCasaPage() {
               <h3 className="font-serif text-xl text-ink">Vendita pubblica</h3>
               <p className="mt-3 text-[0.95rem] leading-[1.7] text-[var(--ink-soft)]">
                 Massima esposizione: sito, portali, canali social, richieste che arrivano anche da
-                chi non conosceva la zona. È la strada naturale per la maggior parte degli immobili,
-                e comporta una casa visibile a un pubblico ampio.
+                chi non conosceva la zona. È la modalità con la maggiore esposizione quando si vuole
+                raggiungere un pubblico ampio.
               </p>
             </div>
             <div className="rounded-2xl border border-[var(--terracotta)]/15 bg-[var(--warm-ivory)] p-7">
