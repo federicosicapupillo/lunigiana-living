@@ -375,7 +375,7 @@ function AiBenchmarkPage() {
             20 prompt · {AI_PLATFORMS.find((p) => p.key === platform)?.label} · {runDate}
           </h2>
           <div className="space-y-3">
-            {visiblePrompts.map((p, i) => {
+            {visiblePrompts.map((p) => {
               const d = drafts[p.key] ?? emptyDraft();
               return (
                 <article key={p.key} className="rounded-sm border border-border bg-background p-4">
@@ -387,9 +387,13 @@ function AiBenchmarkPage() {
                       <p className="mt-1 text-sm text-ink">{p.text}</p>
                     </div>
                     <div className="flex items-center gap-2">
-                      {d.existing && (
+                      {d.existing ? (
                         <span className="rounded-sm border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[0.65rem] text-emerald-800">
                           registrato
+                        </span>
+                      ) : (
+                        <span className="rounded-sm border border-border bg-muted/40 px-2 py-0.5 text-[0.65rem] text-muted-foreground">
+                          non testato
                         </span>
                       )}
                       <button
@@ -406,9 +410,12 @@ function AiBenchmarkPage() {
                       Esito
                       <select
                         value={d.status}
-                        onChange={(e) => setDraft(p.key, { status: e.target.value as AiResultStatus })}
+                        onChange={(e) =>
+                          setDraft(p.key, { status: e.target.value as AiResultStatus | "" })
+                        }
                         className="rounded-sm border border-border bg-background px-2 py-1.5 text-sm text-ink"
                       >
+                        <option value="">Non testato — scegli un esito</option>
                         {AI_STATUSES.map((s) => (
                           <option key={s.key} value={s.key}>
                             {s.label}
@@ -465,7 +472,6 @@ function AiBenchmarkPage() {
                       Salva riga
                     </button>
                   </div>
-                  {i === visiblePrompts.length - 1 && null}
                 </article>
               );
             })}
@@ -501,12 +507,18 @@ function AiBenchmarkPage() {
                   return (
                     <tr key={h.runDate} className="border-t border-border">
                       <td className="px-3 py-2 text-ink">{h.runDate}</td>
-                      <td className="px-3 py-2">{h.total}</td>
+                      <td className="px-3 py-2">
+                        {h.total} / {EXPECTED_TESTS_TOTAL}
+                      </td>
                       <td className="px-3 py-2">
                         {h.score} / {h.maxScore}
                       </td>
                       <td className="px-3 py-2 text-muted-foreground">
-                        {prev ? fmtDelta(h.score - prev.score) : "—"}
+                        {prev && h.complete && prev.complete
+                          ? fmtDelta(h.score - prev.score)
+                          : prev
+                            ? "— run incompleto"
+                            : "—"}
                       </td>
                       <td className="px-3 py-2">{h.presentPct}%</td>
                       <td className="px-3 py-2">{h.citedPct}%</td>
@@ -530,13 +542,23 @@ function fmtDelta(n: number) {
   return n > 0 ? `+${n}` : String(n);
 }
 
-function Kpi({ label, value, delta }: { label: string; value: string; delta: number | null }) {
+function Kpi({
+  label,
+  value,
+  delta,
+  deltaNote,
+}: {
+  label: string;
+  value: string;
+  delta: number | null;
+  deltaNote?: string | undefined;
+}) {
   return (
     <div className="rounded-sm border border-border bg-background p-4">
       <div className="text-xs uppercase tracking-wide text-muted-foreground">{label}</div>
       <div className="mt-1 font-serif text-2xl text-ink">{value}</div>
       <div className="text-xs text-muted-foreground">
-        {delta === null ? "nessun run precedente" : `Δ ${fmtDelta(delta)}`}
+        {delta === null ? (deltaNote ?? "—") : `Δ ${fmtDelta(delta)}${deltaNote ? ` · ${deltaNote}` : ""}`}
       </div>
     </div>
   );
