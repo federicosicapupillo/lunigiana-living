@@ -452,6 +452,16 @@ function ValutaCasaPage() {
             </Link>
             .
           </p>
+          <p className="mt-2 text-[0.8rem] text-foreground/60">
+            {t("val.sellguide.pre")}{" "}
+            <Link
+              to="/come-vendere-casa-lunigiana"
+              className="text-primary underline hover:no-underline"
+            >
+              {t("val.sellguide.link")}
+            </Link>
+            .
+          </p>
         </div>
 
         <div className="mt-10 rounded-md border border-warm-border/70 bg-warm-cream p-5 shadow-sm sm:p-8">

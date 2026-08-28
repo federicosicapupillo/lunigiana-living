@@ -28,6 +28,7 @@ import { Route as Elenco_annunciDotaspRouteImport } from './routes/elenco_annunc
 import { Route as DoveComprareCasaLunigianaRouteImport } from './routes/dove-comprare-casa-lunigiana'
 import { Route as ContattiRouteImport } from './routes/contatti'
 import { Route as ContattaciDotaspRouteImport } from './routes/contattaci[.]asp'
+import { Route as ComeVendereCasaLunigianaRouteImport } from './routes/come-vendere-casa-lunigiana'
 import { Route as Chi_siamoDotaspRouteImport } from './routes/chi_siamo[.]asp'
 import { Route as ChiSiamoRouteImport } from './routes/chi-siamo'
 import { Route as AnnuncioDotaspRouteImport } from './routes/annuncio[.]asp'
@@ -155,6 +156,12 @@ const ContattaciDotaspRoute = ContattaciDotaspRouteImport.update({
   path: '/contattaci.asp',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ComeVendereCasaLunigianaRoute =
+  ComeVendereCasaLunigianaRouteImport.update({
+    id: '/come-vendere-casa-lunigiana',
+    path: '/come-vendere-casa-lunigiana',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const Chi_siamoDotaspRoute = Chi_siamoDotaspRouteImport.update({
   id: '/chi_siamo.asp',
   path: '/chi_siamo.asp',
@@ -309,6 +316,7 @@ export interface FileRoutesByFullPath {
   '/annuncio.asp': typeof AnnuncioDotaspRoute
   '/chi-siamo': typeof ChiSiamoRoute
   '/chi_siamo.asp': typeof Chi_siamoDotaspRoute
+  '/come-vendere-casa-lunigiana': typeof ComeVendereCasaLunigianaRoute
   '/contattaci.asp': typeof ContattaciDotaspRoute
   '/contatti': typeof ContattiRoute
   '/dove-comprare-casa-lunigiana': typeof DoveComprareCasaLunigianaRoute
@@ -357,6 +365,7 @@ export interface FileRoutesByTo {
   '/annuncio.asp': typeof AnnuncioDotaspRoute
   '/chi-siamo': typeof ChiSiamoRoute
   '/chi_siamo.asp': typeof Chi_siamoDotaspRoute
+  '/come-vendere-casa-lunigiana': typeof ComeVendereCasaLunigianaRoute
   '/contattaci.asp': typeof ContattaciDotaspRoute
   '/contatti': typeof ContattiRoute
   '/dove-comprare-casa-lunigiana': typeof DoveComprareCasaLunigianaRoute
@@ -405,6 +414,7 @@ export interface FileRoutesById {
   '/annuncio.asp': typeof AnnuncioDotaspRoute
   '/chi-siamo': typeof ChiSiamoRoute
   '/chi_siamo.asp': typeof Chi_siamoDotaspRoute
+  '/come-vendere-casa-lunigiana': typeof ComeVendereCasaLunigianaRoute
   '/contattaci.asp': typeof ContattaciDotaspRoute
   '/contatti': typeof ContattiRoute
   '/dove-comprare-casa-lunigiana': typeof DoveComprareCasaLunigianaRoute
@@ -455,6 +465,7 @@ export interface FileRouteTypes {
     | '/annuncio.asp'
     | '/chi-siamo'
     | '/chi_siamo.asp'
+    | '/come-vendere-casa-lunigiana'
     | '/contattaci.asp'
     | '/contatti'
     | '/dove-comprare-casa-lunigiana'
@@ -503,6 +514,7 @@ export interface FileRouteTypes {
     | '/annuncio.asp'
     | '/chi-siamo'
     | '/chi_siamo.asp'
+    | '/come-vendere-casa-lunigiana'
     | '/contattaci.asp'
     | '/contatti'
     | '/dove-comprare-casa-lunigiana'
@@ -550,6 +562,7 @@ export interface FileRouteTypes {
     | '/annuncio.asp'
     | '/chi-siamo'
     | '/chi_siamo.asp'
+    | '/come-vendere-casa-lunigiana'
     | '/contattaci.asp'
     | '/contatti'
     | '/dove-comprare-casa-lunigiana'
@@ -600,6 +613,7 @@ export interface RootRouteChildren {
   AnnuncioDotaspRoute: typeof AnnuncioDotaspRoute
   ChiSiamoRoute: typeof ChiSiamoRoute
   Chi_siamoDotaspRoute: typeof Chi_siamoDotaspRoute
+  ComeVendereCasaLunigianaRoute: typeof ComeVendereCasaLunigianaRoute
   ContattaciDotaspRoute: typeof ContattaciDotaspRoute
   ContattiRoute: typeof ContattiRoute
   DoveComprareCasaLunigianaRoute: typeof DoveComprareCasaLunigianaRoute
@@ -761,6 +775,13 @@ declare module '@tanstack/react-router' {
       path: '/contattaci.asp'
       fullPath: '/contattaci.asp'
       preLoaderRoute: typeof ContattaciDotaspRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/come-vendere-casa-lunigiana': {
+      id: '/come-vendere-casa-lunigiana'
+      path: '/come-vendere-casa-lunigiana'
+      fullPath: '/come-vendere-casa-lunigiana'
+      preLoaderRoute: typeof ComeVendereCasaLunigianaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/chi_siamo.asp': {
@@ -1036,6 +1057,7 @@ const rootRouteChildren: RootRouteChildren = {
   AnnuncioDotaspRoute: AnnuncioDotaspRoute,
   ChiSiamoRoute: ChiSiamoRoute,
   Chi_siamoDotaspRoute: Chi_siamoDotaspRoute,
+  ComeVendereCasaLunigianaRoute: ComeVendereCasaLunigianaRoute,
   ContattaciDotaspRoute: ContattaciDotaspRoute,
   ContattiRoute: ContattiRoute,
   DoveComprareCasaLunigianaRoute: DoveComprareCasaLunigianaRoute,

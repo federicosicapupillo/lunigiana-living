@@ -447,6 +447,12 @@ function QuantoValePontremoliPage() {
                 body: "Servizi, quartieri, collegamenti e vita quotidiana nel capoluogo della Lunigiana.",
                 ev: "qv_to_vivere",
               },
+              {
+                to: "/come-vendere-casa-lunigiana" as const,
+                title: "Come vendere casa in Lunigiana",
+                body: "I passaggi dall'idea al rogito, i documenti da controllare prima e come si ragiona sul prezzo richiesto.",
+                ev: "qv_to_vendere",
+              },
             ].map((c) => (
               <Link
                 key={c.title}

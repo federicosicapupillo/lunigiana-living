@@ -259,6 +259,16 @@ function OffMarketPage() {
           <div className="rounded-sm border border-warm-border/70 bg-warm-ivory/70 p-5 sm:p-8">
             <h3 className="font-serif text-xl text-ink sm:text-2xl">{t("om.seller.cta")}</h3>
             <p className="mt-2 text-sm leading-relaxed text-foreground/75">{t("om.seller.formNote")}</p>
+            <p className="mt-2 text-[0.8rem] leading-relaxed text-foreground/60">
+              {t("om.seller.guide.pre")}{" "}
+              <Link
+                to="/come-vendere-casa-lunigiana"
+                className="text-terracotta underline hover:no-underline"
+              >
+                {t("om.seller.guide.link")}
+              </Link>
+              .
+            </p>
             <div className="mt-6">
               <OffMarketForm variant="seller" />
             </div>
