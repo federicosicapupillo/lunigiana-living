@@ -35,6 +35,7 @@ export const Route = createFileRoute("/sitemap.xml")({
           "/prezzi-case-lunigiana",
           "/dove-comprare-casa-lunigiana",
           "/osservatorio-immobiliare-lunigiana",
+          "/quanto-vale-casa-pontremoli",
 
 
           "/vivere-in-lunigiana",
