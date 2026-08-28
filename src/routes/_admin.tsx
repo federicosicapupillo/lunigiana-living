@@ -2,7 +2,7 @@ import { createFileRoute, Outlet, Link, useNavigate } from "@tanstack/react-rout
 import { useAdmin } from "@/hooks/use-admin";
 import { useNewLeadsCount } from "@/hooks/use-new-leads-count";
 import { supabase } from "@/integrations/supabase/client";
-import { LogOut, LayoutDashboard, Home, Settings, Inbox, Share2, Database } from "lucide-react";
+import { LogOut, LayoutDashboard, Home, Settings, Inbox, Share2, Database, Sparkles } from "lucide-react";
 import { Loader2 } from "lucide-react";
 import { useEffect } from "react";
 
