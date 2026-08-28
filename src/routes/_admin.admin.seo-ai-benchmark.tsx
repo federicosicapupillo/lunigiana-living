@@ -153,6 +153,18 @@ function AiBenchmarkPage() {
   // Delta metodologicamente validi solo fra due run completi (60/60).
   const comparable = previous !== null && stats.complete && previous.complete;
   const overallDelta = (cur: number, prev: number) => (comparable ? cur - prev : null);
+  const deltaNote = comparable
+    ? undefined
+    : previous === null
+      ? "nessun run precedente"
+      : "run incompleto — Δ non confrontabile";
+  const pctNote =
+    stats.total === 0
+      ? "Nessun test registrato"
+      : comparable
+        ? "sui test completati"
+        : `sui ${stats.total} test completati — Δ non confrontabile`;
+
 
   const saveRow = async (key: string) => {
     const prompt = AI_PROMPTS.find((p) => p.key === key)!;
