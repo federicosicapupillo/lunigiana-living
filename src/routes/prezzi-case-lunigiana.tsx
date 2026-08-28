@@ -204,10 +204,9 @@ function PrezziLunigianaPage() {
 
           <div className="mt-8 max-w-3xl space-y-4 text-[1rem] leading-[1.8] text-[var(--ink-soft)]">
             <p>
-              La parte più economica della valle è quella appenninica e interna: Zeri, Filattiera,
-              Casola in Lunigiana, Mulazzo e Tresana restano sotto gli 810 €/m². Le quotazioni più
-              alte si concentrano invece verso il fondovalle e il confine ligure: Fosdinovo,
-              con {eurM2(1713)}, e Aulla, con {eurM2(1229)}, sono i due valori più alti del gruppo.
+              Tra i valori più bassi del gruppo compaiono Zeri, Filattiera, Casola in Lunigiana,
+              Mulazzo e Tresana. I due valori più alti sono invece Fosdinovo, con {eurM2(1713)},
+              e Aulla, con {eurM2(1229)}.
             </p>
             <p>
               Le variazioni annue vanno lette con prudenza: in comuni piccoli bastano pochi annunci
@@ -533,7 +532,7 @@ function PrezziLunigianaPage() {
               <a
                 href={PZ_SOURCE.externalUrl}
                 target="_blank"
-                rel="noopener nofollow"
+                rel="noopener"
                 className="inline-flex items-center gap-1 text-[var(--terracotta)] underline hover:no-underline"
               >
                 Immobiliare.it, mercato immobiliare provincia di Massa-Carrara
