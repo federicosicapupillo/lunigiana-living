@@ -89,6 +89,13 @@ function AdminLayout() {
                 <Database size={15} /> Dati live
               </Link>
               <Link
+                to="/admin/seo-ai-benchmark"
+                className="flex items-center gap-2 text-muted-foreground transition hover:text-ink"
+                activeProps={{ className: "text-ink" }}
+              >
+                <Sparkles size={15} /> AI Visibility
+              </Link>
+              <Link
                 to="/admin/impostazioni"
                 className="flex items-center gap-2 text-muted-foreground transition hover:text-ink"
                 activeProps={{ className: "text-ink" }}

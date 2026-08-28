@@ -43,6 +43,7 @@ import { Route as CaseInVenditaLunigianaTipologiaRouteImport } from './routes/ca
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
 import { Route as AdminAdminRouteImport } from './routes/_admin.admin'
 import { Route as AdminAdminIndexRouteImport } from './routes/_admin.admin.index'
+import { Route as AdminAdminSeoAiBenchmarkRouteImport } from './routes/_admin.admin.seo-ai-benchmark'
 import { Route as AdminAdminRichiesteRouteImport } from './routes/_admin.admin.richieste'
 import { Route as AdminAdminImpostazioniRouteImport } from './routes/_admin.admin.impostazioni'
 import { Route as AdminAdminIdealistaRouteImport } from './routes/_admin.admin.idealista'
@@ -229,6 +230,12 @@ const AdminAdminIndexRoute = AdminAdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminAdminRoute,
 } as any)
+const AdminAdminSeoAiBenchmarkRoute =
+  AdminAdminSeoAiBenchmarkRouteImport.update({
+    id: '/seo-ai-benchmark',
+    path: '/seo-ai-benchmark',
+    getParentRoute: () => AdminAdminRoute,
+  } as any)
 const AdminAdminRichiesteRoute = AdminAdminRichiesteRouteImport.update({
   id: '/richieste',
   path: '/richieste',
@@ -325,6 +332,7 @@ export interface FileRoutesByFullPath {
   '/admin/idealista': typeof AdminAdminIdealistaRoute
   '/admin/impostazioni': typeof AdminAdminImpostazioniRoute
   '/admin/richieste': typeof AdminAdminRichiesteRoute
+  '/admin/seo-ai-benchmark': typeof AdminAdminSeoAiBenchmarkRoute
   '/admin/': typeof AdminAdminIndexRoute
   '/admin/immobili/$id': typeof AdminAdminImmobiliIdRouteWithChildren
   '/admin/immobili/assistente': typeof AdminAdminImmobiliAssistenteRoute
@@ -369,6 +377,7 @@ export interface FileRoutesByTo {
   '/admin/idealista': typeof AdminAdminIdealistaRoute
   '/admin/impostazioni': typeof AdminAdminImpostazioniRoute
   '/admin/richieste': typeof AdminAdminRichiesteRoute
+  '/admin/seo-ai-benchmark': typeof AdminAdminSeoAiBenchmarkRoute
   '/admin': typeof AdminAdminIndexRoute
   '/admin/immobili/$id': typeof AdminAdminImmobiliIdRouteWithChildren
   '/admin/immobili/assistente': typeof AdminAdminImmobiliAssistenteRoute
@@ -417,6 +426,7 @@ export interface FileRoutesById {
   '/_admin/admin/idealista': typeof AdminAdminIdealistaRoute
   '/_admin/admin/impostazioni': typeof AdminAdminImpostazioniRoute
   '/_admin/admin/richieste': typeof AdminAdminRichiesteRoute
+  '/_admin/admin/seo-ai-benchmark': typeof AdminAdminSeoAiBenchmarkRoute
   '/_admin/admin/': typeof AdminAdminIndexRoute
   '/_admin/admin/immobili/$id': typeof AdminAdminImmobiliIdRouteWithChildren
   '/_admin/admin/immobili/assistente': typeof AdminAdminImmobiliAssistenteRoute
@@ -465,6 +475,7 @@ export interface FileRouteTypes {
     | '/admin/idealista'
     | '/admin/impostazioni'
     | '/admin/richieste'
+    | '/admin/seo-ai-benchmark'
     | '/admin/'
     | '/admin/immobili/$id'
     | '/admin/immobili/assistente'
@@ -509,6 +520,7 @@ export interface FileRouteTypes {
     | '/admin/idealista'
     | '/admin/impostazioni'
     | '/admin/richieste'
+    | '/admin/seo-ai-benchmark'
     | '/admin'
     | '/admin/immobili/$id'
     | '/admin/immobili/assistente'
@@ -556,6 +568,7 @@ export interface FileRouteTypes {
     | '/_admin/admin/idealista'
     | '/_admin/admin/impostazioni'
     | '/_admin/admin/richieste'
+    | '/_admin/admin/seo-ai-benchmark'
     | '/_admin/admin/'
     | '/_admin/admin/immobili/$id'
     | '/_admin/admin/immobili/assistente'
@@ -841,6 +854,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAdminIndexRouteImport
       parentRoute: typeof AdminAdminRoute
     }
+    '/_admin/admin/seo-ai-benchmark': {
+      id: '/_admin/admin/seo-ai-benchmark'
+      path: '/seo-ai-benchmark'
+      fullPath: '/admin/seo-ai-benchmark'
+      preLoaderRoute: typeof AdminAdminSeoAiBenchmarkRouteImport
+      parentRoute: typeof AdminAdminRoute
+    }
     '/_admin/admin/richieste': {
       id: '/_admin/admin/richieste'
       path: '/richieste'
@@ -937,6 +957,7 @@ interface AdminAdminRouteChildren {
   AdminAdminIdealistaRoute: typeof AdminAdminIdealistaRoute
   AdminAdminImpostazioniRoute: typeof AdminAdminImpostazioniRoute
   AdminAdminRichiesteRoute: typeof AdminAdminRichiesteRoute
+  AdminAdminSeoAiBenchmarkRoute: typeof AdminAdminSeoAiBenchmarkRoute
   AdminAdminIndexRoute: typeof AdminAdminIndexRoute
   AdminAdminImmobiliIdRoute: typeof AdminAdminImmobiliIdRouteWithChildren
   AdminAdminImmobiliAssistenteRoute: typeof AdminAdminImmobiliAssistenteRoute
@@ -949,6 +970,7 @@ const AdminAdminRouteChildren: AdminAdminRouteChildren = {
   AdminAdminIdealistaRoute: AdminAdminIdealistaRoute,
   AdminAdminImpostazioniRoute: AdminAdminImpostazioniRoute,
   AdminAdminRichiesteRoute: AdminAdminRichiesteRoute,
+  AdminAdminSeoAiBenchmarkRoute: AdminAdminSeoAiBenchmarkRoute,
   AdminAdminIndexRoute: AdminAdminIndexRoute,
   AdminAdminImmobiliIdRoute: AdminAdminImmobiliIdRouteWithChildren,
   AdminAdminImmobiliAssistenteRoute: AdminAdminImmobiliAssistenteRoute,
