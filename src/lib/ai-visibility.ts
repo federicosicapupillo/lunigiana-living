@@ -26,13 +26,16 @@ export const AI_STATUSES: Array<{
 
 export const MAX_SCORE = 3;
 
+// Denominatori FISSI del benchmark: 20 prompt × 3 piattaforme = 60 test, max 3 punti ciascuno.
+export const EXPECTED_TESTS_PER_PLATFORM = 20;
+export const EXPECTED_TESTS_TOTAL = 60;
+export const MAX_SCORE_PER_PLATFORM = EXPECTED_TESTS_PER_PLATFORM * MAX_SCORE; // 60
+export const MAX_SCORE_TOTAL = EXPECTED_TESTS_TOTAL * MAX_SCORE; // 180
+
 export function scoreForStatus(status: AiResultStatus): 0 | 1 | 2 | 3 {
   return AI_STATUSES.find((s) => s.key === status)!.score;
 }
 
-export function statusLabel(status: AiResultStatus): string {
-  return AI_STATUSES.find((s) => s.key === status)?.label ?? status;
-}
 
 export type AiCategory =
   | "Brand / Agenzie"
