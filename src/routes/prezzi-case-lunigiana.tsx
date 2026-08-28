@@ -130,7 +130,7 @@ function PrezziLunigianaPage() {
               La Lunigiana non ha un prezzo solo. Nella rilevazione di {PZ_SOURCE.externalPeriod}{" "}
               i prezzi medi richiesti nei quattordici comuni della valle vanno da circa{" "}
               {eurM2(min.eurM2)} a {min.nome} a circa {eurM2(max.eurM2)} a {max.nome}: quasi il
-              triplo, all&apos;interno dello stesso territorio e a mezz&apos;ora di auto di distanza.
+              triplo, all&apos;interno dello stesso territorio.
             </p>
             <p>
               In pratica, chi cerca casa qui si muove più spesso per budget complessivo che per
@@ -259,7 +259,7 @@ function PrezziLunigianaPage() {
             <p className="mt-5 text-[1rem] leading-[1.8] text-[var(--ink-soft)]">
               Questa è la fotografia del portafoglio Furia al 28 agosto 2026, non del mercato
               dell&apos;intera Lunigiana: sono gli immobili in vendita che seguiamo direttamente,
-              esclusa Massa. Dà però un&apos;idea concreta di cosa circola davvero e a che cifre.
+              esclusa Massa. Dà però un&apos;idea concreta del tipo di offerta che seguiamo direttamente e delle fasce di prezzo presenti nel nostro portafoglio.
             </p>
           </div>
 
@@ -316,7 +316,7 @@ function PrezziLunigianaPage() {
           </div>
           <p className="mt-6 max-w-3xl text-[0.95rem] leading-relaxed text-[var(--ink-soft)]">
             È disponibilità attuale: cambia ogni volta che un immobile viene venduto o entra in
-            portafoglio. L&apos;elenco aggiornato in tempo reale è nella pagina{" "}
+            portafoglio. L&apos;elenco aggiornato è nella pagina{" "}
             <Link
               to="/immobili"
               data-track="pz_to_immobili_click"
@@ -452,9 +452,11 @@ function PrezziLunigianaPage() {
             <p>
               Il prezzo più basso, però, non è automaticamente la scelta migliore. Zeri è splendida
               e autentica, ma è montagna vera: distanze maggiori, inverni impegnativi, meno servizi
-              a portata di mano. Casola e Comano guardano al versante appenninico dell&apos;alta
-              valle del Taverone, con logiche diverse dal fondovalle. In generale, dove il valore è
-              più basso c&apos;è più spesso da ristrutturare, e la spesa si sposta dall&apos;acquisto
+              a portata di mano. Comano si trova nella valle del Taverone, mentre Casola in
+              Lunigiana è nell&apos;alto corso dell&apos;Aulella, tra Appennino e Alpi Apuane: due aree
+              con caratteristiche proprie rispetto al fondovalle. In generale, il prezzo richiesto
+              più basso può riflettere lo stato dell&apos;immobile, la posizione e la necessità di
+              lavori, quindi va valutato caso per caso: a volte la spesa si sposta dall&apos;acquisto
               ai lavori.
             </p>
             <p>
