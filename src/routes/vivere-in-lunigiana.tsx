@@ -204,6 +204,18 @@ function VivereLunigianaPage() {
               </Link>{" "}
               mostra dove c&apos;è disponibilità in questo momento.
             </p>
+            <p className="mt-4 text-[0.95rem] leading-relaxed text-[var(--ink-soft)]">
+              Se la scelta della zona dipende anche dal budget, consulta i{" "}
+              <Link
+                to="/prezzi-case-lunigiana"
+                data-track="vl_to_prezzi_click"
+                onClick={() => trackClick("vl_to_prezzi_click", { source: "vivere_lunigiana" })}
+                className="text-[var(--terracotta)] underline hover:no-underline"
+              >
+                prezzi delle case in Lunigiana nel 2026
+              </Link>
+              , comune per comune.
+            </p>
           </div>
         </div>
       </section>

@@ -32,6 +32,7 @@ export const Route = createFileRoute("/sitemap.xml")({
           "/valuta-casa",
           "/off-market",
           "/vivere-a-pontremoli",
+          "/prezzi-case-lunigiana",
           "/vivere-in-lunigiana",
         ];
         const entries: { path: string; lastmod?: string }[] = [
