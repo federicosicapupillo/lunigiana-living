@@ -161,7 +161,7 @@ export const PZ_CONSIGLI: { title: string; body: string }[] = [
   {
     title: "Controllate la conformità urbanistica e catastale",
     body:
-      "Ampliamenti, tettoia e cambi d'uso non sanati sono una causa frequente di trattative che si fermano. È una verifica da fare prima della proposta, non dopo.",
+      "Ampliamenti, tettoie e cambi d'uso non sanati sono una causa frequente di trattative che si fermano. È una verifica da fare prima della proposta, non dopo.",
   },
   {
     title: "Considerate i costi ricorrenti",
