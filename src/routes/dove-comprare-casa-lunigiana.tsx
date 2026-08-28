@@ -296,11 +296,13 @@ function DoveComprarePage() {
           </h2>
           <div className="mt-5 space-y-4 text-[1rem] leading-[1.8] text-[var(--ink-soft)]">
             <p>
-              La Lunigiana è attraversata dalla ferrovia Parma–La Spezia. Le fermate sul territorio
-              sono quattro: <strong className="font-medium text-ink">Pontremoli</strong>,{" "}
+              Sulla linea ferroviaria Parma–La Spezia le fermate lunigianesi sono: <strong className="font-medium text-ink">Pontremoli</strong>,{" "}
               <strong className="font-medium text-ink">Filattiera</strong>,{" "}
               <strong className="font-medium text-ink">Villafranca-Bagnone</strong> e{" "}
-              <strong className="font-medium text-ink">Aulla-Lunigiana</strong>. Se volete ridurre la
+              <strong className="font-medium text-ink">Aulla-Lunigiana</strong>. Da Aulla parte anche
+              la linea verso Lucca, che serve il territorio di Fivizzano e l'area di Casola in
+              Lunigiana. Le fermate possono trovarsi in frazioni e non necessariamente nel capoluogo,
+              quindi la distanza dalla singola casa va valutata caso per caso. Se volete ridurre la
               dipendenza dall&apos;auto, è da qui che conviene partire nella scelta della zona.
             </p>
             <p>
