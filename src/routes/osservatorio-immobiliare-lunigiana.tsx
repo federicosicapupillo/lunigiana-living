@@ -53,7 +53,6 @@ export const Route = createFileRoute("/osservatorio-immobiliare-lunigiana")({
         "Quotazioni medie richieste in vendita nei 14 comuni della Lunigiana (fonte esterna Immobiliare.it, rilevazione luglio 2026) e fotografia aggregata del portafoglio di immobili in vendita di Furia Immobiliare al 28 agosto 2026.",
       url: PAGE_URL,
       inLanguage: "it-IT",
-      license: "https://furiaimmobiliare.it/osservatorio-immobiliare-lunigiana",
       isAccessibleForFree: true,
       creator: { "@id": AGENCY_ID },
       publisher: { "@id": AGENCY_ID },
@@ -116,6 +115,8 @@ function OsservatorioPage() {
   const comuniConLanding = new Set(COMUNE_SEO.map((c) => c.slug));
   const tipologieConLanding = new Set(TIPOLOGIE_SEO.map((t) => t.slug));
   const facts = mercatoFacts();
+  // Derivazione locale ordinata per €/m² crescente (copia+sort; PZ_COMUNI resta invariato).
+  const comuniSorted = [...PZ_COMUNI].sort((a, b) => a.eurM2 - b.eurM2);
   const tipologie = PZ_TIPOLOGIE.filter((t) => t.campione >= 3);
   const fasceMax = Math.max(...PZ_FASCE.map((f) => f.count));
 
@@ -251,7 +252,7 @@ function OsservatorioPage() {
                 </tr>
               </thead>
               <tbody>
-                {PZ_COMUNI.map((c) => (
+                {comuniSorted.map((c) => (
                   <tr key={c.nome} className={ROW}>
                     <th scope="row" className="py-3 pr-4 font-normal text-ink">
                       {c.slug && comuniConLanding.has(c.slug) ? (
@@ -323,10 +324,10 @@ function OsservatorioPage() {
           </dl>
 
           <p className="mt-8 max-w-3xl text-[1rem] leading-[1.8] text-[var(--ink-soft)]">
-            La differenza tra media ({eur(PZ_FURIA.prezzoMedio)}) e mediana ({eur(PZ_FURIA.prezzoMediano)})
-            dipende dai pochi immobili di fascia alta, che alzano la media senza rappresentare la
-            disponibilità tipica. Gli indicatori al metro quadro sono calcolati solo dove prezzo e
-            superficie sono entrambi validi.
+            La media ({eur(PZ_FURIA.prezzoMedio)}) è superiore alla mediana ({eur(PZ_FURIA.prezzoMediano)}),
+            una differenza coerente con la presenza nel portafoglio di alcuni immobili di fascia
+            più alta. Gli indicatori al metro quadro sono calcolati solo dove prezzo e superficie
+            sono entrambi validi.
           </p>
         </div>
       </section>
@@ -493,13 +494,15 @@ function OsservatorioPage() {
             <p>
               <strong className="font-normal text-ink">Prezzo richiesto</strong> vuol dire quanto
               viene chiesto in un annuncio. Il prezzo a cui una casa viene poi effettivamente
-              venduta può essere diverso, e non è un dato che possiamo pubblicare qui.
+              venduta può essere diverso: il prezzo conclusivo non è il dato misurato da questo
+              Osservatorio.
             </p>
             <p>
-              <strong className="font-normal text-ink">La mediana</strong> è il valore centrale:
-              metà degli immobili costa meno, metà costa più. È più affidabile della media quando
-              nel gruppo ci sono pochi immobili molto costosi, perché la media si sposta in alto e
-              descrive male la disponibilità tipica.
+              <strong className="font-normal text-ink">La mediana</strong> è il valore centrale
+              della distribuzione: circa metà delle osservazioni si trova sotto o al valore mediano
+              e circa metà sopra o al valore mediano. È meno influenzata dai valori estremi rispetto
+              alla media: quando nel gruppo ci sono pochi immobili molto costosi, la media si
+              sposta in alto e descrive male la disponibilità tipica.
             </p>
             <p>
               <strong className="font-normal text-ink">Il €/m²</strong> serve per confrontare case
