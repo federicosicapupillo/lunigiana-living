@@ -179,9 +179,10 @@ function OsservatorioPage() {
                 Quotazioni richieste nei 14 comuni
               </h2>
               <p className="mt-4 text-[0.98rem] leading-[1.8] text-[var(--ink-soft)]">
-                Prezzo medio richiesto in vendita al metro quadro, rilevato sugli annunci pubblicati
-                dell&apos;intero mercato. Fonte esterna: {PZ_SOURCE.externalName}, rilevazione{" "}
-                {PZ_SOURCE.externalPeriod}. Comprende tutte le agenzie e i privati, non solo noi.
+                Prezzo medio richiesto in vendita al metro quadro, rilevato sull'offerta
+                pubblicata del portale. Fonte esterna: {PZ_SOURCE.externalName}, rilevazione{" "}
+                {PZ_SOURCE.externalPeriod}. Riflette l'offerta pubblicata sul portale e non
+                il solo portafoglio Furia.
               </p>
             </div>
             <div className="rounded-2xl border border-[var(--terracotta)]/15 bg-[var(--cream)] p-7">
@@ -527,8 +528,8 @@ function OsservatorioPage() {
             <li>
               <strong className="font-normal text-ink">Quotazioni esterne.</strong> I valori €/m²
               dei 14 comuni provengono dalle statistiche pubbliche di mercato di Immobiliare.it,
-              rilevazione {PZ_SOURCE.externalPeriod}. Sono prezzi medi richiesti sull&apos;offerta
-              pubblicata dell&apos;intero mercato.
+              rilevazione {PZ_SOURCE.externalPeriod}. Sono prezzi medi richiesti sull'offerta
+              pubblicata rilevata dal portale.
             </li>
             <li>
               <strong className="font-normal text-ink">Snapshot Furia.</strong> Gli indicatori del
