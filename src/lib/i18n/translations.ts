@@ -1883,6 +1883,8 @@ const en: Dict = {
   "val.free": "The request is free and comes with no obligation.",
   "val.guide.pre": "If the property is in Pontremoli, it may help to first read",
   "val.guide.link": "how much a house in Pontremoli is worth in 2026",
+  "val.sellguide.pre": "If you'd like to understand how a sale works first, read our guide on",
+  "val.sellguide.link": "how to sell a house in Lunigiana",
   "val.progress.step": "Step",
   "val.progress.of": "of",
   "val.cta.next": "Continue",
