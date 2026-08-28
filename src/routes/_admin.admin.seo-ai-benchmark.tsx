@@ -8,7 +8,10 @@ import {
   AI_PLATFORMS,
   AI_PROMPTS,
   AI_STATUSES,
-  MAX_SCORE,
+  EXPECTED_TESTS_PER_PLATFORM,
+  EXPECTED_TESTS_TOTAL,
+  MAX_SCORE_PER_PLATFORM,
+  MAX_SCORE_TOTAL,
   computeRunStats,
   parseCompetitors,
   scoreForStatus,
@@ -18,6 +21,7 @@ import {
   type AiResultStatus,
   type RunStats,
 } from "@/lib/ai-visibility";
+
 
 export const Route = createFileRoute("/_admin/admin/seo-ai-benchmark")({
   head: () => ({
