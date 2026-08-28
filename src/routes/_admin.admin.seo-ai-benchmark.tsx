@@ -144,12 +144,20 @@ function AiBenchmarkPage() {
   );
 
   const setDraft = (key: string, patch: Partial<Draft>) =>
-    setDrafts((d) => ({ ...d, [key]: { ...d[key], ...patch, dirty: true } }));
+    setDrafts((d) => ({ ...d, [key]: { ...d[key], ...patch } }));
+
+  // Delta metodologicamente validi solo fra due run completi (60/60).
+  const comparable = previous !== null && stats.complete && previous.complete;
+  const overallDelta = (cur: number, prev: number) => (comparable ? cur - prev : null);
 
   const saveRow = async (key: string) => {
     const prompt = AI_PROMPTS.find((p) => p.key === key)!;
     const draft = drafts[key];
     if (!draft) return;
+    if (draft.status === "") {
+      toast.error("Seleziona l'esito del test");
+      return;
+    }
     const positionRaw = draft.position.trim();
     const position = positionRaw === "" ? null : Number.parseInt(positionRaw, 10);
     if (position !== null && (!Number.isInteger(position) || position < 1)) {
@@ -157,6 +165,7 @@ function AiBenchmarkPage() {
       return;
     }
     const score = scoreForStatus(draft.status);
+
     if (score === 3 && draft.citedUrl.trim() === "") {
       toast.warning("Score 3 senza URL citata: salvato comunque");
     }
