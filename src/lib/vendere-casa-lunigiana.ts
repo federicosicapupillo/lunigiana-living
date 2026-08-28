@@ -9,7 +9,7 @@
 
 export const VCL_META = {
   h1: "Come vendere casa in Lunigiana: guida pratica 2026",
-  title: "Come vendere casa in Lunigiana: guida pratica 2026",
+  title: "Come vendere casa in Lunigiana: guida pratica 2026 | Furia Immobiliare",
   description:
     "Come vendere casa in Lunigiana nel 2026: i passaggi dall'idea al rogito, quali documenti preparare prima, come scegliere il prezzo richiesto e come chiedere una valutazione.",
   isoDate: "2026-08-28",
