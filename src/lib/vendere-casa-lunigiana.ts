@@ -32,7 +32,7 @@ export const VCL_STEPS: VclStep[] = [
   {
     title: "Controllare la documentazione prima delle visite",
     body:
-      "È il passaggio che più spesso viene rinviato. Riordinare atto di provenienza, dati catastali, planimetria e pratiche edilizie prima di far entrare le persone evita di scoprire un nodo quando c'è già un interessato al tavolo.",
+      "È un passaggio che conviene non rinviare. Riordinare atto di provenienza, dati catastali, planimetria e pratiche edilizie prima di far entrare le persone aiuta a evitare di scoprire un nodo quando c'è già un interessato al tavolo.",
   },
   {
     title: "Preparare casa, foto e testo",
@@ -47,7 +47,7 @@ export const VCL_STEPS: VclStep[] = [
   {
     title: "Gestire proposta e preliminare con professionisti competenti",
     body:
-      "Quando arriva una proposta si entra in una fase con effetti giuridici. È il momento di lavorare insieme a notaio e, se serve, a un tecnico: contenuti, tempi e condizioni vanno impostati sul caso concreto, non su un modello generico.",
+      "Quando si valuta una proposta, contenuto, condizioni e modalità di eventuale accettazione possono avere effetti giuridici. È il momento di lavorare con i professionisti competenti — notaio e, se serve, un tecnico — perché contenuti, tempi e condizioni vanno impostati sul caso concreto, non su un modello generico.",
   },
   {
     title: "Arrivare al rogito con tutto allineato",
@@ -62,7 +62,7 @@ export const VCL_CHECKLIST: VclCheck[] = [
   {
     title: "Atto di provenienza",
     body:
-      "L'atto con cui la casa è entrata nel tuo patrimonio: acquisto, successione, donazione, divisione. È il punto di partenza per ricostruire la storia dell'immobile.",
+      "La documentazione che spiega come l'immobile è entrato nel tuo patrimonio — per esempio acquisto, successione, donazione o divisione — è il punto di partenza per ricostruirne la storia.",
   },
   {
     title: "Dati e planimetria catastale",
@@ -97,7 +97,7 @@ export const VCL_CHECKLIST: VclCheck[] = [
   {
     title: "Terreni, pertinenze e fabbricati accessori",
     body:
-      "Molto frequente in Lunigiana: orti, corti, cantine, legnaie, piccoli fabbricati. Capire quali particelle sono comprese e come sono censite evita malintesi sul perimetro di quello che stai vendendo.",
+      "Nel territorio si incontrano anche orti, corti, cantine, legnaie e piccoli fabbricati. Capire quali particelle sono comprese e come sono censite aiuta a evitare malintesi sul perimetro di ciò che si vende.",
   },
 ];
 
@@ -112,7 +112,7 @@ export const VCL_ERRORI: VclFactor[] = [
   {
     title: "Scoprire i documenti mancanti dopo un'offerta",
     body:
-      "È il rischio pratico più comune: la trattativa si ferma nel momento peggiore, quando l'attenzione dell'acquirente è massima e ogni attesa pesa.",
+      "Può diventare un problema proprio quando la trattativa è già avanzata: una verifica o un documento mancante può rallentare il percorso nel momento in cui c'è già un acquirente interessato.",
   },
   {
     title: "Foto e descrizioni che promettono più di quanto c'è",
