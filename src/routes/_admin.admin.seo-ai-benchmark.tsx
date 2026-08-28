@@ -30,26 +30,26 @@ export const Route = createFileRoute("/_admin/admin/seo-ai-benchmark")({
 });
 
 type Draft = {
-  status: AiResultStatus;
+  /** "" = test non ancora eseguito: non salvabile, nessuna riga DB. */
+  status: AiResultStatus | "";
   position: string;
   citedUrl: string;
   competitors: string;
   notes: string;
   saving: boolean;
-  dirty: boolean;
   existing: boolean;
 };
 
 const emptyDraft = (): Draft => ({
-  status: "not_mentioned",
+  status: "",
   position: "",
   citedUrl: "",
   competitors: "",
   notes: "",
   saving: false,
-  dirty: false,
   existing: false,
 });
+
 
 function todayIso() {
   const d = new Date();
