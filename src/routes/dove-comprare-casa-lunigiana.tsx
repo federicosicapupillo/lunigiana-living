@@ -428,8 +428,20 @@ function DoveComprarePage() {
             >
               vivere in Lunigiana
             </Link>{" "}
-            racconta come funziona la vita quotidiana qui.
+            racconta come funziona la vita quotidiana qui. Per i dati aggregati — quotazioni
+            richieste dei 14 comuni e fotografia del portafoglio Furia, con fonti e metodologia —
+            c&apos;è l&apos;{" "}
+            <Link
+              to="/osservatorio-immobiliare-lunigiana"
+              data-track="dc_to_osservatorio_click"
+              onClick={() => trackClick("dc_to_osservatorio_click", { source: "dove_comprare" })}
+              className="text-[var(--terracotta)] underline hover:no-underline"
+            >
+              Osservatorio Immobiliare Lunigiana
+            </Link>
+            .
           </p>
+
         </div>
       </section>
 
