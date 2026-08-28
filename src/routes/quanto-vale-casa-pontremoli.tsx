@@ -192,7 +192,7 @@ function QuantoValePontremoliPage() {
               {
                 k: "Annunci in vendita mostrati",
                 v: itNum(QV_PUBBLICO.annunciPortale),
-                n: "offerta pubblicata sul portale",
+                n: `conteggio del portale — ${QV_PUBBLICO.annunciDataLabel}`,
               },
             ].map((b) => (
               <div
@@ -213,14 +213,17 @@ function QuantoValePontremoliPage() {
             <a
               href={QV_PUBBLICO.fonteUrl}
               target="_blank"
-              rel="noopener noreferrer nofollow"
+              rel="noopener noreferrer"
               className="inline-flex items-center gap-1 text-[var(--terracotta)] underline hover:no-underline"
             >
               pagina di riferimento
               <ExternalLink size={13} strokeWidth={1.6} />
             </a>
             . La variazione annua di un comune di queste dimensioni va letta con prudenza: bastano
-            pochi annunci nuovi, o molto diversi dai precedenti, per spostare la media.
+            pochi annunci nuovi, o molto diversi dai precedenti, per spostare la media. Il conteggio
+            degli annunci è quello mostrato dal portale al momento della verifica del{" "}
+            {QV_PUBBLICO.annunciDataLabel}, distinto dalla rilevazione dei prezzi di{" "}
+            {QV_PUBBLICO.periodo}.
           </p>
         </div>
       </section>
