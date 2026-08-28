@@ -441,6 +441,19 @@ function DoveComprarePage() {
             </Link>
             .
           </p>
+          <p className="mt-4 max-w-3xl text-[1rem] leading-[1.8] text-[var(--ink-soft)]">
+            Se la casa che cercate non sarà la vostra residenza principale, la guida{" "}
+            <Link
+              to="/seconda-casa-lunigiana"
+              data-track="dc_to_seconda_casa_click"
+              onClick={() => trackClick("dc_to_seconda_casa_click", { source: "dove_comprare" })}
+              className="text-[var(--terracotta)] underline hover:no-underline"
+            >
+              seconda casa in Lunigiana
+            </Link>{" "}
+            affronta gli aspetti specifici: uso reale della casa, accessibilità, spazi esterni e
+            costi di mantenimento.
+          </p>
 
         </div>
       </section>

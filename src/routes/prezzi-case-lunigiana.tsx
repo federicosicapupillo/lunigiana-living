@@ -500,6 +500,16 @@ function PrezziLunigianaPage() {
               >
                 quanto vale una casa a Pontremoli
               </Link>
+              . Chi cerca una casa per weekend e vacanze trova i criteri d'uso, i costi di
+              mantenimento e una checklist nella guida{" "}
+              <Link
+                to="/seconda-casa-lunigiana"
+                data-track="pz_to_seconda_casa_click"
+                onClick={() => trackClick("pz_to_seconda_casa_click", { source: "prezzi_lunigiana" })}
+                className="text-[var(--terracotta)] underline hover:no-underline"
+              >
+                seconda casa in Lunigiana
+              </Link>
               .
             </p>
 

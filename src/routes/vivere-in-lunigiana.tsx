@@ -253,6 +253,19 @@ function VivereLunigianaPage() {
               </Link>
               .
             </p>
+            <p className="mt-4 text-[0.95rem] leading-relaxed text-[var(--ink-soft)]">
+              Se invece stai pensando a una casa per weekend e vacanze, e non a un trasferimento,
+              parti dalla guida su{" "}
+              <Link
+                to="/seconda-casa-lunigiana"
+                data-track="vl_to_seconda_casa_click"
+                onClick={() => trackClick("vl_to_seconda_casa_click", { source: "vivere_lunigiana" })}
+                className="text-[var(--terracotta)] underline hover:no-underline"
+              >
+                la seconda casa in Lunigiana
+              </Link>
+              .
+            </p>
 
 
           </div>
