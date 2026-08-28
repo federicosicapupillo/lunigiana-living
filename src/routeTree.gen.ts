@@ -19,6 +19,7 @@ import { Route as TerritoriRouteImport } from './routes/territori'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ServiziRouteImport } from './routes/servizi'
 import { Route as PrezziCaseLunigianaRouteImport } from './routes/prezzi-case-lunigiana'
+import { Route as OsservatorioImmobiliareLunigianaRouteImport } from './routes/osservatorio-immobiliare-lunigiana'
 import { Route as OffMarketRouteImport } from './routes/off-market'
 import { Route as IndexDotaspRouteImport } from './routes/index[.]asp'
 import { Route as ImmobiliRouteImport } from './routes/immobili'
@@ -104,6 +105,12 @@ const PrezziCaseLunigianaRoute = PrezziCaseLunigianaRouteImport.update({
   path: '/prezzi-case-lunigiana',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OsservatorioImmobiliareLunigianaRoute =
+  OsservatorioImmobiliareLunigianaRouteImport.update({
+    id: '/osservatorio-immobiliare-lunigiana',
+    path: '/osservatorio-immobiliare-lunigiana',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const OffMarketRoute = OffMarketRouteImport.update({
   id: '/off-market',
   path: '/off-market',
@@ -295,6 +302,7 @@ export interface FileRoutesByFullPath {
   '/immobili': typeof ImmobiliRouteWithChildren
   '/index.asp': typeof IndexDotaspRoute
   '/off-market': typeof OffMarketRoute
+  '/osservatorio-immobiliare-lunigiana': typeof OsservatorioImmobiliareLunigianaRoute
   '/prezzi-case-lunigiana': typeof PrezziCaseLunigianaRoute
   '/servizi': typeof ServiziRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -339,6 +347,7 @@ export interface FileRoutesByTo {
   '/elenco_annunci.asp': typeof Elenco_annunciDotaspRoute
   '/index.asp': typeof IndexDotaspRoute
   '/off-market': typeof OffMarketRoute
+  '/osservatorio-immobiliare-lunigiana': typeof OsservatorioImmobiliareLunigianaRoute
   '/prezzi-case-lunigiana': typeof PrezziCaseLunigianaRoute
   '/servizi': typeof ServiziRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -385,6 +394,7 @@ export interface FileRoutesById {
   '/immobili': typeof ImmobiliRouteWithChildren
   '/index.asp': typeof IndexDotaspRoute
   '/off-market': typeof OffMarketRoute
+  '/osservatorio-immobiliare-lunigiana': typeof OsservatorioImmobiliareLunigianaRoute
   '/prezzi-case-lunigiana': typeof PrezziCaseLunigianaRoute
   '/servizi': typeof ServiziRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -432,6 +442,7 @@ export interface FileRouteTypes {
     | '/immobili'
     | '/index.asp'
     | '/off-market'
+    | '/osservatorio-immobiliare-lunigiana'
     | '/prezzi-case-lunigiana'
     | '/servizi'
     | '/sitemap.xml'
@@ -476,6 +487,7 @@ export interface FileRouteTypes {
     | '/elenco_annunci.asp'
     | '/index.asp'
     | '/off-market'
+    | '/osservatorio-immobiliare-lunigiana'
     | '/prezzi-case-lunigiana'
     | '/servizi'
     | '/sitemap.xml'
@@ -521,6 +533,7 @@ export interface FileRouteTypes {
     | '/immobili'
     | '/index.asp'
     | '/off-market'
+    | '/osservatorio-immobiliare-lunigiana'
     | '/prezzi-case-lunigiana'
     | '/servizi'
     | '/sitemap.xml'
@@ -568,6 +581,7 @@ export interface RootRouteChildren {
   ImmobiliRoute: typeof ImmobiliRouteWithChildren
   IndexDotaspRoute: typeof IndexDotaspRoute
   OffMarketRoute: typeof OffMarketRoute
+  OsservatorioImmobiliareLunigianaRoute: typeof OsservatorioImmobiliareLunigianaRoute
   PrezziCaseLunigianaRoute: typeof PrezziCaseLunigianaRoute
   ServiziRoute: typeof ServiziRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
@@ -657,6 +671,13 @@ declare module '@tanstack/react-router' {
       path: '/prezzi-case-lunigiana'
       fullPath: '/prezzi-case-lunigiana'
       preLoaderRoute: typeof PrezziCaseLunigianaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/osservatorio-immobiliare-lunigiana': {
+      id: '/osservatorio-immobiliare-lunigiana'
+      path: '/osservatorio-immobiliare-lunigiana'
+      fullPath: '/osservatorio-immobiliare-lunigiana'
+      preLoaderRoute: typeof OsservatorioImmobiliareLunigianaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/off-market': {
@@ -979,6 +1000,7 @@ const rootRouteChildren: RootRouteChildren = {
   ImmobiliRoute: ImmobiliRouteWithChildren,
   IndexDotaspRoute: IndexDotaspRoute,
   OffMarketRoute: OffMarketRoute,
+  OsservatorioImmobiliareLunigianaRoute: OsservatorioImmobiliareLunigianaRoute,
   PrezziCaseLunigianaRoute: PrezziCaseLunigianaRoute,
   ServiziRoute: ServiziRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
