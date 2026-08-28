@@ -41,7 +41,7 @@ export const DC_PROFILI: Profilo[] = [
       "Entrambi hanno una fermata sulla linea (Filattiera e Villafranca-Bagnone) e si trovano lungo il fondovalle attraversato dalla SS62. Sono paesi, non città: i servizi essenziali ci sono, per il resto si va a Pontremoli o ad Aulla.",
   },
   {
-    titolo: "Se vuoi borgo e natura restando vicino al fondovalle",
+    titolo: "Se vuoi borgo e natura, con collegamenti verso il fondovalle",
     comuni: "Bagnone, Mulazzo, Licciana Nardi, Tresana",
     body:
       "Case di pietra, frazioni, silenzio, e il fondovalle con i suoi servizi a breve distanza. L'auto qui serve quasi sempre, e conviene guardare bene la strada di accesso e come si vive quella casa in inverno.",
@@ -53,10 +53,10 @@ export const DC_PROFILI: Profilo[] = [
       "Sono ambienti di montagna e alta valle, con paesaggi molto belli e prezzi richiesti spesso più bassi. Le distanze reali si allungano, i servizi quotidiani vanno verificati sul posto e l'inverno va messo in conto senza illusioni.",
   },
   {
-    titolo: "Se guardi al versante orientale e all'area sud-est",
+    titolo: "Se guardi alla parte orientale e alla bassa Lunigiana",
     comuni: "Fivizzano, Fosdinovo, Podenzana",
     body:
-      "Sono tre realtà diverse fra loro e non vanno assimilate: Fivizzano è un centro storico importante con un presidio ospedaliero, Fosdinovo è collina panoramica verso il mare, Podenzana è vicina al nodo di Aulla. Le accomuna solo la posizione nella parte orientale e sud del territorio.",
+      "Sono tre realtà diverse fra loro e non vanno assimilate: Fivizzano è un centro storico importante con un presidio ospedaliero, Fosdinovo è collina panoramica verso il mare, Podenzana è vicina al nodo di Aulla. Le accomuna solo la posizione nella parte orientale e nella bassa Lunigiana.",
   },
 ];
 
@@ -76,7 +76,7 @@ export const DC_SCHEDE: ComuneScheda[] = [
   {
     nome: "Pontremoli",
     chiave: "Casello A15, stazione, presidio ospedaliero, SS62, scuole e negozi",
-    adattoA: "chi vuole servizi veri e non vuole dipendere sempre dall'auto",
+    adattoA: "chi vuole servizi quotidiani e non vuole dipendere sempre dall'auto",
     paragrafi: [
       "Pontremoli è la città della Lunigiana alta: portici, ponti sul Magra, un centro storico dove si vive davvero anche d'inverno. Ci sono scuole, negozi, mercato, uffici, un presidio ospedaliero, la stazione sulla linea Parma–La Spezia e un casello dell'A15.",
       "Il punto di forza pratico è proprio questo: è uno dei pochi posti della valle dove si può fare la spesa, portare i figli a scuola e prendere un treno senza programmare la giornata intorno agli spostamenti.",
@@ -112,7 +112,7 @@ export const DC_SCHEDE: ComuneScheda[] = [
     adattoA: "chi cerca un borgo autentico con il fondovalle a portata di mano",
     paragrafi: [
       "Mulazzo è il comune dei borghi: nuclei di pietra come Montereggio, storie legate ai Malaspina e ai librai, un territorio che sale dal fondovalle verso la collina.",
-      "Il punto di forza è la combinazione tra carattere dei luoghi e prezzi medi richiesti ancora bassi: è una delle zone dove chi cerca la casa di pietra da recuperare trova più scelta.",
+      "Il punto di forza è la combinazione tra carattere dei luoghi e prezzi medi richiesti ancora bassi: il territorio comprende molti borghi e case in pietra, mentre disponibilità e stato degli immobili cambiano nel tempo.",
       "Il compromesso è la dipendenza dall'auto per quasi tutto, e la necessità di valutare con attenzione strade, pendenze e stato degli immobili storici, che spesso richiedono lavori significativi.",
       "Ha senso per chi vuole un borgo vero e non un centro abitato di servizio, per chi ama recuperare, e per chi accetta di spostarsi verso Pontremoli o Aulla per la vita pratica.",
     ],
@@ -124,7 +124,7 @@ export const DC_SCHEDE: ComuneScheda[] = [
     paragrafi: [
       "Villafranca in Lunigiana è uno dei paesi più comodi della valle: fondovalle, SS62, la stazione di Villafranca-Bagnone, negozi e servizi di uso quotidiano concentrati in poco spazio.",
       "Il punto di forza è la praticità: si fanno molte cose a piedi e si raggiunge il resto della Lunigiana in tempi ragionevoli, in auto o in treno.",
-      "Il compromesso è che è una zona richiesta, e questo si vede nel prezzo medio richiesto, più alto di diversi comuni vicini. Chi cerca isolamento e panorami ampi deve guardare le frazioni, non il centro.",
+      "Il compromesso è che il prezzo medio richiesto è superiore a quello di diversi comuni vicini. Chi cerca isolamento e panorami ampi deve guardare le frazioni, non il centro.",
       "Ha senso per famiglie, per chi lavora spostandosi lungo la valle e per chi vuole una seconda casa che funzioni anche senza auto sempre disponibile.",
     ],
   },
@@ -135,7 +135,7 @@ export const DC_SCHEDE: ComuneScheda[] = [
     paragrafi: [
       "Bagnone è uno dei borghi più riconoscibili della Lunigiana: il torrente che attraversa il paese, i portici, il castello sopra l'abitato, e una parte alta di frazioni che sale verso l'Appennino.",
       "Il punto di forza è che unisce atmosfera da borgo e alcuni servizi in loco, cosa non frequente nei comuni collinari. La stazione di riferimento della linea è Villafranca-Bagnone.",
-      "Il compromesso è il prezzo medio richiesto, tra i più alti della fascia collinare, e la conformazione del territorio: alcune frazioni sono lontane e con strade strette.",
+      "Il compromesso è il prezzo medio richiesto, superiore a quello di alcuni comuni limitrofi e interni, e la conformazione del territorio: alcune frazioni sono lontane e con strade strette.",
       "Ha senso per chi vuole un paese vivo e piacevole da abitare anche fuori stagione, e per chi cerca una casa di carattere accettando di curarla nel tempo.",
     ],
   },
@@ -178,8 +178,8 @@ export const DC_SCHEDE: ComuneScheda[] = [
     adattoA: "chi mette al primo posto collegamenti e servizi quotidiani",
     paragrafi: [
       "Aulla è il nodo della bassa Lunigiana: qui si incontrano l'A15 con il suo casello, la stazione di Aulla-Lunigiana sulla linea Parma–La Spezia, la SS62 e le diramazioni verso Fivizzano e Casola.",
-      "Il punto di forza è la comodità: supermercati, uffici, scuole, negozi e la vicinanza reale alla costa e a La Spezia. È la scelta più semplice per chi lavora fuori valle.",
-      "Il compromesso è il carattere del luogo: è la zona più urbana e trafficata della Lunigiana, con il prezzo medio richiesto tra i più alti, e non è il posto giusto per chi cerca il borgo di pietra.",
+      "Il punto di forza è la comodità: supermercati, uffici, scuole, negozi e la vicinanza reale alla costa e a La Spezia. Può essere una delle scelte più pratiche per chi lavora fuori valle.",
+      "Il compromesso è il carattere del luogo: è tra i contesti più urbani e trafficati della Lunigiana, con il prezzo medio richiesto tra i più alti, e non è il posto giusto per chi cerca il borgo di pietra.",
       "Ha senso per chi si trasferisce per lavoro, per famiglie che vogliono tutto vicino e per chi preferisce una casa recente e pronta.",
     ],
   },
@@ -222,7 +222,7 @@ export const DC_SCHEDE: ComuneScheda[] = [
     adattoA: "chi cerca panorama e vicinanza alla costa",
     paragrafi: [
       "Fosdinovo è il balcone della Lunigiana verso il mare: il borgo con il castello, i crinali coltivati, e in giornate limpide la vista che arriva fino al golfo.",
-      "Il punto di forza è proprio il paesaggio, insieme alla vicinanza relativa alla costa e ai centri della piana, che ne fa una zona molto richiesta.",
+      "Il punto di forza è proprio il paesaggio, insieme alla vicinanza relativa alla costa e ai centri della piana.",
       "Il compromesso si legge nel prezzo medio richiesto, il più alto dei quattordici comuni, e nella conformazione collinare: strade tortuose, frazioni distanti fra loro, servizi quotidiani da verificare caso per caso.",
       "Ha senso per chi mette il panorama e la posizione al primo posto, per chi guarda anche alla costa e per chi cerca una casa con esterni curati.",
     ],
