@@ -607,6 +607,12 @@ function OsservatorioPage() {
                 ev: "oss_to_immobili",
               },
               {
+                to: "/quanto-vale-casa-pontremoli" as const,
+                title: "Quanto vale una casa a Pontremoli",
+                body: "Prezzi richiesti nel capoluogo e cosa serve davvero per valutare un immobile.",
+                ev: "oss_to_quanto_vale",
+              },
+              {
                 to: "/valuta-casa" as const,
                 title: "Valuta la tua casa",
                 body: "Un percorso guidato per ricevere una valutazione sul tuo immobile.",

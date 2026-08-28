@@ -491,6 +491,15 @@ function PrezziLunigianaPage() {
               >
                 Osservatorio Immobiliare Lunigiana
               </Link>
+              . Chi ragiona sul capoluogo può partire dalla pagina{" "}
+              <Link
+                to="/quanto-vale-casa-pontremoli"
+                data-track="pz_to_quanto_vale_click"
+                onClick={() => trackClick("pz_to_quanto_vale_click", { source: "prezzi_lunigiana" })}
+                className="text-[var(--terracotta)] underline hover:no-underline"
+              >
+                quanto vale una casa a Pontremoli
+              </Link>
               .
             </p>
 
