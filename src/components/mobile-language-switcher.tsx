@@ -5,6 +5,7 @@ import {
   SheetContent,
   SheetHeader,
   SheetTitle,
+  SheetDescription,
 } from "@/components/ui/sheet";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import type { Language } from "@/lib/i18n/translations";
@@ -60,6 +61,11 @@ export function MobileLanguageControl({ className = "" }: { className?: string }
             <SheetTitle className="text-lg tracking-wide text-foreground">
               {language === "en" ? "Language" : "Lingua"}
             </SheetTitle>
+            <SheetDescription className="sr-only">
+              {language === "en"
+                ? "Choose the site language"
+                : "Scegli la lingua del sito"}
+            </SheetDescription>
           </SheetHeader>
           <ul className="mt-4 flex flex-col gap-2">
             {LANGS.map((l) => {
