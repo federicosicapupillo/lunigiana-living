@@ -4,6 +4,10 @@ import { Menu, X } from "lucide-react";
 import logoAsset from "@/assets/furia-logo.png.asset.json";
 import { StaticImage } from "@/components/static-image";
 import { LanguageSwitcher } from "@/components/language-switcher";
+import {
+  MobileLanguageControl,
+  MobileLanguageSection,
+} from "@/components/mobile-language-switcher";
 import { useT } from "@/lib/i18n/LanguageContext";
 
 const NAV_ITEMS = [
@@ -53,13 +57,16 @@ export function SiteHeader() {
           <LanguageSwitcher />
         </div>
 
-        <button
-          aria-label={t("nav.openMenu")}
-          onClick={() => setOpen((v) => !v)}
-          className="ml-auto rounded-md p-2 text-foreground transition-colors hover:bg-warm-ivory/70 hover:text-terracotta lg:hidden"
-        >
-          {open ? <X size={22} /> : <Menu size={22} />}
-        </button>
+        <div className="ml-auto flex items-center gap-2 lg:hidden">
+          <MobileLanguageControl />
+          <button
+            aria-label={t("nav.openMenu")}
+            onClick={() => setOpen((v) => !v)}
+            className="inline-flex h-11 w-11 items-center justify-center rounded-md text-foreground transition-colors hover:bg-warm-ivory/70 hover:text-terracotta"
+          >
+            {open ? <X size={22} /> : <Menu size={22} />}
+          </button>
+        </div>
       </div>
 
       {open && (
@@ -76,7 +83,7 @@ export function SiteHeader() {
               </Link>
             ))}
             <div className="mt-2 border-t border-warm-border/50 px-3 pt-3">
-              <LanguageSwitcher />
+              <MobileLanguageSection onSwitch={() => setOpen(false)} />
             </div>
           </nav>
         </div>
