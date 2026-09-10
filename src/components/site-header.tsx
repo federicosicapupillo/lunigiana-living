@@ -83,7 +83,7 @@ export function SiteHeader() {
               </Link>
             ))}
             <div className="mt-2 border-t border-warm-border/50 px-3 pt-3">
-              <LanguageSwitcher />
+              <MobileLanguageSection onSwitch={() => setOpen(false)} />
             </div>
           </nav>
         </div>
