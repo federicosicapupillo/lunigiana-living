@@ -722,6 +722,28 @@ function PropertyDetail() {
         )}
       </section>
 
+      {lightboxOpen && p.gallery.length > 0 && (
+        <PropertyLightbox
+          images={p.gallery}
+          index={active}
+          onIndexChange={(i) => {
+            setActive(i);
+            trackClick("property_gallery_interaction", {
+              action: "lightbox_navigate",
+              image_index: i,
+              property_id: String(p.id),
+              property_code: p.reference,
+              language,
+            });
+          }}
+          onClose={() => setLightboxOpen(false)}
+          variants={p.imageVariants}
+          alt={title}
+          labels={{ close: t("detail.closeFullscreen") }}
+        />
+      )}
+
+
       {/* First Vision — dedicated rendering section */}
       {p.renderings && p.renderings.length > 0 && (
         <section className="container-editorial mt-16 sm:mt-20">
