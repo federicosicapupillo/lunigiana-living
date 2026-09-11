@@ -1467,6 +1467,8 @@ const en: Dict = {
   "detail.firstVisionBody": "These images are indicative renderings created to highlight the property's potential and help you imagine new possibilities of furnishing, atmosphere and use of the spaces.",
   "detail.renderingBadge": "Indicative rendering",
   "detail.renderingBadgeShort": "Indicative vision",
+  "detail.openFullscreen": "Open photo full screen",
+  "detail.closeFullscreen": "Close",
  "detail.occasioneBadge": "Opportunity",
  "detail.occasioneHeadline": "Not to be missed",
  "detail.whyTitle": "Why it is interesting",
