@@ -590,7 +590,23 @@ function PropertyDetail() {
             }
           }}
         >
-          <div className="mx-auto flex w-full items-center justify-center h-[60vw] max-h-[450px] sm:h-[55vw] sm:max-h-[550px] md:h-[60vh] md:max-h-[650px]">
+          <div
+            role={renderFor ? undefined : "button"}
+            tabIndex={renderFor ? undefined : 0}
+            aria-label={renderFor ? undefined : t("detail.openFullscreen")}
+            onClick={renderFor ? undefined : () => setLightboxOpen(true)}
+            onKeyDown={
+              renderFor
+                ? undefined
+                : (e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      setLightboxOpen(true);
+                    }
+                  }
+            }
+            className={`mx-auto flex w-full items-center justify-center h-[60vw] max-h-[450px] sm:h-[55vw] sm:max-h-[550px] md:h-[60vh] md:max-h-[650px] ${renderFor ? "" : "cursor-zoom-in"}`}
+          >
             {renderFor ? (
               <BeforeAfterSlider
                 key={main}
