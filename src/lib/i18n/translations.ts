@@ -474,6 +474,8 @@ const it: Dict = {
  "detail.firstVisionBody": "Queste immagini sono rendering indicativi pensati per valorizzare il potenziale dell'immobile e aiutarti a immaginare nuove possibilità di arredo, atmosfera e utilizzo degli spazi.",
  "detail.renderingBadge": "Rendering indicativo",
  "detail.renderingBadgeShort": "Visione indicativa",
+  "detail.openFullscreen": "Apri la foto a schermo intero",
+  "detail.closeFullscreen": "Chiudi",
  "detail.occasioneBadge": "Occasione",
  "detail.occasioneHeadline": "Occasione da non perdere",
  "detail.whyTitle": "Perché è interessante",
