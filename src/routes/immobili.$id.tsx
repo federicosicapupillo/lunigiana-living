@@ -32,6 +32,7 @@ import {
 } from "@/lib/i18n/property-localize";
 import { COMMERCIAL_HIGHLIGHT_EN } from "@/lib/admin/property-constants";
 import { img, imgSrcSet } from "@/lib/image-url";
+import { PropertyLightbox } from "@/components/property-lightbox";
 import { trackEvent, trackClick } from "@/lib/analytics";
 import { siteUrl } from "@/lib/site-url";
 import { propertyPath, propertyOgImagePath } from "@/lib/property-url";
@@ -306,6 +307,7 @@ function PropertyDetail() {
     contactRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
   const [active, setActive] = useState(0);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
   const main = p.gallery[active] || p.image;
   const galleryCount = p.gallery.length;
   const renderFor = p.galleryPairs?.[main];
@@ -589,7 +591,23 @@ function PropertyDetail() {
             }
           }}
         >
-          <div className="mx-auto flex w-full items-center justify-center h-[60vw] max-h-[450px] sm:h-[55vw] sm:max-h-[550px] md:h-[60vh] md:max-h-[650px]">
+          <div
+            role={renderFor ? undefined : "button"}
+            tabIndex={renderFor ? undefined : 0}
+            aria-label={renderFor ? undefined : t("detail.openFullscreen")}
+            onClick={renderFor ? undefined : () => setLightboxOpen(true)}
+            onKeyDown={
+              renderFor
+                ? undefined
+                : (e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      setLightboxOpen(true);
+                    }
+                  }
+            }
+            className={`mx-auto flex w-full items-center justify-center h-[60vw] max-h-[450px] sm:h-[55vw] sm:max-h-[550px] md:h-[60vh] md:max-h-[650px] ${renderFor ? "" : "cursor-zoom-in"}`}
+          >
             {renderFor ? (
               <BeforeAfterSlider
                 key={main}
@@ -704,6 +722,34 @@ function PropertyDetail() {
           </div>
         )}
       </section>
+
+      {lightboxOpen && p.gallery.length > 0 && (
+        <PropertyLightbox
+          images={p.gallery}
+          index={active}
+          onIndexChange={(i) => {
+            setActive(i);
+            trackClick("property_gallery_interaction", {
+              action: "lightbox_navigate",
+              image_index: i,
+              property_id: String(p.id),
+              property_code: p.reference,
+              language,
+            });
+          }}
+          onClose={() => setLightboxOpen(false)}
+          variants={p.imageVariants}
+          alt={title}
+          labels={{
+            close: t("detail.closeFullscreen"),
+            prev: t("detail.lightboxPrev"),
+            next: t("detail.lightboxNext"),
+            hint: t("detail.lightboxHint"),
+            error: t("detail.lightboxError"),
+          }}
+        />
+      )}
+
 
       {/* First Vision — dedicated rendering section */}
       {p.renderings && p.renderings.length > 0 && (
