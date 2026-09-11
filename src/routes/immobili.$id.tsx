@@ -306,6 +306,7 @@ function PropertyDetail() {
     contactRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
   const [active, setActive] = useState(0);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
   const main = p.gallery[active] || p.image;
   const galleryCount = p.gallery.length;
   const renderFor = p.galleryPairs?.[main];
