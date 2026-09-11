@@ -740,7 +740,13 @@ function PropertyDetail() {
           onClose={() => setLightboxOpen(false)}
           variants={p.imageVariants}
           alt={title}
-          labels={{ close: t("detail.closeFullscreen") }}
+          labels={{
+            close: t("detail.closeFullscreen"),
+            prev: t("detail.lightboxPrev"),
+            next: t("detail.lightboxNext"),
+            hint: t("detail.lightboxHint"),
+            error: t("detail.lightboxError"),
+          }}
         />
       )}
 

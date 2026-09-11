@@ -10,7 +10,7 @@ type Props = {
   variants?: VariantsMap;
   /** Base alt text; index is appended for uniqueness. */
   alt: string;
-  labels?: { close?: string; prev?: string; next?: string };
+  labels?: { close?: string; prev?: string; next?: string; hint?: string; error?: string };
 };
 
 const MAX_SCALE = 4;
@@ -299,8 +299,7 @@ export function PropertyLightbox({
         )}
         {failed ? (
           <div className="absolute inset-0 flex items-center justify-center px-6 text-center text-sm text-white/70">
-            {labels?.close ? "" : ""}
-            Immagine non disponibile
+            {labels?.error ?? "Immagine non disponibile"}
           </div>
         ) : (
           <img
@@ -353,7 +352,7 @@ export function PropertyLightbox({
         className="relative z-20 pb-2 text-center text-[11px] text-white/50"
         style={{ paddingBottom: "max(env(safe-area-inset-bottom), 0.5rem)" }}
       >
-        {count > 1 ? "Scorri per cambiare foto · doppio tap per zoom" : "Doppio tap per zoom"}
+        {labels?.hint ?? (count > 1 ? "Scorri per cambiare foto · doppio tap per zoom" : "Doppio tap per zoom")}
       </div>
     </div>
   );
