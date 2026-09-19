@@ -10,15 +10,19 @@
  * 2. Third-party forward — Plausible / gtag / fbq / dataLayer / lvAnalytics,
  *    whatever happens to be on `window`. Safe no-op when none exists.
  *
- * Privacy guarantees (enforced here, not at call sites):
- * - No personal data is ever forwarded (name / email / phone / message / IP),
- *   including obfuscated keys like `customer_email` or `contact_phone`.
+ * Privacy (enforced here, not at call sites):
+ * - Known / recognizable PII fields (name / email / phone / message / IP,
+ *   including disguised keys like `customer_email` or `contact_phone`) are
+ *   filtered out before anything is persisted or forwarded.
  * - No referrer, query string, user-agent or IP is ever read or sent.
+ * - Call sites should pass only categorical metadata, never free-form user
+ *   input; this file is a safety net, not a licence to send personal data.
  * - `session_id` is a pseudonymous per-tab identifier kept in sessionStorage.
  * - `created_at` is never sent; the database assigns the server timestamp.
  */
 
 import { getAttribution } from "@/lib/attribution";
+import { createClientUuid } from "@/lib/client-id";
 
 export type AnalyticsPayload = Record<string, string | number | boolean | null | undefined>;
 
@@ -132,14 +136,10 @@ function currentPath(): string {
 const SESSION_KEY = "furia_event_session_v1";
 let memorySessionId: string | null = null;
 
+// Session id uses createClientUuid() so it also benefits from the
+// crypto.getRandomValues fallback when crypto.randomUUID is unavailable.
 function newSessionId(): string | null {
-  try {
-    return typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
-      ? crypto.randomUUID()
-      : null;
-  } catch {
-    return null;
-  }
+  return createClientUuid();
 }
 
 /** Stable within the same sessionStorage lifetime; in-memory fallback. */
