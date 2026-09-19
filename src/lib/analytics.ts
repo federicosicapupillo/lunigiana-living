@@ -92,7 +92,7 @@ function isBrowser(): boolean {
 
 function isDev(): boolean {
   try {
-    return Boolean((import.meta as any)?.env?.DEV);
+    return Boolean(import.meta.env.DEV);
   } catch {
     return false;
   }
