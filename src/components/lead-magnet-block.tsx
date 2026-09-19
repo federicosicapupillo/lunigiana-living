@@ -6,6 +6,7 @@ import { sendLeadNotification } from "@/lib/lead-notify.functions";
 import { useT, useLanguage } from "@/lib/i18n/LanguageContext";
 import { trackEvent } from "@/lib/analytics";
 import { getAttribution } from "@/lib/attribution";
+import { createClientUuid } from "@/lib/client-id";
 
 type Variant = "full" | "compact";
 
@@ -126,7 +127,11 @@ export function LeadMagnetBlock({
       : "Lead magnet — Guida Lunigiana";
 
     setStatus("submitting");
+    // Client-generated id lets the success event reference this lead without a
+    // read-back (SELECT on leads is admin-only); falls back to the DB default.
+    const leadId = createClientUuid();
     const insertPayload = {
+      ...(leadId ? { id: leadId } : {}),
       full_name,
       email,
       phone,
@@ -174,6 +179,7 @@ export function LeadMagnetBlock({
       language,
       interest_type: interestValue,
       page_path: sourcePath,
+      lead_id: leadId ?? undefined,
     });
   }
 

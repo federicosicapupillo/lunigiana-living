@@ -9,6 +9,7 @@ import type { Language } from "@/lib/i18n/translations";
 import { useLocalizedHead } from "@/hooks/use-localized-head";
 import { trackEvent } from "@/lib/analytics";
 import { getAttribution } from "@/lib/attribution";
+import { createClientUuid } from "@/lib/client-id";
 import { siteUrl } from "@/lib/site-url";
 import { institutionalGraph } from "@/lib/structured-data";
 import { whatsappUrl } from "@/components/whatsapp-float";
@@ -299,7 +300,11 @@ function TrovaCasaPage() {
     const source_page = "guided_search:/trova-casa-lunigiana";
 
     setStatus("submitting");
+    // Client-generated id lets the success event reference this lead without a
+    // read-back (SELECT on leads is admin-only); falls back to the DB default.
+    const leadId = createClientUuid();
     const { error } = await supabase.from("leads").insert({
+      ...(leadId ? { id: leadId } : {}),
       full_name,
       email,
       phone,
@@ -350,6 +355,7 @@ function TrovaCasaPage() {
       selected_area: state.areas.join(",") || undefined,
       budget_range: state.budget || undefined,
       timeline: state.timeline || undefined,
+      lead_id: leadId ?? undefined,
     });
   }
 

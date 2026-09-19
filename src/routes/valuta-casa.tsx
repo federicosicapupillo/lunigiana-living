@@ -16,6 +16,7 @@ import type { Language } from "@/lib/i18n/translations";
 import { useLocalizedHead } from "@/hooks/use-localized-head";
 import { trackEvent } from "@/lib/analytics";
 import { getAttribution } from "@/lib/attribution";
+import { createClientUuid } from "@/lib/client-id";
 import { siteUrl } from "@/lib/site-url";
 import { institutionalGraph } from "@/lib/structured-data";
 import { whatsappUrl } from "@/components/whatsapp-float";
@@ -354,7 +355,11 @@ function ValutaCasaPage() {
 
     submittingRef.current = true;
     setStatus("submitting");
+    // Client-generated id lets the success event reference this lead without a
+    // read-back (SELECT on leads is admin-only); falls back to the DB default.
+    const leadId = createClientUuid();
     const { error } = await supabase.from("leads").insert({
+      ...(leadId ? { id: leadId } : {}),
       full_name,
       email,
       phone,
@@ -401,6 +406,7 @@ function ValutaCasaPage() {
       selling_timeline: details.selling_timeline ?? undefined,
       main_goal: details.main_goal ?? undefined,
       off_market_interest: offMarketInterest,
+      lead_id: leadId ?? undefined,
     });
   }
 
