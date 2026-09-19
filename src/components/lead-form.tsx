@@ -6,6 +6,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { sendLeadNotification } from "@/lib/lead-notify.functions";
 import { trackClick, trackEvent } from "@/lib/analytics";
 import { getAttribution } from "@/lib/attribution";
+import { createClientUuid } from "@/lib/client-id";
 
 const PROPERTY_TYPES_IT = [
   "Appartamento","Casa indipendente","Villetta","Rustico / casale","Villa","Terreno","Immobile da ristrutturare","Non ho ancora deciso",
@@ -117,7 +118,12 @@ export function LeadForm({
     }
 
     setStatus("submitting");
-    const { error } = await supabase.from("leads").insert(payload);
+    // Client-generated id so the success event can reference the lead without
+    // a .select("id") read-back (SELECT on leads is admin-only). Null-safe:
+    // the database default applies when secure randomness is unavailable.
+    const leadId = createClientUuid();
+    const insertPayload = leadId ? { ...payload, id: leadId } : payload;
+    const { error } = await supabase.from("leads").insert(insertPayload);
     if (error) {
       setStatus("error");
       setErrorMsg(t("form.err.generic2"));
@@ -160,12 +166,14 @@ export function LeadForm({
       budget_range: payload.budget_range ?? undefined,
       property_type: payload.property_type ?? undefined,
       language,
+      lead_id: leadId ?? undefined,
     });
     trackEvent("contact_form_submit_success", {
       source: trackingSource,
       variant,
       page_path: payload.source_page,
       language,
+      lead_id: leadId ?? undefined,
     });
   }
 

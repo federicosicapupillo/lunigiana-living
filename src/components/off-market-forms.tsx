@@ -5,6 +5,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { sendLeadNotification } from "@/lib/lead-notify.functions";
 import { trackEvent } from "@/lib/analytics";
 import { getAttribution } from "@/lib/attribution";
+import { createClientUuid } from "@/lib/client-id";
 import { useT } from "@/lib/i18n/LanguageContext";
 import { OM_BUDGETS, OM_TYPES } from "@/lib/off-market";
 
@@ -84,7 +85,11 @@ export function OffMarketForm({ variant }: { variant: Variant }) {
     };
 
     setStatus("submitting");
-    const { error } = await supabase.from("leads").insert(payload);
+    // Client-generated id lets the success event reference this lead without a
+    // read-back (SELECT on leads is admin-only); falls back to the DB default.
+    const leadId = createClientUuid();
+    const insertPayload = leadId ? { ...payload, id: leadId } : payload;
+    const { error } = await supabase.from("leads").insert(insertPayload);
     if (error) {
       setStatus("error");
       setErrorMsg(t("om.form.err.generic"));
@@ -112,6 +117,12 @@ export function OffMarketForm({ variant }: { variant: Variant }) {
       source: "off_market_page",
       property_type: payload.property_type ?? undefined,
       budget_range: payload.budget_range ?? undefined,
+      lead_id: leadId ?? undefined,
+    });
+    trackEvent("offmarket_submit_success", {
+      source: "off_market",
+      variant,
+      lead_id: leadId ?? undefined,
     });
   }
 

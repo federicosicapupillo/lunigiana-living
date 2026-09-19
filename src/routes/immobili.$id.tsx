@@ -35,6 +35,7 @@ import { img, imgSrcSet } from "@/lib/image-url";
 import { PropertyLightbox } from "@/components/property-lightbox";
 import { trackEvent, trackClick } from "@/lib/analytics";
 import { getAttribution } from "@/lib/attribution";
+import { createClientUuid } from "@/lib/client-id";
 import { siteUrl } from "@/lib/site-url";
 import { propertyPath, propertyOgImagePath } from "@/lib/property-url";
 import { propertyGraph } from "@/lib/structured-data";
@@ -376,7 +377,11 @@ function PropertyDetail() {
     const source_page = typeof window !== "undefined" ? window.location.pathname : `/immobili/${base.id}`;
     const composedMessage = `[${p.reference}] ${p.title} — ${p.location}${message ? `\n\n${message}` : ""}`;
 
+    // Client-generated id lets the success event reference this lead without a
+    // read-back (SELECT on leads is admin-only); falls back to the DB default.
+    const leadId = createClientUuid();
     const { error } = await supabase.from("leads").insert({
+      ...(leadId ? { id: leadId } : {}),
       full_name,
       email,
       phone,
@@ -431,6 +436,7 @@ function PropertyDetail() {
       property_id: String(p.id),
       property_code: p.reference,
       language,
+      lead_id: leadId ?? undefined,
     });
     trackEvent("contact_form_submit_success", {
       source: "property_detail",
@@ -439,6 +445,7 @@ function PropertyDetail() {
       property_id: String(p.id),
       property_code: p.reference,
       language,
+      lead_id: leadId ?? undefined,
     });
   }
   // Preload neighbor images so prev/next feels instant.

@@ -621,6 +621,65 @@ export type Database = {
           },
         ]
       }
+      site_events: {
+        Row: {
+          created_at: string
+          event_name: string
+          id: string
+          language: string | null
+          lead_id: string | null
+          page_path: string
+          payload: Json
+          property_code: string | null
+          property_id: string | null
+          session_id: string
+          utm_campaign: string | null
+          utm_content: string | null
+          utm_medium: string | null
+          utm_source: string | null
+        }
+        Insert: {
+          created_at?: string
+          event_name: string
+          id?: string
+          language?: string | null
+          lead_id?: string | null
+          page_path: string
+          payload?: Json
+          property_code?: string | null
+          property_id?: string | null
+          session_id: string
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+        }
+        Update: {
+          created_at?: string
+          event_name?: string
+          id?: string
+          language?: string | null
+          lead_id?: string | null
+          page_path?: string
+          payload?: Json
+          property_code?: string | null
+          property_id?: string | null
+          session_id?: string
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "site_events_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       site_settings: {
         Row: {
           key: string
