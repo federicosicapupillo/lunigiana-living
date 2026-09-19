@@ -134,6 +134,10 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  // Capture the first known UTM campaign of the session (client-only, best-effort).
+  useEffect(() => {
+    initAttribution();
+  }, []);
   // Admin area renders its own chrome (header/sidebar). Skip the public
   // SiteHeader/SiteFooter for any /admin* URL so the back-office isn't wrapped
   // by the marketing layout.
