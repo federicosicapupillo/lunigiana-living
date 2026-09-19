@@ -34,6 +34,7 @@ import { COMMERCIAL_HIGHLIGHT_EN } from "@/lib/admin/property-constants";
 import { img, imgSrcSet } from "@/lib/image-url";
 import { PropertyLightbox } from "@/components/property-lightbox";
 import { trackEvent, trackClick } from "@/lib/analytics";
+import { getAttribution } from "@/lib/attribution";
 import { siteUrl } from "@/lib/site-url";
 import { propertyPath, propertyOgImagePath } from "@/lib/property-url";
 import { propertyGraph } from "@/lib/structured-data";
@@ -382,6 +383,9 @@ function PropertyDetail() {
       message: composedMessage,
       source_page,
       privacy_accepted: true,
+      source: "property_inquiry",
+      property_id: p.id,
+      ...getAttribution(),
     });
     if (error) {
       setSubmitState("error");

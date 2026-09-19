@@ -5,6 +5,7 @@ import { useT, useLanguage } from "@/lib/i18n/LanguageContext";
 import { useServerFn } from "@tanstack/react-start";
 import { sendLeadNotification } from "@/lib/lead-notify.functions";
 import { trackClick, trackEvent } from "@/lib/analytics";
+import { getAttribution } from "@/lib/attribution";
 
 const PROPERTY_TYPES_IT = [
   "Appartamento","Casa indipendente","Villetta","Rustico / casale","Villa","Terreno","Immobile da ristrutturare","Non ho ancora deciso",
@@ -102,6 +103,8 @@ export function LeadForm({
       message: emptyToNull(String(fd.get("message") ?? "").trim().slice(0, 3000)),
       source_page: typeof window !== "undefined" ? window.location.pathname : "/",
       privacy_accepted: true,
+      source: "lead_form",
+      ...getAttribution(),
     };
 
     if (!payload.full_name || !payload.email || !payload.phone) {

@@ -16,6 +16,7 @@ import { SiteFooter } from "../components/site-footer";
 import { Toaster } from "../components/ui/sonner";
 import { WhatsAppFloat } from "../components/whatsapp-float";
 import { LanguageProvider } from "../lib/i18n/LanguageContext";
+import { initAttribution } from "../lib/attribution";
 
 function NotFoundComponent() {
   return (
@@ -133,6 +134,10 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  // Capture the first known UTM campaign of the session (client-only, best-effort).
+  useEffect(() => {
+    initAttribution();
+  }, []);
   // Admin area renders its own chrome (header/sidebar). Skip the public
   // SiteHeader/SiteFooter for any /admin* URL so the back-office isn't wrapped
   // by the marketing layout.
