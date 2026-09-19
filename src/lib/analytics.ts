@@ -181,8 +181,10 @@ function sink(eventName: string, merged: AnalyticsPayload): void {
   // Allowlisted event names only — guards both the client and the DB CHECK.
   if (!EVENT_NAME_RE.test(eventName)) return;
 
-  const url = (import.meta as any)?.env?.VITE_SUPABASE_URL;
-  const key = (import.meta as any)?.env?.VITE_SUPABASE_PUBLISHABLE_KEY;
+  // Direct access required: `(import.meta as any)?.env` optional chaining
+  // defeats Vite's static env replacement and leaves these undefined.
+  const url = import.meta.env.VITE_SUPABASE_URL as string | undefined;
+  const key = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string | undefined;
   if (!url || !key) return;
 
   const sessionId = getEventSessionId();
