@@ -8,6 +8,7 @@ import { useT, useLanguage } from "@/lib/i18n/LanguageContext";
 import type { Language } from "@/lib/i18n/translations";
 import { useLocalizedHead } from "@/hooks/use-localized-head";
 import { trackEvent } from "@/lib/analytics";
+import { getAttribution } from "@/lib/attribution";
 import { siteUrl } from "@/lib/site-url";
 import { institutionalGraph } from "@/lib/structured-data";
 import { whatsappUrl } from "@/components/whatsapp-float";
