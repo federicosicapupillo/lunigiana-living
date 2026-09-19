@@ -211,9 +211,11 @@ function AdminLeadsPage() {
   }
 
   async function markContacted(lead: Lead) {
-    const patch: Partial<Lead> = { status: "contacted" };
-    if (!lead.contacted_at) patch.contacted_at = new Date().toISOString();
-    await updateLead(lead.id, patch, "Segnata come contattata");
+    await updateLead(
+      lead.id,
+      { status: "contacted" },
+      "Segnata come contattata",
+    );
   }
 
   async function markInProgress(lead: Lead) {
