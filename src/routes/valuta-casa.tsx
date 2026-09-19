@@ -367,6 +367,7 @@ function ValutaCasaPage() {
       source_page: "/valuta-casa",
       details,
       privacy_accepted: true,
+      ...getAttribution(),
     });
     if (error) {
       submittingRef.current = false;

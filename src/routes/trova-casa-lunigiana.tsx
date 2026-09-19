@@ -309,6 +309,8 @@ function TrovaCasaPage() {
       message: messageSummary,
       source_page,
       privacy_accepted: true,
+      source: "guided_search",
+      ...getAttribution(),
     });
     if (error) {
       setStatus("error");

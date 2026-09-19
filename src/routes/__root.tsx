@@ -16,6 +16,7 @@ import { SiteFooter } from "../components/site-footer";
 import { Toaster } from "../components/ui/sonner";
 import { WhatsAppFloat } from "../components/whatsapp-float";
 import { LanguageProvider } from "../lib/i18n/LanguageContext";
+import { initAttribution } from "../lib/attribution";
 
 function NotFoundComponent() {
   return (

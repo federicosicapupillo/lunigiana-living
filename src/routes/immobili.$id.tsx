@@ -383,6 +383,9 @@ function PropertyDetail() {
       message: composedMessage,
       source_page,
       privacy_accepted: true,
+      source: "property_inquiry",
+      property_id: p.id,
+      ...getAttribution(),
     });
     if (error) {
       setSubmitState("error");
