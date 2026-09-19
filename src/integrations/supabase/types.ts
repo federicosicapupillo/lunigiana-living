@@ -117,57 +117,89 @@ export type Database = {
       }
       leads: {
         Row: {
+          appointment_at: string | null
           budget_range: string | null
+          contacted_at: string | null
           created_at: string
           details: Json | null
           email: string
           full_name: string
           id: string
           message: string | null
+          outcome: string | null
           phone: string
           preferred_area: string | null
           privacy_accepted: boolean
+          property_id: string | null
           property_type: string | null
           source: string | null
           source_page: string | null
           status: Database["public"]["Enums"]["lead_status"]
           updated_at: string
+          utm_campaign: string | null
+          utm_content: string | null
+          utm_medium: string | null
+          utm_source: string | null
         }
         Insert: {
+          appointment_at?: string | null
           budget_range?: string | null
+          contacted_at?: string | null
           created_at?: string
           details?: Json | null
           email: string
           full_name: string
           id?: string
           message?: string | null
+          outcome?: string | null
           phone: string
           preferred_area?: string | null
           privacy_accepted?: boolean
+          property_id?: string | null
           property_type?: string | null
           source?: string | null
           source_page?: string | null
           status?: Database["public"]["Enums"]["lead_status"]
           updated_at?: string
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
         }
         Update: {
+          appointment_at?: string | null
           budget_range?: string | null
+          contacted_at?: string | null
           created_at?: string
           details?: Json | null
           email?: string
           full_name?: string
           id?: string
           message?: string | null
+          outcome?: string | null
           phone?: string
           preferred_area?: string | null
           privacy_accepted?: boolean
+          property_id?: string | null
           property_type?: string | null
           source?: string | null
           source_page?: string | null
           status?: Database["public"]["Enums"]["lead_status"]
           updated_at?: string
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "leads_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       properties: {
         Row: {
