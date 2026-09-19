@@ -1,47 +1,96 @@
-# Audit tecnico SEO / AEO / GEO — Furia Immobiliare (sola lettura)
+# CRM/Jarvis — Eventi first-party persistenti
 
-Nessun file modificato. Sotto: cosa è già corretto, cosa va migliorato, con gravità, file e modifica consigliata.
+Obiettivo: salvare in modo persistente e interrogabile gli eventi già tracciati nel sito, per ricostruire la catena
+visita immobile → click WhatsApp/form → richiesta → appuntamento → esito.
 
-## Già corretto (OK)
+## 1. Eventi già instrumentati (stato attuale)
 
-- **robots.txt** — `User-agent: *` + `Allow: /` + `Sitemap:` sul dominio canonico. Nessun `Disallow: /`, quindi OAI-SearchBot, PerplexityBot, Bingbot, Google-Extended non sono bloccati. (`public/robots.txt`)
-- **llms.txt presente** con descrizione dell'agenzia e indice di pagine. (`public/llms.txt`)
-- **sitemap dinamica SSR** con hub comuni, hub tipologie, pagine editoriali, `/valuta-casa`, `/off-market` e tutte le schede immobile pubblicate. (`src/routes/sitemap[.]xml.ts`)
-- **SSR/crawlability**: TanStack Start con render server-side; contenuti e JSON-LD emessi in `head()` lato server.
-- **Canonical assoluti** su tutte le pagine pubbliche (home, immobili, hub comuni/tipologie, editoriali, servizi, contatti, chi siamo, off-market, valuta-casa) tramite `siteUrl()`. (`src/lib/site-url.ts`)
-- **Legacy .asp**: 301 per `/index.asp`, `/chi_siamo.asp`, `/contattaci.asp`, `/vendite2.asp`, `/affitti.asp`; `annuncio.asp?ID_immobile=` con mapping ID→slug, 410 per rimossi, 404 per sospesi; validazione anti open-redirect. (`src/lib/legacy-redirects.ts`)
-- **URL immobili slug-based** con 301 dagli ID vecchi. (`src/lib/property-url.ts`, `src/routes/immobili.$id.tsx`)
-- **JSON-LD**: `RealEstateAgent` + `WebSite` + `WebPage` in home, `CollectionPage` + `ItemList` sugli elenchi (omesso quando ci sono filtri attivi), `RealEstateListing` + `Accommodation` + `Offer` (solo vendita, solo prezzo numerico) + `BreadcrumbList` sulle schede. `@id` coerenti = una sola entità agenzia. (`src/lib/structured-data.ts`)
-- **NAP verificato e coerente** (Via Pirandello 7, Pontremoli 54027 MS, +39 0187 830229, email), `areaServed`, `memberOf: FIAIP`.
-- **Nessun `og:image:width/height` falso**; immagine OG di brand su dominio canonico; nessuna signed URL con token nel markup.
-- **Aree admin** con `noindex,nofollow` su login, richieste, impostazioni, immobili (index/nuovo/$id), assistente.
-- **Pagine editoriali conversazionali** già presenti: `/vivere-a-pontremoli`, `/vivere-in-lunigiana`, hub comuni/tipologie con FAQ HTML.
+`src/lib/analytics.ts` espone `trackEvent(name, payload)` e l'alias `trackClick`. Sono presenti ~115 nomi evento distinti. Payload tipici: `source`, `page_path` (aggiunto automaticamente), `language`, `comune`, `slug`, `property_id`, `property_code`, `property_type`, `budget_range`, `step`.
 
-## Da migliorare
+Eventi rilevanti per il funnel commerciale:
 
-| # | Problema | Gravità | File | Modifica consigliata |
-|---|---|---|---|---|
-| 1 | `<html lang="en">` hardcoded nello shell SSR: tutto il sito italiano viene dichiarato inglese ai crawler e ai motori AI (la correzione via `document.documentElement.lang` avviene solo dopo l'hydration). | **Critica** | `src/routes/__root.tsx` | Impostare `lang="it"` nello shell. |
-| 2 | Multilingua senza URL dedicate: IT/EN condividono la stessa URL e il cambio lingua è solo client-side. La versione EN non è indicizzabile né citabile, e non esistono `hreflang` né `og:locale`. | **Alta** | `src/lib/i18n/*`, route pubbliche | Decidere: (a) prefisso `/en/` con canonical+hreflang reciproci, oppure (b) dichiarare esplicitamente il sito monolingua IT e trattare EN come comodità UI. Senza (a) non c'è visibilità EN. |
-| 3 | Nessuna dichiarazione esplicita per i crawler AI in robots.txt. L'accesso è già consentito dal wildcard, ma blocchi espliciti riducono il rischio di regressioni future e rendono l'intento verificabile. | Bassa | `public/robots.txt` | Aggiungere blocchi espliciti `OAI-SearchBot`, `ChatGPT-User`, `PerplexityBot`, `Google-Extended`, `ClaudeBot`, `Bingbot` con `Allow: /`. |
-| 4 | `llms.txt` non aggiornato: mancano `/off-market`, `/valuta-casa`, `/vivere-a-pontremoli`, `/vivere-in-lunigiana` — proprio le pagine più utili alle query conversazionali. | Media | `public/llms.txt` | Aggiungere le voci mancanti e una riga NAP (indirizzo, telefono, email) per il grounding dei motori AI. |
-| 5 | Nessun `FAQPage` JSON-LD, per scelta documentata, benché le FAQ HTML esistano su hub comuni ed editoriali. Le risposte non sono estraibili come dato strutturato. | Media | `src/lib/seo-editorial.ts`, hub e pagine editoriali | Emettere `FAQPage` solo dove le domande/risposte sono già visibili in pagina, con testo identico al DOM. |
-| 6 | `sameAs` contiene solo Instagram: consolidamento entità debole per i motori AI (nessun Google Business Profile, Facebook, FIAIP, pagina portali). | Media | `src/lib/social-links.ts` | Aggiungere solo profili realmente esistenti e verificati dall'agenzia. |
-| 7 | Alcune route admin senza `noindex`: dati-live, idealista, anteprima immobile, dashboard admin index. | Media | `src/routes/_admin.admin.dati-live.tsx`, `_admin.admin.idealista.tsx`, `_admin.admin.immobili.$id.anteprima.tsx`, `_admin.admin.index.tsx` | Aggiungere `robots: noindex,nofollow` (idealmente nel layout `_admin.admin.tsx`) + `Disallow: /admin` in robots.txt. |
-| 8 | Endpoint tecnici crawlabili: feed Idealista pubblico e route immagini OG. Rischio di indicizzazione di URL non-pagina e di contenuto duplicato dei dati immobili. | Media | `public/robots.txt`, `src/routes/api/public/idealista/feed[.]xml.ts`, `src/routes/media/og/immobili/$.ts` | `Disallow: /api/`, `Disallow: /media/og/` in robots.txt e header `X-Robots-Tag: noindex` sul feed. |
-| 9 | Nessun consolidamento www/non-www a livello applicativo: `furiaimmobiliare.it`, `www.furiaimmobiliare.it`, `furia.cap-ann-one.life` e i domini `lovable.app` possono servire lo stesso contenuto. I canonical assoluti mitigano ma non eliminano il duplicato. | **Alta** | livello hosting/dominio | Impostare un 301 host-level verso l'host canonico e verificare che i domini alternativi redirigano invece di servire copie. |
-| 10 | `/immobili` con query string è raggiungibile e linkata (es. redirect `/affitti.asp` → `/immobili?contract=affitto`): il canonical punta alla versione pulita, corretto, ma sono URL indicizzabili senza contenuto proprio. | Bassa | `src/routes/immobili.index.tsx` | Valutare `noindex,follow` sulle varianti con filtri attivi, mantenendo il canonical. |
-| 11 | Sitemap senza `lastmod`: nessuna segnalazione di freschezza sulle schede immobile. | Bassa | `src/routes/sitemap[.]xml.ts` | Aggiungere `lastmod` solo da un timestamp reale per riga (es. `updated_at`); mai la data di generazione. |
-| 12 | Prezzi delle locazioni assenti dai dati strutturati (scelta corretta) ma nessun segnale alternativo di disponibilità/contatto per gli affitti. | Bassa | `src/lib/structured-data.ts` | Valutare `Offer` senza `price` con `availability` + `seller`, oppure lasciare invariato. |
+| Evento | File | Payload principale |
+| --- | --- | --- |
+| `property_detail_view` | routes/immobili.$id.tsx | property_id, property_code, comune, tipologia, prezzo |
+| `property_card_click` | components/property-card.tsx | property_id, source |
+| `property_filter_apply` | routes/immobili.index.tsx | filtri selezionati |
+| `property_gallery_interaction` (4 punti) | routes/immobili.$id.tsx | azione, property_id |
+| `property_detail_whatsapp_click` (2), `property_detail_mobile_sticky_click` (2), `contact_whatsapp_fallback_click` (3), `whatsapp_click` (2), `phone_click` (2) | scheda immobile, header, pagine SEO | source, property_id dove disponibile |
+| `contact_form_view`, `property_detail_request_info_click` | routes/immobili.$id.tsx | property_id, source |
+| `lead_form_submit_success` / `_error` (2+2) | lead-form.tsx, immobili.$id.tsx | source, page_path, budget_range, property_type |
+| `contact_form_submit_success` / `_error` | lead-form.tsx, immobili.$id.tsx | idem |
+| `lead_magnet_view`, `lead_magnet_cta_click`, `lead_magnet_submit_success` / `_error` | components/lead-magnet-block.tsx | source, interest_type, page_path |
+| `guided_search_start`, `guided_search_step_complete`, `guided_search_submit_success` / `_error`, `guided_search_whatsapp_click` | routes/trova-casa-lunigiana.tsx | step, source |
+| `valuation_page_view`, `valuation_form_start`, `valuation_step_complete`, `valuation_expected_price_yes`, `valuation_offmarket_interest`, `valuation_lead_submit` | routes/valuta-casa.tsx | step, source |
+| `offmarket_view`, `offmarket_buyer_cta` (3), `offmarket_seller_cta` (2), `offmarket_teaser_click`, `home_offmarket_cta_click` | off-market.tsx, index.tsx | source |
+| `property_share`, `language_switch`, `instagram_profile_click`, `reviews_google_click` (2), `trust_block_view` | vari componenti | source, canale |
+| famiglie SEO/editoriali: `seo_area_*`, `seo_type_*`, `pz_*`, `dc_*`, `vl_*`, `vcl_*`, `qv_*`, `sc_*`, `oss_*`, `vivere_*` | pagine guida e landing | comune/slug, source |
 
-## Priorità di intervento suggerita
+## 2. Destinazione attuale
 
-1. `lang="it"` nello shell SSR (#1).
-2. Consolidamento host canonico (#9).
-3. Decisione strategica sul multilingua EN (#2).
-4. Igiene crawl: admin/api/media + robots AI + llms.txt (#3, #4, #7, #8).
-5. Rafforzamento entità e FAQ strutturate (#5, #6).
+Confermato: **nessuna destinazione first-party persistente.** `analytics.ts` fa solo un `forward()` a provider eventualmente presenti su `window` (`lvAnalytics`, `plausible`, `gtag`, `dataLayer`, `fbq`). Se nessuno esiste, la chiamata è un no-op e l'evento è perso. In sviluppo c'è solo un `console.debug`. Nessuna tabella, nessuna richiesta di rete.
 
-## Note tecniche
+## 3. Form con evento di successo e id della richiesta
 
-Verificato per lettura diretta di: `public/robots.txt`, `public/llms.txt`, `src/routes/sitemap[.]xml.ts`, `src/lib/site-url.ts`, `src/lib/structured-data.ts`, `src/lib/social-links.ts`, `src/lib/legacy-redirects.ts`, `src/routes/__root.tsx`, `src/hooks/use-localized-head.ts`, `src/server.ts` e tutte le route pubbliche e admin (grep su `canonical`, `robots`, `hreflang`, `FAQPage`). Nessun dato esterno usato: il comportamento reale di www/non-www e dei domini alternativi va confermato con una verifica live, non deducibile dal codice.
+Nessun form recupera oggi l'id: tutti gli insert su `leads` sono `insert(payload)` senza `.select("id").single()`.
+
+| Form | Evento di successo | lead_id oggi |
+| --- | --- | --- |
+| components/lead-form.tsx | `lead_form_submit_success`, `contact_form_submit_success` | no |
+| routes/immobili.$id.tsx | `lead_form_submit_success`, `contact_form_submit_success` | no (ha però `property_id`) |
+| components/lead-magnet-block.tsx | `lead_magnet_submit_success` | no |
+| routes/trova-casa-lunigiana.tsx | `guided_search_submit_success` | no |
+| routes/valuta-casa.tsx | `valuation_lead_submit` | no |
+| components/off-market-forms.tsx | nessun evento di successo | no |
+
+## 4. Soluzione proposta (minima, privacy-safe)
+
+Una sola tabella `public.site_events` nel database del progetto, alimentata dal client tramite la stessa facciata `trackEvent` già usata da tutto il sito. Nessun servizio esterno, nessun endpoint non documentato.
+
+Principi:
+- nessun dato personale: la sanificazione PII già presente in `analytics.ts` viene riusata e resa obbligatoria anche per le chiavi payload arbitrarie;
+- niente referrer grezzo, user-agent, IP: non vengono letti né inviati;
+- `session_id` pseudonimo generato con `crypto.randomUUID()` e conservato in `sessionStorage` (nuovo per ogni sessione, non ricollegabile a una persona);
+- campi strutturati: `event_name`, `page_path`, `property_id`, `property_code`, `lead_id`, UTM dalla prima campagna di sessione (`getAttribution()`), `payload` jsonb sanificato e limitato;
+- timestamp generato dal server (`default now()`), nessun orologio del browser;
+- accesso: inserimento pubblico consentito ma con vincoli, lettura solo admin.
+
+Collegamento del funnel: i form, dopo l'insert, leggono l'id della richiesta e lo passano all'evento di successo. Da lì `appointment_at`, `contacted_at`, `status` e `outcome` sono già sulla tabella `leads`, quindi la catena completa si ricostruisce con una join su `lead_id` (e su `property_id` per la parte di navigazione).
+
+## 5. Interventi necessari (da NON eseguire ora)
+
+### Migration SQL (una sola)
+1. `CREATE TABLE public.site_events` con: `id uuid pk default gen_random_uuid()`, `created_at timestamptz not null default now()`, `session_id text not null`, `event_name text not null`, `page_path text`, `language text`, `property_id uuid null references public.properties(id) on delete set null`, `property_code text`, `lead_id uuid null references public.leads(id) on delete set null`, `utm_source/utm_medium/utm_campaign/utm_content text`, `payload jsonb not null default '{}'::jsonb`.
+2. `GRANT INSERT ON public.site_events TO anon, authenticated;` + `GRANT SELECT ON public.site_events TO authenticated;` + `GRANT ALL ... TO service_role;` (nessun SELECT ad `anon`).
+3. `ENABLE ROW LEVEL SECURITY`.
+4. Policy `site_events_public_insert` INSERT per `anon, authenticated` con CHECK: `event_name` fra 1 e 80 caratteri, `session_id` fra 8 e 64 caratteri, `page_path` max 300, `char_length(payload::text) <= 2000`. Nessuna lettura per `anon`.
+5. Policy `site_events_admin_read` SELECT per `authenticated` con `has_role(auth.uid(), 'admin')`; nessuna policy UPDATE/DELETE (solo `service_role`).
+6. Indici: `(created_at desc)`, `(event_name, created_at desc)`, `(session_id)`, `(property_id)`, `(lead_id)`.
+7. Nessuna modifica a `leads`, `properties` o ad altre policy esistenti.
+
+### Frontend
+- `src/lib/analytics.ts`: aggiungere `getSessionId()` (sessionStorage, fallback in memoria) e uno "sink" first-party che accoda gli eventi e li scrive in batch su `site_events` (flush su timer breve, su `visibilitychange` e su `pagehide`). Estrazione dei campi strutturati dal payload (`property_id`, `property_code`, `lead_id`, `language`, `page_path`), resto in `payload`. Tutto in try/catch: un errore di rete non deve mai rompere un click o un form. Il `forward()` esistente resta invariato.
+- `src/lib/attribution.ts`: riusato senza modifiche per gli UTM.
+- Form: aggiungere `.select("id").single()` all'insert e passare `lead_id` all'evento di successo in `lead-form.tsx`, `immobili.$id.tsx`, `lead-magnet-block.tsx`, `trova-casa-lunigiana.tsx`, `valuta-casa.tsx`; in `off-market-forms.tsx` aggiungere l'evento `offmarket_submit_success` con `lead_id`. Se la lettura dell'id fallisce, il lead resta valido e l'evento viene inviato senza `lead_id`.
+- `src/integrations/supabase/types.ts`: aggiungere la definizione di `site_events` (rigenerata dalla migration).
+- Nessuna modifica a design pubblico, URL, SEO, JSON-LD, sitemap.
+
+### Opzionale (secondo step, non incluso)
+Una pagina `/admin/eventi` con conteggi per evento e imbuto per immobile. Con i dati persistiti è comunque già interrogabile dal backend.
+
+## Rischi
+- **Volume**: eventi come `property_gallery_interaction` possono essere molto frequenti. Mitigazione: batch, deduplica dei `*_view` per sessione, eventuale lista di eventi esclusi.
+- **Insert pubblico**: una tabella scrivibile da anonimi può essere riempita con dati falsi. Mitigazione: vincoli stretti nel CHECK, nessuna lettura pubblica, nessun uso della tabella per logica applicativa; se serve, in seguito un limite di frequenza lato client.
+- **Privacy**: rischio che uno sviluppatore passi per errore un dato personale nel payload. Mitigazione: filtro PII già esistente applicato anche al sink, valori stringa troncati.
+- **Bloccanti storage/rete**: adblocker o storage disabilitato causano perdita di eventi, non errori: l'esperienza utente resta identica.
+- **Foreign key su lead_id**: se una richiesta viene eliminata dal backend, l'evento resta con `lead_id` nullo (`on delete set null`), senza errori.
+
+## Test previsti
+1. Typecheck pulito.
+2. Su mobile 390px: apertura scheda immobile → verifica riga `property_detail_view` con `property_id`/`property_code` e `session_id`.
+3. Click WhatsApp e invio form: eventi registrati, `lead_id` presente e corrispondente alla richiesta creata.
+4. Sessione con `?utm_source=meta&utm_medium=cpc&utm_campaign=...`: UTM della prima campagna presenti su tutti gli eventi successivi.
+5. Con sessionStorage bloccato: form e click funzionano, nessun errore in console.
+6. Verifica accessi: un utente non admin non legge la tabella; l'inserimento anonimo funziona.
+7. Verifica che nessuna riga contenga nome, email, telefono, messaggio, IP o user-agent.
+8. Nessuna regressione su galleria, filtri, selettore lingua, pagina richieste admin.
