@@ -8,7 +8,7 @@ import { useT, useLanguage } from "@/lib/i18n/LanguageContext";
 import type { Language } from "@/lib/i18n/translations";
 import { useLocalizedHead } from "@/hooks/use-localized-head";
 import { trackEvent } from "@/lib/analytics";
-import { getAttribution } from "@/lib/attribution";
+import { getLeadAttribution } from "@/lib/attribution";
 import { createClientUuid } from "@/lib/client-id";
 import { siteUrl } from "@/lib/site-url";
 import { institutionalGraph } from "@/lib/structured-data";
@@ -315,7 +315,7 @@ function TrovaCasaPage() {
       source_page,
       privacy_accepted: true,
       source: "guided_search",
-      ...getAttribution(),
+      ...getLeadAttribution(),
     });
     if (error) {
       setStatus("error");

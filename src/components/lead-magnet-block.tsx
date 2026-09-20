@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { sendLeadNotification } from "@/lib/lead-notify.functions";
 import { useT, useLanguage } from "@/lib/i18n/LanguageContext";
 import { trackEvent } from "@/lib/analytics";
-import { getAttribution } from "@/lib/attribution";
+import { getLeadAttribution } from "@/lib/attribution";
 import { createClientUuid } from "@/lib/client-id";
 
 type Variant = "full" | "compact";
@@ -142,7 +142,7 @@ export function LeadMagnetBlock({
       source_page: `lead_magnet:${sourcePath}`,
       privacy_accepted: true,
       source: "lead_magnet",
-      ...getAttribution(),
+      ...getLeadAttribution(),
     };
     const { error } = await supabase.from("leads").insert(insertPayload);
     if (error) {

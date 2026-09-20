@@ -15,7 +15,7 @@ import { useLanguage, useT } from "@/lib/i18n/LanguageContext";
 import type { Language } from "@/lib/i18n/translations";
 import { useLocalizedHead } from "@/hooks/use-localized-head";
 import { trackEvent } from "@/lib/analytics";
-import { getAttribution } from "@/lib/attribution";
+import { getLeadAttribution } from "@/lib/attribution";
 import { createClientUuid } from "@/lib/client-id";
 import { siteUrl } from "@/lib/site-url";
 import { institutionalGraph } from "@/lib/structured-data";
@@ -372,7 +372,7 @@ function ValutaCasaPage() {
       source_page: "/valuta-casa",
       details,
       privacy_accepted: true,
-      ...getAttribution(),
+      ...getLeadAttribution(),
     });
     if (error) {
       submittingRef.current = false;
