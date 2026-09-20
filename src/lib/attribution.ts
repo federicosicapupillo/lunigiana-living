@@ -17,6 +17,7 @@ export type Attribution = {
   utm_medium: string | null;
   utm_campaign: string | null;
   utm_content: string | null;
+  utm_term: string | null;
 };
 
 const EMPTY: Attribution = {
@@ -24,6 +25,7 @@ const EMPTY: Attribution = {
   utm_medium: null,
   utm_campaign: null,
   utm_content: null,
+  utm_term: null,
 };
 
 function clean(value: string | null, lower: boolean): string | null {
