@@ -4,6 +4,7 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
+  useRouterState,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
@@ -16,7 +17,8 @@ import { SiteFooter } from "../components/site-footer";
 import { Toaster } from "../components/ui/sonner";
 import { WhatsAppFloat } from "../components/whatsapp-float";
 import { LanguageProvider } from "../lib/i18n/LanguageContext";
-import { initAttribution } from "../lib/attribution";
+import { initAttribution, initLanding } from "../lib/attribution";
+import { trackPageView } from "../lib/page-view";
 
 function NotFoundComponent() {
   return (
@@ -134,19 +136,26 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
-  // Capture the first known UTM campaign of the session (client-only, best-effort).
+  // 1° — l'attribuzione deve esistere PRIMA della prima page view,
+  //      altrimenti la visita che ha portato l'utente sul sito è proprio
+  //      quella che perde la campagna.
   useEffect(() => {
     initAttribution();
+    initLanding();
   }, []);
+
+  // 2° — poi le pagine. Il guard interno decide se contarle.
+  const loc = useRouterState({ select: (s) => s.location });
+  useEffect(() => {
+    trackPageView(loc.pathname, loc.searchStr ?? "");
+  }, [loc.pathname, loc.searchStr]);
   // Admin area renders its own chrome (header/sidebar). Skip the public
   // SiteHeader/SiteFooter for any /admin* URL so the back-office isn't wrapped
   // by the marketing layout.
-  const isAdminArea =
-    typeof window !== "undefined" && window.location.pathname.startsWith("/admin");
+  const isAdminArea = loc.pathname.startsWith("/admin");
   // Hide the floating WhatsApp button on mobile property-detail pages
   // because the page renders a sticky CTA bar at the bottom there.
-  const isPropertyDetail =
-    typeof window !== "undefined" && /^\/immobili\/[^/]+$/.test(window.location.pathname);
+  const isPropertyDetail = /^\/immobili\/[^/]+$/.test(loc.pathname);
 
   return (
     <QueryClientProvider client={queryClient}>
