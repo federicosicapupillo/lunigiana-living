@@ -24,6 +24,7 @@ import { Route as QuantoValeCasaPontremoliRouteImport } from './routes/quanto-va
 import { Route as PrezziCaseLunigianaRouteImport } from './routes/prezzi-case-lunigiana'
 import { Route as OsservatorioImmobiliareLunigianaRouteImport } from './routes/osservatorio-immobiliare-lunigiana'
 import { Route as OffMarketRouteImport } from './routes/off-market'
+import { Route as McpRouteImport } from './routes/mcp'
 import { Route as IndexDotaspRouteImport } from './routes/index[.]asp'
 import { Route as ImmobiliRouteImport } from './routes/immobili'
 import { Route as Elenco_annunciDotaspRouteImport } from './routes/elenco_annunci[.]asp'
@@ -48,12 +49,14 @@ import { Route as CaseInVenditaComuneRouteImport } from './routes/case-in-vendit
 import { Route as CaseInVenditaLunigianaTipologiaRouteImport } from './routes/case-in-vendita-lunigiana.$tipologia'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
 import { Route as AdminAdminRouteImport } from './routes/_admin.admin'
+import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
 import { Route as AdminAdminIndexRouteImport } from './routes/_admin.admin.index'
 import { Route as AdminAdminSeoAiBenchmarkRouteImport } from './routes/_admin.admin.seo-ai-benchmark'
 import { Route as AdminAdminRichiesteRouteImport } from './routes/_admin.admin.richieste'
 import { Route as AdminAdminImpostazioniRouteImport } from './routes/_admin.admin.impostazioni'
 import { Route as AdminAdminIdealistaRouteImport } from './routes/_admin.admin.idealista'
 import { Route as AdminAdminDatiLiveRouteImport } from './routes/_admin.admin.dati-live'
+import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 import { Route as AdminAdminImmobiliIndexRouteImport } from './routes/_admin.admin.immobili.index'
 import { Route as MediaOgImmobiliSplatRouteImport } from './routes/media/og/immobili/$'
 import { Route as ApiPublicIdealistaFeedDotxmlRouteImport } from './routes/api/public/idealista/feed[.]xml'
@@ -137,6 +140,11 @@ const OsservatorioImmobiliareLunigianaRoute =
 const OffMarketRoute = OffMarketRouteImport.update({
   id: '/off-market',
   path: '/off-market',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const McpRoute = McpRouteImport.update({
+  id: '/mcp',
+  path: '/mcp',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexDotaspRoute = IndexDotaspRouteImport.update({
@@ -263,6 +271,12 @@ const AdminAdminRoute = AdminAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => AdminRoute,
 } as any)
+const Char91DotwellKnownChar93OauthProtectedResourceRoute =
+  Char91DotwellKnownChar93OauthProtectedResourceRouteImport.update({
+    id: '/.well-known/oauth-protected-resource',
+    path: '/.well-known/oauth-protected-resource',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AdminAdminIndexRoute = AdminAdminIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -293,6 +307,11 @@ const AdminAdminDatiLiveRoute = AdminAdminDatiLiveRouteImport.update({
   id: '/dati-live',
   path: '/dati-live',
   getParentRoute: () => AdminAdminRoute,
+} as any)
+const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
+  id: '/.lovable/oauth/consent',
+  path: '/.lovable/oauth/consent',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AdminAdminImmobiliIndexRoute = AdminAdminImmobiliIndexRouteImport.update({
   id: '/immobili/',
@@ -349,6 +368,7 @@ export interface FileRoutesByFullPath {
   '/elenco_annunci.asp': typeof Elenco_annunciDotaspRoute
   '/immobili': typeof ImmobiliRouteWithChildren
   '/index.asp': typeof IndexDotaspRoute
+  '/mcp': typeof McpRoute
   '/off-market': typeof OffMarketRoute
   '/osservatorio-immobiliare-lunigiana': typeof OsservatorioImmobiliareLunigianaRoute
   '/prezzi-case-lunigiana': typeof PrezziCaseLunigianaRoute
@@ -364,6 +384,7 @@ export interface FileRoutesByFullPath {
   '/vendite2.asp': typeof Vendite2DotaspRoute
   '/vivere-a-pontremoli': typeof VivereAPontremoliRoute
   '/vivere-in-lunigiana': typeof VivereInLunigianaRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/admin': typeof AdminAdminRouteWithChildren
   '/admin/login': typeof AdminLoginRoute
   '/case-in-vendita-lunigiana/$tipologia': typeof CaseInVenditaLunigianaTipologiaRoute
@@ -372,6 +393,7 @@ export interface FileRoutesByFullPath {
   '/case-in-vendita-lunigiana/': typeof CaseInVenditaLunigianaIndexRoute
   '/case-in-vendita/': typeof CaseInVenditaIndexRoute
   '/immobili/': typeof ImmobiliIndexRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/admin/dati-live': typeof AdminAdminDatiLiveRoute
   '/admin/idealista': typeof AdminAdminIdealistaRoute
   '/admin/impostazioni': typeof AdminAdminImpostazioniRoute
@@ -401,6 +423,7 @@ export interface FileRoutesByTo {
   '/dove_siamo.asp': typeof Dove_siamoDotaspRoute
   '/elenco_annunci.asp': typeof Elenco_annunciDotaspRoute
   '/index.asp': typeof IndexDotaspRoute
+  '/mcp': typeof McpRoute
   '/off-market': typeof OffMarketRoute
   '/osservatorio-immobiliare-lunigiana': typeof OsservatorioImmobiliareLunigianaRoute
   '/prezzi-case-lunigiana': typeof PrezziCaseLunigianaRoute
@@ -416,6 +439,7 @@ export interface FileRoutesByTo {
   '/vendite2.asp': typeof Vendite2DotaspRoute
   '/vivere-a-pontremoli': typeof VivereAPontremoliRoute
   '/vivere-in-lunigiana': typeof VivereInLunigianaRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/admin/login': typeof AdminLoginRoute
   '/case-in-vendita-lunigiana/$tipologia': typeof CaseInVenditaLunigianaTipologiaRoute
   '/case-in-vendita/$comune': typeof CaseInVenditaComuneRoute
@@ -423,6 +447,7 @@ export interface FileRoutesByTo {
   '/case-in-vendita-lunigiana': typeof CaseInVenditaLunigianaIndexRoute
   '/case-in-vendita': typeof CaseInVenditaIndexRoute
   '/immobili': typeof ImmobiliIndexRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/admin/dati-live': typeof AdminAdminDatiLiveRoute
   '/admin/idealista': typeof AdminAdminIdealistaRoute
   '/admin/impostazioni': typeof AdminAdminImpostazioniRoute
@@ -455,6 +480,7 @@ export interface FileRoutesById {
   '/elenco_annunci.asp': typeof Elenco_annunciDotaspRoute
   '/immobili': typeof ImmobiliRouteWithChildren
   '/index.asp': typeof IndexDotaspRoute
+  '/mcp': typeof McpRoute
   '/off-market': typeof OffMarketRoute
   '/osservatorio-immobiliare-lunigiana': typeof OsservatorioImmobiliareLunigianaRoute
   '/prezzi-case-lunigiana': typeof PrezziCaseLunigianaRoute
@@ -470,6 +496,7 @@ export interface FileRoutesById {
   '/vendite2.asp': typeof Vendite2DotaspRoute
   '/vivere-a-pontremoli': typeof VivereAPontremoliRoute
   '/vivere-in-lunigiana': typeof VivereInLunigianaRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/_admin/admin': typeof AdminAdminRouteWithChildren
   '/admin/login': typeof AdminLoginRoute
   '/case-in-vendita-lunigiana/$tipologia': typeof CaseInVenditaLunigianaTipologiaRoute
@@ -478,6 +505,7 @@ export interface FileRoutesById {
   '/case-in-vendita-lunigiana/': typeof CaseInVenditaLunigianaIndexRoute
   '/case-in-vendita/': typeof CaseInVenditaIndexRoute
   '/immobili/': typeof ImmobiliIndexRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/_admin/admin/dati-live': typeof AdminAdminDatiLiveRoute
   '/_admin/admin/idealista': typeof AdminAdminIdealistaRoute
   '/_admin/admin/impostazioni': typeof AdminAdminImpostazioniRoute
@@ -510,6 +538,7 @@ export interface FileRouteTypes {
     | '/elenco_annunci.asp'
     | '/immobili'
     | '/index.asp'
+    | '/mcp'
     | '/off-market'
     | '/osservatorio-immobiliare-lunigiana'
     | '/prezzi-case-lunigiana'
@@ -525,6 +554,7 @@ export interface FileRouteTypes {
     | '/vendite2.asp'
     | '/vivere-a-pontremoli'
     | '/vivere-in-lunigiana'
+    | '/.well-known/oauth-protected-resource'
     | '/admin'
     | '/admin/login'
     | '/case-in-vendita-lunigiana/$tipologia'
@@ -533,6 +563,7 @@ export interface FileRouteTypes {
     | '/case-in-vendita-lunigiana/'
     | '/case-in-vendita/'
     | '/immobili/'
+    | '/.lovable/oauth/consent'
     | '/admin/dati-live'
     | '/admin/idealista'
     | '/admin/impostazioni'
@@ -562,6 +593,7 @@ export interface FileRouteTypes {
     | '/dove_siamo.asp'
     | '/elenco_annunci.asp'
     | '/index.asp'
+    | '/mcp'
     | '/off-market'
     | '/osservatorio-immobiliare-lunigiana'
     | '/prezzi-case-lunigiana'
@@ -577,6 +609,7 @@ export interface FileRouteTypes {
     | '/vendite2.asp'
     | '/vivere-a-pontremoli'
     | '/vivere-in-lunigiana'
+    | '/.well-known/oauth-protected-resource'
     | '/admin/login'
     | '/case-in-vendita-lunigiana/$tipologia'
     | '/case-in-vendita/$comune'
@@ -584,6 +617,7 @@ export interface FileRouteTypes {
     | '/case-in-vendita-lunigiana'
     | '/case-in-vendita'
     | '/immobili'
+    | '/.lovable/oauth/consent'
     | '/admin/dati-live'
     | '/admin/idealista'
     | '/admin/impostazioni'
@@ -615,6 +649,7 @@ export interface FileRouteTypes {
     | '/elenco_annunci.asp'
     | '/immobili'
     | '/index.asp'
+    | '/mcp'
     | '/off-market'
     | '/osservatorio-immobiliare-lunigiana'
     | '/prezzi-case-lunigiana'
@@ -630,6 +665,7 @@ export interface FileRouteTypes {
     | '/vendite2.asp'
     | '/vivere-a-pontremoli'
     | '/vivere-in-lunigiana'
+    | '/.well-known/oauth-protected-resource'
     | '/_admin/admin'
     | '/admin/login'
     | '/case-in-vendita-lunigiana/$tipologia'
@@ -638,6 +674,7 @@ export interface FileRouteTypes {
     | '/case-in-vendita-lunigiana/'
     | '/case-in-vendita/'
     | '/immobili/'
+    | '/.lovable/oauth/consent'
     | '/_admin/admin/dati-live'
     | '/_admin/admin/idealista'
     | '/_admin/admin/impostazioni'
@@ -670,6 +707,7 @@ export interface RootRouteChildren {
   Elenco_annunciDotaspRoute: typeof Elenco_annunciDotaspRoute
   ImmobiliRoute: typeof ImmobiliRouteWithChildren
   IndexDotaspRoute: typeof IndexDotaspRoute
+  McpRoute: typeof McpRoute
   OffMarketRoute: typeof OffMarketRoute
   OsservatorioImmobiliareLunigianaRoute: typeof OsservatorioImmobiliareLunigianaRoute
   PrezziCaseLunigianaRoute: typeof PrezziCaseLunigianaRoute
@@ -685,11 +723,13 @@ export interface RootRouteChildren {
   Vendite2DotaspRoute: typeof Vendite2DotaspRoute
   VivereAPontremoliRoute: typeof VivereAPontremoliRoute
   VivereInLunigianaRoute: typeof VivereInLunigianaRoute
+  Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   AdminLoginRoute: typeof AdminLoginRoute
   CaseInVenditaLunigianaTipologiaRoute: typeof CaseInVenditaLunigianaTipologiaRoute
   CaseInVenditaComuneRoute: typeof CaseInVenditaComuneRoute
   CaseInVenditaLunigianaIndexRoute: typeof CaseInVenditaLunigianaIndexRoute
   CaseInVenditaIndexRoute: typeof CaseInVenditaIndexRoute
+  DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
   ApiPublicIdealistaFeedDotxmlRoute: typeof ApiPublicIdealistaFeedDotxmlRoute
   MediaOgImmobiliSplatRoute: typeof MediaOgImmobiliSplatRoute
 }
@@ -799,6 +839,13 @@ declare module '@tanstack/react-router' {
       path: '/off-market'
       fullPath: '/off-market'
       preLoaderRoute: typeof OffMarketRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mcp': {
+      id: '/mcp'
+      path: '/mcp'
+      fullPath: '/mcp'
+      preLoaderRoute: typeof McpRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/index.asp': {
@@ -969,6 +1016,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAdminRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/.well-known/oauth-protected-resource': {
+      id: '/.well-known/oauth-protected-resource'
+      path: '/.well-known/oauth-protected-resource'
+      fullPath: '/.well-known/oauth-protected-resource'
+      preLoaderRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_admin/admin/': {
       id: '/_admin/admin/'
       path: '/'
@@ -1010,6 +1064,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/dati-live'
       preLoaderRoute: typeof AdminAdminDatiLiveRouteImport
       parentRoute: typeof AdminAdminRoute
+    }
+    '/.lovable/oauth/consent': {
+      id: '/.lovable/oauth/consent'
+      path: '/.lovable/oauth/consent'
+      fullPath: '/.lovable/oauth/consent'
+      preLoaderRoute: typeof DotlovableOauthConsentRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_admin/admin/immobili/': {
       id: '/_admin/admin/immobili/'
@@ -1146,6 +1207,7 @@ const rootRouteChildren: RootRouteChildren = {
   Elenco_annunciDotaspRoute: Elenco_annunciDotaspRoute,
   ImmobiliRoute: ImmobiliRouteWithChildren,
   IndexDotaspRoute: IndexDotaspRoute,
+  McpRoute: McpRoute,
   OffMarketRoute: OffMarketRoute,
   OsservatorioImmobiliareLunigianaRoute: OsservatorioImmobiliareLunigianaRoute,
   PrezziCaseLunigianaRoute: PrezziCaseLunigianaRoute,
@@ -1161,11 +1223,14 @@ const rootRouteChildren: RootRouteChildren = {
   Vendite2DotaspRoute: Vendite2DotaspRoute,
   VivereAPontremoliRoute: VivereAPontremoliRoute,
   VivereInLunigianaRoute: VivereInLunigianaRoute,
+  Char91DotwellKnownChar93OauthProtectedResourceRoute:
+    Char91DotwellKnownChar93OauthProtectedResourceRoute,
   AdminLoginRoute: AdminLoginRoute,
   CaseInVenditaLunigianaTipologiaRoute: CaseInVenditaLunigianaTipologiaRoute,
   CaseInVenditaComuneRoute: CaseInVenditaComuneRoute,
   CaseInVenditaLunigianaIndexRoute: CaseInVenditaLunigianaIndexRoute,
   CaseInVenditaIndexRoute: CaseInVenditaIndexRoute,
+  DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
   ApiPublicIdealistaFeedDotxmlRoute: ApiPublicIdealistaFeedDotxmlRoute,
   MediaOgImmobiliSplatRoute: MediaOgImmobiliSplatRoute,
 }
