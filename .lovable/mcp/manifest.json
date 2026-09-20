@@ -1,0 +1,219 @@
+{
+  "version": 1,
+  "sdk_version": "3.0.1",
+  "path": "/mcp",
+  "auth": {
+    "type": "oauth",
+    "issuer": "https://ewmhrupsvslvdnbdzgly.supabase.co/auth/v1",
+    "accepted_audiences": [
+      "authenticated"
+    ]
+  },
+  "mcp": {
+    "server": {
+      "name": "sito-furia",
+      "version": "0.1.0",
+      "title": "Sito Furia"
+    },
+    "tools": [
+      {
+        "name": "search_properties",
+        "title": "Cerca immobili",
+        "description": "Search the Furia Immobiliare portfolio (published listings by default) by comune, type, contract, price and size.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "query": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 200
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Free text matched against title and reference code. Null for no text filter."
+            },
+            "municipality": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 100
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Comune, e.g. Pontremoli. Null for any."
+            },
+            "property_type": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 60
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Property type as stored, e.g. casa, villa, rustico. Null for any."
+            },
+            "contract_type": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "vendita",
+                    "affitto"
+                  ]
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Sale or rent. Null for any."
+            },
+            "max_price": {
+              "anyOf": [
+                {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Maximum price in EUR. Null for any."
+            },
+            "min_size_sqm": {
+              "anyOf": [
+                {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Minimum size in sqm. Null for any."
+            },
+            "include_unpublished": {
+              "type": "boolean",
+              "description": "When true, also return drafts and other non-published listings (staff only)."
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "description": "Maximum number of results, 1-50."
+            }
+          },
+          "required": [
+            "query",
+            "municipality",
+            "property_type",
+            "contract_type",
+            "max_price",
+            "min_size_sqm",
+            "include_unpublished",
+            "limit"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_property",
+        "title": "Dettaglio immobile",
+        "description": "Fetch one listing with its full detail (features, description, gallery count) by reference code, slug or id.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "reference": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 120,
+              "description": "Reference code (e.g. I709), slug, or the listing uuid."
+            }
+          },
+          "required": [
+            "reference"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_leads",
+        "title": "Elenco richieste",
+        "description": "List CRM contact requests (leads) with status, source and linked listing. Staff accounts only; contains personal contact data.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "status": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "new",
+                    "contacted",
+                    "in_progress",
+                    "closed"
+                  ]
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by lead status. Null for any."
+            },
+            "since": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 40
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "ISO date/time lower bound on creation, e.g. 2026-09-01. Null for no bound."
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "description": "Maximum number of leads, 1-100."
+            }
+          },
+          "required": [
+            "status",
+            "since",
+            "limit"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}

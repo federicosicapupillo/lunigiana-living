@@ -11,21 +11,39 @@ export const Route = createFileRoute("/admin/login")({
       { name: "robots", content: "noindex,nofollow" },
     ],
   }),
+  // `next` è usato dalla schermata di autorizzazione agenti: dopo l'accesso
+  // l'utente torna esattamente alla richiesta che stava approvando.
+  validateSearch: (s: Record<string, unknown>): { next?: string } =>
+    typeof s.next === "string" ? { next: s.next } : {},
+
   component: AdminLoginPage,
 });
 
+/** Solo percorsi relativi same-origin: nessun redirect verso l'esterno. */
+function safeNext(next: string | undefined): string | null {
+  if (!next) return null;
+  if (!next.startsWith("/") || next.startsWith("//")) return null;
+  return next;
+}
+
 function AdminLoginPage() {
   const navigate = useNavigate();
+  const { next } = Route.useSearch();
   const { session, isAdmin, loading } = useAdmin();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    if (!loading && session && isAdmin) {
-      navigate({ to: "/admin/immobili" });
+    if (loading || !session) return;
+    const target = safeNext(next);
+    if (target) {
+      window.location.href = target;
+      return;
     }
-  }, [session, isAdmin, loading, navigate]);
+    if (isAdmin) navigate({ to: "/admin/immobili" });
+  }, [session, isAdmin, loading, navigate, next]);
+
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
