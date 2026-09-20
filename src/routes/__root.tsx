@@ -152,9 +152,15 @@ function RootComponent() {
   const loc = useRouterState({ select: (s) => s.location });
   const router = useRouter();
   useEffect(() => {
+    // Ingresso diretto: all'idratazione l'URL è già quello giusto, quindi
+    // qui window.location.pathname è corretto. onResolved non scatta per
+    // il caricamento iniziale; il guard a livello di modulo assorbe il
+    // doppio mount di StrictMode.
+    trackPageView(loc.pathname, loc.searchStr ?? "");
     return router.subscribe("onResolved", (e) => {
       trackPageView(e.toLocation.pathname, e.toLocation.searchStr ?? "");
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router]);
   // Admin area renders its own chrome (header/sidebar). Skip the public
   // SiteHeader/SiteFooter for any /admin* URL so the back-office isn't wrapped
