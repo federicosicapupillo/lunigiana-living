@@ -34,8 +34,9 @@ import { COMMERCIAL_HIGHLIGHT_EN } from "@/lib/admin/property-constants";
 import { img, imgSrcSet } from "@/lib/image-url";
 import { PropertyLightbox } from "@/components/property-lightbox";
 import { trackEvent, trackClick } from "@/lib/analytics";
-import { getAttribution } from "@/lib/attribution";
+import { getLeadAttribution } from "@/lib/attribution";
 import { createClientUuid } from "@/lib/client-id";
+import { setCurrentProperty, clearCurrentProperty } from "@/lib/property-context";
 import { siteUrl } from "@/lib/site-url";
 import { propertyPath, propertyOgImagePath } from "@/lib/property-url";
 import { propertyGraph } from "@/lib/structured-data";
@@ -332,6 +333,14 @@ function PropertyDetail() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [p.id]);
 
+  // Rende l'immobile corrente disponibile al pulsante WhatsApp flottante,
+  // che vive in __root e non lo conoscerebbe altrimenti.
+  // ⛔ p.id è l'uuid del database, non lo slug dell'URL.
+  useEffect(() => {
+    setCurrentProperty({ property_id: String(p.id), property_code: p.reference });
+    return () => clearCurrentProperty();
+  }, [p.id, p.reference]);
+
   const notify = useServerFn(sendLeadNotification);
   const [submitState, setSubmitState] = useState<"idle" | "submitting" | "ok" | "error">("idle");
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -390,7 +399,7 @@ function PropertyDetail() {
       privacy_accepted: true,
       source: "property_inquiry",
       property_id: p.id,
-      ...getAttribution(),
+      ...getLeadAttribution(),
     });
     if (error) {
       setSubmitState("error");
@@ -1043,7 +1052,7 @@ function PropertyDetail() {
               <a
                 href="tel:+390187830229"
                 data-track="phone_click"
-                onClick={() => trackClick("phone_click", { source: "property_detail", language })}
+                onClick={() => trackClick("phone_click", { source: "property_detail", language, property_id: String(p.id), property_code: p.reference })}
                 className="mt-1 block font-serif text-xl text-ink"
               >
                 0187 830229
@@ -1051,7 +1060,7 @@ function PropertyDetail() {
               <a
                 href="tel:+393207019985"
                 data-track="phone_click"
-                onClick={() => trackClick("phone_click", { source: "property_detail", language })}
+                onClick={() => trackClick("phone_click", { source: "property_detail", language, property_id: String(p.id), property_code: p.reference })}
                 className="block font-serif text-xl text-ink"
               >
                 320 7019985

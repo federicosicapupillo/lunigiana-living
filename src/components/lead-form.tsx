@@ -5,7 +5,7 @@ import { useT, useLanguage } from "@/lib/i18n/LanguageContext";
 import { useServerFn } from "@tanstack/react-start";
 import { sendLeadNotification } from "@/lib/lead-notify.functions";
 import { trackClick, trackEvent } from "@/lib/analytics";
-import { getAttribution } from "@/lib/attribution";
+import { getLeadAttribution } from "@/lib/attribution";
 import { createClientUuid } from "@/lib/client-id";
 
 const PROPERTY_TYPES_IT = [
@@ -105,7 +105,7 @@ export function LeadForm({
       source_page: typeof window !== "undefined" ? window.location.pathname : "/",
       privacy_accepted: true,
       source: "lead_form",
-      ...getAttribution(),
+      ...getLeadAttribution(),
     };
 
     if (!payload.full_name || !payload.email || !payload.phone) {

@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useServerFn } from "@tanstack/react-start";
 import { sendLeadNotification } from "@/lib/lead-notify.functions";
 import { trackEvent } from "@/lib/analytics";
-import { getAttribution } from "@/lib/attribution";
+import { getLeadAttribution } from "@/lib/attribution";
 import { createClientUuid } from "@/lib/client-id";
 import { useT } from "@/lib/i18n/LanguageContext";
 import { OM_BUDGETS, OM_TYPES } from "@/lib/off-market";
@@ -81,7 +81,7 @@ export function OffMarketForm({ variant }: { variant: Variant }) {
       source_page: "/off-market",
       privacy_accepted: true,
       source: "off_market",
-      ...getAttribution(),
+      ...getLeadAttribution(),
     };
 
     setStatus("submitting");
