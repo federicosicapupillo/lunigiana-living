@@ -45,6 +45,7 @@ function readStorage(): Attribution | null {
       utm_medium: clean(parsed.utm_medium ?? null, true),
       utm_campaign: clean(parsed.utm_campaign ?? null, true),
       utm_content: clean(parsed.utm_content ?? null, false),
+      utm_term: clean(parsed.utm_term ?? null, true),
     };
   } catch {
     return null;
@@ -59,6 +60,7 @@ function readUrl(): Attribution {
       utm_medium: clean(params.get("utm_medium"), true),
       utm_campaign: clean(params.get("utm_campaign"), true),
       utm_content: clean(params.get("utm_content"), false),
+      utm_term: clean(params.get("utm_term"), true),
     };
   } catch {
     return EMPTY;
@@ -66,7 +68,7 @@ function readUrl(): Attribution {
 }
 
 function hasAny(a: Attribution): boolean {
-  return Boolean(a.utm_source || a.utm_medium || a.utm_campaign || a.utm_content);
+  return Boolean(a.utm_source || a.utm_medium || a.utm_campaign || a.utm_content || a.utm_term);
 }
 
 /**
