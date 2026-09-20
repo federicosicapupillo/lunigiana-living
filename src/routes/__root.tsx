@@ -145,10 +145,17 @@ function RootComponent() {
   }, []);
 
   // 2° — poi le pagine. Il guard interno decide se contarle.
+  //      onResolved (non un effect su loc): scatta DOPO che il router ha
+  //      committato l'URL, quindi window.location.pathname letto dal sink è
+  //      già quello nuovo; con l'effect la colonna page_path restava
+  //      indietro di una navigazione.
   const loc = useRouterState({ select: (s) => s.location });
+  const router = useRouter();
   useEffect(() => {
-    trackPageView(loc.pathname, loc.searchStr ?? "");
-  }, [loc.pathname, loc.searchStr]);
+    return router.subscribe("onResolved", (e) => {
+      trackPageView(e.toLocation.pathname, e.toLocation.searchStr ?? "");
+    });
+  }, [router]);
   // Admin area renders its own chrome (header/sidebar). Skip the public
   // SiteHeader/SiteFooter for any /admin* URL so the back-office isn't wrapped
   // by the marketing layout.
