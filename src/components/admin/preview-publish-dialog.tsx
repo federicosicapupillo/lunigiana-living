@@ -16,6 +16,8 @@ type Data = {
   title: string | null;
   reference_code: string | null;
   municipality: string | null;
+  locality: string | null;
+  area_zone: string | null;
   property_type: string | null;
   contract_type: string | null;
   price: number | null;
@@ -53,7 +55,7 @@ export function PreviewPublishDialog({ propertyId, onClose, onPublished }: Props
     setPublished(false);
     (async () => {
       const [{ data: p }, { data: imgs }, { data: desc }] = await Promise.all([
-        supabase.from("properties").select("id,title,reference_code,municipality,property_type,contract_type,price,price_on_request,size_sqm,bedrooms,bathrooms,status").eq("id", propertyId).maybeSingle(),
+        supabase.from("properties").select("id,title,reference_code,municipality,locality,area_zone,property_type,contract_type,price,price_on_request,size_sqm,bedrooms,bathrooms,status").eq("id", propertyId).maybeSingle(),
         supabase.from("property_images").select("*").eq("property_id", propertyId),
         supabase.from("property_descriptions").select("edited_description,generated_description").eq("property_id", propertyId).maybeSingle(),
       ]);
@@ -77,6 +79,8 @@ export function PreviewPublishDialog({ propertyId, onClose, onPublished }: Props
         title: (p.title as string | null) ?? null,
         reference_code: (p.reference_code as string | null) ?? null,
         municipality: (p.municipality as string | null) ?? null,
+        locality: (p.locality as string | null) ?? null,
+        area_zone: (p.area_zone as string | null) ?? null,
         property_type: (p.property_type as string | null) ?? null,
         contract_type: (p.contract_type as string | null) ?? null,
         price: (p.price as number | null) ?? null,
