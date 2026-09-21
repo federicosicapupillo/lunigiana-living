@@ -9,6 +9,7 @@ import {
   Loader2,
   ChevronDown,
   FileText,
+  Eye,
 } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { generateDescription } from "@/lib/ai-description.functions";
@@ -54,6 +55,10 @@ import {
   AMENITY_GROUPS,
   AMENITY_TO_COLUMN,
   AMENITY_FEATURE_PREFIX,
+  PRICE_OPTIONS,
+  PRICE_CUSTOM,
+  isCustomPrice,
+  HOMEPAGE_ORDER_OPTIONS,
 } from "@/lib/admin/property-constants";
 import {
   MULTI_SELECT_FIELDS,
@@ -72,6 +77,7 @@ import {
   type StatusAction,
 } from "@/lib/admin/property-status";
 import { ConfirmDialog } from "@/components/admin/confirm-dialog";
+import { PreviewPublishDialog } from "@/components/admin/preview-publish-dialog";
 
 type Property = {
   id: string;
