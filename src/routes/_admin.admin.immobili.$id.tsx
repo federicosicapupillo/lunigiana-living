@@ -526,6 +526,12 @@ function PropertyEditor() {
             Salva bozza
           </button>
           <button
+            onClick={() => setPreviewOpen(true)}
+            className="inline-flex items-center gap-2 rounded-sm border border-primary bg-primary/10 px-4 py-2 text-xs uppercase tracking-wider text-primary hover:bg-primary/20"
+          >
+            <Eye size={13} /> Anteprima grafica
+          </button>
+          <button
             onClick={() => setFlyerOpen(true)}
             className="inline-flex items-center gap-2 rounded-sm border border-border bg-background px-4 py-2 text-xs uppercase tracking-wider hover:border-primary/50"
           >
@@ -618,6 +624,12 @@ function PropertyEditor() {
         >
           {saving ? <Loader2 size={13} className="animate-spin" /> : <Save size={13} />}
           Salva
+        </button>
+        <button
+          onClick={() => setPreviewOpen(true)}
+          className="inline-flex flex-1 items-center justify-center gap-2 rounded-sm border border-primary bg-primary/10 px-3 py-2.5 text-xs uppercase tracking-wider text-primary"
+        >
+          <Eye size={13} /> Anteprima
         </button>
         <StatusActionsButton
           status={prop.status}
