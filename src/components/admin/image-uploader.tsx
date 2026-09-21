@@ -976,7 +976,7 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
                     hasRender={!!img.rendered_storage_path}
                     canRender={!!img.render_availability?.canRender}
                     rendering={renderingId === img.id}
-                    onGenerate={() => generate(img)}
+                    onGenerate={(settings) => generate(img, settings)}
                   />
                   {img.render_error && (
                     <div className="text-[10px] text-destructive">{img.render_error}</div>
