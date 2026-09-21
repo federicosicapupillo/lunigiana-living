@@ -376,7 +376,11 @@ export function LocationFields({
           allowFree
         />
       </Field>
-      <Field label="Indirizzo / Via" full>
+      <Field
+        label="Indirizzo / Via (facoltativo)"
+        full
+        hint="L'indirizzo esatto resta riservato: sull'annuncio pubblico si vedono solo Comune, Zona/Località, Provincia e Regione."
+      >
         <input
           type="text"
           value={value.address}
@@ -385,55 +389,6 @@ export function LocationFields({
           className={inputCls}
         />
       </Field>
-      <div className="md:col-span-2">
-        <span className="block text-xs uppercase tracking-wider text-muted-foreground">
-          Visibilità indirizzo sull'annuncio pubblico
-        </span>
-        <div className="mt-2 grid gap-2 md:grid-cols-2">
-          <button
-            type="button"
-            onClick={() => onChange({ show_full_address: false })}
-            className={`flex items-start gap-3 rounded-sm border px-4 py-3 text-left text-sm transition ${
-              !value.show_full_address
-                ? "border-primary bg-primary/5 text-ink"
-                : "border-border bg-card text-muted-foreground hover:border-primary/40"
-            }`}
-          >
-            <span
-              className={`mt-0.5 inline-block h-3 w-3 shrink-0 rounded-full border ${
-                !value.show_full_address ? "border-primary bg-primary" : "border-muted-foreground/40"
-              }`}
-            />
-            <span>
-              <span className="block font-medium text-ink">No, mostra solo Comune / Zona / Località</span>
-              <span className="block text-xs text-muted-foreground">
-                L'indirizzo esatto resta riservato; nella scheda pubblica si vede solo Comune, Zona, Provincia, Regione.
-              </span>
-            </span>
-          </button>
-          <button
-            type="button"
-            onClick={() => onChange({ show_full_address: true })}
-            className={`flex items-start gap-3 rounded-sm border px-4 py-3 text-left text-sm transition ${
-              value.show_full_address
-                ? "border-primary bg-primary/5 text-ink"
-                : "border-border bg-card text-muted-foreground hover:border-primary/40"
-            }`}
-          >
-            <span
-              className={`mt-0.5 inline-block h-3 w-3 shrink-0 rounded-full border ${
-                value.show_full_address ? "border-primary bg-primary" : "border-muted-foreground/40"
-              }`}
-            />
-            <span>
-              <span className="block font-medium text-ink">Sì, mostra indirizzo completo</span>
-              <span className="block text-xs text-muted-foreground">
-                L'indirizzo esatto sarà visibile pubblicamente.
-              </span>
-            </span>
-          </button>
-        </div>
-      </div>
     </>
   );
 }
