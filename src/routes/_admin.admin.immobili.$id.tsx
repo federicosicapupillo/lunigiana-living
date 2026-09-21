@@ -189,6 +189,7 @@ function PropertyEditor() {
   const [proposal, setProposal] = useState<string | null>(null);
   const [flyerOpen, setFlyerOpen] = useState(false);
   const [idealistaOpen, setIdealistaOpen] = useState(false);
+  const [previewOpen, setPreviewOpen] = useState(false);
   const [titleManual, setTitleManual] = useState(false);
   const [titleGenerating, setTitleGenerating] = useState(false);
 
@@ -648,6 +649,11 @@ function PropertyEditor() {
         description={desc}
         open={idealistaOpen}
         onClose={() => setIdealistaOpen(false)}
+        onPublished={load}
+      />
+      <PreviewPublishDialog
+        propertyId={previewOpen ? id : null}
+        onClose={() => setPreviewOpen(false)}
         onPublished={load}
       />
     </div>
