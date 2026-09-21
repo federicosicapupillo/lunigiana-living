@@ -21,6 +21,10 @@ type Props = {
   hasRender: boolean;
   canRender: boolean;
   rendering: boolean;
+  /**
+   * Riceve i parametri scelti: il salvataggio e l'avvio della generazione
+   * avvengono in un'unica azione server (nessun round trip aggiuntivo).
+   */
   onGenerate: (settings: RenderSettings) => Promise<void> | void;
 };
 
@@ -52,13 +56,14 @@ export function RenderSettingsPanel({
   onGenerate,
 }: Props) {
   const [open, setOpen] = useState(false);
+  const [advanced, setAdvanced] = useState(false);
   const [state, setState] = useState<RenderSettings>(initial);
   const [busy, setBusy] = useState(false);
-  const save = useServerFn(saveRenderSettings);
 
   useEffect(() => {
     setState({ ...initial, preserve_structure: true });
     setOpen(false);
+    setAdvanced(false);
   }, [imageId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const update = <K extends keyof RenderSettings>(k: K, v: RenderSettings[K]) => {
