@@ -64,6 +64,8 @@ export type PropertyPromptContext = {
   balcony: boolean | null;
   commercial_highlights: string[] | null;
   short_notes: string | null;
+  /** Dotazioni salvate in property_features (solo fatti già registrati). */
+  extra_features?: string[] | null;
 };
 
 function buildPropertyContext(p: PropertyPromptContext | null): string {
@@ -86,6 +88,7 @@ function buildPropertyContext(p: PropertyPromptContext | null): string {
     p.bedrooms != null ? `bedrooms: ${p.bedrooms}` : null,
     p.bathrooms != null ? `bathrooms: ${p.bathrooms}` : null,
     amenities.length ? `features: ${amenities.join(", ")}` : null,
+    p.extra_features?.length ? `listed amenities: ${p.extra_features.join(", ")}` : null,
   ].filter((v): v is string => !!v);
   const narrative = [
     p.commercial_highlights?.length
