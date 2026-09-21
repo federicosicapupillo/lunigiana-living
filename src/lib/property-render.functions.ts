@@ -64,6 +64,8 @@ export type PropertyPromptContext = {
   balcony: boolean | null;
   commercial_highlights: string[] | null;
   short_notes: string | null;
+  /** Dotazioni salvate in property_features (solo fatti già registrati). */
+  extra_features?: string[] | null;
 };
 
 function buildPropertyContext(p: PropertyPromptContext | null): string {
@@ -86,6 +88,7 @@ function buildPropertyContext(p: PropertyPromptContext | null): string {
     p.bedrooms != null ? `bedrooms: ${p.bedrooms}` : null,
     p.bathrooms != null ? `bathrooms: ${p.bathrooms}` : null,
     amenities.length ? `features: ${amenities.join(", ")}` : null,
+    p.extra_features?.length ? `listed amenities: ${p.extra_features.join(", ")}` : null,
   ].filter((v): v is string => !!v);
   const narrative = [
     p.commercial_highlights?.length
@@ -533,8 +536,8 @@ export const renderPropertyImage = createServerFn({ method: "POST" })
       .eq("id", data.imageId);
 
     try {
-      // Letture indipendenti in parallelo: foto originale + dati immobile.
-      const [dl, ctxRes] = await Promise.all([
+      // Letture indipendenti in parallelo: foto originale + dati immobile + dotazioni.
+      const [dl, ctxRes, featRes] = await Promise.all([
         supabaseAdmin.storage.from(BUCKET).download(img.storage_path),
         supabaseAdmin
           .from("properties")
@@ -543,6 +546,10 @@ export const renderPropertyImage = createServerFn({ method: "POST" })
           )
           .eq("id", img.property_id)
           .maybeSingle(),
+        supabaseAdmin
+          .from("property_features")
+          .select("feature_name, feature_value")
+          .eq("property_id", img.property_id),
       ]);
       const blob = dl.data;
       if (dl.error || !blob) {
@@ -561,9 +568,16 @@ export const renderPropertyImage = createServerFn({ method: "POST" })
       const key = process.env.LOVABLE_API_KEY;
       if (!key) throw new Error("AI non configurata");
 
+      const ctxBase = (ctxRes.data as PropertyPromptContext | null) ?? null;
+      const extraFeatures = (featRes.data ?? [])
+        .map((f) =>
+          [f.feature_name, f.feature_value].filter((v) => v && String(v).trim()).join(": "),
+        )
+        .filter((v) => v.length > 0)
+        .slice(0, 12);
       const prompt = buildPrompt(
         settings,
-        (ctxRes.data as PropertyPromptContext | null) ?? null,
+        ctxBase ? { ...ctxBase, extra_features: extraFeatures } : null,
       );
       const upstream = await fetch("https://ai.gateway.lovable.dev/v1/images/generations", {
         method: "POST",
