@@ -916,14 +916,9 @@ function MainTab({
           className={inputCls}
         />
       </Field>
-      <Field label="Prezzo (€)" full>
+      <Field label="Prezzo" full>
         <div className="space-y-2">
-          <NumberInput
-            value={prop.price}
-            onChange={(v) => update({ price: v })}
-            step={1000}
-            placeholder="Inserisci prezzo interno"
-          />
+          <PriceGuidedInput value={prop.price} onChange={(v) => update({ price: v })} />
           <Toggle
             label="Mostra come prezzo su richiesta"
             value={prop.price_on_request}
@@ -943,7 +938,7 @@ function MainTab({
           className={inputCls}
         />
       </Field>
-      <Field label="Visibilità e promozione" full>
+      <Field label="Promozione in home" full>
         <div className="space-y-2 rounded-sm border border-border bg-muted/20 p-4">
           <Toggle
             label="Mostra in home page (immobile in evidenza)"
@@ -953,14 +948,22 @@ function MainTab({
           {prop.featured && (
             <div>
               <label className="mb-1 block text-xs uppercase tracking-wider text-muted-foreground">
-                Ordine in home page (1 = primo)
+                Posizione in home page (1 = primo)
               </label>
-              <NumberInput
-                value={prop.homepage_order}
-                onChange={(v) => update({ homepage_order: v })}
-                step={1}
-                placeholder="Lascia vuoto per ordinare automaticamente"
-              />
+              <select
+                value={prop.homepage_order == null ? "" : String(prop.homepage_order)}
+                onChange={(e) =>
+                  update({ homepage_order: e.target.value ? Number(e.target.value) : null })
+                }
+                className={inputCls}
+              >
+                <option value="">Automatica (prima i più recenti)</option>
+                {HOMEPAGE_ORDER_OPTIONS.map((n) => (
+                  <option key={n} value={n}>
+                    Posizione {n}
+                  </option>
+                ))}
+              </select>
             </div>
           )}
           <p className="text-xs text-muted-foreground">
