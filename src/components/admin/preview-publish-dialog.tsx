@@ -175,7 +175,9 @@ export function PreviewPublishDialog({ propertyId, onClose, onPublished }: Props
 
               <div>
                 <div className="flex flex-wrap items-center gap-2 text-[10px] uppercase tracking-wider text-muted-foreground">
-                  {data.reference_code && <span className="text-primary">{data.reference_code}</span>}
+                  {data.reference_code && (
+                    <span className="text-primary">Cod. annuncio {data.reference_code}</span>
+                  )}
                   {data.property_type && <span>· {data.property_type}</span>}
                   <span
                     className={`ml-auto rounded-sm px-2 py-0.5 ${
@@ -188,9 +190,12 @@ export function PreviewPublishDialog({ propertyId, onClose, onPublished }: Props
                   </span>
                 </div>
                 <h3 className="mt-2 font-serif text-2xl text-ink">{data.title || "(Senza titolo)"}</h3>
-                {data.municipality && (
+                {(data.municipality || data.locality || data.area_zone) && (
                   <div className="mt-1 flex items-center gap-1 text-sm text-muted-foreground">
-                    <MapPin size={14} /> {data.municipality}
+                    <MapPin size={14} />{" "}
+                    {[data.municipality, data.locality || data.area_zone]
+                      .filter((v) => v && v.trim())
+                      .join(" — ")}
                   </div>
                 )}
                 <div className="mt-3 font-serif text-2xl text-primary">
