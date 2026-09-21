@@ -429,10 +429,12 @@ export const checkImageRenderAvailability = createServerFn({ method: "POST" })
 
 export const renderPropertyImage = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: { imageId: string }) =>
+  .inputValidator((data: { imageId: string; settings?: unknown }) =>
     z
       .object({
         imageId: z.string().uuid(),
+        // Parametri scelti nel pannello: salvati e usati nella stessa azione.
+        settings: SettingsSchema.optional(),
       })
       .parse(data),
   )
@@ -457,54 +459,101 @@ export const renderPropertyImage = createServerFn({ method: "POST" })
       .eq("id", data.imageId)
       .maybeSingle();
     if (imgErr || !img) throw new Error("Immagine non trovata");
-    if (!img.photo_type) throw new Error("Seleziona prima il tipo foto (Interno/Esterno)");
 
-    const availability = await verifyInternalStorageImage(supabaseAdmin, img);
-    if (!availability.canRender) {
-      await supabaseAdmin
-        .from("property_images")
-        .update({ render_status: "not_generated", render_error: availability.message })
-        .eq("id", data.imageId);
-      throw new Error(availability.message ?? IMPORTED_NOT_SYNCED_MESSAGE);
+    const incoming = data.settings ?? null;
+    const settings: RenderSettings = {
+      photo_type: (incoming?.photo_type ?? img.photo_type) as RenderSettings["photo_type"],
+      photo_category: incoming?.photo_category ?? img.photo_category,
+      render_style: incoming?.render_style ?? img.render_style,
+      render_goal: incoming?.render_goal ?? img.render_goal,
+      room_condition: incoming?.room_condition ?? img.room_condition,
+      intervention_level: incoming?.intervention_level ?? img.intervention_level,
+      // Real-estate rendering must ALWAYS preserve the original architecture.
+      preserve_structure: true,
+      desired_lighting: incoming?.desired_lighting ?? img.desired_lighting,
+      visual_target: incoming?.visual_target ?? img.visual_target,
+      render_notes: incoming?.render_notes ?? img.render_notes,
+    };
+    if (!settings.photo_type) throw new Error("Seleziona prima il tipo foto (Interno/Esterno)");
+
+    // Una foto già presente nello storage interno non viene risincronizzata:
+    // basta l'URL firmato, il download successivo conferma la disponibilità.
+    const isImportedExternal =
+      !!img.is_imported ||
+      !!img.imported_source_url ||
+      img.import_status === "external_only" ||
+      img.import_status === "imported_external_only" ||
+      !img.storage_path ||
+      isExternalUrl(img.storage_path);
+
+    let availability: ImageAvailability;
+    if (isImportedExternal) {
+      availability = await verifyInternalStorageImage(supabaseAdmin, img);
+      if (!availability.canRender) {
+        await supabaseAdmin
+          .from("property_images")
+          .update({ render_status: "not_generated", render_error: availability.message })
+          .eq("id", data.imageId);
+        throw new Error(availability.message ?? IMPORTED_NOT_SYNCED_MESSAGE);
+      }
+    } else {
+      const { data: signed } = await supabaseAdmin.storage
+        .from(BUCKET)
+        .createSignedUrl(img.storage_path, SIGNED_URL_TTL_SECONDS);
+      availability = {
+        imageId: img.id,
+        canRender: true,
+        state: "ready_manual",
+        statusLabel: "Foto disponibile",
+        message: null,
+        originalImageUrl: signed?.signedUrl ?? null,
+      };
     }
 
     const log = createPhaseLogger("image_render", data.imageId);
     log.phase("request_started");
 
-    const settings: RenderSettings = {
-      photo_type: img.photo_type,
-      photo_category: img.photo_category,
-      render_style: img.render_style,
-      render_goal: img.render_goal,
-      room_condition: img.room_condition,
-      intervention_level: img.intervention_level,
-      // Real-estate rendering must ALWAYS preserve the original architecture.
-      preserve_structure: true,
-      desired_lighting: img.desired_lighting,
-      visual_target: img.visual_target,
-      render_notes: img.render_notes,
-    };
-
+    // Un'unica scrittura DB: parametri scelti + stato "in elaborazione".
     await supabaseAdmin
       .from("property_images")
-      .update({ render_status: "processing", render_error: null })
+      .update({
+        photo_type: settings.photo_type,
+        photo_category: settings.photo_category,
+        render_style: settings.render_style,
+        render_goal: settings.render_goal,
+        room_condition: settings.room_condition,
+        intervention_level: settings.intervention_level,
+        preserve_structure: true,
+        desired_lighting: settings.desired_lighting,
+        visual_target: settings.visual_target,
+        render_notes: settings.render_notes,
+        render_status: "processing",
+        render_error: null,
+      })
       .eq("id", data.imageId);
 
     try {
-      let bytesIn: Uint8Array;
-      let mime = "image/jpeg";
-      const { data: blob, error: dlErr } = await supabaseAdmin.storage
-        .from(BUCKET)
-        .download(img.storage_path);
-      if (dlErr || !blob) {
+      // Letture indipendenti in parallelo: foto originale + dati immobile.
+      const [dl, ctxRes] = await Promise.all([
+        supabaseAdmin.storage.from(BUCKET).download(img.storage_path),
+        supabaseAdmin
+          .from("properties")
+          .select(
+            "property_type, condition, municipality, locality, area_zone, province, size_sqm, bedrooms, bathrooms, panoramic_view, historic_property, garden, terrace, balcony, commercial_highlights, short_notes",
+          )
+          .eq("id", img.property_id)
+          .maybeSingle(),
+      ]);
+      const blob = dl.data;
+      if (dl.error || !blob) {
         await supabaseAdmin
           .from("property_images")
           .update({ import_status: "sync_error", render_status: "error", render_error: IMPORTED_NOT_SYNCED_MESSAGE })
           .eq("id", data.imageId);
         throw new Error(IMPORTED_NOT_SYNCED_MESSAGE);
       }
-      mime = blob.type || mime;
-      bytesIn = new Uint8Array(await blob.arrayBuffer());
+      const mime = blob.type || "image/jpeg";
+      const bytesIn = new Uint8Array(await blob.arrayBuffer());
       log.phase("source_download_completed", { bytes: bytesIn.length });
       const dataUrl = `data:${mime};base64,${toBase64(bytesIn)}`;
       log.phase("source_encoded");
@@ -512,7 +561,10 @@ export const renderPropertyImage = createServerFn({ method: "POST" })
       const key = process.env.LOVABLE_API_KEY;
       if (!key) throw new Error("AI non configurata");
 
-      const prompt = buildPrompt(settings);
+      const prompt = buildPrompt(
+        settings,
+        (ctxRes.data as PropertyPromptContext | null) ?? null,
+      );
       const upstream = await fetch("https://ai.gateway.lovable.dev/v1/images/generations", {
         method: "POST",
         headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
