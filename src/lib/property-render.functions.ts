@@ -43,7 +43,68 @@ function joinLabels(parts: (string | null)[]): string {
   return parts.filter((p): p is string => !!p && p.length > 0).join(" · ");
 }
 
-function buildPrompt(s: RenderSettings): string {
+/**
+ * Dati dell'immobile usati per costruire il prompt in automatico:
+ * l'admin non scrive nessun prompt a mano.
+ */
+export type PropertyPromptContext = {
+  property_type: string | null;
+  condition: string | null;
+  municipality: string | null;
+  locality: string | null;
+  area_zone: string | null;
+  province: string | null;
+  size_sqm: number | null;
+  bedrooms: number | null;
+  bathrooms: number | null;
+  panoramic_view: boolean | null;
+  historic_property: boolean | null;
+  garden: boolean | null;
+  terrace: boolean | null;
+  balcony: boolean | null;
+  commercial_highlights: string[] | null;
+  short_notes: string | null;
+};
+
+function buildPropertyContext(p: PropertyPromptContext | null): string {
+  if (!p) return "";
+  const place = [p.locality || p.area_zone, p.municipality, p.province]
+    .filter((v) => v && String(v).trim())
+    .join(", ");
+  const amenities = [
+    p.panoramic_view ? "panoramic view" : null,
+    p.historic_property ? "historic property" : null,
+    p.garden ? "garden" : null,
+    p.terrace ? "terrace" : null,
+    p.balcony ? "balcony" : null,
+  ].filter((v): v is string => !!v);
+  const facts = [
+    p.property_type ? `type: ${p.property_type}` : null,
+    p.condition ? `condition: ${p.condition}` : null,
+    place ? `location: ${place} (Lunigiana, Tuscany, Italy)` : null,
+    p.size_sqm ? `size: ${p.size_sqm} sqm` : null,
+    p.bedrooms != null ? `bedrooms: ${p.bedrooms}` : null,
+    p.bathrooms != null ? `bathrooms: ${p.bathrooms}` : null,
+    amenities.length ? `features: ${amenities.join(", ")}` : null,
+  ].filter((v): v is string => !!v);
+  const narrative = [
+    p.commercial_highlights?.length
+      ? `commercial angle: ${p.commercial_highlights.slice(0, 5).join("; ")}`
+      : null,
+    p.short_notes ? `agent notes: ${p.short_notes.slice(0, 300)}` : null,
+  ].filter((v): v is string => !!v);
+  if (!facts.length && !narrative.length) return "";
+  return [
+    "PROPERTY CONTEXT (for mood and styling coherence only) —",
+    facts.join(" | "),
+    narrative.join(" | "),
+    "USE OF CONTEXT — This context guides ONLY styling, decor choices, palette and atmosphere so the image matches the written listing. It does NOT authorise adding, removing or inventing anything that is not visible in the source photograph (no extra rooms, windows, gardens, pools, views or buildings). Structural fidelity to the source photo always wins over the context.",
+  ]
+    .filter((v) => v.length > 0)
+    .join(" ");
+}
+
+function buildPrompt(s: RenderSettings, ctx: PropertyPromptContext | null = null): string {
   const isExternal = s.photo_type === "esterno";
   const categoryLabel =
     labelOf(isExternal ? EXTERNAL_CATEGORIES : INTERNAL_CATEGORIES, s.photo_category) ?? "ambiente";
@@ -79,6 +140,7 @@ function buildPrompt(s: RenderSettings): string {
   return joinLabels([
     structureRule,
     intensityHint,
+    buildPropertyContext(ctx),
     sceneLine,
     styleLine,
     goalLine,
