@@ -565,9 +565,16 @@ export const renderPropertyImage = createServerFn({ method: "POST" })
       const key = process.env.LOVABLE_API_KEY;
       if (!key) throw new Error("AI non configurata");
 
+      const ctxBase = (ctxRes.data as PropertyPromptContext | null) ?? null;
+      const extraFeatures = (featRes.data ?? [])
+        .map((f) =>
+          [f.feature_name, f.feature_value].filter((v) => v && String(v).trim()).join(": "),
+        )
+        .filter((v) => v.length > 0)
+        .slice(0, 12);
       const prompt = buildPrompt(
         settings,
-        (ctxRes.data as PropertyPromptContext | null) ?? null,
+        ctxBase ? { ...ctxBase, extra_features: extraFeatures } : null,
       );
       const upstream = await fetch("https://ai.gateway.lovable.dev/v1/images/generations", {
         method: "POST",
