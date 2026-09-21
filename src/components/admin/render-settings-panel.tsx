@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react";
 import { ChevronDown, Loader2, Sparkles, Settings2 } from "lucide-react";
-import { useServerFn } from "@tanstack/react-start";
-import { saveRenderSettings } from "@/lib/property-render.functions";
 import {
   PHOTO_TYPES,
   RENDER_STYLES,
@@ -21,6 +19,10 @@ type Props = {
   hasRender: boolean;
   canRender: boolean;
   rendering: boolean;
+  /**
+   * Riceve i parametri scelti: il salvataggio e l'avvio della generazione
+   * avvengono in un'unica azione server (nessun round trip aggiuntivo).
+   */
   onGenerate: (settings: RenderSettings) => Promise<void> | void;
 };
 
@@ -52,13 +54,14 @@ export function RenderSettingsPanel({
   onGenerate,
 }: Props) {
   const [open, setOpen] = useState(false);
+  const [advanced, setAdvanced] = useState(false);
   const [state, setState] = useState<RenderSettings>(initial);
   const [busy, setBusy] = useState(false);
-  const save = useServerFn(saveRenderSettings);
 
   useEffect(() => {
     setState({ ...initial, preserve_structure: true });
     setOpen(false);
+    setAdvanced(false);
   }, [imageId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const update = <K extends keyof RenderSettings>(k: K, v: RenderSettings[K]) => {
@@ -76,9 +79,10 @@ export function RenderSettingsPanel({
       toast.error("Completa i campi obbligatori per generare il rendering");
       return;
     }
+    if (busy || rendering) return;
     setBusy(true);
     try {
-      await save({ data: { imageId, settings: state } });
+      // Salvataggio parametri + generazione in un'unica azione server.
       await onGenerate(state);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Errore");
@@ -92,17 +96,13 @@ export function RenderSettingsPanel({
 
   const cats = categoriesFor(state.photo_type);
 
-  const triggerLabel = hasRender
-    ? "Rigenera rendering"
-    : state.photo_type
-    ? "Configura rendering"
-    : "Crea rendering";
+  const triggerLabel = hasRender ? "Rigenera foto con IA" : "Genera foto con IA";
 
   const statusLabel = open
-    ? "Configura e genera rendering"
+    ? "Scegli i parametri e genera"
     : hasRender
-    ? "Rendering generato"
-    : "Rendering non configurato";
+    ? "Foto IA generata"
+    : "Non ancora generata";
 
   const busyNow = busy || rendering;
 
@@ -254,16 +254,27 @@ export function RenderSettingsPanel({
             />
             Mantieni struttura originale (sempre attivo: muri, porte, finestre e prospettiva non vengono mai modificati)
           </label>
-          <Field label="Note libere">
-            <textarea
-              rows={2}
-              maxLength={500}
-              value={state.render_notes ?? ""}
-              onChange={(e) => update("render_notes", e.target.value || null)}
-              placeholder="Es. valorizzare il camino, mantenere pavimento originale, non stravolgere la cucina."
-              className="w-full resize-none rounded-sm border border-border bg-background px-2 py-1 text-xs focus:border-primary focus:outline-none"
-            />
-          </Field>
+          {/* Note libere: facoltative, fuori dal percorso principale. */}
+          <button
+            type="button"
+            onClick={() => setAdvanced((a) => !a)}
+            className="flex w-full items-center justify-between gap-2 rounded-sm border border-border px-2 py-1.5 text-[10px] uppercase tracking-wider text-muted-foreground hover:text-primary"
+          >
+            Opzioni avanzate (facoltative)
+            <ChevronDown size={12} className={`transition ${advanced ? "rotate-180" : ""}`} />
+          </button>
+          {advanced && (
+            <Field label="Note libere (facoltative)">
+              <textarea
+                rows={2}
+                maxLength={500}
+                value={state.render_notes ?? ""}
+                onChange={(e) => update("render_notes", e.target.value || null)}
+                placeholder="Es. valorizzare il camino, mantenere pavimento originale, non stravolgere la cucina."
+                className="w-full resize-none rounded-sm border border-border bg-background px-2 py-1 text-xs focus:border-primary focus:outline-none"
+              />
+            </Field>
+          )}
           <button
             type="button"
             onClick={generate}
@@ -274,8 +285,8 @@ export function RenderSettingsPanel({
             {busyNow
               ? "Generazione in corso…"
               : hasRender
-              ? "Rigenera rendering"
-              : "Genera rendering"}
+              ? "Rigenera foto con IA"
+              : "Genera foto con IA"}
           </button>
           {!state.photo_type && (
             <p className="text-center text-[10px] text-destructive">

@@ -16,6 +16,8 @@ type Data = {
   title: string | null;
   reference_code: string | null;
   municipality: string | null;
+  locality: string | null;
+  area_zone: string | null;
   property_type: string | null;
   contract_type: string | null;
   price: number | null;
@@ -53,7 +55,7 @@ export function PreviewPublishDialog({ propertyId, onClose, onPublished }: Props
     setPublished(false);
     (async () => {
       const [{ data: p }, { data: imgs }, { data: desc }] = await Promise.all([
-        supabase.from("properties").select("id,title,reference_code,municipality,property_type,contract_type,price,price_on_request,size_sqm,bedrooms,bathrooms,status").eq("id", propertyId).maybeSingle(),
+        supabase.from("properties").select("id,title,reference_code,municipality,locality,area_zone,property_type,contract_type,price,price_on_request,size_sqm,bedrooms,bathrooms,status").eq("id", propertyId).maybeSingle(),
         supabase.from("property_images").select("*").eq("property_id", propertyId),
         supabase.from("property_descriptions").select("edited_description,generated_description").eq("property_id", propertyId).maybeSingle(),
       ]);
@@ -77,6 +79,8 @@ export function PreviewPublishDialog({ propertyId, onClose, onPublished }: Props
         title: (p.title as string | null) ?? null,
         reference_code: (p.reference_code as string | null) ?? null,
         municipality: (p.municipality as string | null) ?? null,
+        locality: (p.locality as string | null) ?? null,
+        area_zone: (p.area_zone as string | null) ?? null,
         property_type: (p.property_type as string | null) ?? null,
         contract_type: (p.contract_type as string | null) ?? null,
         price: (p.price as number | null) ?? null,
@@ -171,7 +175,9 @@ export function PreviewPublishDialog({ propertyId, onClose, onPublished }: Props
 
               <div>
                 <div className="flex flex-wrap items-center gap-2 text-[10px] uppercase tracking-wider text-muted-foreground">
-                  {data.reference_code && <span className="text-primary">{data.reference_code}</span>}
+                  {data.reference_code && (
+                    <span className="text-primary">Cod. annuncio {data.reference_code}</span>
+                  )}
                   {data.property_type && <span>· {data.property_type}</span>}
                   <span
                     className={`ml-auto rounded-sm px-2 py-0.5 ${
@@ -184,9 +190,12 @@ export function PreviewPublishDialog({ propertyId, onClose, onPublished }: Props
                   </span>
                 </div>
                 <h3 className="mt-2 font-serif text-2xl text-ink">{data.title || "(Senza titolo)"}</h3>
-                {data.municipality && (
+                {(data.municipality || data.locality || data.area_zone) && (
                   <div className="mt-1 flex items-center gap-1 text-sm text-muted-foreground">
-                    <MapPin size={14} /> {data.municipality}
+                    <MapPin size={14} />{" "}
+                    {[data.municipality, data.locality || data.area_zone]
+                      .filter((v) => v && v.trim())
+                      .join(" — ")}
                   </div>
                 )}
                 <div className="mt-3 font-serif text-2xl text-primary">

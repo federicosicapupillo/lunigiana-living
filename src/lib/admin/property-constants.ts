@@ -218,6 +218,51 @@ export const TOTAL_FLOORS_OPTIONS = [
 ] as const;
 export const TOTAL_FLOORS_CUSTOM = "Inserisci valore personalizzato";
 
+/* ---------- Prezzo: menu guidato ---------- */
+
+/** Importi comuni proposti a tendina (valore numerico in euro). */
+export const PRICE_OPTIONS: ReadonlyArray<{ value: number; label: string }> = [
+  { value: 25000, label: "€ 25.000" },
+  { value: 35000, label: "€ 35.000" },
+  { value: 45000, label: "€ 45.000" },
+  { value: 55000, label: "€ 55.000" },
+  { value: 65000, label: "€ 65.000" },
+  { value: 75000, label: "€ 75.000" },
+  { value: 85000, label: "€ 85.000" },
+  { value: 95000, label: "€ 95.000" },
+  { value: 110000, label: "€ 110.000" },
+  { value: 125000, label: "€ 125.000" },
+  { value: 140000, label: "€ 140.000" },
+  { value: 155000, label: "€ 155.000" },
+  { value: 170000, label: "€ 170.000" },
+  { value: 185000, label: "€ 185.000" },
+  { value: 200000, label: "€ 200.000" },
+  { value: 225000, label: "€ 225.000" },
+  { value: 250000, label: "€ 250.000" },
+  { value: 275000, label: "€ 275.000" },
+  { value: 300000, label: "€ 300.000" },
+  { value: 350000, label: "€ 350.000" },
+  { value: 400000, label: "€ 400.000" },
+  { value: 450000, label: "€ 450.000" },
+  { value: 500000, label: "€ 500.000" },
+  { value: 600000, label: "€ 600.000" },
+  { value: 750000, label: "€ 750.000" },
+  { value: 900000, label: "€ 900.000" },
+  { value: 1000000, label: "€ 1.000.000" },
+];
+
+/** Voce del menu prezzo che apre il campo con l'importo esatto. */
+export const PRICE_CUSTOM = "Altro importo";
+
+/** True se il valore salvato non è tra gli importi comuni (va mostrato come valore preciso). */
+export function isCustomPrice(price: number | null | undefined): boolean {
+  if (price == null) return false;
+  return !PRICE_OPTIONS.some((o) => o.value === price);
+}
+
+/** Posizioni disponibili per la vetrina in home page. */
+export const HOMEPAGE_ORDER_OPTIONS = [1, 2, 3, 4, 5, 6] as const;
+
 /* ---------- Dotazioni raggruppate ---------- */
 
 export const AMENITY_GROUPS: Array<{ title: string; items: readonly string[] }> = [

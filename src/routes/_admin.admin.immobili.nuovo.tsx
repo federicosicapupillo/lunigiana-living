@@ -47,6 +47,7 @@ import {
 } from "@/lib/admin/property-constants";
 import { MultiSelectChips } from "@/components/admin/multi-select-chips";
 import { LocationFields, EMPTY_LOCATION, type LocationValue } from "@/components/admin/location-fields";
+import { PriceGuidedInput } from "@/components/admin/price-guided-input";
 import {
   normalizeReferenceCode,
   validateReferenceCode,
@@ -503,13 +504,11 @@ function NewPropertyPage() {
               options={CONTRACT_TYPES.map((o) => ({ value: o, label: o }))}
             />
           </Field>
-          <Field label="Prezzo (€)" full>
+          <Field label="Prezzo" full>
             <div className="space-y-2">
-              <NumberInput
-                value={f.price}
-                onChange={(v) => upd("price", v)}
-                step={1000}
-                placeholder="Inserisci prezzo interno"
+              <PriceGuidedInput
+                value={f.price.trim() === "" ? null : Number(f.price)}
+                onChange={(v) => upd("price", v == null ? "" : String(v))}
               />
               <Toggle
                 label="Mostra come prezzo su richiesta"

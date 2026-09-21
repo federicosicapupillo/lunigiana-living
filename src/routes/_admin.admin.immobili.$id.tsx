@@ -9,6 +9,7 @@ import {
   Loader2,
   ChevronDown,
   FileText,
+  Eye,
 } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { generateDescription } from "@/lib/ai-description.functions";
@@ -54,6 +55,7 @@ import {
   AMENITY_GROUPS,
   AMENITY_TO_COLUMN,
   AMENITY_FEATURE_PREFIX,
+  HOMEPAGE_ORDER_OPTIONS,
 } from "@/lib/admin/property-constants";
 import {
   MULTI_SELECT_FIELDS,
@@ -72,6 +74,8 @@ import {
   type StatusAction,
 } from "@/lib/admin/property-status";
 import { ConfirmDialog } from "@/components/admin/confirm-dialog";
+import { PreviewPublishDialog } from "@/components/admin/preview-publish-dialog";
+import { PriceGuidedInput } from "@/components/admin/price-guided-input";
 
 type Property = {
   id: string;
@@ -183,6 +187,7 @@ function PropertyEditor() {
   const [proposal, setProposal] = useState<string | null>(null);
   const [flyerOpen, setFlyerOpen] = useState(false);
   const [idealistaOpen, setIdealistaOpen] = useState(false);
+  const [previewOpen, setPreviewOpen] = useState(false);
   const [titleManual, setTitleManual] = useState(false);
   const [titleGenerating, setTitleGenerating] = useState(false);
 
@@ -519,6 +524,12 @@ function PropertyEditor() {
             Salva bozza
           </button>
           <button
+            onClick={() => setPreviewOpen(true)}
+            className="inline-flex items-center gap-2 rounded-sm border border-primary bg-primary/10 px-4 py-2 text-xs uppercase tracking-wider text-primary hover:bg-primary/20"
+          >
+            <Eye size={13} /> Anteprima grafica
+          </button>
+          <button
             onClick={() => setFlyerOpen(true)}
             className="inline-flex items-center gap-2 rounded-sm border border-border bg-background px-4 py-2 text-xs uppercase tracking-wider hover:border-primary/50"
           >
@@ -612,6 +623,12 @@ function PropertyEditor() {
           {saving ? <Loader2 size={13} className="animate-spin" /> : <Save size={13} />}
           Salva
         </button>
+        <button
+          onClick={() => setPreviewOpen(true)}
+          className="inline-flex flex-1 items-center justify-center gap-2 rounded-sm border border-primary bg-primary/10 px-3 py-2.5 text-xs uppercase tracking-wider text-primary"
+        >
+          <Eye size={13} /> Anteprima
+        </button>
         <StatusActionsButton
           status={prop.status}
           open={statusMenu}
@@ -642,6 +659,11 @@ function PropertyEditor() {
         description={desc}
         open={idealistaOpen}
         onClose={() => setIdealistaOpen(false)}
+        onPublished={load}
+      />
+      <PreviewPublishDialog
+        propertyId={previewOpen ? id : null}
+        onClose={() => setPreviewOpen(false)}
         onPublished={load}
       />
     </div>
@@ -892,14 +914,9 @@ function MainTab({
           className={inputCls}
         />
       </Field>
-      <Field label="Prezzo (€)" full>
+      <Field label="Prezzo" full>
         <div className="space-y-2">
-          <NumberInput
-            value={prop.price}
-            onChange={(v) => update({ price: v })}
-            step={1000}
-            placeholder="Inserisci prezzo interno"
-          />
+          <PriceGuidedInput value={prop.price} onChange={(v) => update({ price: v })} />
           <Toggle
             label="Mostra come prezzo su richiesta"
             value={prop.price_on_request}
@@ -919,7 +936,7 @@ function MainTab({
           className={inputCls}
         />
       </Field>
-      <Field label="Visibilità e promozione" full>
+      <Field label="Promozione in home" full>
         <div className="space-y-2 rounded-sm border border-border bg-muted/20 p-4">
           <Toggle
             label="Mostra in home page (immobile in evidenza)"
@@ -929,14 +946,22 @@ function MainTab({
           {prop.featured && (
             <div>
               <label className="mb-1 block text-xs uppercase tracking-wider text-muted-foreground">
-                Ordine in home page (1 = primo)
+                Posizione in home page (1 = primo)
               </label>
-              <NumberInput
-                value={prop.homepage_order}
-                onChange={(v) => update({ homepage_order: v })}
-                step={1}
-                placeholder="Lascia vuoto per ordinare automaticamente"
-              />
+              <select
+                value={prop.homepage_order == null ? "" : String(prop.homepage_order)}
+                onChange={(e) =>
+                  update({ homepage_order: e.target.value ? Number(e.target.value) : null })
+                }
+                className={inputCls}
+              >
+                <option value="">Automatica (prima i più recenti)</option>
+                {HOMEPAGE_ORDER_OPTIONS.map((n) => (
+                  <option key={n} value={n}>
+                    Posizione {n}
+                  </option>
+                ))}
+              </select>
             </div>
           )}
           <p className="text-xs text-muted-foreground">

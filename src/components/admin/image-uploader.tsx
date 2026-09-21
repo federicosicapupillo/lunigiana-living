@@ -465,17 +465,19 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
     await supabase.from("property_images").update({ alt_text: alt }).eq("id", id);
   };
 
-  const generate = async (img: Image) => {
+  const generate = async (img: Image, settings?: RenderSettings) => {
     if (!img.render_availability?.canRender) {
       toast.error(
         img.render_availability?.message ?? "Sincronizza la foto prima di generare il rendering",
       );
       return;
     }
+    // Anti doppio clic: una sola generazione alla volta.
+    if (renderingId) return;
     setRenderingId(img.id);
     try {
-      await runRender({ data: { imageId: img.id } });
-      toast.success("Rendering generato");
+      await runRender({ data: { imageId: img.id, settings } });
+      toast.success("Foto IA generata");
       await load();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Errore rendering");
@@ -974,7 +976,7 @@ export function ImageUploader({ propertyId }: { propertyId: string }) {
                     hasRender={!!img.rendered_storage_path}
                     canRender={!!img.render_availability?.canRender}
                     rendering={renderingId === img.id}
-                    onGenerate={() => generate(img)}
+                    onGenerate={(settings) => generate(img, settings)}
                   />
                   {img.render_error && (
                     <div className="text-[10px] text-destructive">{img.render_error}</div>
