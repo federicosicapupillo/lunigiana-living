@@ -78,6 +78,7 @@ import {
 } from "@/lib/admin/property-status";
 import { ConfirmDialog } from "@/components/admin/confirm-dialog";
 import { PreviewPublishDialog } from "@/components/admin/preview-publish-dialog";
+import { PriceGuidedInput } from "@/components/admin/price-guided-input";
 
 type Property = {
   id: string;
