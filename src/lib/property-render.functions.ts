@@ -533,8 +533,8 @@ export const renderPropertyImage = createServerFn({ method: "POST" })
       .eq("id", data.imageId);
 
     try {
-      // Letture indipendenti in parallelo: foto originale + dati immobile.
-      const [dl, ctxRes] = await Promise.all([
+      // Letture indipendenti in parallelo: foto originale + dati immobile + dotazioni.
+      const [dl, ctxRes, featRes] = await Promise.all([
         supabaseAdmin.storage.from(BUCKET).download(img.storage_path),
         supabaseAdmin
           .from("properties")
@@ -543,6 +543,10 @@ export const renderPropertyImage = createServerFn({ method: "POST" })
           )
           .eq("id", img.property_id)
           .maybeSingle(),
+        supabaseAdmin
+          .from("property_features")
+          .select("feature_name, feature_value")
+          .eq("property_id", img.property_id),
       ]);
       const blob = dl.data;
       if (dl.error || !blob) {

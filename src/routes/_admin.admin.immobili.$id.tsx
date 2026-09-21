@@ -405,15 +405,26 @@ function PropertyEditor() {
     }
   };
 
+  // Se esiste già un testo (anche modificato a mano) la nuova generazione
+  // arriva sempre come proposta: si applica solo con un'azione esplicita.
   const generate = () => {
     const current = desc?.edited_description ?? desc?.generated_description ?? "";
-    if (current.trim()) {
-      if (!confirm("La descrizione attuale verrà sostituita. Vuoi continuare?")) return;
-    }
-    void runGeneration("overwrite");
+    void runGeneration(current.trim() ? "proposal" : "overwrite");
   };
 
   const generateProposal = () => void runGeneration("proposal");
+
+  /**
+   * Azione unica "Genera testo annuncio": salva i dati aggiornati, genera il
+   * titolo (solo se non è stato scritto a mano) e la bozza di descrizione.
+   * Non cambia mai lo stato dell'annuncio e non pubblica nulla.
+   */
+  const generateAnnouncementText = async () => {
+    if (!prop || generating || titleGenerating) return;
+    setTab("description");
+    if (!titleManual) await regenerateTitleAi();
+    generate();
+  };
 
   const acceptProposal = async () => {
     if (!proposal) return;
@@ -522,6 +533,20 @@ function PropertyEditor() {
           >
             {saving ? <Loader2 size={13} className="animate-spin" /> : <Save size={13} />}
             Salva bozza
+          </button>
+          <button
+            onClick={() => void generateAnnouncementText()}
+            disabled={generating !== null || titleGenerating || saving}
+            className="inline-flex items-center gap-2 rounded-sm bg-primary px-4 py-2 text-xs uppercase tracking-wider text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
+          >
+            {generating !== null || titleGenerating ? (
+              <Loader2 size={13} className="animate-spin" />
+            ) : (
+              <Sparkles size={13} />
+            )}
+            {generating !== null || titleGenerating
+              ? "Generazione in corso…"
+              : "Genera testo annuncio"}
           </button>
           <button
             onClick={() => setPreviewOpen(true)}
@@ -1577,8 +1602,8 @@ function DescriptionTab({
   seoFocus: string;
   setSeoFocus: (v: string) => void;
 }) {
-  const hasGenerated = !!desc?.generated_description;
   const edited = desc?.edited_description ?? desc?.generated_description ?? "";
+  const hasText = !!edited.trim();
   const wordCount = useMemo(() => (edited.trim() ? edited.trim().split(/\s+/).length : 0), [edited]);
 
   return (
@@ -1587,9 +1612,11 @@ function DescriptionTab({
       <div className="lg:col-span-4">
         <div className="sticky top-24 space-y-5 rounded-sm border border-border bg-card p-6">
           <div>
-            <h3 className="font-serif text-lg text-ink">Genera descrizione</h3>
+            <h3 className="font-serif text-lg text-ink">Genera testo annuncio</h3>
             <p className="mt-1 text-xs text-muted-foreground">
-              Furia AI genera una bozza basata sui dati inseriti e sui parametri narrativi.
+              Furia AI genera una bozza in italiano dai dati tecnici, dalle dotazioni, dalla
+              descrizione libera e dai parametri narrativi. Resta sempre modificabile e non
+              cambia lo stato dell'annuncio.
             </p>
           </div>
 
@@ -1638,36 +1665,22 @@ function DescriptionTab({
             disabled={generating !== null}
             className="inline-flex w-full items-center justify-center gap-2 rounded-sm bg-primary px-4 py-3 text-xs uppercase tracking-[0.18em] text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
           >
-            {generating === "overwrite" ? (
+            {generating !== null ? (
               <Loader2 size={14} className="animate-spin" />
             ) : (
               <Sparkles size={14} />
             )}
-            {generating === "overwrite"
+            {generating !== null
               ? "Generazione in corso..."
-              : hasGenerated
-                ? "Rigenera descrizione"
-                : "Genera descrizione"}
+              : hasText
+                ? "Genera nuova proposta di testo"
+                : "Genera testo annuncio"}
           </button>
 
-          {hasGenerated && (
-            <button
-              onClick={onGenerateProposal}
-              disabled={generating !== null}
-              className="inline-flex w-full items-center justify-center gap-2 rounded-sm border border-border px-4 py-3 text-xs uppercase tracking-[0.18em] text-ink hover:border-primary/50 disabled:opacity-50"
-            >
-              {generating === "proposal" ? (
-                <Loader2 size={14} className="animate-spin" />
-              ) : (
-                <Sparkles size={14} />
-              )}
-              {generating === "proposal" ? "Generazione in corso..." : "Genera nuova versione"}
-            </button>
-          )}
-          {hasGenerated && (
+          {hasText && (
             <p className="text-[11px] leading-relaxed text-muted-foreground">
-              “Genera nuova versione” crea una proposta alternativa senza sovrascrivere la
-              descrizione attuale.
+              Il testo attuale non viene mai sostituito da solo: la nuova versione arriva come
+              proposta e la applichi tu con “Usa nuova descrizione”.
             </p>
           )}
 
@@ -1726,14 +1739,14 @@ function DescriptionTab({
             <span className="text-xs text-muted-foreground">{wordCount} parole</span>
           </div>
 
-          {!hasGenerated && !edited && (
+          {!hasText && (
             <p className="mt-6 rounded-sm border border-dashed border-border bg-muted/30 px-4 py-8 text-center text-sm text-muted-foreground">
               Nessuna descrizione ancora. Compila i dati dell'immobile e i parametri narrativi, poi
-              clicca <strong>Genera descrizione</strong> qui a sinistra.
+              clicca <strong>Genera testo annuncio</strong> qui a sinistra.
             </p>
           )}
 
-          {(hasGenerated || edited) && (
+          {hasText && (
             <>
               <textarea
                 value={edited}
