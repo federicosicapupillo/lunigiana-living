@@ -1,4 +1,5 @@
 import { useEffect, useState, type FormEvent } from "react";
+import { PrivacyConsentText } from "@/components/privacy-consent-text";
 import { supabase } from "@/integrations/supabase/client";
 import { ArrowRight, Loader2, CheckCircle2, MessageCircle } from "lucide-react";
 import { useT, useLanguage } from "@/lib/i18n/LanguageContext";
@@ -254,7 +255,7 @@ export function LeadForm({
           className="mt-0.5 h-4 w-4 shrink-0 cursor-pointer accent-primary"
         />
         <span>
-          {t("form.privacy")}
+          <PrivacyConsentText text={t("form.privacy")} />
           <span className="mt-1 block text-[0.7rem] text-foreground/55">
             {t("form.hint.privacy")}
           </span>

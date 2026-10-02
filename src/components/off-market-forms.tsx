@@ -1,4 +1,5 @@
 import { useState, type FormEvent, type ReactNode } from "react";
+import { PrivacyConsentText } from "@/components/privacy-consent-text";
 import { ArrowRight, CheckCircle2, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useServerFn } from "@tanstack/react-start";
@@ -216,7 +217,7 @@ export function OffMarketForm({ variant }: { variant: Variant }) {
           className="mt-0.5 h-4 w-4 shrink-0 cursor-pointer accent-primary"
         />
         <span>
-          {t("om.form.privacy")}
+          <PrivacyConsentText text={t("om.form.privacy")} />
           <span className="mt-1 block text-[0.7rem] text-foreground/55">
             {t("om.form.privacyNote")}
           </span>

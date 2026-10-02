@@ -41,6 +41,7 @@ export const Route = createFileRoute("/sitemap.xml")({
 
 
           "/vivere-in-lunigiana",
+          "/privacy",
         ];
         const entries: { path: string; lastmod?: string }[] = [
           ...staticPaths.map((path) => ({ path })),

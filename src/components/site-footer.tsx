@@ -67,6 +67,7 @@ export function SiteFooter() {
             <li><Link to="/off-market" className="hover:text-cream">{t("nav.offMarket")}</Link></li>
             <li><Link to="/chi-siamo" className="hover:text-cream">{t("nav.chiSiamo")}</Link></li>
             <li><Link to="/contatti" className="hover:text-cream">{t("nav.contatti")}</Link></li>
+            <li><Link to="/privacy" className="hover:text-cream">Privacy</Link></li>
             <li><Link to="/admin/login" className="hover:text-cream">{t("footer.adminArea")}</Link></li>
           </ul>
         </div>

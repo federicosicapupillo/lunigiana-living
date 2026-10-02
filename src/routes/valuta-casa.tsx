@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { PrivacyConsentText } from "@/components/privacy-consent-text";
 import { useMemo, useRef, useState, type FormEvent, type ReactNode } from "react";
 import {
   ArrowLeft,
@@ -764,7 +765,7 @@ function ValutaCasaPage() {
                       onChange={(e) => patch({ privacy: e.target.checked })}
                       className="mt-0.5 h-4 w-4 shrink-0 cursor-pointer accent-primary"
                     />
-                    <span>{t("val.privacy.service")}</span>
+                    <span><PrivacyConsentText text={t("val.privacy.service")} /></span>
                   </label>
                   <label className="flex items-start gap-3 text-xs leading-relaxed text-foreground/75">
                     <input

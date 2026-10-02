@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
+import { PrivacyConsentText } from "@/components/privacy-consent-text";
 import { ArrowRight, BookOpen, CheckCircle2, Check, Loader2 } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
@@ -276,7 +277,7 @@ export function LeadMagnetBlock({
                   required
                   className="mt-0.5 h-4 w-4 shrink-0 cursor-pointer accent-primary"
                 />
-                <span>{t("magnet.privacy")}</span>
+                <span><PrivacyConsentText text={t("magnet.privacy")} /></span>
               </label>
 
               {errorMsg && <p className="text-sm text-destructive">{errorMsg}</p>}
