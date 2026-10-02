@@ -342,8 +342,12 @@ function AdminLeadsPage() {
       ) : (
         <div className="mt-6 grid gap-4">
           {filtered.map((l) => (
-            <LeadCard
+            <div
               key={l.id}
+              id={`lead-${l.id}`}
+              className={highlightId === l.id ? "rounded-sm ring-2 ring-primary ring-offset-2" : undefined}
+            >
+            <LeadCard
               lead={l}
               property={l.property_id ? properties[l.property_id] : undefined}
               onContacted={markContacted}
