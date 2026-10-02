@@ -95,7 +95,12 @@ const PERIODS: Array<{ key: "all" | "7" | "30"; label: string }> = [
   { key: "30", label: "Ultimi 30 giorni" },
 ];
 
+const LEAD_ID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 export const Route = createFileRoute("/_admin/admin/richieste")({
+  // ?lead=<id> facoltativo: evidenzia e porta in vista la richiesta (link da Jack).
+  validateSearch: (s: Record<string, unknown>): { lead?: string } =>
+    typeof s.lead === "string" && LEAD_ID_RE.test(s.lead) ? { lead: s.lead } : {},
   head: () => ({
     meta: [
       { title: "Admin · Richieste — Furia Immobiliare" },
@@ -111,6 +116,7 @@ function moduleLabel(source: string | null): string {
 }
 
 function AdminLeadsPage() {
+  const { lead: highlightId } = Route.useSearch();
   const [leads, setLeads] = useState<Lead[]>([]);
   const [properties, setProperties] = useState<Record<string, PropertyRef>>({});
   const [loading, setLoading] = useState(true);
@@ -119,6 +125,10 @@ function AdminLeadsPage() {
   const [propertyFilter, setPropertyFilter] = useState<string>("all");
   const [period, setPeriod] = useState<(typeof PERIODS)[number]["key"]>("all");
   const [closing, setClosing] = useState<Lead | null>(null);
+  useEffect(() => {
+    if (loading || !highlightId) return;
+    document.getElementById(`lead-${highlightId}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }, [loading, highlightId]);
 
   async function load() {
     setLoading(true);
@@ -357,6 +367,7 @@ function AdminLeadsPage() {
               onAppointment={setAppointment}
               onDelete={remove}
             />
+            </div>
           ))}
         </div>
       )}
