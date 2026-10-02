@@ -70,7 +70,7 @@ function PrivacyPage() {
         <Section title="Titolare del trattamento">
           <ul className="space-y-1">
             <li><strong>Titolare del trattamento:</strong> Furia Immobiliare di Furia Elena</li>
-            <li><strong>P.IVA:</strong> 011161140452</li>
+            <li><strong>P.IVA:</strong> 01161140452</li>
             <li><strong>Sede:</strong> Via Pirandello 7, 54027 Pontremoli (MS)</li>
             <li><strong>Email per richieste privacy:</strong> <Mail /></li>
           </ul>
