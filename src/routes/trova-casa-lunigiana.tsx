@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { PrivacyConsentText } from "@/components/privacy-consent-text";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowLeft, ArrowRight, Check, CheckCircle2, Compass, Loader2, MessageCircle } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
@@ -751,7 +752,7 @@ function ContactsAndSummary({
           onChange={(e) => onChange({ privacy: e.target.checked })}
           className="mt-0.5 h-4 w-4 shrink-0 cursor-pointer accent-primary"
         />
-        <span>{t("form.privacy")}</span>
+        <span><PrivacyConsentText text={t("form.privacy")} /></span>
       </label>
 
       {errorMsg && (
