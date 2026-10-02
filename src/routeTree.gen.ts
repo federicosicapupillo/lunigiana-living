@@ -51,6 +51,9 @@ import { Route as AdminLoginRouteImport } from './routes/admin.login'
 import { Route as AdminAdminRouteImport } from './routes/_admin.admin'
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
 import { Route as AdminAdminIndexRouteImport } from './routes/_admin.admin.index'
+import { Route as ApiPublicJarvisNotifyRouteImport } from './routes/api/public/jarvis-notify'
+import { Route as ApiPublicJarvisLeadStatoRouteImport } from './routes/api/public/jarvis-lead-stato'
+import { Route as ApiPublicJarvisFuriaKpiRouteImport } from './routes/api/public/jarvis-furia-kpi'
 import { Route as AdminAdminSeoAiBenchmarkRouteImport } from './routes/_admin.admin.seo-ai-benchmark'
 import { Route as AdminAdminRichiesteRouteImport } from './routes/_admin.admin.richieste'
 import { Route as AdminAdminImpostazioniRouteImport } from './routes/_admin.admin.impostazioni'
@@ -282,6 +285,22 @@ const AdminAdminIndexRoute = AdminAdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminAdminRoute,
 } as any)
+const ApiPublicJarvisNotifyRoute = ApiPublicJarvisNotifyRouteImport.update({
+  id: '/api/public/jarvis-notify',
+  path: '/api/public/jarvis-notify',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicJarvisLeadStatoRoute =
+  ApiPublicJarvisLeadStatoRouteImport.update({
+    id: '/api/public/jarvis-lead-stato',
+    path: '/api/public/jarvis-lead-stato',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicJarvisFuriaKpiRoute = ApiPublicJarvisFuriaKpiRouteImport.update({
+  id: '/api/public/jarvis-furia-kpi',
+  path: '/api/public/jarvis-furia-kpi',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminAdminSeoAiBenchmarkRoute =
   AdminAdminSeoAiBenchmarkRouteImport.update({
     id: '/seo-ai-benchmark',
@@ -399,6 +418,9 @@ export interface FileRoutesByFullPath {
   '/admin/impostazioni': typeof AdminAdminImpostazioniRoute
   '/admin/richieste': typeof AdminAdminRichiesteRoute
   '/admin/seo-ai-benchmark': typeof AdminAdminSeoAiBenchmarkRoute
+  '/api/public/jarvis-furia-kpi': typeof ApiPublicJarvisFuriaKpiRoute
+  '/api/public/jarvis-lead-stato': typeof ApiPublicJarvisLeadStatoRoute
+  '/api/public/jarvis-notify': typeof ApiPublicJarvisNotifyRoute
   '/admin/': typeof AdminAdminIndexRoute
   '/admin/immobili/$id': typeof AdminAdminImmobiliIdRouteWithChildren
   '/admin/immobili/assistente': typeof AdminAdminImmobiliAssistenteRoute
@@ -453,6 +475,9 @@ export interface FileRoutesByTo {
   '/admin/impostazioni': typeof AdminAdminImpostazioniRoute
   '/admin/richieste': typeof AdminAdminRichiesteRoute
   '/admin/seo-ai-benchmark': typeof AdminAdminSeoAiBenchmarkRoute
+  '/api/public/jarvis-furia-kpi': typeof ApiPublicJarvisFuriaKpiRoute
+  '/api/public/jarvis-lead-stato': typeof ApiPublicJarvisLeadStatoRoute
+  '/api/public/jarvis-notify': typeof ApiPublicJarvisNotifyRoute
   '/admin': typeof AdminAdminIndexRoute
   '/admin/immobili/$id': typeof AdminAdminImmobiliIdRouteWithChildren
   '/admin/immobili/assistente': typeof AdminAdminImmobiliAssistenteRoute
@@ -511,6 +536,9 @@ export interface FileRoutesById {
   '/_admin/admin/impostazioni': typeof AdminAdminImpostazioniRoute
   '/_admin/admin/richieste': typeof AdminAdminRichiesteRoute
   '/_admin/admin/seo-ai-benchmark': typeof AdminAdminSeoAiBenchmarkRoute
+  '/api/public/jarvis-furia-kpi': typeof ApiPublicJarvisFuriaKpiRoute
+  '/api/public/jarvis-lead-stato': typeof ApiPublicJarvisLeadStatoRoute
+  '/api/public/jarvis-notify': typeof ApiPublicJarvisNotifyRoute
   '/_admin/admin/': typeof AdminAdminIndexRoute
   '/_admin/admin/immobili/$id': typeof AdminAdminImmobiliIdRouteWithChildren
   '/_admin/admin/immobili/assistente': typeof AdminAdminImmobiliAssistenteRoute
@@ -569,6 +597,9 @@ export interface FileRouteTypes {
     | '/admin/impostazioni'
     | '/admin/richieste'
     | '/admin/seo-ai-benchmark'
+    | '/api/public/jarvis-furia-kpi'
+    | '/api/public/jarvis-lead-stato'
+    | '/api/public/jarvis-notify'
     | '/admin/'
     | '/admin/immobili/$id'
     | '/admin/immobili/assistente'
@@ -623,6 +654,9 @@ export interface FileRouteTypes {
     | '/admin/impostazioni'
     | '/admin/richieste'
     | '/admin/seo-ai-benchmark'
+    | '/api/public/jarvis-furia-kpi'
+    | '/api/public/jarvis-lead-stato'
+    | '/api/public/jarvis-notify'
     | '/admin'
     | '/admin/immobili/$id'
     | '/admin/immobili/assistente'
@@ -680,6 +714,9 @@ export interface FileRouteTypes {
     | '/_admin/admin/impostazioni'
     | '/_admin/admin/richieste'
     | '/_admin/admin/seo-ai-benchmark'
+    | '/api/public/jarvis-furia-kpi'
+    | '/api/public/jarvis-lead-stato'
+    | '/api/public/jarvis-notify'
     | '/_admin/admin/'
     | '/_admin/admin/immobili/$id'
     | '/_admin/admin/immobili/assistente'
@@ -730,6 +767,9 @@ export interface RootRouteChildren {
   CaseInVenditaLunigianaIndexRoute: typeof CaseInVenditaLunigianaIndexRoute
   CaseInVenditaIndexRoute: typeof CaseInVenditaIndexRoute
   DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
+  ApiPublicJarvisFuriaKpiRoute: typeof ApiPublicJarvisFuriaKpiRoute
+  ApiPublicJarvisLeadStatoRoute: typeof ApiPublicJarvisLeadStatoRoute
+  ApiPublicJarvisNotifyRoute: typeof ApiPublicJarvisNotifyRoute
   ApiPublicIdealistaFeedDotxmlRoute: typeof ApiPublicIdealistaFeedDotxmlRoute
   MediaOgImmobiliSplatRoute: typeof MediaOgImmobiliSplatRoute
 }
@@ -1030,6 +1070,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAdminIndexRouteImport
       parentRoute: typeof AdminAdminRoute
     }
+    '/api/public/jarvis-notify': {
+      id: '/api/public/jarvis-notify'
+      path: '/api/public/jarvis-notify'
+      fullPath: '/api/public/jarvis-notify'
+      preLoaderRoute: typeof ApiPublicJarvisNotifyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/jarvis-lead-stato': {
+      id: '/api/public/jarvis-lead-stato'
+      path: '/api/public/jarvis-lead-stato'
+      fullPath: '/api/public/jarvis-lead-stato'
+      preLoaderRoute: typeof ApiPublicJarvisLeadStatoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/jarvis-furia-kpi': {
+      id: '/api/public/jarvis-furia-kpi'
+      path: '/api/public/jarvis-furia-kpi'
+      fullPath: '/api/public/jarvis-furia-kpi'
+      preLoaderRoute: typeof ApiPublicJarvisFuriaKpiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_admin/admin/seo-ai-benchmark': {
       id: '/_admin/admin/seo-ai-benchmark'
       path: '/seo-ai-benchmark'
@@ -1231,6 +1292,9 @@ const rootRouteChildren: RootRouteChildren = {
   CaseInVenditaLunigianaIndexRoute: CaseInVenditaLunigianaIndexRoute,
   CaseInVenditaIndexRoute: CaseInVenditaIndexRoute,
   DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
+  ApiPublicJarvisFuriaKpiRoute: ApiPublicJarvisFuriaKpiRoute,
+  ApiPublicJarvisLeadStatoRoute: ApiPublicJarvisLeadStatoRoute,
+  ApiPublicJarvisNotifyRoute: ApiPublicJarvisNotifyRoute,
   ApiPublicIdealistaFeedDotxmlRoute: ApiPublicIdealistaFeedDotxmlRoute,
   MediaOgImmobiliSplatRoute: MediaOgImmobiliSplatRoute,
 }

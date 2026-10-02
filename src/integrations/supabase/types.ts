@@ -758,6 +758,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      jarvis_internal_key: { Args: never; Returns: string }
     }
     Enums: {
       app_role: "admin" | "editor"
