@@ -120,7 +120,7 @@ export const Route = createFileRoute("/immobili/$id")({
   notFoundComponent: NotFound,
   errorComponent: ({ error }) => (
     <div className="container-editorial py-32 text-center">
-      <p className="text-muted-foreground">Errore: {error.message}</p>
+      <p className="text-muted-foreground">Errore: {error instanceof Error ? error.message : String(error)}</p>
     </div>
   ),
   component: PropertyDetail,
