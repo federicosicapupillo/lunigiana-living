@@ -9,172 +9,119 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as AdminRouteImport } from './routes/_admin'
-import { Route as AffittiResidenzialiCaseVacanzeDotaspRouteImport } from './routes/affitti-residenziali-case-vacanze[.]asp'
-import { Route as AffittiDotaspRouteImport } from './routes/affitti[.]asp'
-import { Route as AnnuncioDotaspRouteImport } from './routes/annuncio[.]asp'
-import { Route as ChiSiamoRouteImport } from './routes/chi-siamo'
-import { Route as Chi_siamoDotaspRouteImport } from './routes/chi_siamo[.]asp'
-import { Route as ComeVendereCasaLunigianaRouteImport } from './routes/come-vendere-casa-lunigiana'
-import { Route as ContattaciDotaspRouteImport } from './routes/contattaci[.]asp'
-import { Route as ContattiRouteImport } from './routes/contatti'
-import { Route as ContattiDotaspRouteImport } from './routes/contatti[.]asp'
-import { Route as DoveComprareCasaLunigianaRouteImport } from './routes/dove-comprare-casa-lunigiana'
-import { Route as Dove_siamoDotaspRouteImport } from './routes/dove_siamo[.]asp'
-import { Route as Elenco_annunciDotaspRouteImport } from './routes/elenco_annunci[.]asp'
-import { Route as ImmobiliRouteImport } from './routes/immobili'
-import { Route as IndexDotaspRouteImport } from './routes/index[.]asp'
-import { Route as McpRouteImport } from './routes/mcp'
-import { Route as OffMarketRouteImport } from './routes/off-market'
-import { Route as OsservatorioImmobiliareLunigianaRouteImport } from './routes/osservatorio-immobiliare-lunigiana'
-import { Route as PrezziCaseLunigianaRouteImport } from './routes/prezzi-case-lunigiana'
-import { Route as PrivacyRouteImport } from './routes/privacy'
-import { Route as QuantoValeCasaPontremoliRouteImport } from './routes/quanto-vale-casa-pontremoli'
-import { Route as SecondaCasaLunigianaRouteImport } from './routes/seconda-casa-lunigiana'
-import { Route as ServiziRouteImport } from './routes/servizi'
-import { Route as ServiziDotaspRouteImport } from './routes/servizi[.]asp'
-import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
-import { Route as TerritoriRouteImport } from './routes/territori'
-import { Route as TrovaCasaLunigianaRouteImport } from './routes/trova-casa-lunigiana'
-import { Route as ValutaCasaRouteImport } from './routes/valuta-casa'
-import { Route as VenditeDotaspRouteImport } from './routes/vendite[.]asp'
-import { Route as Vendite2DotaspRouteImport } from './routes/vendite2[.]asp'
-import { Route as VivereAPontremoliRouteImport } from './routes/vivere-a-pontremoli'
 import { Route as VivereInLunigianaRouteImport } from './routes/vivere-in-lunigiana'
-import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
-import { Route as AdminAdminRouteImport } from './routes/_admin.admin'
-import { Route as AdminLoginRouteImport } from './routes/admin.login'
-import { Route as CaseInVenditaLunigianaIndexRouteImport } from './routes/case-in-vendita-lunigiana.index'
-import { Route as CaseInVenditaLunigianaTipologiaRouteImport } from './routes/case-in-vendita-lunigiana.$tipologia'
-import { Route as CaseInVenditaIndexRouteImport } from './routes/case-in-vendita.index'
-import { Route as CaseInVenditaComuneRouteImport } from './routes/case-in-vendita.$comune'
+import { Route as VivereAPontremoliRouteImport } from './routes/vivere-a-pontremoli'
+import { Route as Vendite2DotaspRouteImport } from './routes/vendite2[.]asp'
+import { Route as VenditeDotaspRouteImport } from './routes/vendite[.]asp'
+import { Route as ValutaCasaRouteImport } from './routes/valuta-casa'
+import { Route as TrovaCasaLunigianaRouteImport } from './routes/trova-casa-lunigiana'
+import { Route as TerritoriRouteImport } from './routes/territori'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as ServiziDotaspRouteImport } from './routes/servizi[.]asp'
+import { Route as ServiziRouteImport } from './routes/servizi'
+import { Route as SecondaCasaLunigianaRouteImport } from './routes/seconda-casa-lunigiana'
+import { Route as QuantoValeCasaPontremoliRouteImport } from './routes/quanto-vale-casa-pontremoli'
+import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as PrezziCaseLunigianaRouteImport } from './routes/prezzi-case-lunigiana'
+import { Route as OsservatorioImmobiliareLunigianaRouteImport } from './routes/osservatorio-immobiliare-lunigiana'
+import { Route as OffMarketRouteImport } from './routes/off-market'
+import { Route as McpRouteImport } from './routes/mcp'
+import { Route as IndexDotaspRouteImport } from './routes/index[.]asp'
+import { Route as ImmobiliRouteImport } from './routes/immobili'
+import { Route as Elenco_annunciDotaspRouteImport } from './routes/elenco_annunci[.]asp'
+import { Route as Dove_siamoDotaspRouteImport } from './routes/dove_siamo[.]asp'
+import { Route as DoveComprareCasaLunigianaRouteImport } from './routes/dove-comprare-casa-lunigiana'
+import { Route as ContattiDotaspRouteImport } from './routes/contatti[.]asp'
+import { Route as ContattiRouteImport } from './routes/contatti'
+import { Route as ContattaciDotaspRouteImport } from './routes/contattaci[.]asp'
+import { Route as ComeVendereCasaLunigianaRouteImport } from './routes/come-vendere-casa-lunigiana'
+import { Route as Chi_siamoDotaspRouteImport } from './routes/chi_siamo[.]asp'
+import { Route as ChiSiamoRouteImport } from './routes/chi-siamo'
+import { Route as AnnuncioDotaspRouteImport } from './routes/annuncio[.]asp'
+import { Route as AffittiDotaspRouteImport } from './routes/affitti[.]asp'
+import { Route as AffittiResidenzialiCaseVacanzeDotaspRouteImport } from './routes/affitti-residenziali-case-vacanze[.]asp'
+import { Route as AdminRouteImport } from './routes/_admin'
+import { Route as IndexRouteImport } from './routes/index'
 import { Route as ImmobiliIndexRouteImport } from './routes/immobili.index'
+import { Route as CaseInVenditaIndexRouteImport } from './routes/case-in-vendita.index'
+import { Route as CaseInVenditaLunigianaIndexRouteImport } from './routes/case-in-vendita-lunigiana.index'
 import { Route as ImmobiliIdRouteImport } from './routes/immobili.$id'
-import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
+import { Route as CaseInVenditaComuneRouteImport } from './routes/case-in-vendita.$comune'
+import { Route as CaseInVenditaLunigianaTipologiaRouteImport } from './routes/case-in-vendita-lunigiana.$tipologia'
+import { Route as AdminLoginRouteImport } from './routes/admin.login'
+import { Route as AdminAdminRouteImport } from './routes/_admin.admin'
+import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
 import { Route as AdminAdminIndexRouteImport } from './routes/_admin.admin.index'
-import { Route as AdminAdminDatiLiveRouteImport } from './routes/_admin.admin.dati-live'
-import { Route as AdminAdminIdealistaRouteImport } from './routes/_admin.admin.idealista'
-import { Route as AdminAdminImpostazioniRouteImport } from './routes/_admin.admin.impostazioni'
-import { Route as AdminAdminRichiesteRouteImport } from './routes/_admin.admin.richieste'
-import { Route as AdminAdminSeoAiBenchmarkRouteImport } from './routes/_admin.admin.seo-ai-benchmark'
-import { Route as ApiPublicJarvisFuriaKpiRouteImport } from './routes/api/public/jarvis-furia-kpi'
-import { Route as ApiPublicJarvisLeadStatoRouteImport } from './routes/api/public/jarvis-lead-stato'
 import { Route as ApiPublicJarvisNotifyRouteImport } from './routes/api/public/jarvis-notify'
+import { Route as ApiPublicJarvisLeadStatoRouteImport } from './routes/api/public/jarvis-lead-stato'
+import { Route as ApiPublicJarvisFuriaKpiRouteImport } from './routes/api/public/jarvis-furia-kpi'
+import { Route as AdminAdminSeoAiBenchmarkRouteImport } from './routes/_admin.admin.seo-ai-benchmark'
+import { Route as AdminAdminRichiesteRouteImport } from './routes/_admin.admin.richieste'
+import { Route as AdminAdminImpostazioniRouteImport } from './routes/_admin.admin.impostazioni'
+import { Route as AdminAdminIdealistaRouteImport } from './routes/_admin.admin.idealista'
+import { Route as AdminAdminDatiLiveRouteImport } from './routes/_admin.admin.dati-live'
+import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 import { Route as AdminAdminImmobiliIndexRouteImport } from './routes/_admin.admin.immobili.index'
-import { Route as AdminAdminImmobiliIdRouteImport } from './routes/_admin.admin.immobili.$id'
-import { Route as AdminAdminImmobiliAssistenteRouteImport } from './routes/_admin.admin.immobili.assistente'
-import { Route as AdminAdminImmobiliNuovoRouteImport } from './routes/_admin.admin.immobili.nuovo'
-import { Route as ApiPublicIdealistaFeedDotxmlRouteImport } from './routes/api/public/idealista/feed[.]xml'
 import { Route as MediaOgImmobiliSplatRouteImport } from './routes/media/og/immobili/$'
+import { Route as ApiPublicIdealistaFeedDotxmlRouteImport } from './routes/api/public/idealista/feed[.]xml'
+import { Route as AdminAdminImmobiliNuovoRouteImport } from './routes/_admin.admin.immobili.nuovo'
+import { Route as AdminAdminImmobiliAssistenteRouteImport } from './routes/_admin.admin.immobili.assistente'
+import { Route as AdminAdminImmobiliIdRouteImport } from './routes/_admin.admin.immobili.$id'
 import { Route as AdminAdminImmobiliIdAnteprimaRouteImport } from './routes/_admin.admin.immobili.$id.anteprima'
 
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const VivereInLunigianaRoute = VivereInLunigianaRouteImport.update({
+  id: '/vivere-in-lunigiana',
+  path: '/vivere-in-lunigiana',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AdminRoute = AdminRouteImport.update({
-  id: '/_admin',
+const VivereAPontremoliRoute = VivereAPontremoliRouteImport.update({
+  id: '/vivere-a-pontremoli',
+  path: '/vivere-a-pontremoli',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AffittiResidenzialiCaseVacanzeDotaspRoute =
-  AffittiResidenzialiCaseVacanzeDotaspRouteImport.update({
-    id: '/affitti-residenziali-case-vacanze.asp',
-    path: '/affitti-residenziali-case-vacanze.asp',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const AffittiDotaspRoute = AffittiDotaspRouteImport.update({
-  id: '/affitti.asp',
-  path: '/affitti.asp',
+const Vendite2DotaspRoute = Vendite2DotaspRouteImport.update({
+  id: '/vendite2.asp',
+  path: '/vendite2.asp',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AnnuncioDotaspRoute = AnnuncioDotaspRouteImport.update({
-  id: '/annuncio.asp',
-  path: '/annuncio.asp',
+const VenditeDotaspRoute = VenditeDotaspRouteImport.update({
+  id: '/vendite.asp',
+  path: '/vendite.asp',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ChiSiamoRoute = ChiSiamoRouteImport.update({
-  id: '/chi-siamo',
-  path: '/chi-siamo',
+const ValutaCasaRoute = ValutaCasaRouteImport.update({
+  id: '/valuta-casa',
+  path: '/valuta-casa',
   getParentRoute: () => rootRouteImport,
 } as any)
-const Chi_siamoDotaspRoute = Chi_siamoDotaspRouteImport.update({
-  id: '/chi_siamo.asp',
-  path: '/chi_siamo.asp',
+const TrovaCasaLunigianaRoute = TrovaCasaLunigianaRouteImport.update({
+  id: '/trova-casa-lunigiana',
+  path: '/trova-casa-lunigiana',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ComeVendereCasaLunigianaRoute =
-  ComeVendereCasaLunigianaRouteImport.update({
-    id: '/come-vendere-casa-lunigiana',
-    path: '/come-vendere-casa-lunigiana',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ContattaciDotaspRoute = ContattaciDotaspRouteImport.update({
-  id: '/contattaci.asp',
-  path: '/contattaci.asp',
+const TerritoriRoute = TerritoriRouteImport.update({
+  id: '/territori',
+  path: '/territori',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ContattiRoute = ContattiRouteImport.update({
-  id: '/contatti',
-  path: '/contatti',
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ContattiDotaspRoute = ContattiDotaspRouteImport.update({
-  id: '/contatti.asp',
-  path: '/contatti.asp',
+const ServiziDotaspRoute = ServiziDotaspRouteImport.update({
+  id: '/servizi.asp',
+  path: '/servizi.asp',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DoveComprareCasaLunigianaRoute =
-  DoveComprareCasaLunigianaRouteImport.update({
-    id: '/dove-comprare-casa-lunigiana',
-    path: '/dove-comprare-casa-lunigiana',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const Dove_siamoDotaspRoute = Dove_siamoDotaspRouteImport.update({
-  id: '/dove_siamo.asp',
-  path: '/dove_siamo.asp',
+const ServiziRoute = ServiziRouteImport.update({
+  id: '/servizi',
+  path: '/servizi',
   getParentRoute: () => rootRouteImport,
 } as any)
-const Elenco_annunciDotaspRoute = Elenco_annunciDotaspRouteImport.update({
-  id: '/elenco_annunci.asp',
-  path: '/elenco_annunci.asp',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ImmobiliRoute = ImmobiliRouteImport.update({
-  id: '/immobili',
-  path: '/immobili',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const IndexDotaspRoute = IndexDotaspRouteImport.update({
-  id: '/index.asp',
-  path: '/index.asp',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const McpRoute = McpRouteImport.update({
-  id: '/mcp',
-  path: '/mcp',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const OffMarketRoute = OffMarketRouteImport.update({
-  id: '/off-market',
-  path: '/off-market',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const OsservatorioImmobiliareLunigianaRoute =
-  OsservatorioImmobiliareLunigianaRouteImport.update({
-    id: '/osservatorio-immobiliare-lunigiana',
-    path: '/osservatorio-immobiliare-lunigiana',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const PrezziCaseLunigianaRoute = PrezziCaseLunigianaRouteImport.update({
-  id: '/prezzi-case-lunigiana',
-  path: '/prezzi-case-lunigiana',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PrivacyRoute = PrivacyRouteImport.update({
-  id: '/privacy',
-  path: '/privacy',
+const SecondaCasaLunigianaRoute = SecondaCasaLunigianaRouteImport.update({
+  id: '/seconda-casa-lunigiana',
+  path: '/seconda-casa-lunigiana',
   getParentRoute: () => rootRouteImport,
 } as any)
 const QuantoValeCasaPontremoliRoute =
@@ -183,75 +130,122 @@ const QuantoValeCasaPontremoliRoute =
     path: '/quanto-vale-casa-pontremoli',
     getParentRoute: () => rootRouteImport,
   } as any)
-const SecondaCasaLunigianaRoute = SecondaCasaLunigianaRouteImport.update({
-  id: '/seconda-casa-lunigiana',
-  path: '/seconda-casa-lunigiana',
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ServiziRoute = ServiziRouteImport.update({
-  id: '/servizi',
-  path: '/servizi',
+const PrezziCaseLunigianaRoute = PrezziCaseLunigianaRouteImport.update({
+  id: '/prezzi-case-lunigiana',
+  path: '/prezzi-case-lunigiana',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ServiziDotaspRoute = ServiziDotaspRouteImport.update({
-  id: '/servizi.asp',
-  path: '/servizi.asp',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
-  id: '/sitemap.xml',
-  path: '/sitemap.xml',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TerritoriRoute = TerritoriRouteImport.update({
-  id: '/territori',
-  path: '/territori',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TrovaCasaLunigianaRoute = TrovaCasaLunigianaRouteImport.update({
-  id: '/trova-casa-lunigiana',
-  path: '/trova-casa-lunigiana',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ValutaCasaRoute = ValutaCasaRouteImport.update({
-  id: '/valuta-casa',
-  path: '/valuta-casa',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const VenditeDotaspRoute = VenditeDotaspRouteImport.update({
-  id: '/vendite.asp',
-  path: '/vendite.asp',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const Vendite2DotaspRoute = Vendite2DotaspRouteImport.update({
-  id: '/vendite2.asp',
-  path: '/vendite2.asp',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const VivereAPontremoliRoute = VivereAPontremoliRouteImport.update({
-  id: '/vivere-a-pontremoli',
-  path: '/vivere-a-pontremoli',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const VivereInLunigianaRoute = VivereInLunigianaRouteImport.update({
-  id: '/vivere-in-lunigiana',
-  path: '/vivere-in-lunigiana',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const Char91DotwellKnownChar93OauthProtectedResourceRoute =
-  Char91DotwellKnownChar93OauthProtectedResourceRouteImport.update({
-    id: '/.well-known/oauth-protected-resource',
-    path: '/.well-known/oauth-protected-resource',
+const OsservatorioImmobiliareLunigianaRoute =
+  OsservatorioImmobiliareLunigianaRouteImport.update({
+    id: '/osservatorio-immobiliare-lunigiana',
+    path: '/osservatorio-immobiliare-lunigiana',
     getParentRoute: () => rootRouteImport,
   } as any)
-const AdminAdminRoute = AdminAdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
-  getParentRoute: () => AdminRoute,
+const OffMarketRoute = OffMarketRouteImport.update({
+  id: '/off-market',
+  path: '/off-market',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const AdminLoginRoute = AdminLoginRouteImport.update({
-  id: '/admin/login',
-  path: '/admin/login',
+const McpRoute = McpRouteImport.update({
+  id: '/mcp',
+  path: '/mcp',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IndexDotaspRoute = IndexDotaspRouteImport.update({
+  id: '/index.asp',
+  path: '/index.asp',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ImmobiliRoute = ImmobiliRouteImport.update({
+  id: '/immobili',
+  path: '/immobili',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const Elenco_annunciDotaspRoute = Elenco_annunciDotaspRouteImport.update({
+  id: '/elenco_annunci.asp',
+  path: '/elenco_annunci.asp',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const Dove_siamoDotaspRoute = Dove_siamoDotaspRouteImport.update({
+  id: '/dove_siamo.asp',
+  path: '/dove_siamo.asp',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DoveComprareCasaLunigianaRoute =
+  DoveComprareCasaLunigianaRouteImport.update({
+    id: '/dove-comprare-casa-lunigiana',
+    path: '/dove-comprare-casa-lunigiana',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ContattiDotaspRoute = ContattiDotaspRouteImport.update({
+  id: '/contatti.asp',
+  path: '/contatti.asp',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContattiRoute = ContattiRouteImport.update({
+  id: '/contatti',
+  path: '/contatti',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContattaciDotaspRoute = ContattaciDotaspRouteImport.update({
+  id: '/contattaci.asp',
+  path: '/contattaci.asp',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ComeVendereCasaLunigianaRoute =
+  ComeVendereCasaLunigianaRouteImport.update({
+    id: '/come-vendere-casa-lunigiana',
+    path: '/come-vendere-casa-lunigiana',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const Chi_siamoDotaspRoute = Chi_siamoDotaspRouteImport.update({
+  id: '/chi_siamo.asp',
+  path: '/chi_siamo.asp',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ChiSiamoRoute = ChiSiamoRouteImport.update({
+  id: '/chi-siamo',
+  path: '/chi-siamo',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AnnuncioDotaspRoute = AnnuncioDotaspRouteImport.update({
+  id: '/annuncio.asp',
+  path: '/annuncio.asp',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AffittiDotaspRoute = AffittiDotaspRouteImport.update({
+  id: '/affitti.asp',
+  path: '/affitti.asp',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AffittiResidenzialiCaseVacanzeDotaspRoute =
+  AffittiResidenzialiCaseVacanzeDotaspRouteImport.update({
+    id: '/affitti-residenziali-case-vacanze.asp',
+    path: '/affitti-residenziali-case-vacanze.asp',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/_admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ImmobiliIndexRoute = ImmobiliIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ImmobiliRoute,
+} as any)
+const CaseInVenditaIndexRoute = CaseInVenditaIndexRouteImport.update({
+  id: '/case-in-vendita/',
+  path: '/case-in-vendita/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CaseInVenditaLunigianaIndexRoute =
@@ -260,71 +254,46 @@ const CaseInVenditaLunigianaIndexRoute =
     path: '/case-in-vendita-lunigiana/',
     getParentRoute: () => rootRouteImport,
   } as any)
-const CaseInVenditaLunigianaTipologiaRoute =
-  CaseInVenditaLunigianaTipologiaRouteImport.update({
-    id: '/case-in-vendita-lunigiana/$tipologia',
-    path: '/case-in-vendita-lunigiana/$tipologia',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const CaseInVenditaIndexRoute = CaseInVenditaIndexRouteImport.update({
-  id: '/case-in-vendita/',
-  path: '/case-in-vendita/',
-  getParentRoute: () => rootRouteImport,
+const ImmobiliIdRoute = ImmobiliIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => ImmobiliRoute,
 } as any)
 const CaseInVenditaComuneRoute = CaseInVenditaComuneRouteImport.update({
   id: '/case-in-vendita/$comune',
   path: '/case-in-vendita/$comune',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ImmobiliIndexRoute = ImmobiliIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => ImmobiliRoute,
-} as any)
-const ImmobiliIdRoute = ImmobiliIdRouteImport.update({
-  id: '/$id',
-  path: '/$id',
-  getParentRoute: () => ImmobiliRoute,
-} as any)
-const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
-  id: '/.lovable/oauth/consent',
-  path: '/.lovable/oauth/consent',
+const CaseInVenditaLunigianaTipologiaRoute =
+  CaseInVenditaLunigianaTipologiaRouteImport.update({
+    id: '/case-in-vendita-lunigiana/$tipologia',
+    path: '/case-in-vendita-lunigiana/$tipologia',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const AdminLoginRoute = AdminLoginRouteImport.update({
+  id: '/admin/login',
+  path: '/admin/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminAdminRoute = AdminAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AdminRoute,
+} as any)
+const Char91DotwellKnownChar93OauthProtectedResourceRoute =
+  Char91DotwellKnownChar93OauthProtectedResourceRouteImport.update({
+    id: '/.well-known/oauth-protected-resource',
+    path: '/.well-known/oauth-protected-resource',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AdminAdminIndexRoute = AdminAdminIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AdminAdminRoute,
 } as any)
-const AdminAdminDatiLiveRoute = AdminAdminDatiLiveRouteImport.update({
-  id: '/dati-live',
-  path: '/dati-live',
-  getParentRoute: () => AdminAdminRoute,
-} as any)
-const AdminAdminIdealistaRoute = AdminAdminIdealistaRouteImport.update({
-  id: '/idealista',
-  path: '/idealista',
-  getParentRoute: () => AdminAdminRoute,
-} as any)
-const AdminAdminImpostazioniRoute = AdminAdminImpostazioniRouteImport.update({
-  id: '/impostazioni',
-  path: '/impostazioni',
-  getParentRoute: () => AdminAdminRoute,
-} as any)
-const AdminAdminRichiesteRoute = AdminAdminRichiesteRouteImport.update({
-  id: '/richieste',
-  path: '/richieste',
-  getParentRoute: () => AdminAdminRoute,
-} as any)
-const AdminAdminSeoAiBenchmarkRoute =
-  AdminAdminSeoAiBenchmarkRouteImport.update({
-    id: '/seo-ai-benchmark',
-    path: '/seo-ai-benchmark',
-    getParentRoute: () => AdminAdminRoute,
-  } as any)
-const ApiPublicJarvisFuriaKpiRoute = ApiPublicJarvisFuriaKpiRouteImport.update({
-  id: '/api/public/jarvis-furia-kpi',
-  path: '/api/public/jarvis-furia-kpi',
+const ApiPublicJarvisNotifyRoute = ApiPublicJarvisNotifyRouteImport.update({
+  id: '/api/public/jarvis-notify',
+  path: '/api/public/jarvis-notify',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicJarvisLeadStatoRoute =
@@ -333,9 +302,40 @@ const ApiPublicJarvisLeadStatoRoute =
     path: '/api/public/jarvis-lead-stato',
     getParentRoute: () => rootRouteImport,
   } as any)
-const ApiPublicJarvisNotifyRoute = ApiPublicJarvisNotifyRouteImport.update({
-  id: '/api/public/jarvis-notify',
-  path: '/api/public/jarvis-notify',
+const ApiPublicJarvisFuriaKpiRoute = ApiPublicJarvisFuriaKpiRouteImport.update({
+  id: '/api/public/jarvis-furia-kpi',
+  path: '/api/public/jarvis-furia-kpi',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminAdminSeoAiBenchmarkRoute =
+  AdminAdminSeoAiBenchmarkRouteImport.update({
+    id: '/seo-ai-benchmark',
+    path: '/seo-ai-benchmark',
+    getParentRoute: () => AdminAdminRoute,
+  } as any)
+const AdminAdminRichiesteRoute = AdminAdminRichiesteRouteImport.update({
+  id: '/richieste',
+  path: '/richieste',
+  getParentRoute: () => AdminAdminRoute,
+} as any)
+const AdminAdminImpostazioniRoute = AdminAdminImpostazioniRouteImport.update({
+  id: '/impostazioni',
+  path: '/impostazioni',
+  getParentRoute: () => AdminAdminRoute,
+} as any)
+const AdminAdminIdealistaRoute = AdminAdminIdealistaRouteImport.update({
+  id: '/idealista',
+  path: '/idealista',
+  getParentRoute: () => AdminAdminRoute,
+} as any)
+const AdminAdminDatiLiveRoute = AdminAdminDatiLiveRouteImport.update({
+  id: '/dati-live',
+  path: '/dati-live',
+  getParentRoute: () => AdminAdminRoute,
+} as any)
+const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
+  id: '/.lovable/oauth/consent',
+  path: '/.lovable/oauth/consent',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminAdminImmobiliIndexRoute = AdminAdminImmobiliIndexRouteImport.update({
@@ -343,9 +343,20 @@ const AdminAdminImmobiliIndexRoute = AdminAdminImmobiliIndexRouteImport.update({
   path: '/immobili/',
   getParentRoute: () => AdminAdminRoute,
 } as any)
-const AdminAdminImmobiliIdRoute = AdminAdminImmobiliIdRouteImport.update({
-  id: '/immobili/$id',
-  path: '/immobili/$id',
+const MediaOgImmobiliSplatRoute = MediaOgImmobiliSplatRouteImport.update({
+  id: '/media/og/immobili/$',
+  path: '/media/og/immobili/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicIdealistaFeedDotxmlRoute =
+  ApiPublicIdealistaFeedDotxmlRouteImport.update({
+    id: '/api/public/idealista/feed.xml',
+    path: '/api/public/idealista/feed.xml',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const AdminAdminImmobiliNuovoRoute = AdminAdminImmobiliNuovoRouteImport.update({
+  id: '/immobili/nuovo',
+  path: '/immobili/nuovo',
   getParentRoute: () => AdminAdminRoute,
 } as any)
 const AdminAdminImmobiliAssistenteRoute =
@@ -354,21 +365,10 @@ const AdminAdminImmobiliAssistenteRoute =
     path: '/immobili/assistente',
     getParentRoute: () => AdminAdminRoute,
   } as any)
-const AdminAdminImmobiliNuovoRoute = AdminAdminImmobiliNuovoRouteImport.update({
-  id: '/immobili/nuovo',
-  path: '/immobili/nuovo',
+const AdminAdminImmobiliIdRoute = AdminAdminImmobiliIdRouteImport.update({
+  id: '/immobili/$id',
+  path: '/immobili/$id',
   getParentRoute: () => AdminAdminRoute,
-} as any)
-const ApiPublicIdealistaFeedDotxmlRoute =
-  ApiPublicIdealistaFeedDotxmlRouteImport.update({
-    id: '/api/public/idealista/feed.xml',
-    path: '/api/public/idealista/feed.xml',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const MediaOgImmobiliSplatRoute = MediaOgImmobiliSplatRouteImport.update({
-  id: '/media/og/immobili/$',
-  path: '/media/og/immobili/$',
-  getParentRoute: () => rootRouteImport,
 } as any)
 const AdminAdminImmobiliIdAnteprimaRoute =
   AdminAdminImmobiliIdAnteprimaRouteImport.update({
@@ -789,221 +789,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_admin': {
-      id: '/_admin'
-      path: ''
-      fullPath: '/'
-      preLoaderRoute: typeof AdminRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/affitti-residenziali-case-vacanze.asp': {
-      id: '/affitti-residenziali-case-vacanze.asp'
-      path: '/affitti-residenziali-case-vacanze.asp'
-      fullPath: '/affitti-residenziali-case-vacanze.asp'
-      preLoaderRoute: typeof AffittiResidenzialiCaseVacanzeDotaspRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/affitti.asp': {
-      id: '/affitti.asp'
-      path: '/affitti.asp'
-      fullPath: '/affitti.asp'
-      preLoaderRoute: typeof AffittiDotaspRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/annuncio.asp': {
-      id: '/annuncio.asp'
-      path: '/annuncio.asp'
-      fullPath: '/annuncio.asp'
-      preLoaderRoute: typeof AnnuncioDotaspRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/chi-siamo': {
-      id: '/chi-siamo'
-      path: '/chi-siamo'
-      fullPath: '/chi-siamo'
-      preLoaderRoute: typeof ChiSiamoRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/chi_siamo.asp': {
-      id: '/chi_siamo.asp'
-      path: '/chi_siamo.asp'
-      fullPath: '/chi_siamo.asp'
-      preLoaderRoute: typeof Chi_siamoDotaspRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/come-vendere-casa-lunigiana': {
-      id: '/come-vendere-casa-lunigiana'
-      path: '/come-vendere-casa-lunigiana'
-      fullPath: '/come-vendere-casa-lunigiana'
-      preLoaderRoute: typeof ComeVendereCasaLunigianaRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/contattaci.asp': {
-      id: '/contattaci.asp'
-      path: '/contattaci.asp'
-      fullPath: '/contattaci.asp'
-      preLoaderRoute: typeof ContattaciDotaspRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/contatti': {
-      id: '/contatti'
-      path: '/contatti'
-      fullPath: '/contatti'
-      preLoaderRoute: typeof ContattiRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/contatti.asp': {
-      id: '/contatti.asp'
-      path: '/contatti.asp'
-      fullPath: '/contatti.asp'
-      preLoaderRoute: typeof ContattiDotaspRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dove-comprare-casa-lunigiana': {
-      id: '/dove-comprare-casa-lunigiana'
-      path: '/dove-comprare-casa-lunigiana'
-      fullPath: '/dove-comprare-casa-lunigiana'
-      preLoaderRoute: typeof DoveComprareCasaLunigianaRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dove_siamo.asp': {
-      id: '/dove_siamo.asp'
-      path: '/dove_siamo.asp'
-      fullPath: '/dove_siamo.asp'
-      preLoaderRoute: typeof Dove_siamoDotaspRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/elenco_annunci.asp': {
-      id: '/elenco_annunci.asp'
-      path: '/elenco_annunci.asp'
-      fullPath: '/elenco_annunci.asp'
-      preLoaderRoute: typeof Elenco_annunciDotaspRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/immobili': {
-      id: '/immobili'
-      path: '/immobili'
-      fullPath: '/immobili'
-      preLoaderRoute: typeof ImmobiliRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/index.asp': {
-      id: '/index.asp'
-      path: '/index.asp'
-      fullPath: '/index.asp'
-      preLoaderRoute: typeof IndexDotaspRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/mcp': {
-      id: '/mcp'
-      path: '/mcp'
-      fullPath: '/mcp'
-      preLoaderRoute: typeof McpRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/off-market': {
-      id: '/off-market'
-      path: '/off-market'
-      fullPath: '/off-market'
-      preLoaderRoute: typeof OffMarketRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/osservatorio-immobiliare-lunigiana': {
-      id: '/osservatorio-immobiliare-lunigiana'
-      path: '/osservatorio-immobiliare-lunigiana'
-      fullPath: '/osservatorio-immobiliare-lunigiana'
-      preLoaderRoute: typeof OsservatorioImmobiliareLunigianaRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/prezzi-case-lunigiana': {
-      id: '/prezzi-case-lunigiana'
-      path: '/prezzi-case-lunigiana'
-      fullPath: '/prezzi-case-lunigiana'
-      preLoaderRoute: typeof PrezziCaseLunigianaRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/privacy': {
-      id: '/privacy'
-      path: '/privacy'
-      fullPath: '/privacy'
-      preLoaderRoute: typeof PrivacyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/quanto-vale-casa-pontremoli': {
-      id: '/quanto-vale-casa-pontremoli'
-      path: '/quanto-vale-casa-pontremoli'
-      fullPath: '/quanto-vale-casa-pontremoli'
-      preLoaderRoute: typeof QuantoValeCasaPontremoliRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/seconda-casa-lunigiana': {
-      id: '/seconda-casa-lunigiana'
-      path: '/seconda-casa-lunigiana'
-      fullPath: '/seconda-casa-lunigiana'
-      preLoaderRoute: typeof SecondaCasaLunigianaRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/servizi': {
-      id: '/servizi'
-      path: '/servizi'
-      fullPath: '/servizi'
-      preLoaderRoute: typeof ServiziRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/servizi.asp': {
-      id: '/servizi.asp'
-      path: '/servizi.asp'
-      fullPath: '/servizi.asp'
-      preLoaderRoute: typeof ServiziDotaspRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/sitemap.xml': {
-      id: '/sitemap.xml'
-      path: '/sitemap.xml'
-      fullPath: '/sitemap.xml'
-      preLoaderRoute: typeof SitemapDotxmlRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/territori': {
-      id: '/territori'
-      path: '/territori'
-      fullPath: '/territori'
-      preLoaderRoute: typeof TerritoriRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/trova-casa-lunigiana': {
-      id: '/trova-casa-lunigiana'
-      path: '/trova-casa-lunigiana'
-      fullPath: '/trova-casa-lunigiana'
-      preLoaderRoute: typeof TrovaCasaLunigianaRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/valuta-casa': {
-      id: '/valuta-casa'
-      path: '/valuta-casa'
-      fullPath: '/valuta-casa'
-      preLoaderRoute: typeof ValutaCasaRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/vendite.asp': {
-      id: '/vendite.asp'
-      path: '/vendite.asp'
-      fullPath: '/vendite.asp'
-      preLoaderRoute: typeof VenditeDotaspRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/vendite2.asp': {
-      id: '/vendite2.asp'
-      path: '/vendite2.asp'
-      fullPath: '/vendite2.asp'
-      preLoaderRoute: typeof Vendite2DotaspRouteImport
+    '/vivere-in-lunigiana': {
+      id: '/vivere-in-lunigiana'
+      path: '/vivere-in-lunigiana'
+      fullPath: '/vivere-in-lunigiana'
+      preLoaderRoute: typeof VivereInLunigianaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/vivere-a-pontremoli': {
@@ -1013,60 +803,221 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof VivereAPontremoliRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/vivere-in-lunigiana': {
-      id: '/vivere-in-lunigiana'
-      path: '/vivere-in-lunigiana'
-      fullPath: '/vivere-in-lunigiana'
-      preLoaderRoute: typeof VivereInLunigianaRouteImport
+    '/vendite2.asp': {
+      id: '/vendite2.asp'
+      path: '/vendite2.asp'
+      fullPath: '/vendite2.asp'
+      preLoaderRoute: typeof Vendite2DotaspRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/.well-known/oauth-protected-resource': {
-      id: '/.well-known/oauth-protected-resource'
-      path: '/.well-known/oauth-protected-resource'
-      fullPath: '/.well-known/oauth-protected-resource'
-      preLoaderRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRouteImport
+    '/vendite.asp': {
+      id: '/vendite.asp'
+      path: '/vendite.asp'
+      fullPath: '/vendite.asp'
+      preLoaderRoute: typeof VenditeDotaspRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_admin/admin': {
-      id: '/_admin/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AdminAdminRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/login': {
-      id: '/admin/login'
-      path: '/admin/login'
-      fullPath: '/admin/login'
-      preLoaderRoute: typeof AdminLoginRouteImport
+    '/valuta-casa': {
+      id: '/valuta-casa'
+      path: '/valuta-casa'
+      fullPath: '/valuta-casa'
+      preLoaderRoute: typeof ValutaCasaRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/case-in-vendita-lunigiana/': {
-      id: '/case-in-vendita-lunigiana/'
-      path: '/case-in-vendita-lunigiana'
-      fullPath: '/case-in-vendita-lunigiana/'
-      preLoaderRoute: typeof CaseInVenditaLunigianaIndexRouteImport
+    '/trova-casa-lunigiana': {
+      id: '/trova-casa-lunigiana'
+      path: '/trova-casa-lunigiana'
+      fullPath: '/trova-casa-lunigiana'
+      preLoaderRoute: typeof TrovaCasaLunigianaRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/case-in-vendita-lunigiana/$tipologia': {
-      id: '/case-in-vendita-lunigiana/$tipologia'
-      path: '/case-in-vendita-lunigiana/$tipologia'
-      fullPath: '/case-in-vendita-lunigiana/$tipologia'
-      preLoaderRoute: typeof CaseInVenditaLunigianaTipologiaRouteImport
+    '/territori': {
+      id: '/territori'
+      path: '/territori'
+      fullPath: '/territori'
+      preLoaderRoute: typeof TerritoriRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/case-in-vendita/': {
-      id: '/case-in-vendita/'
-      path: '/case-in-vendita'
-      fullPath: '/case-in-vendita/'
-      preLoaderRoute: typeof CaseInVenditaIndexRouteImport
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/case-in-vendita/$comune': {
-      id: '/case-in-vendita/$comune'
-      path: '/case-in-vendita/$comune'
-      fullPath: '/case-in-vendita/$comune'
-      preLoaderRoute: typeof CaseInVenditaComuneRouteImport
+    '/servizi.asp': {
+      id: '/servizi.asp'
+      path: '/servizi.asp'
+      fullPath: '/servizi.asp'
+      preLoaderRoute: typeof ServiziDotaspRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/servizi': {
+      id: '/servizi'
+      path: '/servizi'
+      fullPath: '/servizi'
+      preLoaderRoute: typeof ServiziRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/seconda-casa-lunigiana': {
+      id: '/seconda-casa-lunigiana'
+      path: '/seconda-casa-lunigiana'
+      fullPath: '/seconda-casa-lunigiana'
+      preLoaderRoute: typeof SecondaCasaLunigianaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/quanto-vale-casa-pontremoli': {
+      id: '/quanto-vale-casa-pontremoli'
+      path: '/quanto-vale-casa-pontremoli'
+      fullPath: '/quanto-vale-casa-pontremoli'
+      preLoaderRoute: typeof QuantoValeCasaPontremoliRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/prezzi-case-lunigiana': {
+      id: '/prezzi-case-lunigiana'
+      path: '/prezzi-case-lunigiana'
+      fullPath: '/prezzi-case-lunigiana'
+      preLoaderRoute: typeof PrezziCaseLunigianaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/osservatorio-immobiliare-lunigiana': {
+      id: '/osservatorio-immobiliare-lunigiana'
+      path: '/osservatorio-immobiliare-lunigiana'
+      fullPath: '/osservatorio-immobiliare-lunigiana'
+      preLoaderRoute: typeof OsservatorioImmobiliareLunigianaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/off-market': {
+      id: '/off-market'
+      path: '/off-market'
+      fullPath: '/off-market'
+      preLoaderRoute: typeof OffMarketRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mcp': {
+      id: '/mcp'
+      path: '/mcp'
+      fullPath: '/mcp'
+      preLoaderRoute: typeof McpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/index.asp': {
+      id: '/index.asp'
+      path: '/index.asp'
+      fullPath: '/index.asp'
+      preLoaderRoute: typeof IndexDotaspRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/immobili': {
+      id: '/immobili'
+      path: '/immobili'
+      fullPath: '/immobili'
+      preLoaderRoute: typeof ImmobiliRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/elenco_annunci.asp': {
+      id: '/elenco_annunci.asp'
+      path: '/elenco_annunci.asp'
+      fullPath: '/elenco_annunci.asp'
+      preLoaderRoute: typeof Elenco_annunciDotaspRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dove_siamo.asp': {
+      id: '/dove_siamo.asp'
+      path: '/dove_siamo.asp'
+      fullPath: '/dove_siamo.asp'
+      preLoaderRoute: typeof Dove_siamoDotaspRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dove-comprare-casa-lunigiana': {
+      id: '/dove-comprare-casa-lunigiana'
+      path: '/dove-comprare-casa-lunigiana'
+      fullPath: '/dove-comprare-casa-lunigiana'
+      preLoaderRoute: typeof DoveComprareCasaLunigianaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contatti.asp': {
+      id: '/contatti.asp'
+      path: '/contatti.asp'
+      fullPath: '/contatti.asp'
+      preLoaderRoute: typeof ContattiDotaspRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contatti': {
+      id: '/contatti'
+      path: '/contatti'
+      fullPath: '/contatti'
+      preLoaderRoute: typeof ContattiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contattaci.asp': {
+      id: '/contattaci.asp'
+      path: '/contattaci.asp'
+      fullPath: '/contattaci.asp'
+      preLoaderRoute: typeof ContattaciDotaspRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/come-vendere-casa-lunigiana': {
+      id: '/come-vendere-casa-lunigiana'
+      path: '/come-vendere-casa-lunigiana'
+      fullPath: '/come-vendere-casa-lunigiana'
+      preLoaderRoute: typeof ComeVendereCasaLunigianaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/chi_siamo.asp': {
+      id: '/chi_siamo.asp'
+      path: '/chi_siamo.asp'
+      fullPath: '/chi_siamo.asp'
+      preLoaderRoute: typeof Chi_siamoDotaspRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/chi-siamo': {
+      id: '/chi-siamo'
+      path: '/chi-siamo'
+      fullPath: '/chi-siamo'
+      preLoaderRoute: typeof ChiSiamoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/annuncio.asp': {
+      id: '/annuncio.asp'
+      path: '/annuncio.asp'
+      fullPath: '/annuncio.asp'
+      preLoaderRoute: typeof AnnuncioDotaspRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/affitti.asp': {
+      id: '/affitti.asp'
+      path: '/affitti.asp'
+      fullPath: '/affitti.asp'
+      preLoaderRoute: typeof AffittiDotaspRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/affitti-residenziali-case-vacanze.asp': {
+      id: '/affitti-residenziali-case-vacanze.asp'
+      path: '/affitti-residenziali-case-vacanze.asp'
+      fullPath: '/affitti-residenziali-case-vacanze.asp'
+      preLoaderRoute: typeof AffittiResidenzialiCaseVacanzeDotaspRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_admin': {
+      id: '/_admin'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/immobili/': {
@@ -1076,6 +1027,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ImmobiliIndexRouteImport
       parentRoute: typeof ImmobiliRoute
     }
+    '/case-in-vendita/': {
+      id: '/case-in-vendita/'
+      path: '/case-in-vendita'
+      fullPath: '/case-in-vendita/'
+      preLoaderRoute: typeof CaseInVenditaIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/case-in-vendita-lunigiana/': {
+      id: '/case-in-vendita-lunigiana/'
+      path: '/case-in-vendita-lunigiana'
+      fullPath: '/case-in-vendita-lunigiana/'
+      preLoaderRoute: typeof CaseInVenditaLunigianaIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/immobili/$id': {
       id: '/immobili/$id'
       path: '/$id'
@@ -1083,11 +1048,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ImmobiliIdRouteImport
       parentRoute: typeof ImmobiliRoute
     }
-    '/.lovable/oauth/consent': {
-      id: '/.lovable/oauth/consent'
-      path: '/.lovable/oauth/consent'
-      fullPath: '/.lovable/oauth/consent'
-      preLoaderRoute: typeof DotlovableOauthConsentRouteImport
+    '/case-in-vendita/$comune': {
+      id: '/case-in-vendita/$comune'
+      path: '/case-in-vendita/$comune'
+      fullPath: '/case-in-vendita/$comune'
+      preLoaderRoute: typeof CaseInVenditaComuneRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/case-in-vendita-lunigiana/$tipologia': {
+      id: '/case-in-vendita-lunigiana/$tipologia'
+      path: '/case-in-vendita-lunigiana/$tipologia'
+      fullPath: '/case-in-vendita-lunigiana/$tipologia'
+      preLoaderRoute: typeof CaseInVenditaLunigianaTipologiaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/login': {
+      id: '/admin/login'
+      path: '/admin/login'
+      fullPath: '/admin/login'
+      preLoaderRoute: typeof AdminLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_admin/admin': {
+      id: '/_admin/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminAdminRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/.well-known/oauth-protected-resource': {
+      id: '/.well-known/oauth-protected-resource'
+      path: '/.well-known/oauth-protected-resource'
+      fullPath: '/.well-known/oauth-protected-resource'
+      preLoaderRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_admin/admin/': {
@@ -1097,46 +1090,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAdminIndexRouteImport
       parentRoute: typeof AdminAdminRoute
     }
-    '/_admin/admin/dati-live': {
-      id: '/_admin/admin/dati-live'
-      path: '/dati-live'
-      fullPath: '/admin/dati-live'
-      preLoaderRoute: typeof AdminAdminDatiLiveRouteImport
-      parentRoute: typeof AdminAdminRoute
-    }
-    '/_admin/admin/idealista': {
-      id: '/_admin/admin/idealista'
-      path: '/idealista'
-      fullPath: '/admin/idealista'
-      preLoaderRoute: typeof AdminAdminIdealistaRouteImport
-      parentRoute: typeof AdminAdminRoute
-    }
-    '/_admin/admin/impostazioni': {
-      id: '/_admin/admin/impostazioni'
-      path: '/impostazioni'
-      fullPath: '/admin/impostazioni'
-      preLoaderRoute: typeof AdminAdminImpostazioniRouteImport
-      parentRoute: typeof AdminAdminRoute
-    }
-    '/_admin/admin/richieste': {
-      id: '/_admin/admin/richieste'
-      path: '/richieste'
-      fullPath: '/admin/richieste'
-      preLoaderRoute: typeof AdminAdminRichiesteRouteImport
-      parentRoute: typeof AdminAdminRoute
-    }
-    '/_admin/admin/seo-ai-benchmark': {
-      id: '/_admin/admin/seo-ai-benchmark'
-      path: '/seo-ai-benchmark'
-      fullPath: '/admin/seo-ai-benchmark'
-      preLoaderRoute: typeof AdminAdminSeoAiBenchmarkRouteImport
-      parentRoute: typeof AdminAdminRoute
-    }
-    '/api/public/jarvis-furia-kpi': {
-      id: '/api/public/jarvis-furia-kpi'
-      path: '/api/public/jarvis-furia-kpi'
-      fullPath: '/api/public/jarvis-furia-kpi'
-      preLoaderRoute: typeof ApiPublicJarvisFuriaKpiRouteImport
+    '/api/public/jarvis-notify': {
+      id: '/api/public/jarvis-notify'
+      path: '/api/public/jarvis-notify'
+      fullPath: '/api/public/jarvis-notify'
+      preLoaderRoute: typeof ApiPublicJarvisNotifyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/jarvis-lead-stato': {
@@ -1146,11 +1104,53 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicJarvisLeadStatoRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/jarvis-notify': {
-      id: '/api/public/jarvis-notify'
-      path: '/api/public/jarvis-notify'
-      fullPath: '/api/public/jarvis-notify'
-      preLoaderRoute: typeof ApiPublicJarvisNotifyRouteImport
+    '/api/public/jarvis-furia-kpi': {
+      id: '/api/public/jarvis-furia-kpi'
+      path: '/api/public/jarvis-furia-kpi'
+      fullPath: '/api/public/jarvis-furia-kpi'
+      preLoaderRoute: typeof ApiPublicJarvisFuriaKpiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_admin/admin/seo-ai-benchmark': {
+      id: '/_admin/admin/seo-ai-benchmark'
+      path: '/seo-ai-benchmark'
+      fullPath: '/admin/seo-ai-benchmark'
+      preLoaderRoute: typeof AdminAdminSeoAiBenchmarkRouteImport
+      parentRoute: typeof AdminAdminRoute
+    }
+    '/_admin/admin/richieste': {
+      id: '/_admin/admin/richieste'
+      path: '/richieste'
+      fullPath: '/admin/richieste'
+      preLoaderRoute: typeof AdminAdminRichiesteRouteImport
+      parentRoute: typeof AdminAdminRoute
+    }
+    '/_admin/admin/impostazioni': {
+      id: '/_admin/admin/impostazioni'
+      path: '/impostazioni'
+      fullPath: '/admin/impostazioni'
+      preLoaderRoute: typeof AdminAdminImpostazioniRouteImport
+      parentRoute: typeof AdminAdminRoute
+    }
+    '/_admin/admin/idealista': {
+      id: '/_admin/admin/idealista'
+      path: '/idealista'
+      fullPath: '/admin/idealista'
+      preLoaderRoute: typeof AdminAdminIdealistaRouteImport
+      parentRoute: typeof AdminAdminRoute
+    }
+    '/_admin/admin/dati-live': {
+      id: '/_admin/admin/dati-live'
+      path: '/dati-live'
+      fullPath: '/admin/dati-live'
+      preLoaderRoute: typeof AdminAdminDatiLiveRouteImport
+      parentRoute: typeof AdminAdminRoute
+    }
+    '/.lovable/oauth/consent': {
+      id: '/.lovable/oauth/consent'
+      path: '/.lovable/oauth/consent'
+      fullPath: '/.lovable/oauth/consent'
+      preLoaderRoute: typeof DotlovableOauthConsentRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_admin/admin/immobili/': {
@@ -1160,11 +1160,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAdminImmobiliIndexRouteImport
       parentRoute: typeof AdminAdminRoute
     }
-    '/_admin/admin/immobili/$id': {
-      id: '/_admin/admin/immobili/$id'
-      path: '/immobili/$id'
-      fullPath: '/admin/immobili/$id'
-      preLoaderRoute: typeof AdminAdminImmobiliIdRouteImport
+    '/media/og/immobili/$': {
+      id: '/media/og/immobili/$'
+      path: '/media/og/immobili/$'
+      fullPath: '/media/og/immobili/$'
+      preLoaderRoute: typeof MediaOgImmobiliSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/idealista/feed.xml': {
+      id: '/api/public/idealista/feed.xml'
+      path: '/api/public/idealista/feed.xml'
+      fullPath: '/api/public/idealista/feed.xml'
+      preLoaderRoute: typeof ApiPublicIdealistaFeedDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_admin/admin/immobili/nuovo': {
+      id: '/_admin/admin/immobili/nuovo'
+      path: '/immobili/nuovo'
+      fullPath: '/admin/immobili/nuovo'
+      preLoaderRoute: typeof AdminAdminImmobiliNuovoRouteImport
       parentRoute: typeof AdminAdminRoute
     }
     '/_admin/admin/immobili/assistente': {
@@ -1174,26 +1188,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAdminImmobiliAssistenteRouteImport
       parentRoute: typeof AdminAdminRoute
     }
-    '/_admin/admin/immobili/nuovo': {
-      id: '/_admin/admin/immobili/nuovo'
-      path: '/immobili/nuovo'
-      fullPath: '/admin/immobili/nuovo'
-      preLoaderRoute: typeof AdminAdminImmobiliNuovoRouteImport
+    '/_admin/admin/immobili/$id': {
+      id: '/_admin/admin/immobili/$id'
+      path: '/immobili/$id'
+      fullPath: '/admin/immobili/$id'
+      preLoaderRoute: typeof AdminAdminImmobiliIdRouteImport
       parentRoute: typeof AdminAdminRoute
-    }
-    '/api/public/idealista/feed.xml': {
-      id: '/api/public/idealista/feed.xml'
-      path: '/api/public/idealista/feed.xml'
-      fullPath: '/api/public/idealista/feed.xml'
-      preLoaderRoute: typeof ApiPublicIdealistaFeedDotxmlRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/media/og/immobili/$': {
-      id: '/media/og/immobili/$'
-      path: '/media/og/immobili/$'
-      fullPath: '/media/og/immobili/$'
-      preLoaderRoute: typeof MediaOgImmobiliSplatRouteImport
-      parentRoute: typeof rootRouteImport
     }
     '/_admin/admin/immobili/$id/anteprima': {
       id: '/_admin/admin/immobili/$id/anteprima'

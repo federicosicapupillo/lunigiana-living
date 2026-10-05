@@ -98,7 +98,7 @@ export const Route = createFileRoute("/immobili/")({
   },
   errorComponent: ({ error }) => (
     <div className="container-editorial py-32 text-center">
-      <p className="text-muted-foreground">Errore nel caricamento: {error.message}</p>
+      <p className="text-muted-foreground">Errore nel caricamento: {error instanceof Error ? error.message : String(error)}</p>
     </div>
   ),
   notFoundComponent: () => (
