@@ -1,0 +1,1 @@
+DROP POLICY IF EXISTS "Public can view images of published properties" ON storage.objects;
