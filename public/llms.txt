@@ -7,11 +7,12 @@ Furia Immobiliare, guidata da Elena Furia, aiuta clienti italiani e stranieri a 
 ## Pages
 
 - [Home](/): chi siamo, cosa facciamo, immobili in evidenza.
-- [Immobili in vendita](/immobili): tutti gli immobili pubblicati, con filtri per zona, tipologia e prezzo.
-- [Territori della Lunigiana](/territori): guida ai comuni e alle zone della Lunigiana.
+- [Catalogo immobili](/immobili): immobili pubblicati in vendita e in locazione; verificare il tipo di contratto nella singola scheda, con filtri per zona, tipologia e prezzo.
+- [Dove si trova la Lunigiana](/territori): geografia del territorio storico tra Toscana e Liguria e comuni dell'area servita dall'agenzia.
 - [Servizi](/servizi): acquisto, vendita, valutazione, assistenza per clienti stranieri.
 - [Chi siamo](/chi-siamo): Elena Furia e l'agenzia di Pontremoli.
 - [Contatti](/contatti): telefono, email, indirizzo, WhatsApp.
+- [Informativa privacy e cookie](/privacy): trattamento dei dati, statistiche proprie, conservazione e diritti degli interessati.
 - [Trova la tua casa ideale](/trova-casa-lunigiana): percorso guidato per descrivere la casa che cerchi.
 - [Valuta la tua casa](/valuta-casa): percorso guidato per richiedere una valutazione immobiliare.
 - [Furia Off Market](/off-market): ricerca e vendita riservata di immobili non pubblicati.
@@ -50,11 +51,11 @@ Furia Immobiliare, guidata da Elena Furia, aiuta clienti italiani e stranieri a 
 ## Case in vendita per tipologia
 
 - [Tipologie in Lunigiana — hub](/case-in-vendita-lunigiana): indice delle tipologie.
-- [Rustici in vendita in Lunigiana](/case-in-vendita-lunigiana/rustici)
-- [Casali in vendita in Lunigiana](/case-in-vendita-lunigiana/casali)
+- [Rustici e casali in vendita in Lunigiana](/case-in-vendita-lunigiana/rustici-casali): annunci pubblicati di rustici e casali nella categoria dedicata.
 - [Case indipendenti in vendita in Lunigiana](/case-in-vendita-lunigiana/case-indipendenti)
 - [Appartamenti in vendita in Lunigiana](/case-in-vendita-lunigiana/appartamenti)
 - [Ville in vendita in Lunigiana](/case-in-vendita-lunigiana/ville)
+- [Case con giardino in Lunigiana](/case-in-vendita-lunigiana/case-con-giardino): percorso per cercare immobili con spazio esterno.
 
 ## Optional
 

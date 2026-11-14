@@ -39,7 +39,7 @@ export const COMUNE_SEO: ComuneSeo[] = [
     fullName: "Pontremoli",
     match: ["Pontremoli"],
     subtitle:
-      "Scopri case, appartamenti e immobili di carattere a Pontremoli, nel cuore della Lunigiana, con l'accompagnamento locale di Furia Immobiliare.",
+      "Cerchi una casa in vendita a Pontremoli? Qui trovi gli annunci pubblicati da Furia Immobiliare nel comune: confronta località, foto, superficie e prezzo richiesto nelle singole schede.",
     paragraphs: [
       "Pontremoli è il centro principale della Lunigiana: una piccola città di pietra e portici, attraversata dal torrente Magra, con un centro storico vivo, servizi quotidiani, scuole, una stazione ferroviaria sulla linea Parma–La Spezia e un casello autostradale che la collega facilmente alla costa ligure e alla pianura padana.",
       "Qui si trovano appartamenti nel centro storico, case di paese da rivedere con gusto, ville nelle frazioni collinari e proprietà con vista sul Castello del Piagnaro. È la scelta naturale per chi cerca autenticità senza rinunciare ai servizi, sia come prima casa sia come seconda casa abitabile tutto l'anno.",
@@ -54,7 +54,7 @@ export const COMUNE_SEO: ComuneSeo[] = [
     blurb: "Capoluogo della Lunigiana, servizi e centro storico.",
     en: {
       subtitle:
-        "Discover homes, apartments and character properties for sale in Pontremoli, in the heart of Lunigiana, with local guidance from Furia Immobiliare.",
+        "Looking for a home for sale in Pontremoli? Browse Furia Immobiliare's published listings in the municipality and compare location, photos, floor area and asking price on each property page.",
       paragraphs: [
         "Pontremoli is the main town of Lunigiana: a small stone city of arcades and bridges, crossed by the Magra river, with a living historic centre, everyday services, schools, a railway station on the Parma–La Spezia line and a motorway exit that easily connects it to the Ligurian coast and the Po valley.",
         "Here you'll find apartments in the historic centre, village houses to bring back to life with taste, villas in the hillside hamlets and properties overlooking the Castello del Piagnaro. It's a natural choice for those who want authenticity without giving up everyday services — whether as a first home or as a second home you can live in all year round.",
@@ -69,7 +69,7 @@ export const COMUNE_SEO: ComuneSeo[] = [
       blurb: "The main town of Lunigiana, with services and a living historic centre.",
       metaTitle: "Homes for sale in Pontremoli | Furia Immobiliare",
       metaDescription:
-        "Explore homes and character properties for sale in Pontremoli, in the heart of Lunigiana. Local guidance by Furia Immobiliare.",
+        "Homes for sale in Pontremoli: explore published listings, photos, floor areas and asking prices. Local guidance in Lunigiana from Furia Immobiliare.",
     },
   },
   {
@@ -354,8 +354,10 @@ export function localizeComuneSeo(c: ComuneSeo, lang: "it" | "en"): ComuneSeoLoc
     paragraphs: c.paragraphs,
     audience: c.audience,
     blurb: c.blurb,
-    metaTitle: `Case in vendita a ${c.fullName} | Furia Immobiliare`,
-    metaDescription: `Scopri case, appartamenti e immobili di carattere a ${c.fullName} con Furia Immobiliare. Ti guidiamo nella scelta della casa giusta in Lunigiana.`,
+    metaTitle: `Case in vendita ${comunePreposition(c.fullName)} ${c.fullName} | Furia Immobiliare`,
+    metaDescription: c.slug === "pontremoli"
+      ? "Case in vendita a Pontremoli: consulta annunci pubblicati, foto, superfici e prezzi richiesti. Furia Immobiliare ti accompagna nella scelta in Lunigiana."
+      : `Scopri case, appartamenti e immobili di carattere ${comunePreposition(c.fullName)} ${c.fullName} con Furia Immobiliare. Ti guidiamo nella scelta della casa giusta in Lunigiana.`,
   };
 }
 /**

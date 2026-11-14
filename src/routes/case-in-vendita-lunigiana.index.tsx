@@ -6,13 +6,14 @@ import { siteUrl } from "@/lib/site-url";
 import { collectionPageGraph } from "@/lib/structured-data";
 import { useLanguage, useT } from "@/lib/i18n/LanguageContext";
 import { useDocHead } from "@/hooks/use-localized-head";
+import { PropertySearchAnswers } from "@/components/property-search-answers";
 
 export const Route = createFileRoute("/case-in-vendita-lunigiana/")({
   head: () => {
     const url = siteUrl("/case-in-vendita-lunigiana");
     const title = "Case in vendita in Lunigiana per tipologia | Furia Immobiliare";
     const description =
-      "Cerca case in vendita in Lunigiana per tipologia: rustici e casali, case indipendenti, appartamenti, ville, case con giardino, case economiche, seconde case.";
+      "Case in vendita in Lunigiana: scegli tra appartamenti, case indipendenti, ville, rustici e casali. Esplora gli annunci per tipologia o comune con Furia Immobiliare.";
     // Hub: elenca landing per tipologia, non immobili → nessun ItemList.
     const ld = collectionPageGraph({
       canonical: url,
@@ -32,6 +33,7 @@ export const Route = createFileRoute("/case-in-vendita-lunigiana/")({
         { property: "og:description", content: description },
         { property: "og:url", content: url },
         { property: "og:type", content: "website" },
+        { name: "twitter:card", content: "summary_large_image" },
       ],
       links: [{ rel: "canonical", href: url }],
       scripts: [
@@ -155,6 +157,8 @@ function TipologieHub() {
           </p>
         </div>
       </section>
+
+      <PropertySearchAnswers area="lunigiana" />
 
       {/* CTA */}
       <section className="container-editorial py-20">

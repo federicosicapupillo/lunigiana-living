@@ -63,21 +63,23 @@ export const Route = createFileRoute("/territori")({
     const ld = institutionalGraph({
       canonical: url,
       type: "WebPage",
-      name: "Territori della Lunigiana: comuni e zone | Furia Immobiliare",
+      name: "Dove si trova la Lunigiana: comuni e zone | Furia Immobiliare",
       description:
-        "Pontremoli, Villafranca, Bagnone, Filattiera, Mulazzo, Zeri: i territori della Lunigiana, comune per comune, per capire zone, atmosfere e dove cercare casa.",
+        "Dove si trova la Lunigiana, tra Toscana e Liguria? Scopri l'area servita da Furia Immobiliare: Pontremoli, Villafranca, Filattiera, Mulazzo, Bagnone, Zeri e Aulla.",
     });
     return {
     meta: [
-      { title: "Territori della Lunigiana: comuni e zone | Furia Immobiliare" },
-      { name: "description", content: "Pontremoli, Villafranca, Bagnone, Filattiera, Mulazzo, Zeri: i territori della Lunigiana, comune per comune, per capire zone, atmosfere e dove cercare casa." },
-      { property: "og:title", content: "Territori della Lunigiana: comuni e zone | Furia Immobiliare" },
-      { property: "og:description", content: "Sei comuni, sei atmosfere: una mappa dei territori della Lunigiana scritta da chi questa terra la abita e la racconta ogni giorno." },
+      { title: "Dove si trova la Lunigiana: comuni e zone | Furia Immobiliare" },
+      { name: "description", content: "Dove si trova la Lunigiana, tra Toscana e Liguria? Scopri l'area servita da Furia Immobiliare: Pontremoli, Villafranca, Filattiera, Mulazzo, Bagnone, Zeri e Aulla." },
+      { property: "og:title", content: "Dove si trova la Lunigiana: comuni e zone | Furia Immobiliare" },
+      { property: "og:description", content: "Dove si trova la Lunigiana, tra Toscana e Liguria? Scopri l'area servita da Furia Immobiliare: Pontremoli, Villafranca, Filattiera, Mulazzo, Bagnone, Zeri e Aulla." },
       { property: "og:url", content: url },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [
       { rel: "canonical", href: url },
-      ...(staticSet(TERR_HERO_SET) ? [preloadImage(staticSet(TERR_HERO_SET)!, TERR_HERO_SIZES)] : []),
+      ...(() => { const set = staticSet(TERR_HERO_SET); return set ? [preloadImage(set, TERR_HERO_SIZES)] : []; })(),
     ],
     scripts: [{ type: "application/ld+json", children: JSON.stringify(ld) }],
     };
@@ -131,6 +133,12 @@ function TerritoriPage() {
           <div className="space-y-5 text-[1.0625rem] leading-[1.75] text-foreground/85 md:col-span-6 md:col-start-7">
             <p>{t("terr.place.p1")}</p>
             <p>{t("terr.place.p2")}</p>
+            <p className="text-sm">
+              {t("terr.place.source")} <a href="https://www.visittuscany.com/en/ideas/lunigiana-a-land-rich-in-history/" target="_blank" rel="noopener noreferrer" className="text-primary underline hover:no-underline">Visit Tuscany</a>.
+            </p>
+            <Link to="/case-in-vendita" className="inline-flex items-center gap-2 text-primary underline hover:no-underline">
+              {t("seoTipologie.hub.comuni.title")} <ArrowRight size={14} />
+            </Link>
           </div>
         </div>
       </section>
@@ -214,10 +222,10 @@ function TerritoriPage() {
                         : centro storico, zone residenziali e frazioni a confronto.
                       </p>
                     )}
-                    {comuneSlugFor(terr.slug) ? (
+                    {(() => { const comuneSlug = comuneSlugFor(terr.slug); return comuneSlug ? (
                       <Link
                         to="/case-in-vendita/$comune"
-                        params={{ comune: comuneSlugFor(terr.slug)! }}
+                        params={{ comune: comuneSlug }}
                         className="group mt-7 inline-flex items-center gap-2 rounded-sm border border-primary/60 px-5 py-2.5 text-[0.7rem] uppercase tracking-[0.22em] text-primary transition hover:bg-primary hover:text-primary-foreground"
                       >
                         {t("terr.borghi.cta")} {terr.name}
@@ -231,7 +239,7 @@ function TerritoriPage() {
                         {t("terr.borghi.cta")} {terr.name}
                         <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
                       </Link>
-                    )}
+                    ); })()}
                   </div>
                 </article>
               </div>

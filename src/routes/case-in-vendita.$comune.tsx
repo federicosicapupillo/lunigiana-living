@@ -21,6 +21,7 @@ import { localizePropertyDynamic } from "@/lib/i18n/property-localize";
 import { siteUrl } from "@/lib/site-url";
 import { propertyPath } from "@/lib/property-url";
 import { collectionPageGraph } from "@/lib/structured-data";
+import { PropertySearchAnswers } from "@/components/property-search-answers";
 
 export const Route = createFileRoute("/case-in-vendita/$comune")({
   loader: async ({ params }) => {
@@ -83,8 +84,7 @@ export const Route = createFileRoute("/case-in-vendita/$comune")({
     }
     const url = siteUrl(`/case-in-vendita/${comune.slug}`);
     const prep = comunePreposition(comune.fullName);
-    const title = `Case in vendita ${prep} ${comune.fullName} | Furia Immobiliare`;
-    const description = `Scopri case, appartamenti e immobili di carattere ${prep} ${comune.fullName} con Furia Immobiliare. Ti guidiamo nella scelta della casa giusta in Lunigiana.`;
+    const { metaTitle: title, metaDescription: description } = localizeComuneSeo(comune, "it");
     const items = loaderData?.properties ?? [];
     // L'ItemList descrive esclusivamente le card effettivamente visibili:
     // quando il comune non ha immobili, sono le alternative dei comuni vicini
@@ -117,6 +117,7 @@ export const Route = createFileRoute("/case-in-vendita/$comune")({
         { property: "og:description", content: description },
         { property: "og:url", content: url },
         { property: "og:type", content: "website" },
+        { name: "twitter:card", content: "summary_large_image" },
       ],
       links: [{ rel: "canonical", href: url }],
       scripts: [{ type: "application/ld+json", children: JSON.stringify(ld) }],
@@ -368,6 +369,8 @@ function ComuneSeoPage() {
           )}
         </div>
       </section>
+
+      {comune.slug === "pontremoli" && <PropertySearchAnswers area="pontremoli" />}
 
       {/* LONGFORM EDITORIALE (1B) */}
       {longform && longform.sections.some((s) => s.id !== "types") && (
