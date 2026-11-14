@@ -522,8 +522,8 @@ const it: Dict = {
  "detail.summaryContractRent": "Affitto",
 
   // SEO meta
-  "seo.home.title": "Agenzia immobiliare a Pontremoli e in Lunigiana | Furia Immobiliare",
-  "seo.home.desc": "Agenzia immobiliare a Pontremoli. Vendita e affitto di case, ville e immobili in Lunigiana.",
+  "seo.home.title": "Furia Immobiliare | Agenzia immobiliare a Pontremoli",
+  "seo.home.desc": "Furia Immobiliare, agenzia immobiliare a Pontremoli: case in vendita e in affitto in Lunigiana. Consulta gli annunci e contattaci per vendere o cercare casa.",
   "seo.chi.title": "Chi siamo — Furia Immobiliare, Pontremoli",
   "seo.chi.desc": "Dietro Furia Immobiliare c'è Elena: un volto, una voce e una presenza costante per chi sceglie casa in Lunigiana.",
   "seo.servizi.title": "Servizi — Furia Immobiliare in Lunigiana",
@@ -1520,8 +1520,8 @@ const en: Dict = {
  "detail.summaryContractRent": "Rent",
 
   // SEO meta
-  "seo.home.title": "Furia Immobiliare — Homes with character in Lunigiana",
-  "seo.home.desc": "Real estate agency in Pontremoli. Sales and rentals of houses, villas and properties in Lunigiana.",
+  "seo.home.title": "Furia Immobiliare | Real estate agency in Pontremoli",
+  "seo.home.desc": "Furia Immobiliare, real estate agency in Pontremoli: homes for sale and rent in Lunigiana. Browse our listings and contact us to sell or find your home.",
   "seo.chi.title": "About us — Furia Immobiliare, Pontremoli",
   "seo.chi.desc": "Behind Furia Immobiliare is Elena: a face, a voice and a constant presence for those choosing a home in Lunigiana.",
   "seo.servizi.title": "Services — Furia Immobiliare in Lunigiana",

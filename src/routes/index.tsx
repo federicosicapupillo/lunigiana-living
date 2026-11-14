@@ -24,6 +24,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useLanguage, useT } from "@/lib/i18n/LanguageContext";
 import { useLocalizedHead } from "@/hooks/use-localized-head";
+import { translate } from "@/lib/i18n/translations";
 import { localizePropertyDynamic } from "@/lib/i18n/property-localize";
 import { siteUrl } from "@/lib/site-url";
 import { homeGraph } from "@/lib/structured-data";
@@ -42,9 +43,8 @@ const AGENCY_FACTS = {
   googleReviewsUrl: "https://share.google/XuLvMM0CG6tmjlwpO",
 };
 
-const HOME_TITLE = "Agenzia immobiliare a Pontremoli e in Lunigiana | Furia Immobiliare";
-const HOME_DESCRIPTION =
-  "Agenzia immobiliare a Pontremoli. Vendita e affitto di case, ville e immobili in Lunigiana: Pontremoli, Villafranca, Filattiera, Mulazzo, Bagnone, Zeri.";
+const HOME_TITLE = translate("seo.home.title", "it");
+const HOME_DESCRIPTION = translate("seo.home.desc", "it");
 
 /** Unico blocco JSON-LD della home: RealEstateAgent + WebSite + WebPage. */
 const HOME_JSONLD = homeGraph(HOME_TITLE, HOME_DESCRIPTION);
@@ -75,7 +75,11 @@ export const Route = createFileRoute("/")({
       { title: HOME_TITLE },
       { name: "description", content: HOME_DESCRIPTION },
       { property: "og:title", content: HOME_TITLE },
-      { property: "og:description", content: "Trova il tuo posto in Lunigiana. Immobili scelti per chi cerca autenticità, panorama e qualità del vivere." },
+      { property: "og:description", content: HOME_DESCRIPTION },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+      { name: "twitter:title", content: HOME_TITLE },
+      { name: "twitter:description", content: HOME_DESCRIPTION },
       { property: "og:url", content: siteUrl("/") },
     ],
     links: [
