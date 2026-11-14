@@ -68,6 +68,30 @@ export type Database = {
         }
         Relationships: []
       }
+      google_rank_snapshots: {
+        Row: {
+          created_at: string
+          id: string
+          period_end: string
+          report: Json
+          site_url: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          period_end: string
+          report: Json
+          site_url: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          period_end?: string
+          report?: Json
+          site_url?: string
+        }
+        Relationships: []
+      }
       idealista_publish_logs: {
         Row: {
           created_at: string

@@ -1,5 +1,7 @@
 # SEO, AEO e GEO
-- [ ] Monitoraggio settimanale delle quattro ricerche Google: preparare storico e confronto in area riservata; attivazione bloccata perché gli strumenti di pianificazione gestita non sono disponibili in questa sessione, anche dopo il ripristino dell’autenticazione.
+- [x] Preparare storico privato e confronto delle quattro ricerche Google; raccolta reale verificata e richieste anonime respinte.
+- [ ] Attivare pianificazione settimanale: strumenti gestiti non disponibili nella sessione, anche dopo il ripristino dell’autenticazione; callback ancora da pubblicare con autorizzazione.
+- [ ] Verificare lo storico nell’area riservata con una sessione amministratore: accesso di prova non disponibile per l’account richiedente.
 - [x] Rafforzare Territori con guide locali e collegamenti stradali e ferroviari documentati; verificare tempi, fonti e pagina bilingue senza pubblicare.
 - [x] Aggiornare titoli e descrizioni delle pagine Lunigiana e Pontremoli e mostrare una selezione di annunci reali in vendita.
 - [x] Verificare selezione, foto e testi nelle due lingue senza pubblicare.

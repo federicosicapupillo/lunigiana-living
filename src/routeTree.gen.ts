@@ -54,10 +54,12 @@ import { Route as ImmobiliIdRouteImport } from './routes/immobili.$id'
 import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 import { Route as AdminAdminIndexRouteImport } from './routes/_admin.admin.index'
 import { Route as AdminAdminDatiLiveRouteImport } from './routes/_admin.admin.dati-live'
+import { Route as AdminAdminGoogleRankingRouteImport } from './routes/_admin.admin.google-ranking'
 import { Route as AdminAdminIdealistaRouteImport } from './routes/_admin.admin.idealista'
 import { Route as AdminAdminImpostazioniRouteImport } from './routes/_admin.admin.impostazioni'
 import { Route as AdminAdminRichiesteRouteImport } from './routes/_admin.admin.richieste'
 import { Route as AdminAdminSeoAiBenchmarkRouteImport } from './routes/_admin.admin.seo-ai-benchmark'
+import { Route as ApiPublicGoogleRankingsWeeklyRouteImport } from './routes/api/public/google-rankings-weekly'
 import { Route as ApiPublicJarvisFuriaKpiRouteImport } from './routes/api/public/jarvis-furia-kpi'
 import { Route as ApiPublicJarvisLeadStatoRouteImport } from './routes/api/public/jarvis-lead-stato'
 import { Route as ApiPublicJarvisNotifyRouteImport } from './routes/api/public/jarvis-notify'
@@ -301,6 +303,11 @@ const AdminAdminDatiLiveRoute = AdminAdminDatiLiveRouteImport.update({
   path: '/dati-live',
   getParentRoute: () => AdminAdminRoute,
 } as any)
+const AdminAdminGoogleRankingRoute = AdminAdminGoogleRankingRouteImport.update({
+  id: '/google-ranking',
+  path: '/google-ranking',
+  getParentRoute: () => AdminAdminRoute,
+} as any)
 const AdminAdminIdealistaRoute = AdminAdminIdealistaRouteImport.update({
   id: '/idealista',
   path: '/idealista',
@@ -321,6 +328,12 @@ const AdminAdminSeoAiBenchmarkRoute =
     id: '/seo-ai-benchmark',
     path: '/seo-ai-benchmark',
     getParentRoute: () => AdminAdminRoute,
+  } as any)
+const ApiPublicGoogleRankingsWeeklyRoute =
+  ApiPublicGoogleRankingsWeeklyRouteImport.update({
+    id: '/api/public/google-rankings-weekly',
+    path: '/api/public/google-rankings-weekly',
+    getParentRoute: () => rootRouteImport,
   } as any)
 const ApiPublicJarvisFuriaKpiRoute = ApiPublicJarvisFuriaKpiRouteImport.update({
   id: '/api/public/jarvis-furia-kpi',
@@ -421,10 +434,12 @@ export interface FileRoutesByFullPath {
   '/immobili/': typeof ImmobiliIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/admin/dati-live': typeof AdminAdminDatiLiveRoute
+  '/admin/google-ranking': typeof AdminAdminGoogleRankingRoute
   '/admin/idealista': typeof AdminAdminIdealistaRoute
   '/admin/impostazioni': typeof AdminAdminImpostazioniRoute
   '/admin/richieste': typeof AdminAdminRichiesteRoute
   '/admin/seo-ai-benchmark': typeof AdminAdminSeoAiBenchmarkRoute
+  '/api/public/google-rankings-weekly': typeof ApiPublicGoogleRankingsWeeklyRoute
   '/api/public/jarvis-furia-kpi': typeof ApiPublicJarvisFuriaKpiRoute
   '/api/public/jarvis-lead-stato': typeof ApiPublicJarvisLeadStatoRoute
   '/api/public/jarvis-notify': typeof ApiPublicJarvisNotifyRoute
@@ -479,10 +494,12 @@ export interface FileRoutesByTo {
   '/immobili': typeof ImmobiliIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/admin/dati-live': typeof AdminAdminDatiLiveRoute
+  '/admin/google-ranking': typeof AdminAdminGoogleRankingRoute
   '/admin/idealista': typeof AdminAdminIdealistaRoute
   '/admin/impostazioni': typeof AdminAdminImpostazioniRoute
   '/admin/richieste': typeof AdminAdminRichiesteRoute
   '/admin/seo-ai-benchmark': typeof AdminAdminSeoAiBenchmarkRoute
+  '/api/public/google-rankings-weekly': typeof ApiPublicGoogleRankingsWeeklyRoute
   '/api/public/jarvis-furia-kpi': typeof ApiPublicJarvisFuriaKpiRoute
   '/api/public/jarvis-lead-stato': typeof ApiPublicJarvisLeadStatoRoute
   '/api/public/jarvis-notify': typeof ApiPublicJarvisNotifyRoute
@@ -541,10 +558,12 @@ export interface FileRoutesById {
   '/immobili/': typeof ImmobiliIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/_admin/admin/dati-live': typeof AdminAdminDatiLiveRoute
+  '/_admin/admin/google-ranking': typeof AdminAdminGoogleRankingRoute
   '/_admin/admin/idealista': typeof AdminAdminIdealistaRoute
   '/_admin/admin/impostazioni': typeof AdminAdminImpostazioniRoute
   '/_admin/admin/richieste': typeof AdminAdminRichiesteRoute
   '/_admin/admin/seo-ai-benchmark': typeof AdminAdminSeoAiBenchmarkRoute
+  '/api/public/google-rankings-weekly': typeof ApiPublicGoogleRankingsWeeklyRoute
   '/api/public/jarvis-furia-kpi': typeof ApiPublicJarvisFuriaKpiRoute
   '/api/public/jarvis-lead-stato': typeof ApiPublicJarvisLeadStatoRoute
   '/api/public/jarvis-notify': typeof ApiPublicJarvisNotifyRoute
@@ -603,10 +622,12 @@ export interface FileRouteTypes {
     | '/immobili/'
     | '/.lovable/oauth/consent'
     | '/admin/dati-live'
+    | '/admin/google-ranking'
     | '/admin/idealista'
     | '/admin/impostazioni'
     | '/admin/richieste'
     | '/admin/seo-ai-benchmark'
+    | '/api/public/google-rankings-weekly'
     | '/api/public/jarvis-furia-kpi'
     | '/api/public/jarvis-lead-stato'
     | '/api/public/jarvis-notify'
@@ -661,10 +682,12 @@ export interface FileRouteTypes {
     | '/immobili'
     | '/.lovable/oauth/consent'
     | '/admin/dati-live'
+    | '/admin/google-ranking'
     | '/admin/idealista'
     | '/admin/impostazioni'
     | '/admin/richieste'
     | '/admin/seo-ai-benchmark'
+    | '/api/public/google-rankings-weekly'
     | '/api/public/jarvis-furia-kpi'
     | '/api/public/jarvis-lead-stato'
     | '/api/public/jarvis-notify'
@@ -722,10 +745,12 @@ export interface FileRouteTypes {
     | '/immobili/'
     | '/.lovable/oauth/consent'
     | '/_admin/admin/dati-live'
+    | '/_admin/admin/google-ranking'
     | '/_admin/admin/idealista'
     | '/_admin/admin/impostazioni'
     | '/_admin/admin/richieste'
     | '/_admin/admin/seo-ai-benchmark'
+    | '/api/public/google-rankings-weekly'
     | '/api/public/jarvis-furia-kpi'
     | '/api/public/jarvis-lead-stato'
     | '/api/public/jarvis-notify'
@@ -780,6 +805,7 @@ export interface RootRouteChildren {
   CaseInVenditaLunigianaIndexRoute: typeof CaseInVenditaLunigianaIndexRoute
   CaseInVenditaIndexRoute: typeof CaseInVenditaIndexRoute
   DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
+  ApiPublicGoogleRankingsWeeklyRoute: typeof ApiPublicGoogleRankingsWeeklyRoute
   ApiPublicJarvisFuriaKpiRoute: typeof ApiPublicJarvisFuriaKpiRoute
   ApiPublicJarvisLeadStatoRoute: typeof ApiPublicJarvisLeadStatoRoute
   ApiPublicJarvisNotifyRoute: typeof ApiPublicJarvisNotifyRoute
@@ -1104,6 +1130,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAdminDatiLiveRouteImport
       parentRoute: typeof AdminAdminRoute
     }
+    '/_admin/admin/google-ranking': {
+      id: '/_admin/admin/google-ranking'
+      path: '/google-ranking'
+      fullPath: '/admin/google-ranking'
+      preLoaderRoute: typeof AdminAdminGoogleRankingRouteImport
+      parentRoute: typeof AdminAdminRoute
+    }
     '/_admin/admin/idealista': {
       id: '/_admin/admin/idealista'
       path: '/idealista'
@@ -1131,6 +1164,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/seo-ai-benchmark'
       preLoaderRoute: typeof AdminAdminSeoAiBenchmarkRouteImport
       parentRoute: typeof AdminAdminRoute
+    }
+    '/api/public/google-rankings-weekly': {
+      id: '/api/public/google-rankings-weekly'
+      path: '/api/public/google-rankings-weekly'
+      fullPath: '/api/public/google-rankings-weekly'
+      preLoaderRoute: typeof ApiPublicGoogleRankingsWeeklyRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/api/public/jarvis-furia-kpi': {
       id: '/api/public/jarvis-furia-kpi'
@@ -1218,6 +1258,7 @@ const AdminAdminImmobiliIdRouteWithChildren =
 
 interface AdminAdminRouteChildren {
   AdminAdminDatiLiveRoute: typeof AdminAdminDatiLiveRoute
+  AdminAdminGoogleRankingRoute: typeof AdminAdminGoogleRankingRoute
   AdminAdminIdealistaRoute: typeof AdminAdminIdealistaRoute
   AdminAdminImpostazioniRoute: typeof AdminAdminImpostazioniRoute
   AdminAdminRichiesteRoute: typeof AdminAdminRichiesteRoute
@@ -1231,6 +1272,7 @@ interface AdminAdminRouteChildren {
 
 const AdminAdminRouteChildren: AdminAdminRouteChildren = {
   AdminAdminDatiLiveRoute: AdminAdminDatiLiveRoute,
+  AdminAdminGoogleRankingRoute: AdminAdminGoogleRankingRoute,
   AdminAdminIdealistaRoute: AdminAdminIdealistaRoute,
   AdminAdminImpostazioniRoute: AdminAdminImpostazioniRoute,
   AdminAdminRichiesteRoute: AdminAdminRichiesteRoute,
@@ -1313,6 +1355,7 @@ const rootRouteChildren: RootRouteChildren = {
   CaseInVenditaLunigianaIndexRoute: CaseInVenditaLunigianaIndexRoute,
   CaseInVenditaIndexRoute: CaseInVenditaIndexRoute,
   DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
+  ApiPublicGoogleRankingsWeeklyRoute: ApiPublicGoogleRankingsWeeklyRoute,
   ApiPublicJarvisFuriaKpiRoute: ApiPublicJarvisFuriaKpiRoute,
   ApiPublicJarvisLeadStatoRoute: ApiPublicJarvisLeadStatoRoute,
   ApiPublicJarvisNotifyRoute: ApiPublicJarvisNotifyRoute,

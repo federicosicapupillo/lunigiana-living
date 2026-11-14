@@ -102,6 +102,7 @@ function AdminLayout() {
               >
                 <Settings size={15} /> Impostazioni
               </Link>
+              <Link to="/admin/google-ranking" className="text-muted-foreground hover:text-ink" activeProps={{ className: 'text-ink' }}>Google</Link>
             </nav>
           </div>
           <div className="flex items-center gap-2 text-sm sm:gap-4">
