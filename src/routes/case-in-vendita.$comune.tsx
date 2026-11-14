@@ -22,6 +22,8 @@ import { siteUrl } from "@/lib/site-url";
 import { propertyPath } from "@/lib/property-url";
 import { collectionPageGraph } from "@/lib/structured-data";
 import { PropertySearchAnswers } from "@/components/property-search-answers";
+import { SeoFeaturedProperties } from "@/components/seo-featured-properties";
+import { selectSeoFeaturedProperties } from "@/lib/seo-featured-properties";
 
 export const Route = createFileRoute("/case-in-vendita/$comune")({
   loader: async ({ params }) => {
@@ -207,6 +209,8 @@ function ComuneSeoPage() {
           </p>
         </div>
       </section>
+
+      {comune.slug === "pontremoli" && <SeoFeaturedProperties properties={selectSeoFeaturedProperties(properties, "pontremoli")} area="pontremoli" />}
 
       {/* EDITORIAL */}
       <section className="bg-[var(--warm-ivory)] py-20">

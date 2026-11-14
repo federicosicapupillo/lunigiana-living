@@ -7,22 +7,29 @@ import { collectionPageGraph } from "@/lib/structured-data";
 import { useLanguage, useT } from "@/lib/i18n/LanguageContext";
 import { useDocHead } from "@/hooks/use-localized-head";
 import { PropertySearchAnswers } from "@/components/property-search-answers";
+import { SeoFeaturedProperties } from "@/components/seo-featured-properties";
+import { selectSeoFeaturedProperties } from "@/lib/seo-featured-properties";
+import { listPublishedPropertiesSummary } from "@/lib/public-properties.functions";
+import { translate } from "@/lib/i18n/translations";
+import { propertyPath } from "@/lib/property-url";
 
 export const Route = createFileRoute("/case-in-vendita-lunigiana/")({
-  head: () => {
+  loader: async () => {
+    const { properties } = await listPublishedPropertiesSummary();
+    return { featured: selectSeoFeaturedProperties(properties, "lunigiana") };
+  },
+  head: ({ loaderData }) => {
     const url = siteUrl("/case-in-vendita-lunigiana");
-    const title = "Case in vendita in Lunigiana per tipologia | Furia Immobiliare";
-    const description =
-      "Case in vendita in Lunigiana: scegli tra appartamenti, case indipendenti, ville, rustici e casali. Esplora gli annunci per tipologia o comune con Furia Immobiliare.";
-    // Hub: elenca landing per tipologia, non immobili → nessun ItemList.
+    const title = translate("seoTipologie.meta.title", "it");
+    const description = translate("seoTipologie.meta.desc", "it");
     const ld = collectionPageGraph({
       canonical: url,
       name: title,
       description,
-      items: [],
+      items: (loaderData?.featured ?? []).map((p) => ({ url: siteUrl(propertyPath(p)), name: p.title })),
       breadcrumb: [
         { name: "Home", item: siteUrl("/") },
-        { name: "Case in vendita in Lunigiana per tipologia", item: url },
+        { name: "Case in vendita in Lunigiana", item: url },
       ],
     });
     return {
@@ -41,10 +48,13 @@ export const Route = createFileRoute("/case-in-vendita-lunigiana/")({
       ],
     };
   },
+  errorComponent: () => <div role="alert" className="container-editorial py-32 text-ink">Impossibile caricare gli annunci. Riprova tra poco.</div>,
+  notFoundComponent: () => <div className="container-editorial py-32 text-ink">Pagina non trovata.</div>,
   component: TipologieHub,
 });
 
 function TipologieHub() {
+  const { featured } = Route.useLoaderData();
   const { language } = useLanguage();
   const t = useT();
   useDocHead(t("seoTipologie.meta.title"), t("seoTipologie.meta.desc"));
@@ -90,6 +100,8 @@ function TipologieHub() {
           </p>
         </div>
       </section>
+
+      <SeoFeaturedProperties properties={featured} area="lunigiana" />
 
       <section className="bg-[var(--warm-ivory)] py-20">
         <div className="container-editorial">

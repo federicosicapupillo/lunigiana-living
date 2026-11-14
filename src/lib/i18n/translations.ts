@@ -736,8 +736,8 @@ const it: Dict = {
   "seoTipologie.hub.cta.title": "Non sai da dove partire?",
   "seoTipologie.hub.cta.body": "Scrivici cosa stai cercando: tipologia, zona, budget. Ti aiutiamo a capire quali soluzioni in Lunigiana sono davvero coerenti. Lavoriamo spesso con chi compra dall'estero o da un'altra regione.",
   "seoTipologie.hub.cta.primary": "Raccontaci cosa cerchi",
-  "seoTipologie.meta.title": "Case in vendita in Lunigiana per tipologia | Furia Immobiliare",
-  "seoTipologie.meta.desc": "Case in vendita in Lunigiana: scegli tra appartamenti, case indipendenti, ville, rustici e casali. Esplora gli annunci per tipologia o comune con Furia Immobiliare.",
+  "seoTipologie.meta.title": "Case in vendita in Lunigiana | Furia Immobiliare",
+  "seoTipologie.meta.desc": "Scopri le case in vendita in Lunigiana di Furia Immobiliare: annunci con foto, superfici e prezzi. Esplora gli immobili per comune o tipologia e richiedi una visita.",
 
   // Immobili — "Cerca per tipologia" block
   "immobili.byType.eyebrow": "Cerca per tipologia",
@@ -1717,8 +1717,8 @@ const en: Dict = {
   "seoTipologie.hub.cta.title": "Not sure where to start?",
   "seoTipologie.hub.cta.body": "Tell us what you are looking for: type, area, budget. We will help you understand which options in Lunigiana truly make sense. We often work with people buying from abroad or from another region.",
   "seoTipologie.hub.cta.primary": "Tell us what you are looking for",
-  "seoTipologie.meta.title": "Homes for sale in Lunigiana — by type | Furia Immobiliare",
-  "seoTipologie.meta.desc": "Search homes for sale in Lunigiana by type: rustic houses and country homes, independent houses, apartments, villas, homes with garden, affordable homes, second homes.",
+  "seoTipologie.meta.title": "Homes for sale in Lunigiana | Furia Immobiliare",
+  "seoTipologie.meta.desc": "Explore Furia Immobiliare's homes for sale in Lunigiana with photos, floor areas and asking prices. Browse by municipality or property type and request a viewing.",
 
   // Immobili — "Search by type" block
   "immobili.byType.eyebrow": "Search by type",

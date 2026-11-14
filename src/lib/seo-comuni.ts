@@ -67,9 +67,9 @@ export const COMUNE_SEO: ComuneSeo[] = [
         "Families looking for schools, healthcare and a real, active community.",
       ],
       blurb: "The main town of Lunigiana, with services and a living historic centre.",
-      metaTitle: "Homes for sale in Pontremoli | Furia Immobiliare",
+      metaTitle: "Houses and apartments for sale in Pontremoli | Furia Immobiliare",
       metaDescription:
-        "Homes for sale in Pontremoli: explore published listings, photos, floor areas and asking prices. Local guidance in Lunigiana from Furia Immobiliare.",
+        "Browse houses and apartments for sale in Pontremoli. Compare real listings, photos, floor areas and asking prices, and contact Furia Immobiliare for a viewing.",
     },
   },
   {
@@ -354,9 +354,9 @@ export function localizeComuneSeo(c: ComuneSeo, lang: "it" | "en"): ComuneSeoLoc
     paragraphs: c.paragraphs,
     audience: c.audience,
     blurb: c.blurb,
-    metaTitle: `Case in vendita ${comunePreposition(c.fullName)} ${c.fullName} | Furia Immobiliare`,
+    metaTitle: c.slug === "pontremoli" ? "Case e appartamenti in vendita a Pontremoli | Furia Immobiliare" : `Case in vendita ${comunePreposition(c.fullName)} ${c.fullName} | Furia Immobiliare`,
     metaDescription: c.slug === "pontremoli"
-      ? "Case in vendita a Pontremoli: consulta annunci pubblicati, foto, superfici e prezzi richiesti. Furia Immobiliare ti accompagna nella scelta in Lunigiana."
+      ? "Cerchi casa a Pontremoli? Confronta case e appartamenti in vendita con foto, superfici e prezzi richiesti. Contatta Furia Immobiliare per una visita."
       : `Scopri case, appartamenti e immobili di carattere ${comunePreposition(c.fullName)} ${c.fullName} con Furia Immobiliare. Ti guidiamo nella scelta della casa giusta in Lunigiana.`,
   };
 }

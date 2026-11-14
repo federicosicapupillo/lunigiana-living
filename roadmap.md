@@ -1,4 +1,6 @@
 # SEO, AEO e GEO
+- [x] Aggiornare titoli e descrizioni delle pagine Lunigiana e Pontremoli e mostrare una selezione di annunci reali in vendita.
+- [x] Verificare selezione, foto e testi nelle due lingue senza pubblicare.
 - [x] Migliorare titoli, introduzioni e risposte su Lunigiana e Pontremoli.
 - [x] Chiarire geografia e area servita nella pagina Territori.
 - [x] Verificare identità e aggiornare indice pubblico per assistenti.
