@@ -16,6 +16,8 @@ import { siteUrl } from "@/lib/site-url";
 import { institutionalGraph } from "@/lib/structured-data";
 import { StaticImage, staticSet } from "@/components/static-image";
 import { preloadImage } from "@/lib/static-image-set";
+import { TerritoryConnections } from "@/components/territory-connections";
+import { translate } from "@/lib/i18n/translations";
 
 const imageBySlug: Record<string, string> = {
   pontremoli: pontremoliAsset.url,
@@ -60,19 +62,20 @@ function comuneSlugFor(territorySlug: string): string | null {
 export const Route = createFileRoute("/territori")({
   head: () => {
     const url = siteUrl("/territori");
+    const title = translate("seo.territori.title", "it");
+    const description = translate("seo.territori.desc", "it");
     const ld = institutionalGraph({
       canonical: url,
       type: "WebPage",
-      name: "Dove si trova la Lunigiana: comuni e zone | Furia Immobiliare",
-      description:
-        "Dove si trova la Lunigiana, tra Toscana e Liguria? Scopri l'area servita da Furia Immobiliare: Pontremoli, Villafranca, Filattiera, Mulazzo, Bagnone, Zeri e Aulla.",
+      name: title,
+      description,
     });
     return {
     meta: [
-      { title: "Dove si trova la Lunigiana: comuni e zone | Furia Immobiliare" },
-      { name: "description", content: "Dove si trova la Lunigiana, tra Toscana e Liguria? Scopri l'area servita da Furia Immobiliare: Pontremoli, Villafranca, Filattiera, Mulazzo, Bagnone, Zeri e Aulla." },
-      { property: "og:title", content: "Dove si trova la Lunigiana: comuni e zone | Furia Immobiliare" },
-      { property: "og:description", content: "Dove si trova la Lunigiana, tra Toscana e Liguria? Scopri l'area servita da Furia Immobiliare: Pontremoli, Villafranca, Filattiera, Mulazzo, Bagnone, Zeri e Aulla." },
+      { title },
+      { name: "description", content: description },
+      { property: "og:title", content: title },
+      { property: "og:description", content: description },
       { property: "og:url", content: url },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -142,6 +145,8 @@ function TerritoriPage() {
           </div>
         </div>
       </section>
+
+      <TerritoryConnections />
 
       <section className="bg-warm-sand">
         <div className="container-editorial py-16 md:py-20">
