@@ -1,16 +1,17 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ChevronRight, MapPin } from "lucide-react";
 import { siteUrl } from "@/lib/site-url";
+import { bonfireDateLabel, pontremoliEventCalendar as calendar } from "@/lib/pontremoli-event-calendar";
 
 const PAGE_URL = siteUrl("/eventi-pontremoli");
-const TITLE = "Eventi a Pontremoli: falò, Premio Bancarella, Medievalis | Furia Immobiliare";
+const TITLE = `Eventi a Pontremoli ${calendar.year}: falò, Bancarella e Medievalis | Furia Immobiliare`;
 const DESC =
-  "Calendario degli eventi tradizionali di Pontremoli: la Disfida dei falò di gennaio, il Premio Bancarella di luglio e Medievalis ad agosto. Date e fonti verificate.";
+  `Eventi a Pontremoli ${calendar.year}: date tradizionali dei falò di gennaio, Premio Bancarella e Medievalis. Programmi e date dell'edizione ancora da confermare, con fonti.`;
 
 const MILLS = [
   {
     name: "Disfida dei falò",
-    place: "Gennaio · 13, 17 e 31 gennaio",
+    place: `Date tradizionali · ${bonfireDateLabel} · programma da confermare`,
     text: "L'antica rivalità tra le parrocchie di San Nicolò e San Geminiano si accende ogni gennaio. Il 17 gennaio brucia il falò di San Nicolò sulle sponde del Magra; il 31 gennaio, festa del patrono, quello di San Geminiano sotto il ponte della Cresa, accanto al torrente Verde. Il 13 gennaio si accende il falò più piccolo di Sant'Ilario, accanto all'omonima chiesa. I gruppi lavorano per mesi a raccogliere le fascine e migliaia di persone arrivano in città.",
     sources: [
       { label: "Visit Pontremoli", href: "https://visitpontremoli.it/vivi-pontremoli/manifestazioni/" },
@@ -19,14 +20,14 @@ const MILLS = [
   },
   {
     name: "Premio Bancarella",
-    place: "Luglio · edizione 2026: 26 luglio",
+    place: `Tradizionalmente a luglio · date ${calendar.year} non ancora annunciate nelle fonti consultate`,
     text: "Premio letterario nato nel 1953 a Mulazzo per celebrare i librai ambulanti della Lunigiana, che giravano l'Italia vendendo libri. Si svolge ogni anno a Pontremoli: il centro storico, all'ombra del Campanone, si anima con incontri tra autori, librai e lettori che vanno oltre la serata finale.",
-    sources: [{ label: "Visit Pontremoli", href: "https://visitpontremoli.it/event/premio-bancarella-pontremoli/" }],
+    sources: [{ label: "Fondazione Città del Libro", href: "https://www.fondazionecittadellibro.it/" }],
   },
   {
     name: "Medievalis",
-    place: "Agosto · edizione 2026: 19–23 agosto",
-    text: "Rievocazione storica che ricorda il diploma di Libero Comune concesso a Pontremoli da Federico II nel 1226. Per cinque giorni le auto lasciano il centro storico a figuranti, mercanti, carrozze e cavalieri. La organizza la Compagnia del Piagnaro.",
+    place: `Tradizionalmente ad agosto · date ${calendar.year} non ancora annunciate nelle fonti consultate`,
+    text: "Rievocazione storica che ricorda il diploma di Libero Comune concesso a Pontremoli da Federico II nel 1226. Il centro storico ospita figuranti, mercanti, carrozze e cavalieri. La organizza la Compagnia del Piagnaro. Durata, programma e limitazioni al traffico dell'edizione 2027 sono da verificare con gli organizzatori.",
     sources: [{ label: "Medievalis", href: "https://www.medievalis.eu/" }],
   },
 ];
@@ -37,8 +38,12 @@ const FAQ = [
     a: "I più conosciuti sono la Disfida dei falò di gennaio, che richiama migliaia di persone, e il Premio Bancarella, premio letterario nazionale assegnato ogni estate in città.",
   },
   {
-    q: "Quando si fanno i falò di Pontremoli?",
-    a: "Il 17 gennaio il falò di San Nicolò, il 31 gennaio quello di San Geminiano; il 13 gennaio il falò di Sant'Ilario. Le date sono fisse ogni anno.",
+    q: "Quando si fanno i falò di Pontremoli nel 2027?",
+    a: `Le date tradizionali sono il ${bonfireDateLabel}: Sant'Ilario il 13, San Nicolò il 17 e San Geminiano il 31. Sono ricorrenze annuali, non un programma 2027 confermato: verifica orari ed eventuali variazioni con gli organizzatori.`,
+  },
+  {
+    q: "Sono già disponibili le date 2027 del Premio Bancarella e di Medievalis?",
+    a: "Al 16 novembre 2026, le fonti ufficiali consultate non riportano le date delle edizioni 2027. Il Bancarella si svolge tradizionalmente a luglio e Medievalis ad agosto: questi mesi non costituiscono conferma del calendario 2027.",
   },
   {
     q: "Conviene comprare casa vicino al centro storico per vivere gli eventi?",
@@ -64,13 +69,13 @@ export const Route = createFileRoute("/eventi-pontremoli")({
         children: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "Article",
-          headline: "Eventi a Pontremoli durante l’anno",
+          headline: `Eventi a Pontremoli ${calendar.year}`,
           description: DESC,
           inLanguage: "it-IT",
           url: PAGE_URL,
-          dateModified: "2026-11-16",
+          dateModified: calendar.checkedOn,
           author: { "@type": "Organization", name: "Furia Immobiliare" },
-          about: MILLS.map((m) => ({ "@type": "Place", name: m.name, description: m.place })),
+          about: MILLS.map((m) => ({ "@type": "Thing", name: m.name, description: m.place })),
           citation: MILLS.flatMap((m) => m.sources.map((s) => s.href)),
         }),
       },
@@ -108,10 +113,10 @@ function EventiPage() {
             <span className="text-xs uppercase tracking-[0.24em]">Pontremoli</span>
           </div>
           <h1 className="mt-3 max-w-3xl font-serif text-4xl leading-tight text-ink md:text-6xl">
-            Eventi a Pontremoli durante l’anno
+            Eventi a Pontremoli {calendar.year}
           </h1>
           <p className="mt-7 max-w-2xl text-[1.02rem] leading-[1.8] text-[var(--ink-soft)]">
-            In breve: a gennaio la Disfida dei falò (13, 17 e 31 gennaio), a luglio il Premio Bancarella e ad agosto la rievocazione Medievalis. Tre appuntamenti che raccontano bene la vita della città, anche per chi pensa di trasferirsi qui.
+            Nel 2027 le ricorrenze tradizionali dei falò cadono il {bonfireDateLabel}. Il Premio Bancarella si tiene abitualmente a luglio e Medievalis ad agosto, ma le date delle edizioni 2027 non risultano ancora annunciate nelle fonti ufficiali consultate. Anche il programma dei falò è da confermare.
           </p>
         </div>
       </section>
@@ -135,7 +140,7 @@ function EventiPage() {
             </article>
           ))}
           <p className="text-sm text-[var(--ink-soft)]">
-            Le date delle singole edizioni possono cambiare: verifica sempre con gli organizzatori prima di andare. Informazioni controllate il 16/11/2026.
+            Calendario 2027 in attesa dei programmi ufficiali. Le date tradizionali non garantiscono lo svolgimento: verifica sempre con gli organizzatori prima di andare. Fonti consultate il 16/11/2026; le date 2026 non sono riportate come appuntamenti futuri.
           </p>
         </div>
       </section>
