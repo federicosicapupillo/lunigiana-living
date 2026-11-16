@@ -306,6 +306,43 @@ export const COMUNE_SEO: ComuneSeo[] = [
         "Homes and apartments for sale in Aulla, the connection hub of lower Lunigiana. Local guidance by Furia Immobiliare.",
     },
   },
+  {
+    slug: "licciana-nardi",
+    name: "Licciana Nardi",
+    fullName: "Licciana Nardi",
+    match: ["Licciana Nardi"],
+    subtitle:
+      "Case e immobili in vendita a Licciana Nardi, tra il borgo con il castello Malaspina e le frazioni della valle del Taverone, a pochi minuti da Aulla.",
+    paragraphs: [
+      "Licciana Nardi è un comune della Lunigiana orientale, nella valle del torrente Taverone. Il capoluogo conserva il borgo storico raccolto intorno al castello Malaspina, mentre frazioni come Terrarossa, Tavernelle e Monti offrono paesi più piccoli e tranquilli, immersi nel verde.",
+      "La vicinanza ad Aulla permette di raggiungere in breve servizi, stazione e autostrada. Qui si cercano soprattutto case di paese, rustici e abitazioni con terreno: una scelta adatta a chi vuole calma e natura senza allontanarsi troppo dai collegamenti.",
+    ],
+    audience: [
+      "Chi cerca una casa di paese o un rustico in un borgo tranquillo.",
+      "Chi vuole restare vicino ad Aulla e ai suoi collegamenti.",
+      "Chi desidera spazio esterno, terreno e natura.",
+      "Chi cerca una seconda casa nella Lunigiana orientale.",
+    ],
+    blurb: "Borgo malaspiniano e frazioni nella valle del Taverone.",
+    en: {
+      subtitle:
+        "Homes and properties for sale in Licciana Nardi, between the village around the Malaspina castle and the hamlets of the Taverone valley, a few minutes from Aulla.",
+      paragraphs: [
+        "Licciana Nardi is a municipality in eastern Lunigiana, in the valley of the Taverone stream. The main village keeps its historic core gathered around the Malaspina castle, while hamlets such as Terrarossa, Tavernelle and Monti offer smaller, quieter villages surrounded by green.",
+        "Being close to Aulla means services, the railway station and the motorway are within easy reach. Buyers here mostly look for village houses, rustic properties and homes with land: a good fit for those who want calm and nature without moving far from transport links.",
+      ],
+      audience: [
+        "Buyers looking for a village house or rustic home in a quiet hamlet.",
+        "Those who want to stay close to Aulla and its transport links.",
+        "Anyone wanting outdoor space, land and nature.",
+        "People looking for a second home in eastern Lunigiana.",
+      ],
+      blurb: "Malaspina village and hamlets in the Taverone valley.",
+      metaTitle: "Homes for sale in Licciana Nardi | Furia Immobiliare",
+      metaDescription:
+        "Village houses, rustic homes and properties for sale in Licciana Nardi, Lunigiana, near Aulla. Local guidance by Furia Immobiliare.",
+    },
+  },
 ];
 
 export function getComuneSeo(slug: string): ComuneSeo | undefined {
