@@ -26,6 +26,7 @@ import { Route as Elenco_annunciDotaspRouteImport } from './routes/elenco_annunc
 import { Route as ImmobiliRouteImport } from './routes/immobili'
 import { Route as IndexDotaspRouteImport } from './routes/index[.]asp'
 import { Route as McpRouteImport } from './routes/mcp'
+import { Route as MuliniStoriciLunigianaRouteImport } from './routes/mulini-storici-lunigiana'
 import { Route as OffMarketRouteImport } from './routes/off-market'
 import { Route as OsservatorioImmobiliareLunigianaRouteImport } from './routes/osservatorio-immobiliare-lunigiana'
 import { Route as PrezziCaseLunigianaRouteImport } from './routes/prezzi-case-lunigiana'
@@ -156,6 +157,11 @@ const IndexDotaspRoute = IndexDotaspRouteImport.update({
 const McpRoute = McpRouteImport.update({
   id: '/mcp',
   path: '/mcp',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MuliniStoriciLunigianaRoute = MuliniStoriciLunigianaRouteImport.update({
+  id: '/mulini-storici-lunigiana',
+  path: '/mulini-storici-lunigiana',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OffMarketRoute = OffMarketRouteImport.update({
@@ -407,6 +413,7 @@ export interface FileRoutesByFullPath {
   '/immobili': typeof ImmobiliRouteWithChildren
   '/index.asp': typeof IndexDotaspRoute
   '/mcp': typeof McpRoute
+  '/mulini-storici-lunigiana': typeof MuliniStoriciLunigianaRoute
   '/off-market': typeof OffMarketRoute
   '/osservatorio-immobiliare-lunigiana': typeof OsservatorioImmobiliareLunigianaRoute
   '/prezzi-case-lunigiana': typeof PrezziCaseLunigianaRoute
@@ -468,6 +475,7 @@ export interface FileRoutesByTo {
   '/elenco_annunci.asp': typeof Elenco_annunciDotaspRoute
   '/index.asp': typeof IndexDotaspRoute
   '/mcp': typeof McpRoute
+  '/mulini-storici-lunigiana': typeof MuliniStoriciLunigianaRoute
   '/off-market': typeof OffMarketRoute
   '/osservatorio-immobiliare-lunigiana': typeof OsservatorioImmobiliareLunigianaRoute
   '/prezzi-case-lunigiana': typeof PrezziCaseLunigianaRoute
@@ -531,6 +539,7 @@ export interface FileRoutesById {
   '/immobili': typeof ImmobiliRouteWithChildren
   '/index.asp': typeof IndexDotaspRoute
   '/mcp': typeof McpRoute
+  '/mulini-storici-lunigiana': typeof MuliniStoriciLunigianaRoute
   '/off-market': typeof OffMarketRoute
   '/osservatorio-immobiliare-lunigiana': typeof OsservatorioImmobiliareLunigianaRoute
   '/prezzi-case-lunigiana': typeof PrezziCaseLunigianaRoute
@@ -595,6 +604,7 @@ export interface FileRouteTypes {
     | '/immobili'
     | '/index.asp'
     | '/mcp'
+    | '/mulini-storici-lunigiana'
     | '/off-market'
     | '/osservatorio-immobiliare-lunigiana'
     | '/prezzi-case-lunigiana'
@@ -656,6 +666,7 @@ export interface FileRouteTypes {
     | '/elenco_annunci.asp'
     | '/index.asp'
     | '/mcp'
+    | '/mulini-storici-lunigiana'
     | '/off-market'
     | '/osservatorio-immobiliare-lunigiana'
     | '/prezzi-case-lunigiana'
@@ -718,6 +729,7 @@ export interface FileRouteTypes {
     | '/immobili'
     | '/index.asp'
     | '/mcp'
+    | '/mulini-storici-lunigiana'
     | '/off-market'
     | '/osservatorio-immobiliare-lunigiana'
     | '/prezzi-case-lunigiana'
@@ -782,6 +794,7 @@ export interface RootRouteChildren {
   ImmobiliRoute: typeof ImmobiliRouteWithChildren
   IndexDotaspRoute: typeof IndexDotaspRoute
   McpRoute: typeof McpRoute
+  MuliniStoriciLunigianaRoute: typeof MuliniStoriciLunigianaRoute
   OffMarketRoute: typeof OffMarketRoute
   OsservatorioImmobiliareLunigianaRoute: typeof OsservatorioImmobiliareLunigianaRoute
   PrezziCaseLunigianaRoute: typeof PrezziCaseLunigianaRoute
@@ -932,6 +945,13 @@ declare module '@tanstack/react-router' {
       path: '/mcp'
       fullPath: '/mcp'
       preLoaderRoute: typeof McpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mulini-storici-lunigiana': {
+      id: '/mulini-storici-lunigiana'
+      path: '/mulini-storici-lunigiana'
+      fullPath: '/mulini-storici-lunigiana'
+      preLoaderRoute: typeof MuliniStoriciLunigianaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/off-market': {
@@ -1331,6 +1351,7 @@ const rootRouteChildren: RootRouteChildren = {
   ImmobiliRoute: ImmobiliRouteWithChildren,
   IndexDotaspRoute: IndexDotaspRoute,
   McpRoute: McpRoute,
+  MuliniStoriciLunigianaRoute: MuliniStoriciLunigianaRoute,
   OffMarketRoute: OffMarketRoute,
   OsservatorioImmobiliareLunigianaRoute: OsservatorioImmobiliareLunigianaRoute,
   PrezziCaseLunigianaRoute: PrezziCaseLunigianaRoute,

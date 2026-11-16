@@ -11,6 +11,7 @@ const guides = [
   { to: "/vivere-in-lunigiana", title: "Vivere in Lunigiana", body: { it: "Servizi, comuni e aspetti da valutare prima di trasferirsi.", en: "Services, towns and practical considerations before moving." } },
   { to: "/vivere-a-pontremoli", title: "Vivere a Pontremoli", body: { it: "Centro storico, zone residenziali e frazioni a confronto.", en: "Compare the historic centre, residential areas and outlying villages." } },
   { to: "/dove-comprare-casa-lunigiana", title: "Dove comprare casa in Lunigiana", body: { it: "Confronta le zone in base alle tue esigenze e alla ricerca della casa.", en: "Compare areas against your needs and property search." } },
+  { to: "/mulini-storici-lunigiana", title: "Mulini storici della Lunigiana", body: { it: "Dove vedere i mulini ad acqua di Arlia e Filattiera, con fonti verificate.", en: "Where to see the water mills of Arlia and Filattiera, with sources." } },
 ] as const;
 
 export function TerritoryConnections() {
@@ -48,7 +49,7 @@ export function TerritoryConnections() {
         <div className="container-editorial">
           <span className="eyebrow">{en ? "Local guides · Italian" : "Guide locali"}</span>
           <h2 id="territory-guides" className="mt-3 font-serif text-3xl text-ink md:text-4xl">{en ? "Choose where to live in Lunigiana" : "Dove vivere e cercare casa in Lunigiana"}</h2>
-          <div className="mt-8 grid gap-8 md:grid-cols-3">
+          <div className="mt-8 grid gap-8 md:grid-cols-2">
             {guides.map((guide) => <div key={guide.to} className="border-t border-warm-border pt-5">
               <h3 className="font-serif text-2xl text-ink"><Link to={guide.to} className="hover:text-primary">{guide.title}</Link></h3>
               <p className="mt-3 leading-relaxed text-foreground/85">{guide.body[language]}</p>
