@@ -42,6 +42,7 @@ export const Route = createFileRoute("/sitemap.xml")({
 
           "/vivere-in-lunigiana",
           "/mulini-storici-lunigiana",
+          "/eventi-pontremoli",
           "/privacy",
         ];
         const entries: { path: string; lastmod?: string }[] = [

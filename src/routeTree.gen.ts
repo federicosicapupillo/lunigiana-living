@@ -23,6 +23,7 @@ import { Route as ContattiDotaspRouteImport } from './routes/contatti[.]asp'
 import { Route as DoveComprareCasaLunigianaRouteImport } from './routes/dove-comprare-casa-lunigiana'
 import { Route as Dove_siamoDotaspRouteImport } from './routes/dove_siamo[.]asp'
 import { Route as Elenco_annunciDotaspRouteImport } from './routes/elenco_annunci[.]asp'
+import { Route as EventiPontremoliRouteImport } from './routes/eventi-pontremoli'
 import { Route as ImmobiliRouteImport } from './routes/immobili'
 import { Route as IndexDotaspRouteImport } from './routes/index[.]asp'
 import { Route as McpRouteImport } from './routes/mcp'
@@ -142,6 +143,11 @@ const Dove_siamoDotaspRoute = Dove_siamoDotaspRouteImport.update({
 const Elenco_annunciDotaspRoute = Elenco_annunciDotaspRouteImport.update({
   id: '/elenco_annunci.asp',
   path: '/elenco_annunci.asp',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EventiPontremoliRoute = EventiPontremoliRouteImport.update({
+  id: '/eventi-pontremoli',
+  path: '/eventi-pontremoli',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ImmobiliRoute = ImmobiliRouteImport.update({
@@ -410,6 +416,7 @@ export interface FileRoutesByFullPath {
   '/dove-comprare-casa-lunigiana': typeof DoveComprareCasaLunigianaRoute
   '/dove_siamo.asp': typeof Dove_siamoDotaspRoute
   '/elenco_annunci.asp': typeof Elenco_annunciDotaspRoute
+  '/eventi-pontremoli': typeof EventiPontremoliRoute
   '/immobili': typeof ImmobiliRouteWithChildren
   '/index.asp': typeof IndexDotaspRoute
   '/mcp': typeof McpRoute
@@ -473,6 +480,7 @@ export interface FileRoutesByTo {
   '/dove-comprare-casa-lunigiana': typeof DoveComprareCasaLunigianaRoute
   '/dove_siamo.asp': typeof Dove_siamoDotaspRoute
   '/elenco_annunci.asp': typeof Elenco_annunciDotaspRoute
+  '/eventi-pontremoli': typeof EventiPontremoliRoute
   '/index.asp': typeof IndexDotaspRoute
   '/mcp': typeof McpRoute
   '/mulini-storici-lunigiana': typeof MuliniStoriciLunigianaRoute
@@ -536,6 +544,7 @@ export interface FileRoutesById {
   '/dove-comprare-casa-lunigiana': typeof DoveComprareCasaLunigianaRoute
   '/dove_siamo.asp': typeof Dove_siamoDotaspRoute
   '/elenco_annunci.asp': typeof Elenco_annunciDotaspRoute
+  '/eventi-pontremoli': typeof EventiPontremoliRoute
   '/immobili': typeof ImmobiliRouteWithChildren
   '/index.asp': typeof IndexDotaspRoute
   '/mcp': typeof McpRoute
@@ -601,6 +610,7 @@ export interface FileRouteTypes {
     | '/dove-comprare-casa-lunigiana'
     | '/dove_siamo.asp'
     | '/elenco_annunci.asp'
+    | '/eventi-pontremoli'
     | '/immobili'
     | '/index.asp'
     | '/mcp'
@@ -664,6 +674,7 @@ export interface FileRouteTypes {
     | '/dove-comprare-casa-lunigiana'
     | '/dove_siamo.asp'
     | '/elenco_annunci.asp'
+    | '/eventi-pontremoli'
     | '/index.asp'
     | '/mcp'
     | '/mulini-storici-lunigiana'
@@ -726,6 +737,7 @@ export interface FileRouteTypes {
     | '/dove-comprare-casa-lunigiana'
     | '/dove_siamo.asp'
     | '/elenco_annunci.asp'
+    | '/eventi-pontremoli'
     | '/immobili'
     | '/index.asp'
     | '/mcp'
@@ -791,6 +803,7 @@ export interface RootRouteChildren {
   DoveComprareCasaLunigianaRoute: typeof DoveComprareCasaLunigianaRoute
   Dove_siamoDotaspRoute: typeof Dove_siamoDotaspRoute
   Elenco_annunciDotaspRoute: typeof Elenco_annunciDotaspRoute
+  EventiPontremoliRoute: typeof EventiPontremoliRoute
   ImmobiliRoute: typeof ImmobiliRouteWithChildren
   IndexDotaspRoute: typeof IndexDotaspRoute
   McpRoute: typeof McpRoute
@@ -924,6 +937,13 @@ declare module '@tanstack/react-router' {
       path: '/elenco_annunci.asp'
       fullPath: '/elenco_annunci.asp'
       preLoaderRoute: typeof Elenco_annunciDotaspRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/eventi-pontremoli': {
+      id: '/eventi-pontremoli'
+      path: '/eventi-pontremoli'
+      fullPath: '/eventi-pontremoli'
+      preLoaderRoute: typeof EventiPontremoliRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/immobili': {
@@ -1348,6 +1368,7 @@ const rootRouteChildren: RootRouteChildren = {
   DoveComprareCasaLunigianaRoute: DoveComprareCasaLunigianaRoute,
   Dove_siamoDotaspRoute: Dove_siamoDotaspRoute,
   Elenco_annunciDotaspRoute: Elenco_annunciDotaspRoute,
+  EventiPontremoliRoute: EventiPontremoliRoute,
   ImmobiliRoute: ImmobiliRouteWithChildren,
   IndexDotaspRoute: IndexDotaspRoute,
   McpRoute: McpRoute,

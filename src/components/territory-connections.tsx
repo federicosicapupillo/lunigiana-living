@@ -12,6 +12,7 @@ const guides = [
   { to: "/vivere-a-pontremoli", title: "Vivere a Pontremoli", body: { it: "Centro storico, zone residenziali e frazioni a confronto.", en: "Compare the historic centre, residential areas and outlying villages." } },
   { to: "/dove-comprare-casa-lunigiana", title: "Dove comprare casa in Lunigiana", body: { it: "Confronta le zone in base alle tue esigenze e alla ricerca della casa.", en: "Compare areas against your needs and property search." } },
   { to: "/mulini-storici-lunigiana", title: "Mulini storici della Lunigiana", body: { it: "Dove vedere i mulini ad acqua di Arlia e Filattiera, con fonti verificate.", en: "Where to see the water mills of Arlia and Filattiera, with sources." } },
+  { to: "/eventi-pontremoli", title: "Eventi a Pontremoli", body: { it: "Falò di gennaio, Premio Bancarella e Medievalis: date e fonti.", en: "January bonfires, Premio Bancarella and Medievalis: dates and sources." } },
 ] as const;
 
 export function TerritoryConnections() {
