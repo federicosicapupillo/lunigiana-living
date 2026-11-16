@@ -262,7 +262,7 @@ function PropertyEditor() {
     titleManual,
   ]);
 
-  const regenerateTitleAi = async () => {
+  const regenerateTitleAi = async (): Promise<string | undefined> => {
     if (!prop) return;
     setTitleGenerating(true);
     try {
@@ -272,22 +272,27 @@ function PropertyEditor() {
       update({ title: res.title });
       setTitleManual(false);
       toast.success(res.source === "ai" ? "Titolo rigenerato con IA" : "Titolo rigenerato");
+      return res.title;
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : "Errore generazione titolo";
       // Fallback locale
-      update({ title: buildFallbackTitle(prop) });
+      const fallback = buildFallbackTitle(prop);
+      update({ title: fallback });
       setTitleManual(false);
       toast.error(msg);
+      return fallback;
     } finally {
       setTitleGenerating(false);
     }
   };
 
-  const save = async (silent = false) => {
+  const save = async (silent = false, override: Partial<Property> = {}) => {
     if (!prop) return;
+    // `override` porta valori appena calcolati che lo stato React non riflette ancora.
+    const current = { ...prop, ...override };
     // Il codice annuncio è un dato commerciale modificabile: l'identità tecnica
     // dell'immobile resta l'UUID (`id`), che non viene mai toccato.
-    const referenceCode = normalizeReferenceCode(prop.reference_code);
+    const referenceCode = normalizeReferenceCode(current.reference_code);
     const refError = validateReferenceCode(referenceCode);
     if (refError) {
       toast.error(refError);
@@ -300,18 +305,18 @@ function PropertyEditor() {
     setSaving(true);
     // Lo slug è un dato tecnico interno: si genera solo se manca,
     // non viene mai rigenerato dal titolo dopo la creazione (stabilità SEO/link).
-    const existingSlug = prop.slug?.trim();
+    const existingSlug = current.slug?.trim();
     const slug =
       existingSlug && existingSlug.length > 0
         ? existingSlug
         : slugify(
-            [prop.title, prop.municipality, referenceCode]
+            [current.title, current.municipality, referenceCode]
               .filter(Boolean)
               .join(" ") || "immobile",
           );
     const { error } = await supabase
       .from("properties")
-      .update({ ...prop, reference_code: referenceCode, slug })
+      .update({ ...current, reference_code: referenceCode, slug })
       .eq("id", id);
     if (error) {
       toast.error(isDuplicateReferenceError(error) ? REFERENCE_DUPLICATE_MESSAGE : error.message);
@@ -361,12 +366,12 @@ function PropertyEditor() {
     update({ status: res.status });
   };
 
-  const runGeneration = async (mode: "overwrite" | "proposal") => {
+  const runGeneration = async (mode: "overwrite" | "proposal", override: Partial<Property> = {}) => {
     if (!prop || generating) return; // blocca doppi clic e richieste duplicate
     setGenerating(mode);
     try {
       // Auto-save first so AI sees latest data
-      await save(true);
+      await save(true, override);
       const result = await genDescFn({
         data: {
           propertyId: id,
@@ -407,9 +412,9 @@ function PropertyEditor() {
 
   // Se esiste già un testo (anche modificato a mano) la nuova generazione
   // arriva sempre come proposta: si applica solo con un'azione esplicita.
-  const generate = () => {
+  const generate = (override: Partial<Property> = {}) => {
     const current = desc?.edited_description ?? desc?.generated_description ?? "";
-    void runGeneration(current.trim() ? "proposal" : "overwrite");
+    void runGeneration(current.trim() ? "proposal" : "overwrite", override);
   };
 
   const generateProposal = () => void runGeneration("proposal");
@@ -422,8 +427,8 @@ function PropertyEditor() {
   const generateAnnouncementText = async () => {
     if (!prop || generating || titleGenerating) return;
     setTab("description");
-    if (!titleManual) await regenerateTitleAi();
-    generate();
+    const newTitle = titleManual ? undefined : await regenerateTitleAi();
+    generate(newTitle ? { title: newTitle } : {});
   };
 
   const acceptProposal = async () => {
@@ -496,7 +501,7 @@ function PropertyEditor() {
           <div className="mt-1 flex items-center gap-3 text-[11px] text-muted-foreground">
             <button
               type="button"
-              onClick={regenerateTitleAi}
+              onClick={() => void regenerateTitleAi()}
               disabled={titleGenerating}
               className="inline-flex items-center gap-1 rounded-sm border border-border bg-background px-2 py-1 uppercase tracking-wider hover:border-primary/50 disabled:opacity-50"
             >
@@ -622,7 +627,7 @@ function PropertyEditor() {
             desc={desc}
             setDesc={setDesc}
             generating={generating}
-            onGenerate={generate}
+            onGenerate={() => generate()}
             onGenerateProposal={generateProposal}
             proposal={proposal}
             onAcceptProposal={acceptProposal}
